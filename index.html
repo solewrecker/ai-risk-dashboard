@@ -122,8 +122,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('dashboard_data.json')
-                .then(response => response.json())
+            fetch('./dashboard_data.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const grid = document.getElementById('tool-grid');
                     data.forEach(tool => {
