@@ -63,96 +63,160 @@
     "name": "Maestro Labs TeamsMaestro Notetaker",
     "score": 63,
     "risk_level": "HIGH RISK (60-79 points) 🟠",
-    "details": {
+    "category": "Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "15/25",
       "Training Usage": "23/25",
       "Access Controls": "18/20",
       "Compliance": "5/20",
       "Vendor Transparency": "2/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US/EU servers), Encryption: 4 (unspecified standards), Retention: 8 (vague policy)",
+      "Training Usage": "Training: 20 (CRITICAL RISK - shares data with third-party AI models with no opt-out), Sharing: 3 (shares with partners)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 7 (no audit trail), Integration: 3 (Teams only)",
+      "Compliance": "Violations: 0 (Strong GDPR compliance), Transparency: 5 (some gaps)",
+      "Vendor Transparency": "Good privacy policy but limited security documentation."
     }
   },
   {
     "name": "Read.ai (Free/Basic)",
     "score": 61,
     "risk_level": "HIGH RISK (60-79 points) 🟠",
-    "details": {
+    "category": "Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "6/25",
       "Training Usage": "13/25",
       "Access Controls": "20/20",
       "Compliance": "17/20",
       "Vendor Transparency": "5/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 2 (AWS us-east-1), Encryption: 2 (AES-256 at rest, TLS 1.2 in transit), Retention: 2 (configurable deletion)",
+      "Training Usage": "Training: 8 (default training use with opt-out), Sharing: 5 (shares with third parties as 'necessary')",
+      "Access Controls": "Admin: 8 (No enterprise controls), Audit: 7 (No audit capabilities), Integration: 5 (No SSO)",
+      "Compliance": "Violations: 10 (No HIPAA compliance), Transparency: 7 (vague sharing language)",
+      "Vendor Transparency": "Limited documentation on data practices."
     }
   },
   {
     "name": "GitHub Copilot Personal",
     "score": 56,
     "risk_level": "MEDIUM RISK (35-59 points) 🟡",
-    "details": {
+    "category": "Developer Tool",
+    "breakdown": {
       "Data Storage & Security": "11/25",
       "Training Usage": "15/25",
       "Access Controls": "15/20",
       "Compliance": "15/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (Microsoft infra), Encryption: 2 (TLS in transit, Azure encryption at rest), Retention: 6 (90-day retention)",
+      "Training Usage": "Training: 10 (opt-in for training), Sharing: 5 (shared with Microsoft/OpenAI)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 5 (basic tracking), Integration: 2 (GitHub integration)",
+      "Compliance": "Violations: 15 (No HIPAA compliance)",
+      "Vendor Transparency": "Excellent Microsoft documentation."
     }
   },
   {
     "name": "Fireflies.ai Free",
     "score": 52,
     "risk_level": "MEDIUM RISK (35-59 points) 🟡",
-    "details": {
+    "category": "Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "8/25",
       "Training Usage": "0/25",
       "Access Controls": "20/20",
       "Compliance": "20/20",
       "Vendor Transparency": "4/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US servers), Encryption: 2 (AES-256), Retention: 3 (user can delete)",
+      "Training Usage": "Training: 0 (no training by default), Sharing: 0 (BAA with vendors)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 7 (no audit trail), Integration: 5 (basic)",
+      "Compliance": "Violations: 15 (HIPAA compliance is Enterprise only)",
+      "Vendor Transparency": "Generally clear, some gaps on data retention exceptions."
     }
   },
   {
     "name": "ChatGPT Enterprise",
     "score": 50,
     "risk_level": "MEDIUM RISK (35-59 points) 🟡",
-    "details": {
+    "category": "Enterprise AI Platform",
+    "breakdown": {
       "Data Storage & Security": "10/25",
       "Training Usage": "0/25",
       "Access Controls": "4/20",
       "Compliance": "12/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (controlled regions), Encryption: 2 (AES-256), Retention: 5 (configurable but no guaranteed short-term deletion)",
+      "Training Usage": "Training: 0 (ZDR guarantee), Sharing: 0 (data isolation)",
+      "Access Controls": "Admin: 0 (comprehensive controls), Audit: 0 (detailed logging), Integration: 2 (SSO support)",
+      "Compliance": "Violations: 12 (CRITICAL GAP: No HIPAA BAA available)",
+      "Vendor Transparency": "Excellent enterprise documentation and trust portal."
     }
   },
   {
     "name": "Cursor IDE",
     "score": 48,
     "risk_level": "MEDIUM RISK (35-59 points) 🟡",
-    "details": {
+    "category": "Developer Tool",
+    "breakdown": {
       "Data Storage & Security": "15/25",
       "Training Usage": "8/25",
       "Access Controls": "12/20",
       "Compliance": "12/20",
       "Vendor Transparency": "1/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (AWS US/Tokyo/London), Encryption: 4 (visible in memory unencrypted), Retention: 8 (exists in memory for 'minutes to hours')",
+      "Training Usage": "Training: 5 (Privacy Mode prevents training), Sharing: 3 (transmitted to providers for inference)",
+      "Access Controls": "Admin: 3 (enforced privacy mode), Audit: 7 (limited audit), Integration: 2 (VS Code compatible)",
+      "Compliance": "Violations: 12 (CRITICAL HIPAA LIMITATION: not suitable for PHI)",
+      "Vendor Transparency": "Excellent transparency in security docs."
     }
   },
   {
     "name": "Maestro Labs TeamsMaestro Notetaker Enterprise",
     "score": 38,
     "risk_level": "MEDIUM RISK (35-59 points) 🟡",
-    "details": {
+    "category": "Enterprise Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "12/25",
       "Training Usage": "8/25",
       "Access Controls": "12/20",
       "Compliance": "6/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US only), Encryption: 2 (SOC 2 implies standards), Retention: 7 (concerning default retention > 90 days)",
+      "Training Usage": "Training: 5 (negotiated restrictions for enterprise), Sharing: 3 (controlled sharing)",
+      "Access Controls": "Admin: 6 (enhanced controls), Audit: 3 (comprehensive logging), Integration: 3 (native Teams/SSO)",
+      "Compliance": "Violations: 1 (SOC 2 Type 2 certified, but no HIPAA compliance)",
+      "Vendor Transparency": "Excellent transparency via Microsoft app certification."
     }
   },
   {
     "name": "Read.ai Enterprise",
     "score": 28,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Enterprise Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "6/25",
       "Training Usage": "0/25",
       "Access Controls": "14/20",
       "Compliance": "5/20",
       "Vendor Transparency": "3/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 2 (AWS us-east-1), Encryption: 2 (AES-256), Retention: 2 (configurable deletion)",
+      "Training Usage": "Training: 0 (opt-out by default), Sharing: 0 (no data selling)",
+      "Access Controls": "Admin: 6 (some user controls), Audit: 5 (basic tracking), Integration: 3 (basic platform integration)",
+      "Compliance": "Violations: 5 (HIPAA BAA available for Enterprise+ plan)",
+      "Vendor Transparency": "Limited documentation on some data practices."
     }
   },
   {
@@ -179,12 +243,20 @@
     "name": "Grammarly Business",
     "score": 25,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Enterprise Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "8/25",
       "Training Usage": "3/25",
       "Access Controls": "6/20",
       "Compliance": "0/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (business tier controls), Encryption: 2 (encrypted processing), Retention: 3 (configurable)",
+      "Training Usage": "Training: 3 (limited training use), Sharing: 0 (business isolation)",
+      "Access Controls": "Admin: 0 (admin dashboard), Audit: 3 (basic tracking), Integration: 2 (business SSO)",
+      "Compliance": "Violations: 0 (established compliance), Transparency: 0 (clear scope)",
+      "Vendor Transparency": "Excellent business documentation."
     }
   },
   {
@@ -211,48 +283,80 @@
     "name": "Claude Enterprise/Teams",
     "score": 22,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Enterprise AI Platform",
+    "breakdown": {
       "Data Storage & Security": "5/25",
       "Training Usage": "0/25",
       "Access Controls": "8/20",
       "Compliance": "9/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 0 (US-based infra), Encryption: 2 (AES-256), Retention: 3 (custom deletion policies)",
+      "Training Usage": "Training: 0 (contractual guarantee), Sharing: 0 (data isolation)",
+      "Access Controls": "Admin: 0 (comprehensive controls), Audit: 3 (detailed logs), Integration: 5 (SSO support)",
+      "Compliance": "Violations: 9 (CRITICAL LIMITATION: Not covered by HIPAA BAA)",
+      "Vendor Transparency": "Excellent enterprise documentation."
     }
   },
   {
     "name": "Fathom AI (Business)",
     "score": 21,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Enterprise Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "8/25",
       "Training Usage": "4/25",
       "Access Controls": "8/20",
       "Compliance": "1/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US/Canada), Encryption: 0 (AES-256), Retention: 5 (retained as needed)",
+      "Training Usage": "Training: 2 (no training on user data), Sharing: 2 (no sharing with AI sub-processors)",
+      "Access Controls": "Admin: 3 (some enterprise features), Audit: 3 (basic audit), Integration: 2 (extensive integrations)",
+      "Compliance": "Violations: 1 (HIPAA, SOC2, GDPR compliant)",
+      "Vendor Transparency": "Comprehensive security documentation (SOC2 audit)."
     }
   },
   {
     "name": "Fireflies.ai Enterprise",
     "score": 18,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Enterprise Productivity Tool",
+    "breakdown": {
       "Data Storage & Security": "8/25",
       "Training Usage": "0/25",
       "Access Controls": "8/20",
       "Compliance": "2/20",
       "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US-based), Encryption: 2 (AES-256), Retention: 3 (custom policies)",
+      "Training Usage": "Training: 0 (0-day retention policy), Sharing: 0 (no external sharing)",
+      "Access Controls": "Admin: 0 (super admin), Audit: 5 (enhanced monitoring), Integration: 3 (SSO support)",
+      "Compliance": "Violations: 0 (SOC 2, GDPR, HIPAA compliant), Transparency: 2 (minor gaps)",
+      "Vendor Transparency": "Comprehensive security documentation."
     }
   },
   {
     "name": "Self-hosted Ollama",
     "score": 8,
     "risk_level": "LOW RISK (0-34 points) 🟢",
-    "details": {
+    "category": "Self-Hosted Model",
+    "breakdown": {
       "Data Storage & Security": "0/25",
       "Training Usage": "0/25",
       "Access Controls": "5/20",
       "Compliance": "0/20",
       "Vendor Transparency": "3/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 0 (local control), Encryption: 0 (local implementation), Retention: 0 (local policies)",
+      "Training Usage": "Training: 0 (no external training), Sharing: 0 (local only)",
+      "Access Controls": "Admin: 3 (depends on setup), Audit: 2 (local logging), Integration: 0 (local control)",
+      "Compliance": "Violations: 0 (no external data flow), Transparency: 0 (local deployment)",
+      "Vendor Transparency": "Open source with community documentation."
     }
   }
 ] 
