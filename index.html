@@ -128,22 +128,28 @@
             border-radius: 8px;
             padding: 1rem;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
         }
 
         .breakdown-box .score {
             font-size: 1.75rem;
             font-weight: 600;
             color: var(--heading-color);
+            display: none; /* This hides the sub-scores */
         }
         
         .breakdown-box .label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #6c757d;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin-top: 0.5rem;
+            margin-top: 0; /* Removed margin that was spacing it from the score */
+            font-weight: 500;
         }
 
         .breakdown-box .label svg {
