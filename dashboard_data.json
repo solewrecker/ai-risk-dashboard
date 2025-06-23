@@ -1,0 +1,258 @@
+[
+  {
+    "name": "ChatGPT Free",
+    "score": 82,
+    "risk_level": "CRITICAL RISK (80-100 points) 🔴",
+    "category": "Public AI Platform",
+    "breakdown": {
+      "Data Storage & Security": "20/25",
+      "Training Usage": "25/25",
+      "Access Controls": "20/20",
+      "Compliance": "15/20",
+      "Vendor Transparency": "2/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 6 (unclear server locations), Encryption: 4 (lacks customer key control), Retention: 10 (indefinite retention)",
+      "Training Usage": "Training: 20 (default use), Sharing: 5 (shared with third parties)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 7 (no audit trail), Integration: 5 (no SSO)",
+      "Compliance": "Violations: 15 (Not HIPAA compliant, high GDPR risk)",
+      "Vendor Transparency": "Limited transparency on data processing locations and third-party relationships."
+    }
+  },
+  {
+    "name": "123 Notetaker AI",
+    "score": 87,
+    "risk_level": "CRITICAL RISK (80-100 points) 🔴",
+    "category": "Productivity Tool",
+    "breakdown": {
+      "Data Storage & Security": "17/25",
+      "Training Usage": "25/25",
+      "Access Controls": "20/20",
+      "Compliance": "20/20",
+      "Vendor Transparency": "5/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US servers), Encryption: 4 (lacks enterprise-grade standards), Retention: 10 (unclear active retention policy)",
+      "Training Usage": "Training: 20 (no guarantee against training use), Sharing: 5 (unclear internal use)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 7 (no audit trail), Integration: 5 (Teams only)",
+      "Compliance": "Violations: 15 (CRITICAL GAPS - Not compliant with HIPAA, SOC 2, ISO 27001, etc.)",
+      "Vendor Transparency": "Lacks comprehensive security documentation and detailed data handling policies."
+    }
+  },
+  {
+    "name": "Claude Free",
+    "score": 68,
+    "risk_level": "HIGH RISK (60-79 points) 🟠",
+    "category": "Public AI Platform",
+    "breakdown": {
+      "Data Storage & Security": "15/25",
+      "Training Usage": "5/25",
+      "Access Controls": "20/20",
+      "Compliance": "10/20",
+      "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (US servers), Encryption: 4 (vendor-controlled keys), Retention: 8 (90-day retention for safety monitoring)",
+      "Training Usage": "Training: 0 (strong no-training policy), Sharing: 5 (limited sharing for trust & safety)",
+      "Access Controls": "Admin: 8 (no enterprise controls), Audit: 7 (no audit capabilities), Integration: 5 (basic OAuth)",
+      "Compliance": "Violations: 10 (Regulatory risks for HIPAA/SOX, better GDPR alignment)",
+      "Vendor Transparency": "Excellent policy documentation and clear data handling practices."
+    }
+  },
+  {
+    "name": "Maestro Labs TeamsMaestro Notetaker",
+    "score": 63,
+    "risk_level": "HIGH RISK (60-79 points) 🟠",
+    "details": {
+      "Data Storage & Security": "15/25",
+      "Training Usage": "23/25",
+      "Access Controls": "18/20",
+      "Compliance": "5/20",
+      "Vendor Transparency": "2/10"
+    }
+  },
+  {
+    "name": "Read.ai (Free/Basic)",
+    "score": 61,
+    "risk_level": "HIGH RISK (60-79 points) 🟠",
+    "details": {
+      "Data Storage & Security": "6/25",
+      "Training Usage": "13/25",
+      "Access Controls": "20/20",
+      "Compliance": "17/20",
+      "Vendor Transparency": "5/10"
+    }
+  },
+  {
+    "name": "GitHub Copilot Personal",
+    "score": 56,
+    "risk_level": "MEDIUM RISK (35-59 points) 🟡",
+    "details": {
+      "Data Storage & Security": "11/25",
+      "Training Usage": "15/25",
+      "Access Controls": "15/20",
+      "Compliance": "15/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Fireflies.ai Free",
+    "score": 52,
+    "risk_level": "MEDIUM RISK (35-59 points) 🟡",
+    "details": {
+      "Data Storage & Security": "8/25",
+      "Training Usage": "0/25",
+      "Access Controls": "20/20",
+      "Compliance": "20/20",
+      "Vendor Transparency": "4/10"
+    }
+  },
+  {
+    "name": "ChatGPT Enterprise",
+    "score": 50,
+    "risk_level": "MEDIUM RISK (35-59 points) 🟡",
+    "details": {
+      "Data Storage & Security": "10/25",
+      "Training Usage": "0/25",
+      "Access Controls": "4/20",
+      "Compliance": "12/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Cursor IDE",
+    "score": 48,
+    "risk_level": "MEDIUM RISK (35-59 points) 🟡",
+    "details": {
+      "Data Storage & Security": "15/25",
+      "Training Usage": "8/25",
+      "Access Controls": "12/20",
+      "Compliance": "12/20",
+      "Vendor Transparency": "1/10"
+    }
+  },
+  {
+    "name": "Maestro Labs TeamsMaestro Notetaker Enterprise",
+    "score": 38,
+    "risk_level": "MEDIUM RISK (35-59 points) 🟡",
+    "details": {
+      "Data Storage & Security": "12/25",
+      "Training Usage": "8/25",
+      "Access Controls": "12/20",
+      "Compliance": "6/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Read.ai Enterprise",
+    "score": 28,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "6/25",
+      "Training Usage": "0/25",
+      "Access Controls": "14/20",
+      "Compliance": "5/20",
+      "Vendor Transparency": "3/10"
+    }
+  },
+  {
+    "name": "GitHub Copilot Enterprise",
+    "score": 27,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "category": "Developer Tool",
+    "breakdown": {
+      "Data Storage & Security": "8/25",
+      "Training Usage": "0/25",
+      "Access Controls": "4/20",
+      "Compliance": "15/20",
+      "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 3 (Microsoft enterprise), Encryption: 2 (SOC 2 Type II compliant), Retention: 3 (configurable)",
+      "Training Usage": "Training: 0 (contractual guarantee against training), Sharing: 0 (no external sharing)",
+      "Access Controls": "Admin: 0 (full enterprise controls), Audit: 2 (180-day logging), Integration: 2 (enterprise GitHub)",
+      "Compliance": "Violations: 15 (Lacks HIPAA compliance, unsuitable for healthcare PHI)",
+      "Vendor Transparency": "Excellent Microsoft documentation."
+    }
+  },
+  {
+    "name": "Grammarly Business",
+    "score": 25,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "8/25",
+      "Training Usage": "3/25",
+      "Access Controls": "6/20",
+      "Compliance": "0/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Microsoft Copilot (M365) Enterprise",
+    "score": 23,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "category": "Enterprise Productivity AI",
+    "breakdown": {
+      "Data Storage & Security": "5/25",
+      "Training Usage": "0/25",
+      "Access Controls": "2/20",
+      "Compliance": "8/20",
+      "Vendor Transparency": "0/10"
+    },
+    "details": {
+      "Data Storage & Security": "Geographic: 0 (tenant-controlled), Encryption: 2 (Purview integrated), Retention: 3 (follows M365 policies)",
+      "Training Usage": "Training: 0 (contractual guarantee), Sharing: 0 (tenant isolation)",
+      "Access Controls": "Admin: 0 (full M365 integration), Audit: 0 (Purview audit logging), Integration: 2 (native M365)",
+      "Compliance": "Violations: 8 (Web search functionality is EXCLUDED from HIPAA coverage)",
+      "Vendor Transparency": "Excellent Microsoft enterprise documentation and compliance certifications."
+    }
+  },
+  {
+    "name": "Claude Enterprise/Teams",
+    "score": 22,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "5/25",
+      "Training Usage": "0/25",
+      "Access Controls": "8/20",
+      "Compliance": "9/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Fathom AI (Business)",
+    "score": 21,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "8/25",
+      "Training Usage": "4/25",
+      "Access Controls": "8/20",
+      "Compliance": "1/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Fireflies.ai Enterprise",
+    "score": 18,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "8/25",
+      "Training Usage": "0/25",
+      "Access Controls": "8/20",
+      "Compliance": "2/20",
+      "Vendor Transparency": "0/10"
+    }
+  },
+  {
+    "name": "Self-hosted Ollama",
+    "score": 8,
+    "risk_level": "LOW RISK (0-34 points) 🟢",
+    "details": {
+      "Data Storage & Security": "0/25",
+      "Training Usage": "0/25",
+      "Access Controls": "5/20",
+      "Compliance": "0/20",
+      "Vendor Transparency": "3/10"
+    }
+  }
+] 

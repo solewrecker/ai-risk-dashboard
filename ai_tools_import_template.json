@@ -1,0 +1,792 @@
+
+{
+  "metadata": {
+    "version": "1.0",
+    "importDate": "2024-07-25T12:00:00.000Z",
+    "description": "AI Tool Risk Assessment Import from Framework"
+  },
+  "tools": [
+    {
+      "name": "ChatGPT Free",
+      "category": "Public AI Platform",
+      "dataStorage": 20,
+      "trainingUsage": 25,
+      "accessControls": 20,
+      "complianceRisk": 15,
+      "vendorTransparency": 2,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "non-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 6, "note": "unclear server locations, global OpenAI infrastructure without data residency controls" },
+          "encryption": { "score": 4, "note": "basic TLS encryption in transit and at rest, but lacks enterprise-grade encryption with customer key control" },
+          "retention": { "score": 10, "note": "indefinite retention policy - conversations stored indefinitely unless manually deleted by user, with 30-day hard deletion after user deletion but may retain de-identified data for training purposes" }
+        },
+        "trainingUsage": {
+          "training": { "score": 20, "note": "all conversations used for model training by default with opt-out available but conversations may still be used in de-identified form" },
+          "sharing": { "score": 5, "note": "data shared with third-party AI model providers and potentially across OpenAI's various services" }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "no enterprise admin controls, individual user accounts only, no organizational oversight capabilities" },
+          "audit": { "score": 7, "note": "no audit trail visibility, no usage monitoring, no compliance reporting capabilities" },
+          "integration": { "score": 5, "note": "no enterprise SSO, no domain management, basic OAuth integration only" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 15, "note": "ChatGPT Free is explicitly not HIPAA compliant - OpenAI does not sign Business Associate Agreements (BAAs), lacks built-in PHI encryption and access restrictions per HIPAA guidelines, high GDPR risk due to indefinite data retention and training use, actively blocks PII processing in images but text-based PII can still be submitted and retained" },
+          "transparency": { "score": 0, "note": "reasonably clear privacy policies but implementation gaps in data handling practices" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 2, "note": "reasonably clear privacy policies and terms of service, but significant gaps in implementation details about data processing locations, third-party AI provider relationships, and specific data handling procedures" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: unclear server locations, global OpenAI infrastructure without data residency controls. Encryption: basic TLS encryption in transit and at rest, but lacks enterprise-grade encryption with customer key control. Retention: indefinite retention policy - conversations stored indefinitely unless manually deleted by user, with 30-day hard deletion after user deletion but may retain de-identified data for training purposes.",
+        "trainingUsage": "Training: all conversations used for model training by default with opt-out available but conversations may still be used in de-identified form. Sharing: data shared with third-party AI model providers and potentially across OpenAI's various services.",
+        "accessControls": "Admin: no enterprise admin controls, individual user accounts only, no organizational oversight capabilities. Audit: no audit trail visibility, no usage monitoring, no compliance reporting capabilities. Integration: no enterprise SSO, no domain management, basic OAuth integration only.",
+        "complianceRisk": "Violations: ChatGPT Free is explicitly not HIPAA compliant - OpenAI does not sign Business Associate Agreements (BAAs), lacks built-in PHI encryption and access restrictions per HIPAA guidelines, high GDPR risk due to indefinite data retention and training use, actively blocks PII processing in images but text-based PII can still be submitted and retained. Transparency: reasonably clear privacy policies but implementation gaps in data handling practices.",
+        "vendorTransparency": "Reasonably clear privacy policies and terms of service, but significant gaps in implementation details about data processing locations, third-party AI provider relationships, and specific data handling procedures."
+      }
+    },
+    {
+      "name": "123 Notetaker AI",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 17,
+      "trainingUsage": 25,
+      "accessControls": 20,
+      "complianceRisk": 20,
+      "vendorTransparency": 5,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "non-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Microsoft documentation confirms data stored in \"USA von Amerika\" - US jurisdiction provides basic data protection framework" },
+          "encryption": { "score": 4, "note": "supports TLS 1.1 or higher per Microsoft certification, but lacks enterprise-grade encryption standards like AES-256 specification" },
+          "retention": { "score": 10, "note": "concerning retention policy - while Microsoft certification states \"less than 30 days\" after account termination, no clarity on active retention periods or user control over data deletion during active use" }
+        },
+        "trainingUsage": {
+          "training": { "score": 20, "note": "Microsoft certification shows no contractual guarantee against training use - app processes \"User-ID, Email, Meeting-ID, Audio and Video\" with unclear training restrictions, high risk for AI model improvement without explicit opt-out" },
+          "sharing": { "score": 5, "note": "Microsoft certification states \"No\" to third-party data transfer, but lacks transparency about internal data use and potential future sharing arrangements" }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "no enterprise admin controls - basic Microsoft Teams integration only, no organizational oversight or user management capabilities" },
+          "audit": { "score": 7, "note": "no audit trail capabilities - no usage monitoring, compliance reporting, or activity logging for enterprise governance" },
+          "integration": { "score": 5, "note": "limited to Microsoft Teams integration only - no SSO, domain management, or enterprise identity management" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 15, "note": "CRITICAL COMPLIANCE GAPS: Microsoft certification explicitly confirms 123 Notetaker AI is NOT compliant with HIPAA, SOC 2, ISO 27001, FERPA, COPPA, SOX, FedRAMP, or any major regulatory framework - creates severe compliance violations for healthcare, finance, education, and government sectors handling regulated data" },
+          "transparency": { "score": 5, "note": "privacy policy exists but Microsoft certification reveals significant gaps - no clear data processing documentation, unclear training use policies, insufficient breach notification procedures" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 5, "note": "Microsoft app certification provides some transparency but reveals concerning gaps - BlueSky Apps lacks comprehensive security documentation, no detailed data handling policies, minimal vendor communication channels, and absence of enterprise-grade support infrastructure" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: Microsoft documentation confirms data stored in \"USA von Amerika\" - US jurisdiction provides basic data protection framework. Encryption: supports TLS 1.1 or higher per Microsoft certification, but lacks enterprise-grade encryption standards like AES-256 specification. Retention: concerning retention policy - while Microsoft certification states \"less than 30 days\" after account termination, no clarity on active retention periods or user control over data deletion during active use.",
+        "trainingUsage": "Training: Microsoft certification shows no contractual guarantee against training use - app processes \"User-ID, Email, Meeting-ID, Audio and Video\" with unclear training restrictions, high risk for AI model improvement without explicit opt-out. Sharing: Microsoft certification states \"No\" to third-party data transfer, but lacks transparency about internal data use and potential future sharing arrangements.",
+        "accessControls": "Admin: no enterprise admin controls - basic Microsoft Teams integration only, no organizational oversight or user management capabilities. Audit: no audit trail capabilities - no usage monitoring, compliance reporting, or activity logging for enterprise governance. Integration: limited to Microsoft Teams integration only - no SSO, domain management, or enterprise identity management.",
+        "complianceRisk": "Violations: CRITICAL COMPLIANCE GAPS: Microsoft certification explicitly confirms 123 Notetaker AI is NOT compliant with HIPAA, SOC 2, ISO 27001, FERPA, COPPA, SOX, FedRAMP, or any major regulatory framework. Transparency: privacy policy exists but Microsoft certification reveals significant gaps.",
+        "vendorTransparency": "Microsoft app certification provides some transparency but reveals concerning gaps - BlueSky Apps lacks comprehensive security documentation, no detailed data handling policies, minimal vendor communication channels, and absence of enterprise-grade support infrastructure."
+      }
+    },
+    {
+      "name": "Claude Free",
+      "category": "Public AI Platform",
+      "dataStorage": 15,
+      "trainingUsage": 5,
+      "accessControls": 20,
+      "complianceRisk": 10,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "partial-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Anthropic US servers with clear data residency documentation" },
+          "encryption": { "score": 4, "note": "encrypted in transit via TLS and at rest, but vendor-controlled keys without customer key management" },
+          "retention": { "score": 8, "note": "conversations retained for 90 days for safety monitoring, then deleted unless flagged for trust & safety review - clearer than \"unclear retention policies\"" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "strong contractual no-training policy - \"We don't train Claude on your conversations\"" },
+          "sharing": { "score": 5, "note": "limited sharing only for trust & safety purposes, not for commercial use or broad data sharing" }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "no enterprise admin controls, individual accounts only" },
+          "audit": { "score": 7, "note": "no organizational usage tracking or audit capabilities" },
+          "integration": { "score": 5, "note": "basic OAuth integration, no enterprise SSO or domain management" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 10, "note": "external data processing creates regulatory risks for HIPAA/SOX compliance, but better GDPR alignment due to no training use and clearer retention policies" },
+          "transparency": { "score": 0, "note": "clear and comprehensive privacy policies with detailed explanations" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent policy documentation, detailed Constitutional AI explanations, clear data handling practices, responsive support documentation" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: Anthropic US servers with clear data residency documentation. Encryption: encrypted in transit via TLS and at rest, but vendor-controlled keys without customer key management. Retention: conversations retained for 90 days for safety monitoring, then deleted unless flagged for trust & safety review.",
+        "trainingUsage": "Training: strong contractual no-training policy - \"We don't train Claude on your conversations\". Sharing: limited sharing only for trust & safety purposes, not for commercial use or broad data sharing.",
+        "accessControls": "Admin: no enterprise admin controls, individual accounts only. Audit: no organizational usage tracking or audit capabilities. Integration: basic OAuth integration, no enterprise SSO or domain management.",
+        "complianceRisk": "Violations: external data processing creates regulatory risks for HIPAA/SOX compliance, but better GDPR alignment due to no training use and clearer retention policies. Transparency: clear and comprehensive privacy policies with detailed explanations.",
+        "vendorTransparency": "Excellent policy documentation, detailed Constitutional AI explanations, clear data handling practices, responsive support documentation."
+      }
+    },
+    {
+      "name": "Read.ai (Free/Basic)",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 6,
+      "trainingUsage": 13,
+      "accessControls": 20,
+      "complianceRisk": 17,
+      "vendorTransparency": 5,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "partial-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 2, "note": "Specifically, data captured is stored encrypted at rest within the AWS us-east-1 datacenter in Northern Virginia" },
+          "encryption": { "score": 2, "note": "Read encrypts all data in transit with HTTPS with TLS 1.2, and encrypts all data at rest with AES-256" },
+          "retention": { "score": 2, "note": "automatically delete data after a certain number of days as specified by the organization. This is commonly used by organizations with compliance or tight security constraintss" }
+        },
+        "trainingUsage": {
+          "training": { "score": 8, "note": "Free versions often use data for training by default (with opt-out)" },
+          "sharing": { "score": 5, "note": "No, Read does not sell user data, and will not share user data with third parties except as \"necessary\" to perform the functions of our business. Your data is kept private and only used to provide the service to you. You have full control of what gets shared with whom." }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "No enterprise admin controls" },
+          "audit": { "score": 7, "note": "No audit capabilities for free users" },
+          "integration": { "score": 5, "note": "No SSO or domain management" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 10, "note": "No HIPAA compliance in free version" },
+          "transparency": { "score": 7, "note": "some privacy controls but gaps - vague language when it comes to \"Sharing Data\"" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 5, "note": "limited documentation on data practices" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: data captured is stored encrypted at rest within the AWS us-east-1 datacenter in Northern Virginia. Encryption: Read encrypts all data in transit with HTTPS with TLS 1.2, and encrypts all data at rest with AES-256. Retention: automatically delete data after a certain number of days as specified by the organization.",
+        "trainingUsage": "Training: Free versions often use data for training by default (with opt-out). Sharing: Will not share user data with third parties except as \"necessary\" to perform the functions of our business.",
+        "accessControls": "Admin: No enterprise admin controls. Audit: No audit capabilities for free users. Integration: No SSO or domain management.",
+        "complianceRisk": "Violations: No HIPAA compliance in free version. Transparency: some privacy controls but gaps - vague language when it comes to \"Sharing Data\".",
+        "vendorTransparency": "Limited documentation on data practices."
+      }
+    },
+    {
+      "name": "Maestro Labs Notetaker",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 12,
+      "trainingUsage": 20,
+      "accessControls": 15,
+      "complianceRisk": 8,
+      "vendorTransparency": 2,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "in the United States and the European Union" },
+          "encryption": { "score": 4, "note": "basic encryption likely" },
+          "retention": { "score": 5, "note": "retention periods vary depending on the type of data, contractual commitments, and regulatory requirements\" with \"customized retention settings for enterprise clients" }
+        },
+        "trainingUsage": {
+          "training": { "score": 15, "note": "we share email content and user instructions with third-party AI models as part of Maestro Lab's functionality" },
+          "sharing": { "score": 5, "note": "trusted third-party service providers\" for \"AI processing, transcription services" }
+        },
+        "accessControls": {
+          "admin": { "score": 6, "note": "retention settings may be customized as agreed upon" },
+          "audit": { "score": 5, "note": "basic tracking" },
+          "integration": { "score": 4, "note": "Limited to Teams integration" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 8, "note": "They have GDPR compliance measures, data protection clauses, and appointed DPO,but automatic meeting capture still presents risks" },
+          "transparency": { "score": 0, "note": "Very comprehensive privacy policy with clear data processing explanations" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 2, "note": "Extremely comprehensive privacy policy, clear data processing explanations, appointed DPO, contact information, and detailed cookie policy" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: in the United States and the European Union. Encryption: basic encryption likely. Retention: retention periods vary depending on the type of data, contractual commitments, and regulatory requirements with customized retention settings for enterprise clients.",
+        "trainingUsage": "Training: we share email content and user instructions with third-party AI models as part of Maestro Lab's functionality. Sharing: trusted third-party service providers for AI processing, transcription services.",
+        "accessControls": "Admin: retention settings may be customized as agreed upon. Audit: basic tracking. Integration: Limited to Teams integration.",
+        "complianceRisk": "Violations: They have GDPR compliance measures, data protection clauses, and appointed DPO, but automatic meeting capture still presents risks. Transparency: Very comprehensive privacy policy with clear data processing explanations.",
+        "vendorTransparency": "Extremely comprehensive privacy policy, clear data processing explanations, appointed DPO, contact information, and detailed cookie policy."
+      }
+    },
+    {
+      "name": "GitHub Copilot Personal",
+      "category": "Developer Tool",
+      "dataStorage": 11,
+      "trainingUsage": 15,
+      "accessControls": 15,
+      "complianceRisk": 15,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "partial-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Microsoft/GitHub infrastructure" },
+          "encryption": { "score": 2, "note": "The transmitted data is encrypted both in transit and at rest; Copilot-related data is encrypted in transit using transport layer security (TLS), and for any data we retain at rest using Microsoft Azure’s data encryption (FIPS Publication 140-2 standards)" },
+          "retention": { "score": 6, "note": "GitHub is updating retention policies with 90-day limits for user activity data starting February 2025" }
+        },
+        "trainingUsage": {
+          "training": { "score": 10, "note": "While by default, personal data is not used for AI model training, individual users of the free version of GitHub Copilot can opt-in to allow their code snippets to be used for product improvements, including potentially fine-tuning the models" },
+          "sharing": { "score": 5, "note": "code shared with Microsoft/OpenAI for model improvement" }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "no enterprise controls" },
+          "audit": { "score": 5, "note": "Basic tracking" },
+          "integration": { "score": 2, "note": "GitHub integration" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 15, "note": "Both GitHub Copilot Personal and Enterprise should receive additional penalty points for no HIPAA compliance" },
+          "transparency": { "score": 0, "note": "clear documentation" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent Microsoft documentation" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: Microsoft/GitHub infrastructure. Encryption: The transmitted data is encrypted both in transit and at rest. Retention: 90-day limits for user activity data starting February 2025.",
+        "trainingUsage": "Training: Can opt-in to allow code snippets to be used for product improvements. Sharing: code shared with Microsoft/OpenAI for model improvement.",
+        "accessControls": "Admin: no enterprise controls. Audit: Basic tracking. Integration: GitHub integration.",
+        "complianceRisk": "Violations: No HIPAA compliance. Transparency: clear documentation.",
+        "vendorTransparency": "Excellent Microsoft documentation."
+      }
+    },
+    {
+      "name": "Fireflies.ai Free",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 8,
+      "trainingUsage": 0,
+      "accessControls": 20,
+      "complianceRisk": 20,
+      "vendorTransparency": 4,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Data processed in US servers with clear data privacy framework compliance" },
+          "encryption": { "score": 2, "note": "256-bit AES encryption for data at rest and TLS for data in transit" },
+          "retention": { "score": 3, "note": "Data saved for at least 12 months minimum, but users can delete individual meetings immediately with immediate purging from systems - however there may be circumstances where Fireflies.ai retains data even after deletion request due to legal obligations" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "\"You own your data. We don't train on it by default unlike other AI companies\" and \"0-day retention policy ensures that your meeting data is never used for AI model training\"" },
+          "sharing": { "score": 0, "note": "Business Associate Agreement (BAA) signed with OpenAI and other third-party ASR vendors ensuring no data storage on their systems and no training use" }
+        },
+        "accessControls": {
+          "admin": { "score": 8, "note": "Free plan lacks enterprise admin controls, individual user accounts only" },
+          "audit": { "score": 7, "note": "No comprehensive audit trail capabilities for free users" },
+          "integration": { "score": 5, "note": "Basic meeting platform integration, no enterprise SSO or domain management" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 15, "note": "While SOC 2 Type II, GDPR compliant, HIPAA-BAA compliance is Enterprise only - free users lack HIPAA protection creating compliance gaps for healthcare organizations" },
+          "transparency": { "score": 5, "note": "Some policy gaps regarding data retention exceptions and international data transfers to \"countries other than the country in which the Personal Information was collected\"" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 4, "note": "Generally clear security documentation but some implementation gaps around data deletion exceptions and international transfers" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: Data processed in US servers with clear data privacy framework compliance. Encryption: 256-bit AES encryption for data at rest and TLS for data in transit. Retention: Data saved for at least 12 months minimum, but users can delete individual meetings immediately.",
+        "trainingUsage": "Training: 0-day retention policy ensures that your meeting data is never used for AI model training. Sharing: BAA signed with vendors ensuring no data storage on their systems and no training use.",
+        "accessControls": "Admin: Free plan lacks enterprise admin controls. Audit: No comprehensive audit trail for free users. Integration: Basic meeting platform integration, no enterprise SSO.",
+        "complianceRisk": "Violations: HIPAA-BAA compliance is Enterprise only. Transparency: Some policy gaps regarding data retention exceptions and international data transfers.",
+        "vendorTransparency": "Generally clear security documentation but some implementation gaps."
+      }
+    },
+    {
+      "name": "ChatGPT Enterprise",
+      "category": "Enterprise AI Platform",
+      "dataStorage": 10,
+      "trainingUsage": 0,
+      "accessControls": 4,
+      "complianceRisk": 12,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "enterprise data residency in controlled regions with some geographic flexibility" },
+          "encryption": { "score": 2, "note": "AES-256 encryption at rest, TLS 1.2+ in transit, comprehensive encryption standards" },
+          "retention": { "score": 5, "note": "configurable policies but no guaranteed short-term deletion, 30-day post-removal deletion only applies to user-initiated deletions" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "zero data retention (ZDR) available with contractual guarantee data never used for model training" },
+          "sharing": { "score": 0, "note": "complete data isolation in enterprise tier, no third-party sharing" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "comprehensive enterprise admin controls, workspace management, user provisioning, role-based access" },
+          "audit": { "score": 0, "note": "detailed usage logging, conversation history, activity monitoring dashboard" },
+          "integration": { "score": 2, "note": "enterprise SSO with SAML/OIDC support, limited API integration" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 12, "note": "SOC 2 Type 1 certified progressing to Type 2, but CRITICAL GAP: OpenAI does not offer HIPAA Business Associate Agreements for ChatGPT Enterprise, creating major compliance barriers for healthcare, legal, and financial services handling regulated data" },
+          "transparency": { "score": 0, "note": "comprehensive enterprise policies, dedicated trust portal, clear data processing documentation" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent enterprise documentation, responsive support, detailed trust and safety portal" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: enterprise data residency in controlled regions. Encryption: AES-256 at rest, TLS 1.2+ in transit. Retention: configurable policies but no guaranteed short-term deletion.",
+        "trainingUsage": "Training: zero data retention (ZDR) available. Sharing: complete data isolation.",
+        "accessControls": "Admin: comprehensive enterprise admin controls. Audit: detailed usage logging. Integration: enterprise SSO with SAML/OIDC support.",
+        "complianceRisk": "Violations: OpenAI does not offer HIPAA BAAs for ChatGPT Enterprise. Transparency: comprehensive enterprise policies.",
+        "vendorTransparency": "Excellent enterprise documentation, responsive support, detailed trust and safety portal."
+      }
+    },
+    {
+      "name": "Cursor IDE",
+      "category": "Developer Tool",
+      "dataStorage": 15,
+      "trainingUsage": 8,
+      "accessControls": 12,
+      "complianceRisk": 12,
+      "vendorTransparency": 1,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "partial-compliant",
+        "sox": "non-compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Cursor's infrastructure is primarily hosted on AWS with most servers in the US, and some in Tokyo and London - no data residency outside secure jurisdictions" },
+          "encryption": { "score": 4, "note": "Privacy mode users have data encrypted with client-generated keys for file caching, but code data is visible in server memory during request processing and transmitted unencrypted to multiple third-party AI providers for inference - not true end-to-end encryption" },
+          "retention": { "score": 8, "note": "Code data exists in memory for request duration plus \"minutes to hours\" for background jobs and temporary caching - while not permanently stored, this extended memory retention creates compliance risks for sensitive data" }
+        },
+        "trainingUsage": {
+          "training": { "score": 5, "note": "With Privacy Mode enabled, code is never stored or used for training by Cursor or any third-party AI providers - Privacy mode is available to all users and forcibly enabled for team members with automatic enforcement via parallel infrastructure to prevent accidental exposure" },
+          "sharing": { "score": 3, "note": "Zero data retention agreements with OpenAI, Anthropic, Google Vertex, xAI, and Fireworks - however code data is still transmitted to multiple AI providers even in privacy mode for inference processing" }
+        },
+        "accessControls": {
+          "admin": { "score": 3, "note": "Privacy mode is automatically enforced for team members with server-side validation every 5 minutes - team-level privacy overrides individual settings" },
+          "audit": { "score": 7, "note": "Still limited audit capabilities for individual users - basic usage tracking but no comprehensive enterprise audit logs" },
+          "integration": { "score": 2, "note": "Decent enterprise features available with VS Code extension compatibility" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 12, "note": "CRITICAL HIPAA/PII LIMITATION: While SOC 2 Type II certified with annual penetration testing, Cursor explicitly warns users in \"highly sensitive environments\" to \"be careful when using Cursor (or any other AI tool)\" - NO HIPAA BAA available, code containing PII/PHI transmitted to multiple third-party AI providers even in privacy mode for inference processing, extended memory retention during background jobs creates compliance gaps, making it unsuitable for healthcare organizations handling protected health information despite privacy mode guarantees for general development" },
+          "transparency": { "score": 0, "note": "Excellent transparency in their security documentation with detailed subprocessor list and data flow explanations" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 1, "note": "Comprehensive security documentation at trust.cursor.com and cursor.com/security, but security posture depends on underlying AI providers - transparent about current limitations and ongoing security improvements" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: AWS in US, Tokyo, London. Encryption: Not true end-to-end encryption. Retention: Code data exists in memory for request duration plus \"minutes to hours\".",
+        "trainingUsage": "Training: With Privacy Mode, code is never stored or used for training. Sharing: Code data transmitted to multiple AI providers for inference.",
+        "accessControls": "Admin: Privacy mode is automatically enforced for team members. Audit: Limited audit capabilities. Integration: VS Code extension compatibility.",
+        "complianceRisk": "Violations: NO HIPAA BAA available. Unsuitable for healthcare organizations. Transparency: Excellent transparency in security documentation.",
+        "vendorTransparency": "Comprehensive security documentation, but security posture depends on underlying AI providers."
+      }
+    },
+    {
+      "name": "Read.ai Enterprise",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 6,
+      "trainingUsage": 0,
+      "accessControls": 14,
+      "complianceRisk": 5,
+      "vendorTransparency": 3,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 2, "note": "Specifically, data captured is stored encrypted at rest within the AWS us-east-1 datacenter in Northern Virginia" },
+          "encryption": { "score": 2, "note": "Read encrypts all data in transit with HTTPS with TLS 1.2, and encrypts all data at rest with AES-256" },
+          "retention": { "score": 2, "note": "automatically delete data after a certain number of days as specified by the organization. This is commonly used by organizations with compliance or tight security constraintss" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "Contributing to our model is completely optional, and opt-out by default" },
+          "sharing": { "score": 0, "note": "we don't sell your data to anyone - period" }
+        },
+        "accessControls": {
+          "admin": { "score": 6, "note": "some user controls available" },
+          "audit": { "score": 5, "note": "basic usage tracking" },
+          "integration": { "score": 3, "note": "basic meeting platform integration" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 5, "note": "Read is now able to offer a BAA to support HIPAA compliance. Due to the advanced security features required, this is only supported for users on our Enterprise+ plan, and it is required to setup both SAML authentication and domain capture for the workspace before proceeding with signing the BAA" },
+          "transparency": { "score": 0, "note": "some privacy controls but gaps" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 3, "note": "limited documentation on data practices" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: AWS us-east-1. Encryption: TLS 1.2 and AES-256. Retention: Configurable deletion.",
+        "trainingUsage": "Training: Opt-out by default. Sharing: No selling of data.",
+        "accessControls": "Admin: Some user controls. Audit: Basic tracking. Integration: Basic meeting platform integration.",
+        "complianceRisk": "Violations: BAA available for HIPAA compliance on Enterprise+ plan. Transparency: Some privacy controls but gaps.",
+        "vendorTransparency": "Limited documentation on data practices."
+      }
+    },
+    {
+      "name": "GitHub Copilot Enterprise",
+      "category": "Developer Tool",
+      "dataStorage": 8,
+      "trainingUsage": 0,
+      "accessControls": 4,
+      "complianceRisk": 15,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Microsoft enterprise" },
+          "encryption": { "score": 2, "note": "SOC 2 Type II compliance, which GitHub Copilot Enterprise does maintain" },
+          "retention": { "score": 3, "note": "configurable, not used for training" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "contractual guarantee - Enterprise data never used for training" },
+          "sharing": { "score": 0, "note": "no external sharing" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "full enterprise controls" },
+          "audit": { "score": 2, "note": "180-day comprehensive logging" },
+          "integration": { "score": 2, "note": "enterprise GitHub" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 15, "note": "Both tiers lack HIPAA compliance and are unsuitable for healthcare organizations handling PHI, regardless of other security features." },
+          "transparency": { "score": 0, "note": "clear policies" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent documentation" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: Microsoft enterprise. Encryption: SOC 2 Type II compliant. Retention: configurable, not used for training.",
+        "trainingUsage": "Training: Contractual guarantee - no training. Sharing: No external sharing.",
+        "accessControls": "Admin: Full enterprise controls. Audit: 180-day logging. Integration: Enterprise GitHub.",
+        "complianceRisk": "Violations: Lacks HIPAA compliance. Transparency: Clear policies.",
+        "vendorTransparency": "Excellent documentation."
+      }
+    },
+    {
+      "name": "Grammarly Business",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 8,
+      "trainingUsage": 3,
+      "accessControls": 6,
+      "complianceRisk": 0,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "business tier controls" },
+          "encryption": { "score": 2, "note": "encrypted processing" },
+          "retention": { "score": 3, "note": "configurable" }
+        },
+        "trainingUsage": {
+          "training": { "score": 3, "note": "limited training use" },
+          "sharing": { "score": 0, "note": "business isolation" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "admin dashboard" },
+          "audit": { "score": 3, "note": "basic tracking" },
+          "integration": { "score": 2, "note": "business SSO" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 0, "note": "established compliance" },
+          "transparency": { "score": 0, "note": "clear scope" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent business docs" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: business tier controls. Encryption: encrypted processing. Retention: configurable.",
+        "trainingUsage": "Training: limited training use. Sharing: business isolation.",
+        "accessControls": "Admin: admin dashboard. Audit: basic tracking. Integration: business SSO.",
+        "complianceRisk": "Violations: established compliance. Transparency: clear scope.",
+        "vendorTransparency": "Excellent business docs."
+      }
+    },
+    {
+      "name": "Microsoft Copilot (M365) Enterprise",
+      "category": "Enterprise AI Platform",
+      "dataStorage": 5,
+      "trainingUsage": 0,
+      "accessControls": 2,
+      "complianceRisk": 8,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 0, "note": "tenant-controlled data residency with Microsoft's global infrastructure, follows M365 data location commitments" },
+          "encryption": { "score": 2, "note": "AES-256 encryption at rest, TLS encryption in transit, integrated with Microsoft Purview encryption standards" },
+          "retention": { "score": 3, "note": "follows tenant's existing M365 retention policies, inherits organizational data governance settings" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "contractual guarantee - Microsoft does not use M365 Copilot customer data for LLM training, data stays within tenant boundary" },
+          "sharing": { "score": 0, "note": "complete tenant isolation, no external data sharing, respects M365 data residency requirements" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "full M365 admin center integration, granular permissions, role-based access control through Azure AD" },
+          "audit": { "score": 0, "note": "comprehensive Microsoft Purview audit logging, eDiscovery integration, detailed usage analytics" },
+          "integration": { "score": 2, "note": "native M365 integration across all apps, inherits existing SSO and conditional access policies" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 8, "note": "CRITICAL LIMITATION: While M365 Copilot supports HIPAA compliance under Microsoft's BAA, web search functionality is explicitly excluded from HIPAA coverage and can inadvertently expose PHI to Bing services not covered by BAA - requires careful configuration and monitoring to prevent PHI leakage" },
+          "transparency": { "score": 0, "note": "comprehensive Microsoft compliance documentation, Service Trust Portal, clear data processing descriptions" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "excellent Microsoft enterprise documentation, detailed compliance certifications, responsive enterprise support" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: tenant-controlled data residency. Encryption: AES-256, integrated with Purview. Retention: follows M365 retention policies.",
+        "trainingUsage": "Training: No training on customer data. Sharing: complete tenant isolation.",
+        "accessControls": "Admin: full M365 admin center integration. Audit: comprehensive Purview audit logging. Integration: native M365 integration.",
+        "complianceRisk": "Violations: Web search functionality is excluded from HIPAA coverage. Transparency: comprehensive Microsoft compliance documentation.",
+        "vendorTransparency": "Excellent Microsoft enterprise documentation."
+      }
+    },
+    {
+      "name": "Claude Enterprise/Teams",
+      "category": "Enterprise AI Platform",
+      "dataStorage": 5,
+      "trainingUsage": 0,
+      "accessControls": 8,
+      "complianceRisk": 9,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "non-compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "non-compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 0, "note": "Anthropic US-based infrastructure with clear data residency controls and AWS hosting in specified regions" },
+          "encryption": { "score": 2, "note": "AES-256 encryption at rest and TLS 1.2+ in transit with enterprise-grade security standards" },
+          "retention": { "score": 3, "note": "custom data retention controls available for Enterprise customers, configurable deletion policies, with default 90-day retention that can be customized down to immediate deletion" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "contractual guarantee that Enterprise customer data is never used for model training under any circumstances" },
+          "sharing": { "score": 0, "note": "complete data isolation for Enterprise customers, no third-party sharing or cross-customer data exposure" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "comprehensive enterprise admin controls including user management, role-based access, organizational oversight, and usage monitoring" },
+          "audit": { "score": 3, "note": "detailed audit logs and usage analytics available, but limited compared to full enterprise security platforms" },
+          "integration": { "score": 5, "note": "SSO support available but limited compared to Microsoft/Google enterprise ecosystems" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 9, "note": "CRITICAL LIMITATION: Claude Enterprise/Teams plans are explicitly NOT covered by Anthropic's HIPAA BAA - only specific API customers with zero data retention agreements qualify for HIPAA compliance, making standard Enterprise plans unsuitable for healthcare PHI processing despite other strong security features" },
+          "transparency": { "score": 0, "note": "excellent documentation of enterprise data handling practices and security measures" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "comprehensive enterprise documentation, clear security certifications, detailed privacy policies, and responsive enterprise support" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: US-based with clear residency controls. Encryption: AES-256 and TLS 1.2+. Retention: Custom data retention controls.",
+        "trainingUsage": "Training: No training on enterprise data. Sharing: complete data isolation.",
+        "accessControls": "Admin: comprehensive enterprise admin controls. Audit: detailed audit logs. Integration: limited SSO support.",
+        "complianceRisk": "Violations: Not covered by Anthropic's HIPAA BAA. Transparency: excellent documentation.",
+        "vendorTransparency": "Comprehensive enterprise documentation and support."
+      }
+    },
+    {
+      "name": "Fathom AI (Business)",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 8,
+      "trainingUsage": 4,
+      "accessControls": 8,
+      "complianceRisk": 1,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "Fathom AI stores all its data in AWS cloud data centers located within the United States and Canada" },
+          "encryption": { "score": 0, "note": "RDS encryption uses the industry standard AES-256 encryption algorithm to encrypt the data. S3 data is also encrypted using the industry standard AES-256 encryption method" },
+          "retention": { "score": 5, "note": "Fathom.ai keeps personal information for as long as it's needed for the purposes it was collected for, or as long as required by law or regulatory obligations" }
+        },
+        "trainingUsage": {
+          "training": { "score": 2, "note": "We don't train our AI on your data. No AI Training: We use pre-trained AI services (OpenAI, Anthropic, Google, etc), and we don't permit them to use your personal or company data for development purposes" },
+          "sharing": { "score": 2, "note": "No! Neither Fathom nor any of our AI sub-processors (OpenAI or Anthropic)" }
+        },
+        "accessControls": {
+          "admin": { "score": 3, "note": "some enterprise management features" },
+          "audit": { "score": 3, "note": "basic audit capabilities" },
+          "integration": { "score": 2, "note": "extensive integration with business tools" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 1, "note": "Fathom is HIPAA, SOC2 Type II, and GDPR-compliant and has passed extensive security reviews by Zoom" },
+          "transparency": { "score": 0, "note": "clear security documentation" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "comprehensive security documentation including SOC2 audit" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: AWS in US and Canada. Encryption: AES-256. Retention: Kept as long as needed.",
+        "trainingUsage": "Training: No training on your data. Sharing: No sharing with sub-processors.",
+        "accessControls": "Admin: some enterprise management features. Audit: basic audit capabilities. Integration: extensive integration.",
+        "complianceRisk": "Violations: HIPAA, SOC2 Type II, and GDPR-compliant. Transparency: clear security documentation.",
+        "vendorTransparency": "Comprehensive security documentation including SOC2 audit."
+      }
+    },
+    {
+      "name": "Fireflies.ai Enterprise",
+      "category": "Enterprise Productivity AI",
+      "dataStorage": 8,
+      "trainingUsage": 0,
+      "accessControls": 8,
+      "complianceRisk": 2,
+      "vendorTransparency": 0,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 3, "note": "US-based infrastructure with Private Storage options available for Enterprise customers to store data at preferred location" },
+          "encryption": { "score": 2, "note": "256-bit AES encryption for data at rest and TLS for data in transit with enterprise security features" },
+          "retention": { "score": 3, "note": "Custom Data Retention policies available for Enterprise with user-controlled deletion" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "Contractual 0-day retention policy ensures Enterprise data never used for AI model training" },
+          "sharing": { "score": 0, "note": "Enterprise BAAs with all AI vendors ensure no external data sharing or storage" }
+        },
+        "accessControls": {
+          "admin": { "score": 0, "note": "Super Admin status provides full meeting access control and workspace management" },
+          "audit": { "score": 5, "note": "Enhanced monitoring capabilities but limited compared to full enterprise platforms" },
+          "integration": { "score": 3, "note": "Single Sign-On (SSO) support with secure team access" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 0, "note": "SOC 2 Type II, GDPR, and HIPAA-BAA compliant for Enterprise customers providing complete PHI protection" },
+          "transparency": { "score": 2, "note": "Some minor gaps in detailed implementation documentation" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 0, "note": "Comprehensive security documentation, compliance certifications, and clear enterprise policies" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: US-based with Private Storage options. Encryption: AES-256 and TLS. Retention: Custom data retention policies.",
+        "trainingUsage": "Training: 0-day retention policy. Sharing: No external data sharing or storage.",
+        "accessControls": "Admin: Super Admin status. Audit: Enhanced monitoring. Integration: SSO support.",
+        "complianceRisk": "Violations: SOC 2, GDPR, HIPAA-BAA compliant. Transparency: Some minor gaps in documentation.",
+        "vendorTransparency": "Comprehensive security documentation, compliance certifications, and clear enterprise policies."
+      }
+    },
+    {
+      "name": "Self-hosted Ollama",
+      "category": "Self-hosted Open Source",
+      "dataStorage": 0,
+      "trainingUsage": 0,
+      "accessControls": 5,
+      "complianceRisk": 0,
+      "vendorTransparency": 3,
+      "compliance": {
+        "hipaa": "compliant",
+        "gdpr": "compliant",
+        "sox": "compliant",
+        "pci": "compliant"
+      },
+      "lastUpdated": "2024-07-25",
+      "subScores": {
+        "dataStorage": {
+          "geographic": { "score": 0, "note": "local control" },
+          "encryption": { "score": 0, "note": "local implementation" },
+          "retention": { "score": 0, "note": "local policies" }
+        },
+        "trainingUsage": {
+          "training": { "score": 0, "note": "no external training" },
+          "sharing": { "score": 0, "note": "local only" }
+        },
+        "accessControls": {
+          "admin": { "score": 3, "note": "depends on local setup" },
+          "audit": { "score": 2, "note": "local logging" },
+          "integration": { "score": 0, "note": "local control" }
+        },
+        "complianceRisk": {
+          "violations": { "score": 0, "note": "no external data flow" },
+          "transparency": { "score": 0, "note": "local deployment" }
+        },
+        "vendorTransparency": {
+          "score": { "score": 3, "note": "open source, community docs" }
+        }
+      },
+      "details": {
+        "dataStorage": "Geographic: local control. Encryption: local implementation. Retention: local policies.",
+        "trainingUsage": "Training: no external training. Sharing: local only.",
+        "accessControls": "Admin: depends on local setup. Audit: local logging. Integration: local control.",
+        "complianceRisk": "Violations: no external data flow. Transparency: local deployment.",
+        "vendorTransparency": "Open source, community docs."
+      }
+    }
+  ]
+}

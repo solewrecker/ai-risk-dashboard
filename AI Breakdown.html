@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tool Risk Assessment Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .executive-summary {
+            background: #ecf0f1;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 5px solid #3498db;
+        }
+
+        .executive-summary h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .key-findings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .finding-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #ecf0f1;
+            text-align: center;
+        }
+
+        .finding-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .critical { color: #e74c3c; }
+        .high { color: #f39c12; }
+        .medium { color: #f1c40f; }
+        .low { color: #27ae60; }
+
+        .risk-section {
+            margin: 40px 0;
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .critical-header { background: #fdf2ef; color: #c0392b; border-left: 5px solid #e74c3c; }
+        .high-header { background: #fef9e7; color: #d68910; border-left: 5px solid #f39c12; }
+        .medium-header { background: #fefbea; color: #b7950b; border-left: 5px solid #f1c40f; }
+        .low-header { background: #eafaf1; color: #196f3d; border-left: 5px solid #27ae60; }
+
+        .tool-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tool-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .risk-score {
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .critical-score { background: #e74c3c; }
+        .high-score { background: #f39c12; }
+        .medium-score { background: #f1c40f; color: #2c3e50; }
+        .low-score { background: #27ae60; }
+
+        .risk-factors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .factor {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+
+        .factor-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .factor-detail {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .recommendations {
+            background: #e8f5e8;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+            border-left: 5px solid #27ae60;
+        }
+
+        .recommendations h2 {
+            color: #196f3d;
+            margin-bottom: 20px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d5dbdb;
+        }
+
+        .action-title {
+            font-weight: bold;
+            color: #196f3d;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            background: #fdf6e3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 5px solid #f39c12;
+            font-size: 0.9rem;
+            color: #8b6914;
+        }
+
+        .methodology-note {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .tool-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Tool Risk Assessment</h1>
+            <p class="subtitle">Enterprise Security & Compliance Analysis</p>
+        </div>
+
+        <div class="content">
+            <div class="executive-summary">
+                <h2>Executive Summary</h2>
+                <p>Our comprehensive risk assessment evaluated 16 AI tools across multiple security, compliance, and governance dimensions. The analysis reveals significant variations in risk profiles, with several tools presenting critical compliance gaps that require immediate attention.</p>
+                
+                <div class="key-findings">
+                    <div class="finding-card">
+                        <div class="finding-number critical">2</div>
+                        <div>Critical Risk Tools</div>
+                        <small>Require immediate blocking</small>
+                    </div>
+                    <div class="finding-card">
+                        <div class="finding-number high">3</div>
+                        <div>High Risk Tools</div>
+                        <small>Need significant controls</small>
+                    </div>
+                    <div class="finding-card">
+                        <div class="finding-number medium">5</div>
+                        <div>Medium Risk Tools</div>
+                        <small>Standard controls required</small>
+                    </div>
+                    <div class="finding-card">
+                        <div class="finding-number low">6</div>
+                        <div>Low Risk Tools</div>
+                        <small>Basic monitoring sufficient</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Critical Risk Section -->
+            <div class="risk-section">
+                <div class="risk-header critical-header">
+                    🔴 CRITICAL RISK - Immediate Action Required
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">ChatGPT Free</div>
+                        <div class="risk-score critical-score">82</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Training Data Usage</div>
+                            <div class="factor-detail">All conversations used for model training by default</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Compliance Gaps</div>
+                            <div class="factor-detail">Not HIPAA compliant, no Business Associate Agreement available</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Data Retention</div>
+                            <div class="factor-detail">Indefinite retention policy with limited user control</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Access Controls</div>
+                            <div class="factor-detail">No enterprise admin oversight or audit capabilities</div>
+                        </div>
+                    </div>
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem;">
+                        <strong>⚠️ If Use Required:</strong> Never input confidential data, customer information, or regulated content. Consider as public forum. Manually delete conversations immediately after use.
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">123 Notetaker AI</div>
+                        <div class="risk-score critical-score">87</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Compliance Violations</div>
+                            <div class="factor-detail">Not compliant with HIPAA, SOC 2, ISO 27001, or any major regulatory framework</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Training Data Usage</div>
+                            <div class="factor-detail">No contractual guarantee against training use of meeting audio/video</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Data Retention</div>
+                            <div class="factor-detail">Unclear retention periods during active use</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Enterprise Controls</div>
+                            <div class="factor-detail">No organizational oversight or audit capabilities</div>
+                        </div>
+                    </div>
+                    <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #721c24;">
+                        <strong>🚫 Immediate Removal Required:</strong> Uninstall from all devices. Existing recordings may already be compromised. No safe usage scenario exists.
+                    </div>
+                </div>
+            </div>
+
+            <!-- High Risk Section -->
+            <div class="risk-section">
+                <div class="risk-header high-header">
+                    🟠 HIGH RISK - Significant Controls Needed
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Claude Free</div>
+                        <div class="risk-score high-score">68</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Strong Training Policy</div>
+                            <div class="factor-detail">Contractual guarantee against training use</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Access Limitations</div>
+                            <div class="factor-detail">No enterprise admin controls or audit capabilities</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Compliance Risk</div>
+                            <div class="factor-detail">External processing creates regulatory risks for HIPAA/SOX</div>
+                        </div>
+                    </div>
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem;">
+                        <strong>⏹️ Controlled Use Only:</strong> Limit to non-confidential research and brainstorming. No customer data, PII, or proprietary information. Monitor usage patterns.
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Read.ai (Free/Basic)</div>
+                        <div class="risk-score high-score">61</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Data Security</div>
+                            <div class="factor-detail">Strong encryption (AES-256) with US-based storage</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Training Concerns</div>
+                            <div class="factor-detail">Free versions may use data for training with opt-out available</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Enterprise Gaps</div>
+                            <div class="factor-detail">No admin controls or audit capabilities in free version</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medium Risk Section -->
+            <div class="risk-section">
+                <div class="risk-header medium-header">
+                    🟡 MEDIUM RISK - Standard Enterprise Controls Required
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Maestro Labs Notetaker</div>
+                        <div class="risk-score medium-score">57</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">GDPR Compliance</div>
+                            <div class="factor-detail">Strong privacy policy with appointed Data Protection Officer</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Data Sharing</div>
+                            <div class="factor-detail">Shares content with third-party AI models for processing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">GitHub Copilot Personal</div>
+                        <div class="risk-score medium-score">56</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Training Policy</div>
+                            <div class="factor-detail">Personal data not used by default, opt-in available for improvements</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Compliance Gap</div>
+                            <div class="factor-detail">No HIPAA compliance available</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">ChatGPT Enterprise</div>
+                        <div class="risk-score medium-score">50</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Strong Security</div>
+                            <div class="factor-detail">Zero data retention option with no training use</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">HIPAA Limitation</div>
+                            <div class="factor-detail">No Business Associate Agreement available despite enterprise features</div>
+                        </div>
+                    </div>
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #155724;">
+                        <strong>✅ Enterprise Ready:</strong> Enable zero data retention (ZDR). Suitable for general business use. Upgrade path available for enhanced features.
+                    </div>
+                    <div style="background: #e6bd7f; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem;">
+                        <strong>⏹️ Controlled Use Only:</strong> SOC 2 Type 1 certified progressing to Type 2, but CRITICAL GAP: OpenAI does not offer HIPAA Business Associate Agreements for ChatGPT Enterprise, creating major compliance barriers for healthcare, legal, and financial services handling regulated data
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Cursor IDE</div>
+                        <div class="risk-score medium-score">48</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Privacy Mode</div>
+                            <div class="factor-detail">Strong privacy protections with no training use when enabled</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Compliance Warning</div>
+                            <div class="factor-detail">Vendor warns against use in highly sensitive environments</div>
+                        </div>
+                    </div>
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #155724;">
+                        <strong>✅ Enterprise Ready:</strong> Privacy mode is automatically enforced for team members with server-side validation every 5 minutes - team-level privacy overrides individual settings. With Privacy Mode enabled, code is never stored or used for training by Cursor or any third-party AI providers - Privacy mode is available to all users and forcibly enabled for team members with automatic enforcement via parallel infrastructure to prevent accidental exposure
+                    </div>
+                    <div style="background: #e6bd7f;; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem;">
+                        <strong>⚙️ Configuration Required:</strong> NO HIPAA BAA available, code containing PII/PHI transmitted to multiple third-party AI providers even in privacy mode for inference processing, extended memory retention during background jobs creates compliance gaps, making it unsuitable for healthcare organizations handling protected health information despite privacy mode guarantees for general development
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Fireflies.ai Free</div>
+                        <div class="risk-score medium-score">47</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Strong Training Policy</div>
+                            <div class="factor-detail">Zero-day retention policy, no training use by default</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Limited Controls</div>
+                            <div class="factor-detail">No enterprise admin or audit capabilities in free version</div>
+                        </div>
+                    </div><div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #155724;">
+                        <strong>✅ Enterprise Ready:</strong> Enable zero data retention (ZDR). Suitable for general business use. Upgrade path available for enhanced features.
+                    </div>
+                    <div style="background: #e6bd7f; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem;">
+                        <strong>⏹️ Controlled Use Only:</strong> SOC 2 Type 1 certified progressing to Type 2, but CRITICAL GAP: OpenAI does not offer HIPAA Business Associate Agreements for ChatGPT Enterprise, creating major compliance barriers for healthcare, legal, and financial services handling regulated data
+                </div>
+                </div>
+            </div>
+
+            <!-- Low Risk Section -->
+            <div class="risk-section">
+                <div class="risk-header low-header">
+                    🟢 LOW RISK - Basic Monitoring Sufficient
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Read.ai Enterprise</div>
+                        <div class="risk-score low-score">28</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">HIPAA Compliance</div>
+                            <div class="factor-detail">BAA available for Enterprise+ with SAML authentication</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">No Training Use</div>
+                            <div class="factor-detail">Opt-out by default with contractual guarantees</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">GitHub Copilot Enterprise</div>
+                        <div class="risk-score low-score">27</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Enterprise Security</div>
+                            <div class="factor-detail">SOC 2 Type II compliance with comprehensive logging</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">HIPAA Gap</div>
+                            <div class="factor-detail">Still lacks HIPAA compliance for healthcare organizations</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Microsoft Copilot (M365) Enterprise</div>
+                        <div class="risk-score low-score">23</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Strong Integration</div>
+                            <div class="factor-detail">Native M365 integration with comprehensive admin controls</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">HIPAA Limitation</div>
+                            <div class="factor-detail">Web search functionality excluded from HIPAA coverage</div>
+                        </div>
+                    </div>
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #155724;">
+                        <strong>🏢 Recommended:</strong> Excellent for M365 environments. Disable web search for HIPAA compliance. Comprehensive admin controls available.
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Claude Enterprise/Teams</div>
+                        <div class="risk-score low-score">22</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Excellent Security</div>
+                            <div class="factor-detail">No training use with comprehensive enterprise controls</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">HIPAA Limitation</div>
+                            <div class="factor-detail">Standard plans not covered by HIPAA BAA</div>
+                        </div>
+                    </div>
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 15px; font-size: 0.9rem; color: #155724;">
+                        <strong>🏅 Top Choice:</strong> Excellent privacy controls and enterprise features. Custom retention settings available. Ideal for sensitive business use.
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Fathom AI (Business)</div>
+                        <div class="risk-score low-score">21</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Full Compliance</div>
+                            <div class="factor-detail">HIPAA, SOC2 Type II, and GDPR compliant</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Strong Security</div>
+                            <div class="factor-detail">AES-256 encryption with no AI training use</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">Self-hosted Ollama</div>
+                        <div class="risk-score low-score">8</div>
+                    </div>
+                    <div class="risk-factors">
+                        <div class="factor">
+                            <div class="factor-label">Complete Control</div>
+                            <div class="factor-detail">Local deployment with full data sovereignty</div>
+                        </div>
+                        <div class="factor">
+                            <div class="factor-label">Implementation Dependent</div>
+                            <div class="factor-detail">Security depends on local setup and maintenance</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <h2>Immediate Recommendations</h2>
+                
+                <div class="action-grid">
+                    <div class="action-card">
+                        <div class="action-title">🚫 Immediate Blocking</div>
+                        <ul>
+                            <li>ChatGPT Free - Block at network level</li>
+                            <li>123 Notetaker AI - Remove from approved tools</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-title">⚠️ High Risk Controls</div>
+                        <ul>
+                            <li>Audit current usage of Claude Free and Read.ai Basic</li>
+                            <li>Implement usage restrictions and monitoring</li>
+                            <li>Consider enterprise alternatives</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-title">✅ Approved Enterprise Tools</div>
+                        <ul>
+                            <li>Microsoft Copilot (M365) - Best overall integration</li>
+                            <li>Claude Enterprise - Excellent privacy controls</li>
+                            <li>Fathom AI Business - Full HIPAA compliance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-title">📋 Policy Development</div>
+                        <ul>
+                            <li>Create AI acceptable use policy</li>
+                            <li>Establish approval process for new tools</li>
+                            <li>Implement user training program</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                <strong>Important Note:</strong> Risk scores may vary based on departmental use cases and data sensitivity. Tools used in Legal, Finance, HR, or Healthcare contexts may require additional scrutiny beyond base risk assessments. Contact the assessment team for department-specific evaluations.
+            </div>
+
+            <div class="methodology-note">
+                Assessment conducted using proprietary risk evaluation framework considering data security, compliance requirements, access controls, and vendor transparency across enterprise security standards.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
