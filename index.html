@@ -478,6 +478,11 @@
             <p>Enterprise-grade security analysis for AI tools and platforms</p>
         </div>
 
+        <!-- Login Section -->
+        <div id="loginSection">
+            <!-- Login UI will be populated by JavaScript -->
+        </div>
+
         <!-- Progress Indicator -->
         <div class="progress-container">
             <div class="progress-steps">
@@ -684,6 +689,98 @@
         
         // Initialize Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Authentication state
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Check auth state on load
+        supabase.auth.onAuthStateChange((event, session) => {
+            currentUser = session?.user || null;
+            isAdmin = session?.user?.user_metadata?.role === 'admin';
+            updateUIForAuth();
+        });
+
+        function updateUIForAuth() {
+            const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
+            const loginSection = document.getElementById('loginSection');
+            
+            if (saveButton) {
+                if (isAdmin) {
+                    saveButton.style.display = 'inline-flex';
+                    saveButton.innerHTML = '💾 Save to Database (Admin)';
+                } else {
+                    saveButton.style.display = 'none';
+                }
+            }
+            
+            if (loginSection) {
+                if (currentUser) {
+                    loginSection.innerHTML = `
+                        <div style="text-align: center; margin-bottom: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 0.5rem; border: 1px solid #bbf7d0;">
+                            <span style="color: #166534;">✓ Logged in as: ${currentUser.email}</span>
+                            ${isAdmin ? '<span style="color: #dc2626; margin-left: 0.5rem;">[ADMIN]</span>' : ''}
+                            <button onclick="signOut()" style="margin-left: 1rem; padding: 0.25rem 0.5rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 0.25rem; color: #991b1b; cursor: pointer;">Sign Out</button>
+                        </div>
+                    `;
+                } else {
+                    loginSection.innerHTML = `
+                        <div id="authContainer" style="text-align: center; margin-bottom: 1rem; padding: 1rem; background: #fffbeb; border-radius: 0.5rem; border: 1px solid #fed7aa;">
+                            <div style="margin-bottom: 0.5rem; color: #92400e; font-weight: 600;">Admin Access Required for Database Operations</div>
+                            <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                                <input type="email" id="adminEmail" placeholder="Admin Email" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; min-width: 200px;">
+                                <input type="password" id="adminPassword" placeholder="Admin Password" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; min-width: 150px;">
+                                <button onclick="signInAdmin()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600;">Admin Sign In</button>
+                            </div>
+                            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Public assessments don't require login</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function signInAdmin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Check if user has admin role
+                if (data.user?.user_metadata?.role !== 'admin') {
+                    await supabase.auth.signOut();
+                    showMessage('Access denied: Admin privileges required', 'error');
+                    return;
+                }
+                
+                showMessage('Admin login successful', 'success');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Login failed: ' + error.message, 'error');
+            }
+        }
+
+        async function signOut() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                showMessage('Signed out successfully', 'success');
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showMessage('Sign out failed: ' + error.message, 'error');
+            }
+        }
 
         // Data Classification Multipliers (hidden from UI)
         const DATA_CLASSIFICATION_MULTIPLIERS = {
@@ -1616,6 +1713,12 @@
         }
 
         async function saveToDatabase() {
+            // Security check: Only admins can save to database
+            if (!isAdmin) {
+                showMessage('Access denied: Admin privileges required to save assessments', 'error');
+                return;
+            }
+
             if (!currentAssessment) {
                 showMessage('No assessment to save', 'error');
                 return;
@@ -1626,7 +1729,7 @@
                     .from('ai_tools')
                     .insert([{
                         name: currentAssessment.results.toolName,
-                        score: currentAssessment.results.finalScore,
+                        total_score: currentAssessment.results.finalScore,
                         risk_level: currentAssessment.results.riskLevel.toUpperCase() + ' RISK',
                         category: currentAssessment.formData.toolCategory || 'Other',
                         breakdown: currentAssessment.results.breakdown,
@@ -1634,16 +1737,24 @@
                             formData: currentAssessment.formData,
                             recommendations: currentAssessment.results.recommendations
                         },
-                        assessed_by: 'Assessment Tool v2.0',
-                        notes: `Data Classification: ${currentAssessment.formData.dataClassification}`
+                        assessed_by: `Admin: ${currentUser.email}`,
+                        notes: `Data Classification: ${currentAssessment.formData.dataClassification}`,
+                        created_at: new Date().toISOString()
                     }]);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Database error details:', error);
+                    throw error;
+                }
                 
                 showMessage('Assessment saved to database successfully!', 'success');
             } catch (error) {
                 console.error('Save error:', error);
-                showMessage('Failed to save to database: ' + error.message, 'error');
+                if (error.code === '42501') {
+                    showMessage('Database access denied: Please check admin permissions', 'error');
+                } else {
+                    showMessage('Failed to save to database: ' + error.message, 'error');
+                }
             }
         }
 
@@ -1690,6 +1801,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             showStep(1);
+            updateUIForAuth(); // Initialize auth UI
         });
     </script>
 </body>
