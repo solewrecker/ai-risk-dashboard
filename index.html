@@ -9,26 +9,41 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Add jsPDF for PDF Export with fallback -->
-    <script>
-        // Try primary CDN
-        function loadJsPDF() {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
-            script.onload = () => console.log('✅ jsPDF loaded from jsdelivr');
-            script.onerror = () => {
-                console.warn('❌ jsdelivr failed, trying unpkg...');
-                // Fallback to unpkg
-                const fallbackScript = document.createElement('script');
-                fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
-                fallbackScript.onload = () => console.log('✅ jsPDF loaded from unpkg');
-                fallbackScript.onerror = () => console.error('❌ All CDNs failed');
-                document.head.appendChild(fallbackScript);
-            };
-            document.head.appendChild(script);
-        }
-        loadJsPDF();
-    </script>
+    <!-- Add jsPDF (simple backup) -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+    
+         <!-- Add jsPDF for PDF Export with fallback -->
+     <script>
+         // Global flag to track jsPDF loading
+         window.jsPDFLoaded = false;
+         
+         // Try primary CDN
+         function loadJsPDF() {
+             const script = document.createElement('script');
+             script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+             script.onload = () => {
+                 console.log('✅ jsPDF loaded from jsdelivr');
+                 window.jsPDFLoaded = true;
+             };
+             script.onerror = () => {
+                 console.warn('❌ jsdelivr failed, trying unpkg...');
+                 // Fallback to unpkg
+                 const fallbackScript = document.createElement('script');
+                 fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+                 fallbackScript.onload = () => {
+                     console.log('✅ jsPDF loaded from unpkg');
+                     window.jsPDFLoaded = true;
+                 };
+                 fallbackScript.onerror = () => {
+                     console.error('❌ All CDNs failed');
+                     window.jsPDFLoaded = false;
+                 };
+                 document.head.appendChild(fallbackScript);
+             };
+             document.head.appendChild(script);
+         }
+         loadJsPDF();
+     </script>
     
     <style>
         * {
@@ -1789,17 +1804,30 @@
             }
         }
 
-        function exportAssessment() {
+        async function exportAssessment() {
             if (!currentAssessment) {
                 showMessage('No assessment to export', 'error');
                 return;
             }
 
-            // Check if jsPDF is loaded
-            if (typeof window.jsPDF === 'undefined') {
-                showMessage('PDF library is loading... Falling back to JSON export', 'warning');
-                exportAssessmentJSON();
-                return;
+            // Check if jsPDF is loaded, with retry logic
+            if (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined') {
+                showMessage('PDF library is loading... Please wait.', 'warning');
+                
+                // Wait up to 5 seconds for library to load
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (attempts < maxAttempts && (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined')) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                if (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined') {
+                    showMessage('PDF library failed to load. Falling back to JSON export.', 'warning');
+                    exportAssessmentJSON();
+                    return;
+                }
             }
 
             try {
@@ -2116,12 +2144,14 @@
             showStep(1);
             updateUIForAuth(); // Initialize auth UI
             
-            // Check PDF library loading
+            // Check PDF library loading after page loads
             setTimeout(() => {
-                if (typeof window.jsPDF === 'undefined') {
-                    console.warn('jsPDF library failed to load. PDF export will fall back to JSON.');
+                if (window.jsPDFLoaded && typeof window.jsPDF !== 'undefined') {
+                    console.log('✅ PDF export functionality ready');
+                } else {
+                    console.warn('⚠️ PDF library still loading... Export will retry automatically');
                 }
-            }, 2000);
+            }, 3000);
         });
     </script>
 </body>
