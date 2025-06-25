@@ -1600,7 +1600,7 @@
             // Populate form with existing data
             document.getElementById('toolName').value = tool.name;
             document.getElementById('toolCategory').value = tool.category;
-            document.getElementById('toolRecommendation').value = tool.recommendation || '';
+            document.getElementById('toolRecommendation').value = (tool.recommendation !== undefined && tool.recommendation !== null) ? tool.recommendation : '';
 
             // Populate sub-scores and notes
             document.getElementById('form_dataStorage_geographic_score').value = tool.subScores.dataStorage.geographic.score;
@@ -1692,7 +1692,8 @@
             const tempContainer = document.createElement('div');
             tempContainer.style.cssText = `
                 position: absolute; left: -9999px; top: 0; width: 210mm; 
-                font-family: 'Segoe UI', sans-serif; background: white; padding: 20px;
+                font-family: 'Segoe UI', sans-serif; background: white; padding: 15mm;
+                box-sizing: border-box;
             `;
             
             const riskStats = {
@@ -1747,10 +1748,10 @@
                                        riskLevel === 'medium' ? '#ffc107' : '#388e3c';
                     
                     return `
-                        <div style="background: white; margin-bottom: 25px; border-radius: 8px; border-left: 6px solid ${borderColor}; overflow: hidden; page-break-inside: avoid;">
-                            <div style="background: #f8f9fa; padding: 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h3 style="font-size: 1.3em; font-weight: 600; color: #2c3e50; margin-bottom: 5px;">${tool.name}</h3>
+                        <div style="background: white; margin-bottom: 20px; border-radius: 8px; border-left: 6px solid ${borderColor}; overflow: hidden; page-break-inside: avoid; width: 100%;">
+                            <div style="background: #f8f9fa; padding: 15px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1; margin-right: 20px;">
+                                    <h3 style="font-size: 1.2em; font-weight: 600; color: #2c3e50; margin-bottom: 5px;">${tool.name}</h3>
                                                                          <div style="font-size: 0.9em; color: #666;">
                                          <strong>Category:</strong> ${tool.category} | <strong>Updated:</strong> ${tool.lastUpdated}
                                      </div>
@@ -1784,41 +1785,36 @@
                                 </div>
                             </div>
                             
-                            <div style="padding: 20px;">
-                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px;">
-                                    <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
-                                        <div style="font-size: 1.3em; font-weight: 700; color: #2c3e50;">${tool.dataStorage}</div>
-                                        <div style="font-size: 0.7em; color: #999;">/25</div>
-                                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">Data Storage</div>
+                            <div style="padding: 15px;">
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; width: 100%;">
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
+                                        <div style="font-size: 1.2em; font-weight: 700; color: #2c3e50;">${tool.dataStorage}<span style="font-size: 0.7em; color: #999;">/25</span></div>
+                                        <div style="font-size: 0.7em; color: #666; margin-top: 2px;">Data Storage</div>
                                     </div>
-                                    <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
-                                        <div style="font-size: 1.3em; font-weight: 700; color: #2c3e50;">${tool.trainingUsage}</div>
-                                        <div style="font-size: 0.7em; color: #999;">/25</div>
-                                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">Training Usage</div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
+                                        <div style="font-size: 1.2em; font-weight: 700; color: #2c3e50;">${tool.trainingUsage}<span style="font-size: 0.7em; color: #999;">/25</span></div>
+                                        <div style="font-size: 0.7em; color: #666; margin-top: 2px;">Training Usage</div>
                                     </div>
-                                    <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
-                                        <div style="font-size: 1.3em; font-weight: 700; color: #2c3e50;">${tool.accessControls}</div>
-                                        <div style="font-size: 0.7em; color: #999;">/20</div>
-                                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">Access Controls</div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
+                                        <div style="font-size: 1.2em; font-weight: 700; color: #2c3e50;">${tool.accessControls}<span style="font-size: 0.7em; color: #999;">/20</span></div>
+                                        <div style="font-size: 0.7em; color: #666; margin-top: 2px;">Access Controls</div>
                                     </div>
-                                    <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
-                                        <div style="font-size: 1.3em; font-weight: 700; color: #2c3e50;">${tool.complianceRisk}</div>
-                                        <div style="font-size: 0.7em; color: #999;">/20</div>
-                                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">Compliance</div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
+                                        <div style="font-size: 1.2em; font-weight: 700; color: #2c3e50;">${tool.complianceRisk}<span style="font-size: 0.7em; color: #999;">/20</span></div>
+                                        <div style="font-size: 0.7em; color: #666; margin-top: 2px;">Compliance</div>
                                     </div>
-                                    <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
-                                        <div style="font-size: 1.3em; font-weight: 700; color: #2c3e50;">${tool.vendorTransparency}</div>
-                                        <div style="font-size: 0.7em; color: #999;">/10</div>
-                                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">Transparency</div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border-left: 3px solid #666;">
+                                        <div style="font-size: 1.2em; font-weight: 700; color: #2c3e50;">${tool.vendorTransparency}<span style="font-size: 0.7em; color: #999;">/10</span></div>
+                                        <div style="font-size: 0.7em; color: #666; margin-top: 2px;">Transparency</div>
                                     </div>
                                 </div>
                                 
                                 ${detailLevel === 'pro' ? `
-                                    <div style="background: #fdfdfd; padding: 15px; border-top: 1px solid #e9ecef;">
-                                        <h4 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.1em;">🔍 Detailed Assessment</h4>
+                                    <div style="background: #fdfdfd; padding: 12px; border-top: 1px solid #e9ecef;">
+                                        <h4 style="color: #2c3e50; margin-bottom: 12px; font-size: 1.0em;">🔍 Detailed Assessment</h4>
                                         
-                                                                                 <div style="margin-bottom: 15px;">
-                                             <h5 style="color: #2c3e50; font-size: 0.95em; margin-bottom: 8px;">🔐 Data Storage & Security</h5>
+                                                                                 <div style="margin-bottom: 10px;">
+                                             <h5 style="color: #2c3e50; font-size: 0.9em; margin-bottom: 6px;">🔐 Data Storage & Security</h5>
                                              ${tool.subScores?.dataStorage ? `
                                                  <div style="margin: 8px 0;">
                                                      <div style="background: #f8f9fa; padding: 6px 10px; margin: 3px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.8em;">
@@ -1834,22 +1830,22 @@
                                              ` : `<p style="font-size: 0.85em; color: #5d6d7e; line-height: 1.5; margin-left: 15px;">${tool.details.dataStorage}</p>`}
                                          </div>
                                          
-                                         <div style="margin-bottom: 15px;">
-                                             <h5 style="color: #2c3e50; font-size: 0.95em; margin-bottom: 8px;">🤖 Training Data Usage</h5>
+                                         <div style="margin-bottom: 10px;">
+                                             <h5 style="color: #2c3e50; font-size: 0.9em; margin-bottom: 6px;">🤖 Training Data Usage</h5>
                                              ${tool.subScores?.trainingUsage ? `
-                                                 <div style="margin: 8px 0;">
-                                                     <div style="background: #f8f9fa; padding: 6px 10px; margin: 3px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.8em;">
+                                                 <div style="margin: 6px 0;">
+                                                     <div style="background: #f8f9fa; padding: 5px 8px; margin: 2px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.75em;">
                                                          <strong>Training:</strong> ${tool.subScores.trainingUsage.training.note}
                                                      </div>
-                                                     <div style="background: #f8f9fa; padding: 6px 10px; margin: 3px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.8em;">
+                                                     <div style="background: #f8f9fa; padding: 5px 8px; margin: 2px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.75em;">
                                                          <strong>Sharing:</strong> ${tool.subScores.trainingUsage.sharing.note}
                                                      </div>
                                                  </div>
-                                             ` : `<p style="font-size: 0.85em; color: #5d6d7e; line-height: 1.5; margin-left: 15px;">${tool.details.trainingUsage}</p>`}
+                                             ` : `<p style="font-size: 0.8em; color: #5d6d7e; line-height: 1.4; margin-left: 12px;">${tool.details.trainingUsage}</p>`}
                                          </div>
                                          
-                                         <div style="margin-bottom: 15px;">
-                                             <h5 style="color: #2c3e50; font-size: 0.95em; margin-bottom: 8px;">👥 Access Controls</h5>
+                                         <div style="margin-bottom: 10px;">
+                                             <h5 style="color: #2c3e50; font-size: 0.9em; margin-bottom: 6px;">👥 Access Controls</h5>
                                              ${tool.subScores?.accessControls ? `
                                                  <div style="margin: 8px 0;">
                                                      <div style="background: #f8f9fa; padding: 6px 10px; margin: 3px 0; border-radius: 3px; border-left: 3px solid #999; font-size: 0.8em;">
@@ -1897,10 +1893,10 @@
                                         </p>
                                         <p style="font-size: 0.9em; color: #666;">
                                             <strong>Recommendation:</strong> 
-                                            ${riskLevel === 'critical' ? '🚨 Immediate action required to address critical security concerns.' : 
+                                            ${(tool.recommendation !== undefined && tool.recommendation !== null) ? tool.recommendation : (riskLevel === 'critical' ? '🚨 Immediate action required to address critical security concerns.' : 
                                               riskLevel === 'high' ? '⚠️ Significant security improvements needed before deployment.' :
                                               riskLevel === 'medium' ? '⚡ Moderate risk - implement additional security measures.' : 
-                                              '✅ Low risk - suitable for enterprise use with standard precautions.'}
+                                              '✅ Low risk - suitable for enterprise use with standard precautions.')}
                                         </p>
                                     </div>
                                 `}
@@ -2334,7 +2330,7 @@
                 accessControls: parseInt(tool.accessControls) || 0,
                 complianceRisk: parseInt(tool.complianceRisk) || 0,
                 vendorTransparency: parseInt(tool.vendorTransparency) || 0,
-                recommendation: tool.recommendation || "",
+                recommendation: (tool.recommendation !== undefined && tool.recommendation !== null) ? tool.recommendation : "",
                 compliance: tool.compliance || {
                     hipaa: tool.hipaaCompliance || 'unknown',
                     gdpr: tool.gdprCompliance || 'unknown',
@@ -2693,48 +2689,48 @@
                     
                     .score-overview { 
                         display: grid; 
-                        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-                        gap: 15px; 
-                        padding: 25px; 
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                        gap: 20px; 
+                        padding: 30px; 
                     }
                     
                     .score-card { 
                         background: #f8f9fa; 
-                        padding: 20px; 
+                        padding: 25px; 
                         border-radius: 8px; 
                         text-align: center; 
                         border-left: 4px solid #666;
                     }
                     
                     .score-card .score { 
-                        font-size: 1.8em; 
+                        font-size: 2.2em; 
                         font-weight: 700; 
                         color: #2c3e50; 
                         display: block; 
                     }
                     
                     .score-card .max-score { 
-                        font-size: 0.9em; 
+                        font-size: 1.0em; 
                         color: #999; 
                     }
                     
                     .score-card .category { 
-                        font-size: 0.85em; 
+                        font-size: 0.9em; 
                         color: #666; 
-                        margin-top: 8px; 
+                        margin-top: 10px; 
                         font-weight: 500; 
                     }
                     
                     .details { 
-                        padding: 25px; 
+                        padding: 30px; 
                         background: #fdfdfd; 
                         border-top: 1px solid #e9ecef; 
                     }
                     
                     .details h4 { 
                         color: #2c3e50; 
-                        margin-bottom: 15px; 
-                        font-size: 1.2em; 
+                        margin-bottom: 20px; 
+                        font-size: 1.3em; 
                         font-weight: 600; 
                     }
                     
@@ -2878,7 +2874,7 @@
                                 riskLevel === 'medium' ? '#f57c00' : '#388e3c'
                             };">
                                 <strong>Recommendation:</strong> 
-                                ${tool.recommendation || (riskLevel === 'critical' ? '🚨 Immediate action required to address critical security concerns before deployment.' : 
+                                ${(tool.recommendation !== undefined && tool.recommendation !== null) ? tool.recommendation : (riskLevel === 'critical' ? '🚨 Immediate action required to address critical security concerns before deployment.' : 
                                   riskLevel === 'high' ? '⚠️ Significant security improvements needed before enterprise deployment.' :
                                   riskLevel === 'medium' ? '⚡ Moderate risk - implement additional security measures and monitoring.' : 
                                   '✅ Low risk - suitable for general enterprise use with standard security precautions.')}

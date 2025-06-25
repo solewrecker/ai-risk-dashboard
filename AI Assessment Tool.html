@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Tool Assessment Request</title>
+    
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         * {
             margin: 0;
@@ -369,7 +373,7 @@
             <h1>AI Tool Assessment Request</h1>
             <p class="subtitle">Automated Risk Analysis Using AI Framework</p>
             <div id="dbStatus" style="margin-top: 15px; font-size: 0.9rem; color: #27ae60; font-weight: 500;">
-                💾 Database Ready
+                💾 Connecting to Database...
             </div>
         </div>
 
@@ -385,6 +389,9 @@
                 <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                     <button type="button" class="btn btn-secondary" onclick="importJSONFile()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
                         📂 Import JSON Database
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="exportDatabaseFromSupabase()" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                        📤 Export Database
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="syncDatabase()" style="background: linear-gradient(135deg, #e67e22, #d35400);">
                         🔄 Sync Database
@@ -551,6 +558,13 @@
     </div>
 
     <script>
+        // SUPABASE CONFIGURATION
+        const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         let currentAssessment = null;
         let isProcessing = false;
 
@@ -558,11 +572,164 @@
         document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('assessmentForm').addEventListener('submit', handleAssessmentRequest);
             
-            // Sync database on page load
-            console.log('Initializing AI Assessment Tool...');
-            await syncDatabase();
-            console.log('Database synced on initialization');
+            // Initialize Supabase connection
+            console.log('Initializing AI Assessment Tool with Supabase...');
+            await initializeSupabase();
+            console.log('Supabase connection established');
         });
+
+        // Initialize Supabase connection
+        async function initializeSupabase() {
+            updateDBStatus('🔄 Connecting to Supabase...', 'syncing');
+            
+            try {
+                console.log('Testing Supabase connection...');
+                
+                // Test connection by trying to read from ai_tools table
+                const { data, error, count } = await supabase
+                    .from('ai_tools')
+                    .select('*', { count: 'exact' });
+                
+                console.log('Connection test result:', { data, error, count, dataLength: data?.length });
+                
+                if (error && error.code === '42P01') {
+                    // Table doesn't exist, show helpful message
+                    updateDBStatus('⚠️ Database table not found - Please create ai_tools table', 'error');
+                    showError('Database table "ai_tools" not found. Please create the table in your Supabase dashboard first.');
+                    return false;
+                } else if (error) {
+                    console.error('Supabase connection error:', error);
+                    throw error;
+                }
+                
+                const actualCount = count !== null ? count : (data?.length || 0);
+                console.log(`Connected successfully. Found ${actualCount} assessments.`);
+                updateDBStatus(`✅ Supabase Connected (${actualCount} assessments)`, 'success');
+                return true;
+                
+            } catch (error) {
+                console.error('Supabase connection error:', error);
+                updateDBStatus('❌ Database Connection Failed', 'error');
+                showError('Failed to connect to Supabase: ' + error.message);
+                return false;
+            }
+        }
+
+        // SUPABASE DATABASE FUNCTIONS
+
+        // Save assessment to Supabase
+        async function saveToSupabase(assessmentData) {
+            try {
+                updateDBStatus('💾 Saving to database...', 'syncing');
+                
+                const { data, error } = await supabase
+                    .from('ai_tools')
+                    .insert([
+                        {
+                            name: assessmentData.toolName,
+                            category: assessmentData.category || null,
+                            total_score: assessmentData.totalScore,
+                            risk_level: assessmentData.riskLevel,
+                            data_storage_score: Math.round(assessmentData.scores.dataStorage),
+                            training_usage_score: Math.round(assessmentData.scores.trainingUsage),
+                            access_controls_score: Math.round(assessmentData.scores.accessControls),
+                            compliance_score: Math.round(assessmentData.scores.complianceRisk),
+                            vendor_transparency_score: Math.round(assessmentData.scores.vendorTransparency),
+                            breakdown: {
+                                scores: assessmentData.scores,
+                                subScores: assessmentData.subScores || null,
+                                analysis: assessmentData.analysis || null
+                            },
+                            details: {
+                                riskFactors: assessmentData.riskFactors,
+                                usageNote: assessmentData.usageNote,
+                                generatedBy: assessmentData.generatedBy || 'AI Assessment Tool'
+                            },
+                            sources: assessmentData.sources || null,
+                            assessed_by: 'AI Assessment Tool',
+                            confidence: assessmentData.confidence || 0.8,
+                            notes: assessmentData.notes || null
+                        }
+                    ])
+                    .select();
+
+                if (error) {
+                    throw error;
+                }
+
+                updateDBStatus('✅ Saved to database!', 'success');
+                showSuccess('Assessment saved to Supabase database successfully!');
+                return data[0];
+                
+            } catch (error) {
+                console.error('Error saving to Supabase:', error);
+                updateDBStatus('❌ Save failed', 'error');
+                showError('Failed to save to database: ' + error.message);
+                throw error;
+            }
+        }
+
+        // Load assessments from Supabase
+        async function loadFromSupabase(limit = 50) {
+            try {
+                updateDBStatus('📥 Loading from database...', 'syncing');
+                
+                const { data, error } = await supabase
+                    .from('ai_tools')
+                    .select('*')
+                    .limit(limit);
+
+                if (error) {
+                    throw error;
+                }
+
+                updateDBStatus(`📊 Loaded ${data.length} assessments`, 'success');
+                return data;
+                
+            } catch (error) {
+                console.error('Error loading from Supabase:', error);
+                updateDBStatus('❌ Load failed', 'error');
+                showError('Failed to load from database: ' + error.message);
+                return [];
+            }
+        }
+
+        // Sync database (now uses Supabase)
+        async function syncDatabase() {
+            updateDBStatus('🔄 Syncing with Supabase...', 'syncing');
+            
+            try {
+                const assessments = await loadFromSupabase();
+                console.log('Synced assessments from Supabase:', assessments);
+                updateDBStatus(`✅ Synced ${assessments.length} assessments`, 'success');
+                return assessments;
+                
+            } catch (error) {
+                console.error('Error syncing database:', error);
+                updateDBStatus('❌ Sync Failed', 'error');
+                return null;
+            }
+        }
+
+        // Save assessment to database (modified for Supabase)
+        async function saveToDatabase() {
+            if (!currentAssessment || !currentAssessment.results) {
+                showError('No assessment results to save');
+                return;
+            }
+
+            try {
+                const assessmentData = {
+                    ...currentAssessment.results,
+                    category: currentAssessment.toolCategory
+                };
+                
+                await saveToSupabase(assessmentData);
+                
+            } catch (error) {
+                showError('Failed to save assessment: ' + error.message);
+            }
+        }
 
         // Handle assessment form submission
         async function handleAssessmentRequest(event) {
@@ -1521,7 +1688,7 @@ Focus on enterprise security, compliance (HIPAA/GDPR/SOX), and data privacy conc
             };
         }
 
-        // Import JSON file manually
+        // Import JSON file and save to Supabase
         function importJSONFile() {
             const input = document.createElement('input');
             input.type = 'file';
@@ -1532,33 +1699,65 @@ Focus on enterprise security, compliance (HIPAA/GDPR/SOX), and data privacy conc
                     const reader = new FileReader();
                     reader.onload = async function(e) {
                         try {
-                            const importedDatabase = JSON.parse(e.target.result);
-                            console.log('Imported database:', importedDatabase);
+                            const importedData = JSON.parse(e.target.result);
+                            console.log('Imported database:', importedData);
                             
-                            // Merge with existing localStorage data
-                            const localData = localStorage.getItem('aiToolDatabase');
-                            const localDatabase = localData ? JSON.parse(localData) : createNewDatabase();
+                            updateDBStatus('📥 Importing to Supabase...', 'syncing');
                             
-                            // Merge tools (imported takes precedence)
-                            const mergedDatabase = { ...localDatabase };
-                            if (importedDatabase.tools) {
-                                Object.keys(importedDatabase.tools).forEach(toolId => {
-                                    mergedDatabase.tools[toolId] = importedDatabase.tools[toolId];
-                                });
+                            let importCount = 0;
+                            let tools = [];
+                            
+                            // Handle different JSON formats
+                            if (importedData.tools) {
+                                // Handle object format {tools: {id1: tool1, id2: tool2}}
+                                if (typeof importedData.tools === 'object' && !Array.isArray(importedData.tools)) {
+                                    tools = Object.values(importedData.tools);
+                                } else {
+                                    tools = importedData.tools;
+                                }
+                            } else if (Array.isArray(importedData)) {
+                                // Handle array format [tool1, tool2, tool3]
+                                tools = importedData;
+                            } else {
+                                throw new Error('Invalid JSON format. Expected {tools: [...]} or [...]');
                             }
                             
-                            // Update metadata
-                            mergedDatabase.metadata.totalTools = Object.keys(mergedDatabase.tools).length;
-                            mergedDatabase.metadata.lastUpdated = new Date().toISOString();
+                            // Convert and insert tools to Supabase
+                            for (const tool of tools) {
+                                try {
+                                    console.log('Processing tool:', tool.name, 'with data:', tool);
+                                    const supabaseData = convertToSupabaseFormat(tool);
+                                    console.log('Converted to Supabase format:', supabaseData);
+                                    
+                                    // Use upsert to handle both insert and update
+                                    console.log(`Upserting tool: ${tool.name}`);
+                                    const result = await supabase
+                                        .from('ai_tools')
+                                        .upsert(supabaseData, { 
+                                            onConflict: 'name',
+                                            ignoreDuplicates: false 
+                                        })
+                                        .select();
+                                    console.log('Upsert result:', result);
+                                    
+                                    if (result.error) {
+                                        console.warn('Error importing tool:', tool.name, result.error);
+                                    } else {
+                                        importCount++;
+                                        console.log(`✅ Imported tool:`, tool.name);
+                                    }
+                                } catch (toolError) {
+                                    console.warn('Error processing tool:', tool.name, toolError);
+                                }
+                            }
                             
-                            // Save to localStorage
-                            localStorage.setItem('aiToolDatabase', JSON.stringify(mergedDatabase));
-                            
-                            updateDBStatus('✅ JSON File Imported', 'success');
-                            showSuccess(`Imported ${Object.keys(importedDatabase.tools || {}).length} tools from JSON file`);
+                            updateDBStatus(`✅ Imported ${importCount} tools`, 'success');
+                            showSuccess(`Successfully imported ${importCount} tools to Supabase database!`);
                             
                         } catch (error) {
-                            showError('Error reading JSON file: ' + error.message);
+                            console.error('Import error:', error);
+                            updateDBStatus('❌ Import failed', 'error');
+                            showError('Error importing JSON file: ' + error.message);
                         }
                     };
                     reader.readAsText(file);
@@ -1566,8 +1765,117 @@ Focus on enterprise security, compliance (HIPAA/GDPR/SOX), and data privacy conc
             };
             input.click();
         }
+        
+        // Convert tool data to Supabase format
+        function convertToSupabaseFormat(tool) {
+            console.log('Converting tool to Supabase format:', tool);
+            
+            // Handle different JSON structures for scores
+            const scores = {
+                dataStorage: tool.dataStorage || tool.data_storage_score || tool.scores?.dataStorage || 0,
+                trainingUsage: tool.trainingUsage || tool.training_usage_score || tool.scores?.trainingUsage || 0,
+                accessControls: tool.accessControls || tool.access_controls_score || tool.scores?.accessControls || 0,
+                complianceRisk: tool.complianceRisk || tool.compliance_score || tool.scores?.complianceRisk || 0,
+                vendorTransparency: tool.vendorTransparency || tool.vendor_transparency_score || tool.scores?.vendorTransparency || 0
+            };
+            
+            const totalScore = tool.total_score || Object.values(scores).reduce((sum, score) => sum + score, 0);
+            
+            // Handle different category field names
+            const category = tool.category || tool.toolCategory || tool.tool_category || null;
+            
+            const converted = {
+                name: tool.name,
+                category: category,
+                total_score: totalScore,
+                risk_level: tool.risk_level || calculateRiskLevel(totalScore),
+                data_storage_score: Math.round(scores.dataStorage),
+                training_usage_score: Math.round(scores.trainingUsage),
+                access_controls_score: Math.round(scores.accessControls),
+                compliance_score: Math.round(scores.complianceRisk),
+                vendor_transparency_score: Math.round(scores.vendorTransparency),
+                breakdown: tool.breakdown || {
+                    scores: scores,
+                    subScores: tool.subScores || null,
+                    compliance: tool.compliance || null
+                },
+                details: tool.details || {
+                    riskFactors: tool.riskFactors || null,
+                    usageNote: tool.usageNote || null,
+                    analysis: tool.analysis || null
+                },
+                sources: tool.sources || null,
+                assessed_by: tool.assessed_by || 'JSON Import',
+                confidence: tool.confidence || 0.8,
+                notes: tool.notes || tool.recommendation || `Imported from JSON on ${new Date().toISOString()}`
+            };
+            
+            console.log('Converted result:', converted);
+            return converted;
+        }
+        
+        // Calculate risk level from total score
+        function calculateRiskLevel(totalScore) {
+            if (totalScore >= 80) return 'critical';
+            if (totalScore >= 60) return 'high';
+            if (totalScore >= 35) return 'medium';
+            return 'low';
+        }
 
-        // Save database to JSON file (download)
+        // Export all assessments from Supabase to JSON file
+        async function exportDatabaseFromSupabase() {
+            try {
+                updateDBStatus('📤 Exporting from Supabase...', 'syncing');
+                
+                console.log('Starting export from Supabase...');
+                
+                const { data, error } = await supabase
+                    .from('ai_tools')
+                    .select('*');
+
+                console.log('Supabase response:', { data, error });
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
+
+                console.log(`Found ${data?.length || 0} tools in database`);
+
+                const exportData = {
+                    metadata: {
+                        exportDate: new Date().toISOString(),
+                        totalTools: data?.length || 0,
+                        exportedFrom: 'Supabase AI Tools Database',
+                        version: "2.0"
+                    },
+                    tools: data || []
+                };
+                
+                // Create downloadable JSON file
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ai_tools_database_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                updateDBStatus('✅ Export complete', 'success');
+                showSuccess(`Exported ${data?.length || 0} assessments from Supabase database!`);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                updateDBStatus('❌ Export failed', 'error');
+                showError('Failed to export database: ' + error.message);
+            }
+        }
+        
+        // Legacy function - kept for compatibility
         function saveDatabaseToFile(database) {
             console.log('Creating downloadable database file:', database);
             
@@ -1583,47 +1891,6 @@ Focus on enterprise security, compliance (HIPAA/GDPR/SOX), and data privacy conc
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-        }
-
-        // Sync database (simplified - localStorage only for now)
-        async function syncDatabase() {
-            updateDBStatus('🔄 Syncing Database...', 'syncing');
-            
-            try {
-                // Load from localStorage
-                const localData = localStorage.getItem('aiToolDatabase');
-                let database = localData ? JSON.parse(localData) : createNewDatabase();
-                
-                // Try to load from file (optional - won't fail if CORS blocks it)
-                const fileDatabase = await loadDatabaseFromFile();
-                if (fileDatabase) {
-                    // Merge databases (file takes precedence for existing tools)
-                    if (fileDatabase.tools) {
-                        Object.keys(fileDatabase.tools).forEach(toolId => {
-                            if (!database.tools[toolId]) {
-                                // Add tools from file that aren't in localStorage
-                                database.tools[toolId] = fileDatabase.tools[toolId];
-                            }
-                        });
-                    }
-                }
-                
-                // Update metadata
-                database.metadata.totalTools = Object.keys(database.tools).length;
-                database.metadata.lastUpdated = new Date().toISOString();
-                
-                // Save to localStorage
-                localStorage.setItem('aiToolDatabase', JSON.stringify(database));
-                
-                console.log('Database synced successfully');
-                updateDBStatus('✅ Database Synced', 'success');
-                return database;
-                
-            } catch (error) {
-                console.error('Error syncing database:', error);
-                updateDBStatus('❌ Sync Failed', 'error');
-                return null;
-            }
         }
 
         // Update database status indicator
@@ -1645,57 +1912,6 @@ Focus on enterprise security, compliance (HIPAA/GDPR/SOX), and data privacy conc
                         statusEl.innerHTML = '💾 Database Ready';
                     }, 3000);
                 }
-            }
-        }
-
-        // Save assessment to database
-        async function saveToDatabase() {
-            if (!currentAssessment || !currentAssessment.results) {
-                showError('No assessment results to save');
-                return;
-            }
-
-            try {
-                // Sync database first
-                let database = await syncDatabase();
-                if (!database) {
-                    database = createNewDatabase();
-                }
-
-                // Create tool entry
-                const toolId = Date.now(); // Simple ID generation
-                const toolData = {
-                    id: toolId,
-                    name: currentAssessment.results.toolName,
-                    scores: currentAssessment.results.scores,
-                    riskFactors: currentAssessment.results.riskFactors,
-                    usageNote: currentAssessment.results.usageNote,
-                    assessmentDate: currentAssessment.results.timestamp,
-                    lastModified: new Date().toISOString(),
-                    aiAssessment: {
-                        confidence: currentAssessment.results.confidence,
-                        sources: currentAssessment.results.sources,
-                        timestamp: currentAssessment.results.timestamp
-                    }
-                };
-
-                // Add to database
-                database.tools[toolId] = toolData;
-                database.metadata.totalTools = Object.keys(database.tools).length;
-                database.metadata.lastUpdated = new Date().toISOString();
-
-                // Save to localStorage
-                localStorage.setItem('aiToolDatabase', JSON.stringify(database));
-
-                showSuccess('Assessment saved to database successfully!');
-                
-                // Optionally offer to download JSON file
-                if (confirm('Assessment saved! Would you like to download the updated database as a JSON file for backup?')) {
-                    saveDatabaseToFile(database);
-                }
-                
-            } catch (error) {
-                showError('Failed to save assessment: ' + error.message);
             }
         }
 
