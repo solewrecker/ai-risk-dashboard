@@ -9,6 +9,12 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Add jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" 
+            integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNhh/OKPGM2VmsVAQM9hEhOQy2S9s9gqmhvdL1hLH8F8GGY8A+gDwxFuw==" 
+            crossorigin="anonymous" 
+            referrerpolicy="no-referrer"></script>
+    
     <style>
         * {
             margin: 0;
@@ -668,7 +674,10 @@
                         
                         <div class="btn-group">
                             <button type="button" class="btn btn-secondary" onclick="exportAssessment()">
-                                📄 Export Report
+                                📄 Export PDF Report
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="exportAssessmentJSON()" style="font-size: 0.875rem;">
+                                📊 Export JSON Data
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="saveToDatabase()">
                                 💾 Save to Database
@@ -1771,6 +1780,28 @@
                 return;
             }
 
+            // Check if jsPDF is loaded
+            if (typeof window.jsPDF === 'undefined') {
+                showMessage('PDF library is loading... Falling back to JSON export', 'warning');
+                exportAssessmentJSON();
+                return;
+            }
+
+            try {
+                generatePDFReport(currentAssessment);
+                showMessage('PDF report generated successfully!', 'success');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showMessage('Failed to generate PDF: ' + error.message + '. Exporting JSON instead.', 'error');
+                
+                // Fallback to JSON export
+                exportAssessmentJSON();
+            }
+        }
+
+        function exportAssessmentJSON() {
+            if (!currentAssessment) return;
+
             const exportData = {
                 exportDate: new Date().toISOString(),
                 assessment: currentAssessment.results,
@@ -1792,8 +1823,268 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+        }
 
-            showMessage('Assessment exported successfully!', 'success');
+        function generatePDFReport(assessment) {
+            // Check if jsPDF is available
+            if (typeof window.jsPDF === 'undefined') {
+                throw new Error('jsPDF library not loaded. Please refresh the page and try again.');
+            }
+            
+            const { jsPDF } = window;
+            const doc = new jsPDF();
+            
+            // Page dimensions
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            
+            let currentY = margin;
+            
+            // Helper functions
+            function addText(text, x, y, options = {}) {
+                doc.setFont(options.font || 'helvetica', options.style || 'normal');
+                doc.setFontSize(options.size || 12);
+                if (options.color) doc.setTextColor(...options.color);
+                else doc.setTextColor(0, 0, 0);
+                
+                if (options.align === 'center') {
+                    const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                    x = (pageWidth - textWidth) / 2;
+                }
+                
+                doc.text(text, x, y);
+                return y + (options.lineHeight || 7);
+            }
+            
+            function addLine(x1, y1, x2, y2, color = [200, 200, 200]) {
+                doc.setDrawColor(...color);
+                doc.line(x1, y1, x2, y2);
+            }
+            
+            function addRect(x, y, width, height, fillColor, borderColor = [200, 200, 200]) {
+                if (fillColor) {
+                    doc.setFillColor(...fillColor);
+                    doc.rect(x, y, width, height, 'F');
+                }
+                doc.setDrawColor(...borderColor);
+                doc.rect(x, y, width, height);
+            }
+            
+            function checkPageBreak(neededSpace) {
+                if (currentY + neededSpace > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                    return true;
+                }
+                return false;
+            }
+            
+            // === HEADER ===
+            // Company Logo Area (placeholder)
+            addRect(margin, currentY, 40, 20, [59, 130, 246, 0.1]);
+            currentY = addText('AI RISK', margin + 5, currentY + 8, { 
+                font: 'helvetica', style: 'bold', size: 10, color: [59, 130, 246] 
+            });
+            currentY = addText('FRAMEWORK', margin + 5, currentY - 2, { 
+                font: 'helvetica', style: 'bold', size: 8, color: [59, 130, 246] 
+            });
+            
+            // Report Title
+            currentY = addText('AI TOOL SECURITY RISK ASSESSMENT', pageWidth/2, margin + 10, { 
+                font: 'helvetica', style: 'bold', size: 16, align: 'center' 
+            });
+            
+            currentY = addText('Enterprise Security Analysis Report', pageWidth/2, currentY, { 
+                font: 'helvetica', style: 'normal', size: 12, align: 'center', color: [107, 114, 128] 
+            });
+            
+            // Date and Assessment Info
+            const assessmentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            currentY = addText(`Generated: ${assessmentDate}`, pageWidth/2, currentY + 5, { 
+                size: 10, align: 'center', color: [107, 114, 128] 
+            });
+            
+            currentY += 10;
+            addLine(margin, currentY, pageWidth - margin, currentY);
+            currentY += 15;
+            
+            // === EXECUTIVE SUMMARY ===
+            currentY = addText('EXECUTIVE SUMMARY', margin, currentY, { 
+                font: 'helvetica', style: 'bold', size: 14 
+            });
+            currentY += 5;
+            
+            // Tool Info Box
+            addRect(margin, currentY, contentWidth, 35, [248, 250, 252]);
+            currentY += 8;
+            
+            const toolName = assessment.results.toolName + 
+                (assessment.formData.toolVersion === 'enterprise' && 
+                 !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            currentY = addText(`Tool: ${toolName}`, margin + 10, currentY, { 
+                font: 'helvetica', style: 'bold', size: 12 
+            });
+            
+            if (assessment.formData.toolCategory) {
+                currentY = addText(`Category: ${assessment.formData.toolCategory}`, margin + 10, currentY, { size: 10 });
+            }
+            
+            if (assessment.formData.useCase) {
+                currentY = addText(`Use Case: ${getUseCaseLabel(assessment.formData.useCase)}`, margin + 10, currentY, { size: 10 });
+            }
+            
+            // Data Classification
+            const dataClassificationLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Financial/Payment Data',
+                'trade-secrets': 'Trade Secrets/Intellectual Property',
+                'pii': 'Personally Identifiable Information',
+                'public': 'Public/Marketing Data'
+            };
+            
+            const dataLabel = dataClassificationLabels[assessment.formData.dataClassification] || 'Unknown';
+            currentY = addText(`Data Classification: ${dataLabel}`, margin + 10, currentY, { 
+                size: 10, color: [220, 38, 38] 
+            });
+            
+            currentY += 15;
+            
+            // === RISK SCORE SECTION ===
+            checkPageBreak(80);
+            
+            currentY = addText('RISK ASSESSMENT RESULTS', margin, currentY, { 
+                font: 'helvetica', style: 'bold', size: 14 
+            });
+            currentY += 10;
+            
+            // Risk Score Circle (simplified as text box)
+            const riskColors = {
+                'critical': [220, 38, 38],
+                'high': [234, 88, 12],
+                'medium': [202, 138, 4],
+                'low': [22, 163, 74]
+            };
+            
+            const riskLabels = {
+                'critical': 'CRITICAL RISK',
+                'high': 'HIGH RISK', 
+                'medium': 'MEDIUM RISK',
+                'low': 'LOW RISK'
+            };
+            
+            const riskColor = riskColors[assessment.results.riskLevel];
+            const riskLabel = riskLabels[assessment.results.riskLevel];
+            
+            // Risk Score Box
+            addRect(margin, currentY, contentWidth, 40, [riskColor[0]/255, riskColor[1]/255, riskColor[2]/255, 0.1]);
+            
+            currentY = addText(`RISK SCORE: ${assessment.results.finalScore}`, margin + 10, currentY + 15, { 
+                font: 'helvetica', style: 'bold', size: 20, color: riskColor 
+            });
+            
+            currentY = addText(riskLabel, margin + 10, currentY + 5, { 
+                font: 'helvetica', style: 'bold', size: 14, color: riskColor 
+            });
+            
+            // Risk Descriptions
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+            
+            currentY = addText(riskDescriptions[assessment.results.riskLevel], margin + 10, currentY + 5, { 
+                size: 10, color: [75, 85, 99] 
+            });
+            
+            currentY += 20;
+            
+            // === DETAILED BREAKDOWN ===
+            checkPageBreak(100);
+            
+            currentY = addText('SECURITY CATEGORY BREAKDOWN', margin, currentY, { 
+                font: 'helvetica', style: 'bold', size: 14 
+            });
+            currentY += 10;
+            
+            // Breakdown Table Header
+            addRect(margin, currentY, contentWidth, 12, [59, 130, 246]);
+            currentY = addText('Category', margin + 5, currentY + 8, { 
+                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
+            });
+            addText('Score', margin + 120, currentY - 8, { 
+                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
+            });
+            addText('Assessment', margin + 160, currentY - 8, { 
+                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
+            });
+            
+            currentY += 2;
+            
+            // Breakdown Rows
+            Object.entries(assessment.results.breakdown).forEach(([category, data], index) => {
+                checkPageBreak(15);
+                
+                const bgColor = index % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+                addRect(margin, currentY, contentWidth, 12, bgColor);
+                
+                currentY = addText(category, margin + 5, currentY + 8, { size: 9, font: 'helvetica', style: 'bold' });
+                addText(data.score, margin + 120, currentY - 8, { size: 9 });
+                
+                // Wrap long descriptions
+                const desc = data.description.length > 45 ? 
+                    data.description.substring(0, 45) + '...' : data.description;
+                addText(desc, margin + 160, currentY - 8, { size: 8, color: [75, 85, 99] });
+                
+                currentY += 2;
+            });
+            
+            currentY += 10;
+            
+            // === RECOMMENDATIONS ===
+            if (assessment.results.recommendations.length > 0) {
+                checkPageBreak(50);
+                
+                currentY = addText('RECOMMENDATIONS', margin, currentY, { 
+                    font: 'helvetica', style: 'bold', size: 14 
+                });
+                currentY += 5;
+                
+                assessment.results.recommendations.forEach((rec, index) => {
+                    checkPageBreak(15);
+                    currentY = addText(`${index + 1}. ${rec}`, margin + 5, currentY + 5, { 
+                        size: 10, color: [75, 85, 99] 
+                    });
+                });
+                
+                currentY += 10;
+            }
+            
+            // === FOOTER ===
+            const footerY = pageHeight - 30;
+            addLine(margin, footerY, pageWidth - margin, footerY);
+            
+            addText('AI Tool Risk Assessment Framework v2.0', margin, footerY + 10, { 
+                size: 8, color: [107, 114, 128] 
+            });
+            
+            addText(`Assessment ID: ${Date.now()}`, pageWidth - margin - 50, footerY + 10, { 
+                size: 8, color: [107, 114, 128] 
+            });
+            
+            addText('CONFIDENTIAL - Internal Use Only', pageWidth/2, footerY + 20, { 
+                size: 8, align: 'center', color: [220, 38, 38], font: 'helvetica', style: 'bold' 
+            });
+            
+            // Save PDF
+            const fileName = `ai-risk-assessment-${toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
         }
 
         function startNewAssessment() {
@@ -1809,6 +2100,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             showStep(1);
             updateUIForAuth(); // Initialize auth UI
+            
+            // Check PDF library loading
+            setTimeout(() => {
+                if (typeof window.jsPDF === 'undefined') {
+                    console.warn('jsPDF library failed to load. PDF export will fall back to JSON.');
+                }
+            }, 2000);
         });
     </script>
 </body>
