@@ -1201,11 +1201,12 @@
                 // Store tool data for breakdown generation
                 window.lastToolData = baseScoreResult;
                 
-                const riskLevel = getRiskLevel(adjustedScore);
-                
-                console.log('📋 Generating breakdown...');
-                const breakdown = await generateBreakdown(formData);
-                console.log('✅ Breakdown complete');
+                            const riskLevel = getRiskLevel(adjustedScore);
+            
+            console.log('📋 Generating breakdown...');
+            const breakdown = await generateBreakdown(formData);
+            console.log('✅ Breakdown complete');
+            console.log('🔍 Breakdown structure:', breakdown);
                 
                 const recommendations = generateRecommendations(adjustedScore, formData);
                 console.log('✅ Assessment complete');
@@ -1449,13 +1450,16 @@
                         
                         if (data && data.length > 0) {
                             console.log('✅ Found breakdown data in database');
+                            console.log('📊 Raw database data:', data[0]);
                             // Prefer detailed assessment if available
                             if (data[0].detailed_assessment) {
+                                console.log('🎯 Using detailed assessment');
                                 return generateDetailedBreakdown(data[0], formData);
                             }
                             // Fall back to simple breakdown
                             if (data[0].breakdown) {
-                                return data[0].breakdown;
+                                console.log('📋 Using simple breakdown:', data[0].breakdown);
+                                return convertDatabaseBreakdown(data[0].breakdown, formData);
                             }
                         }
                     } catch (timeoutError) {
@@ -1470,6 +1474,40 @@
             // Fallback to generic breakdown
             console.log('📊 Using generic breakdown fallback');
             return generateGenericBreakdown(formData);
+        }
+
+        function convertDatabaseBreakdown(breakdown, formData) {
+            // Convert database breakdown format to display format
+            if (!breakdown || !breakdown.scores) {
+                console.warn('Invalid breakdown structure:', breakdown);
+                return generateGenericBreakdown(formData);
+            }
+            
+            const scores = breakdown.scores;
+            const isEnterprise = formData.toolVersion === 'enterprise';
+            
+            return {
+                'Data Storage & Security': {
+                    score: `${scores.dataStorage || 0}/25`,
+                    description: isEnterprise ? 'Better data residency controls and encryption' : 'Limited visibility into data storage practices'
+                },
+                'Training Data Usage': {
+                    score: `${scores.trainingUsage || 0}/25`,
+                    description: isEnterprise ? 'Typically offers training opt-out options' : 'High risk - data may be used for model training'
+                },
+                'Access Controls': {
+                    score: `${scores.accessControls || 0}/20`,
+                    description: isEnterprise ? 'Enhanced admin controls and user management' : 'Limited enterprise admin controls available'
+                },
+                'Compliance Risk': {
+                    score: `${scores.complianceRisk || 0}/20`,
+                    description: isEnterprise ? 'Better compliance frameworks and certifications' : 'Potential regulatory compliance gaps'
+                },
+                'Vendor Transparency': {
+                    score: `${scores.vendorTransparency || 0}/10`,
+                    description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices'
+                }
+            };
         }
 
         function generateDetailedBreakdown(toolData, formData) {
