@@ -12,38 +12,55 @@
     <!-- Add jsPDF (simple backup) -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
     
-         <!-- Add jsPDF for PDF Export with fallback -->
-     <script>
-         // Global flag to track jsPDF loading
-         window.jsPDFLoaded = false;
-         
-         // Try primary CDN
-         function loadJsPDF() {
-             const script = document.createElement('script');
-             script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
-             script.onload = () => {
-                 console.log('✅ jsPDF loaded from jsdelivr');
-                 window.jsPDFLoaded = true;
-             };
-             script.onerror = () => {
-                 console.warn('❌ jsdelivr failed, trying unpkg...');
-                 // Fallback to unpkg
-                 const fallbackScript = document.createElement('script');
-                 fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
-                 fallbackScript.onload = () => {
-                     console.log('✅ jsPDF loaded from unpkg');
-                     window.jsPDFLoaded = true;
-                 };
-                 fallbackScript.onerror = () => {
-                     console.error('❌ All CDNs failed');
-                     window.jsPDFLoaded = false;
-                 };
-                 document.head.appendChild(fallbackScript);
-             };
-             document.head.appendChild(script);
-         }
-         loadJsPDF();
-     </script>
+    <!-- Add PDF Template System (conditional loading) -->
+    <script>
+        // Try to load PDF template system, but don't break if it fails
+        const templateScript = document.createElement('script');
+        templateScript.src = 'pdf-templates.js';
+        templateScript.onerror = function() {
+            console.warn('PDF template system not available - using fallback');
+            window.PDFTemplateManager = null;
+        };
+        templateScript.onload = function() {
+            console.log('✅ PDF Template System loaded successfully');
+        };
+        document.head.appendChild(templateScript);
+    </script>
+    
+    <!-- Add jsPDF for PDF Export with fallback -->
+    <script>
+        // Global flag to track jsPDF loading
+        window.jsPDFLoaded = false;
+        
+        // Try primary CDN
+        function loadJsPDF() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+            script.onload = () => {
+                console.log('✅ jsPDF loaded from jsdelivr');
+                console.log('Available at window.jspdf:', typeof window.jspdf);
+                window.jsPDFLoaded = true;
+            };
+            script.onerror = () => {
+                console.warn('❌ jsdelivr failed, trying unpkg...');
+                // Fallback to unpkg
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+                fallbackScript.onload = () => {
+                    console.log('✅ jsPDF loaded from unpkg');
+                    console.log('Available at window.jspdf:', typeof window.jspdf);
+                    window.jsPDFLoaded = true;
+                };
+                fallbackScript.onerror = () => {
+                    console.error('❌ All CDNs failed');
+                    window.jsPDFLoaded = false;
+                };
+                document.head.appendChild(fallbackScript);
+            };
+            document.head.appendChild(script);
+        }
+        loadJsPDF();
+    </script>
     
     <style>
         * {
@@ -703,12 +720,78 @@
                         </div>
                         
                         <div class="btn-group">
-                            <button type="button" class="btn btn-secondary" onclick="exportAssessment()">
-                                📄 Export PDF Report
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="exportAssessmentJSON()" style="font-size: 0.875rem;">
-                                📊 Export JSON Data
-                            </button>
+                            <div style="position: relative; display: inline-block;">
+                                <button type="button" class="btn btn-secondary" onclick="toggleExportMenu()" id="exportMainBtn">
+                                    📄 Export Options ▼
+                                </button>
+                                <div id="exportMenu" style="
+                                    display: none;
+                                    position: absolute;
+                                    bottom: 100%;
+                                    left: 0;
+                                    background: white;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 0.5rem;
+                                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                                    z-index: 9999;
+                                    min-width: 220px;
+                                    margin-bottom: 0.5rem;
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                ">
+                                    <button type="button" class="export-option" onclick="exportTemplated(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                    ">
+                                        🌟 <strong>Professional PDF</strong><br>
+                                        <small style="color: #64748b;">Template-based (Recommended)</small>
+                                    </button>
+                                    <button type="button" class="export-option" onclick="exportAssessment(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                    ">
+                                        📄 <strong>PDF Report (jsPDF)</strong><br>
+                                        <small style="color: #64748b;">Manual layout</small>
+                                    </button>
+                                    <button type="button" class="export-option" onclick="exportHTML(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                    ">
+                                        🌐 <strong>HTML Report</strong><br>
+                                        <small style="color: #64748b;">Viewable in browser</small>
+                                    </button>
+                                    <button type="button" class="export-option" onclick="exportAssessmentJSON(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                    ">
+                                        📊 <strong>JSON Data</strong><br>
+                                        <small style="color: #64748b;">Raw assessment data</small>
+                                    </button>
+                                </div>
+                            </div>
                             <button type="button" class="btn btn-secondary" onclick="saveToDatabase()">
                                 💾 Save to Database
                             </button>
@@ -716,6 +799,45 @@
                                 🔄 New Assessment
                             </button>
                         </div>
+                        
+                        <style>
+                            .export-option:hover {
+                                background: #f8fafc !important;
+                            }
+                            
+                            /* Responsive dropdown positioning */
+                            @media (max-height: 600px) {
+                                #exportMenu {
+                                    position: fixed !important;
+                                    top: 50% !important;
+                                    left: 50% !important;
+                                    transform: translate(-50%, -50%) !important;
+                                    bottom: auto !important;
+                                    margin-bottom: 0 !important;
+                                    max-height: 80vh !important;
+                                }
+                            }
+                            
+                            /* Ensure dropdown is always on top */
+                            #exportMenu {
+                                position: absolute;
+                                z-index: 99999 !important;
+                            }
+                            
+                            /* Better mobile support */
+                            @media (max-width: 768px) {
+                                #exportMenu {
+                                    position: fixed !important;
+                                    top: 50% !important;
+                                    left: 50% !important;
+                                    transform: translate(-50%, -50%) !important;
+                                    bottom: auto !important;
+                                    margin-bottom: 0 !important;
+                                    min-width: 280px !important;
+                                    max-width: 90vw !important;
+                                }
+                            }
+                        </style>
                     </div>
                 </form>
             </div>
@@ -1804,26 +1926,338 @@
             }
         }
 
+        // === EXPORT MENU FUNCTIONS ===
+        let exportMenuVisible = false;
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            const btn = document.getElementById('exportMainBtn');
+            exportMenuVisible = !exportMenuVisible;
+            
+            if (exportMenuVisible) {
+                // Smart positioning based on available space
+                positionDropdown(menu, btn);
+                menu.style.display = 'block';
+                
+                // Close menu when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeExportMenuOnClickOutside);
+                }, 10);
+            } else {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeExportMenuOnClickOutside);
+            }
+        }
+
+        function positionDropdown(menu, button) {
+            const buttonRect = button.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            const menuHeight = 240; // Approximate height of 4 options
+            
+            // Reset positioning
+            menu.style.position = 'absolute';
+            menu.style.top = 'auto';
+            menu.style.bottom = 'auto';
+            menu.style.left = '0';
+            menu.style.right = 'auto';
+            menu.style.transform = 'none';
+            
+            // Check if there's enough space below the button
+            const spaceBelow = viewportHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+            
+            if (spaceBelow >= menuHeight) {
+                // Position below button
+                menu.style.top = '100%';
+                menu.style.marginTop = '0.5rem';
+            } else if (spaceAbove >= menuHeight) {
+                // Position above button
+                menu.style.bottom = '100%';
+                menu.style.marginBottom = '0.5rem';
+            } else {
+                // Center in viewport if neither space is sufficient
+                menu.style.position = 'fixed';
+                menu.style.top = '50%';
+                menu.style.left = '50%';
+                menu.style.transform = 'translate(-50%, -50%)';
+                menu.style.zIndex = '99999';
+            }
+            
+            // Adjust horizontal position if needed
+            if (buttonRect.left + 220 > viewportWidth) {
+                menu.style.left = 'auto';
+                menu.style.right = '0';
+            }
+        }
+
+        function hideExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.style.display = 'none';
+            exportMenuVisible = false;
+            document.removeEventListener('click', closeExportMenuOnClickOutside);
+        }
+
+        function closeExportMenuOnClickOutside(event) {
+            const menu = document.getElementById('exportMenu');
+            const btn = document.getElementById('exportMainBtn');
+            
+            if (!menu.contains(event.target) && !btn.contains(event.target)) {
+                hideExportMenu();
+            }
+        }
+
+        // === EXPORT FUNCTIONS ===
+        
+        // Option 1: Template-based PDF (Recommended) - Updated to use new system
+        async function exportTemplated() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                // Check if template system is available
+                if (!templateManager) {
+                    console.warn('Template system not loaded, falling back to legacy method');
+                    const exporter = new EnhancedPDFExporter();
+                    exporter.exportTemplatedPDF(currentAssessment);
+                    return;
+                }
+
+                // Convert assessment data for new template system
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                
+                // Generate report using new template system (default: enterprise-report)
+                const html = templateManager.generateReport(templateData, 'enterprise-report');
+                
+                // Create new window with report
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                // Add print button and controls
+                addPrintControls(printWindow);
+                
+                // Auto-print after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage('🌟 Professional PDF report generated with new template system!', 'success');
+            } catch (error) {
+                console.error('Template PDF generation error:', error);
+                showMessage('Failed to generate templated PDF: ' + error.message, 'error');
+                
+                // Fallback to legacy system
+                try {
+                    const exporter = new EnhancedPDFExporter();
+                    exporter.exportTemplatedPDF(currentAssessment);
+                    showMessage('📄 Generated using fallback template system', 'warning');
+                } catch (fallbackError) {
+                    showMessage('All PDF generation methods failed', 'error');
+                }
+            }
+        }
+
+        // Convert assessment data to new template format
+        function convertAssessmentForTemplate(assessment) {
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+            
+            const dataLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Financial/Payment Data',
+                'trade-secrets': 'Trade Secrets/Intellectual Property',
+                'pii': 'Personally Identifiable Information',
+                'public': 'Public/Marketing Data'
+            };
+            
+            const toolName = assessment.results.toolName + 
+                (assessment.formData.toolVersion === 'enterprise' && 
+                 !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            return {
+                toolName: toolName,
+                category: assessment.formData.toolCategory || 'Not specified',
+                useCase: getUseCaseLabel(assessment.formData.useCase) || 'Not specified',
+                dataClassification: dataLabels[assessment.formData.dataClassification] || 'Unknown',
+                riskScore: assessment.results.finalScore,
+                riskLevel: assessment.results.riskLevel.toUpperCase(),
+                riskDescription: riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.',
+                categories: Object.entries(assessment.results.breakdown).map(([name, data]) => ({
+                    name: name,
+                    score: data.score,
+                    description: data.description
+                })),
+                recommendations: assessment.results.recommendations || [],
+                primaryRecommendation: assessment.results.recommendations?.[0] || 'Follow security best practices'
+            };
+        }
+
+        // Add print controls to the generated report window
+        function addPrintControls(printWindow) {
+            const controlsHTML = `
+                <div id="printControls" class="no-print" style="
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 1000;
+                    background: white;
+                    padding: 10px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    border: 1px solid #ddd;
+                ">
+                    <button onclick="window.print()" style="
+                        background: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        margin-right: 8px;
+                        font-weight: 600;
+                    ">🖨️ Print PDF</button>
+                    <button onclick="window.close()" style="
+                        background: #6b7280;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">✕ Close</button>
+                </div>
+            `;
+            
+            printWindow.document.body.insertAdjacentHTML('beforeend', controlsHTML);
+        }
+
+        // Add template selection function (for future use)
+        function showTemplateSelector() {
+            if (!templateManager) {
+                showMessage('Template system not available', 'error');
+                return;
+            }
+
+            const templates = templateManager.list();
+            const selectorHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
+                        <h3 style="margin-bottom: 1rem;">Select PDF Template</h3>
+                        <div style="margin-bottom: 2rem;">
+                            ${templates.map(template => `
+                                <button onclick="exportWithTemplate('${template}')" style="
+                                    display: block;
+                                    width: 100%;
+                                    margin: 0.5rem 0;
+                                    padding: 1rem;
+                                    background: #f8fafc;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 0.5rem;
+                                    cursor: pointer;
+                                    text-align: left;
+                                ">
+                                    <strong>${template.replace('-', ' ').toUpperCase()}</strong><br>
+                                    <small style="color: #64748b;">Professional ${template} format</small>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="this.closest('div').parentElement.remove()" style="
+                            background: #6b7280;
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 0.5rem;
+                            cursor: pointer;
+                        ">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', selectorHTML);
+        }
+
+        // Export with specific template
+        function exportWithTemplate(templateName) {
+            // Close selector
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                const html = templateManager.generateReport(templateData, templateName);
+                
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                addPrintControls(printWindow);
+                
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage(`📄 Generated ${templateName.replace('-', ' ')} template successfully!`, 'success');
+            } catch (error) {
+                console.error('Template export error:', error);
+                showMessage('Failed to export with selected template: ' + error.message, 'error');
+            }
+        }
+
+        // Option 2: HTML Export
+        async function exportHTML() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                const exporter = new EnhancedPDFExporter();
+                exporter.exportHTML(currentAssessment);
+                showMessage('HTML report downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('HTML export error:', error);
+                showMessage('Failed to export HTML: ' + error.message, 'error');
+            }
+        }
+
+        // Option 3: Original jsPDF (Keep existing)
         async function exportAssessment() {
             if (!currentAssessment) {
                 showMessage('No assessment to export', 'error');
                 return;
             }
 
-            // Check if jsPDF is loaded, with retry logic
-            if (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined') {
+            // Check if jsPDF is loaded, with retry logic (correct property: window.jspdf)
+            if (!window.jsPDFLoaded || typeof window.jspdf === 'undefined') {
                 showMessage('PDF library is loading... Please wait.', 'warning');
                 
                 // Wait up to 5 seconds for library to load
                 let attempts = 0;
                 const maxAttempts = 10;
                 
-                while (attempts < maxAttempts && (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined')) {
+                while (attempts < maxAttempts && (!window.jsPDFLoaded || typeof window.jspdf === 'undefined')) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     attempts++;
                 }
                 
-                if (!window.jsPDFLoaded || typeof window.jsPDF === 'undefined') {
+                if (!window.jsPDFLoaded || typeof window.jspdf === 'undefined') {
                     showMessage('PDF library failed to load. Falling back to JSON export.', 'warning');
                     exportAssessmentJSON();
                     return;
@@ -1831,7 +2265,7 @@
             }
 
             try {
-                generatePDFReport(currentAssessment);
+                generatePDFReportOriginal(currentAssessment);
                 showMessage('PDF report generated successfully!', 'success');
             } catch (error) {
                 console.error('PDF generation error:', error);
@@ -1868,121 +2302,915 @@
             URL.revokeObjectURL(url);
         }
 
-        function generatePDFReport(assessment) {
-            // Check if jsPDF is available
-            if (typeof window.jsPDF === 'undefined') {
+        // === TEMPLATE-BASED PDF GENERATION (Production Ready) ===
+        class AIRiskReportGenerator {
+            constructor() {
+                this.template = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>AI Risk Assessment Report</title>
+                    <style>
+                        /* === PDF PAGE SETUP === */
+                        @page {
+                            size: A4;
+                            margin: 0.75in;
+                            @top-center {
+                                content: "Risk Assessment Report";
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                font-size: 10pt;
+                                color: #64748b;
+                            }
+                            @bottom-center {
+                                content: "Page " counter(page) " of " counter(pages);
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                font-size: 9pt;
+                                color: #64748b;
+                            }
+                        }
+
+                        /* === BASE STYLES === */
+                        * {
+                            box-sizing: border-box;
+                        }
+
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+                            line-height: 1.5;
+                            color: #1a1a1a;
+                            margin: 0;
+                            padding: 0;
+                            font-size: 11pt;
+                            background: white;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+
+                        .report-container {
+                            max-width: 100%;
+                            margin: 0 auto;
+                            position: relative;
+                        }
+
+                        /* === HEADER SECTION === */
+                        .header {
+                            background: #1a365d;
+                            color: white;
+                            padding: 40px 30px;
+                            text-align: center;
+                            margin-bottom: 0;
+                            page-break-inside: avoid;
+                        }
+
+                        .report-title {
+                            font-size: 28pt;
+                            font-weight: bold;
+                            margin-bottom: 8px;
+                            letter-spacing: 1px;
+                            line-height: 1.2;
+                        }
+
+                        .report-subtitle {
+                            font-size: 14pt;
+                            font-weight: normal;
+                            opacity: 0.9;
+                            margin: 0;
+                        }
+
+                        .report-date {
+                            font-size: 10pt;
+                            margin-top: 15px;
+                            opacity: 0.8;
+                            font-weight: 300;
+                        }
+
+                        /* === EXECUTIVE SUMMARY === */
+                        .executive-summary {
+                            background: #f8f9fa;
+                            border: 2px solid {{RISK_BORDER_COLOR}};
+                            border-radius: 8px;
+                            padding: 25px;
+                            margin: 30px 0;
+                            page-break-inside: avoid;
+                        }
+
+                        .summary-title {
+                            font-size: 16pt;
+                            font-weight: bold;
+                            color: {{RISK_COLOR}};
+                            margin-bottom: 15px;
+                            text-transform: uppercase;
+                        }
+
+                        .risk-score-summary {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin-bottom: 20px;
+                        }
+
+                        .risk-score-large {
+                            font-size: 48pt;
+                            font-weight: bold;
+                            color: {{RISK_COLOR}};
+                            line-height: 1;
+                        }
+
+                        .risk-classification {
+                            text-align: right;
+                        }
+
+                        .risk-level-badge {
+                            background: {{RISK_COLOR}};
+                            color: white;
+                            padding: 8px 16px;
+                            border-radius: 4px;
+                            font-weight: bold;
+                            font-size: 12pt;
+                            display: inline-block;
+                            margin-bottom: 8px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                        }
+
+                        .risk-description {
+                            font-size: 10pt;
+                            color: #666;
+                            line-height: 1.4;
+                        }
+
+                        .critical-alert {
+                            background: #fff3cd;
+                            border: 1px solid #ffeaa7;
+                            border-radius: 4px;
+                            padding: 15px;
+                            margin-top: 15px;
+                        }
+
+                        .alert-text {
+                            color: #856404;
+                            font-weight: bold;
+                            font-size: 10pt;
+                        }
+
+                        /* === SECTION HEADERS === */
+                        .section-header {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            color: #1a365d;
+                            margin: 30px 0 15px 0;
+                            border-bottom: 2px solid #1a365d;
+                            padding-bottom: 5px;
+                            page-break-after: avoid;
+                        }
+
+                        /* === TABLES === */
+                        .info-table, .categories-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 1.5rem;
+                            font-size: 0.9rem;
+                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                            page-break-inside: avoid;
+                        }
+
+                        .info-table th, .info-table td,
+                        .categories-table th, .categories-table td {
+                            padding: 0.6rem 0.75rem;
+                            text-align: left;
+                            border-bottom: 1px solid #e2e8f0;
+                            vertical-align: top;
+                        }
+
+                        .info-table th, .categories-table th {
+                            background: #1a365d;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 0.85rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.025em;
+                        }
+
+                        .info-table tbody tr:nth-child(even),
+                        .categories-table tbody tr:nth-child(even) {
+                            background: #f8fafc;
+                        }
+
+                        .info-table tbody tr:hover,
+                        .categories-table tbody tr:hover {
+                            background: #f1f5f9;
+                        }
+
+                        .score-cell {
+                            font-weight: 700;
+                            text-align: center;
+                            font-size: 0.95rem;
+                        }
+
+                        /* === RISK COLOR CODING === */
+                        .score-critical {
+                            background: #dc3545 !important;
+                            color: white !important;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+
+                        .score-high {
+                            background: #fd7e14 !important;
+                            color: white !important;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+
+                        .score-medium {
+                            background: #ffc107 !important;
+                            color: #333 !important;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+
+                        .score-low {
+                            background: #28a745 !important;
+                            color: white !important;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+
+                        /* === RECOMMENDATIONS === */
+                        .recommendations-section {
+                            margin-top: 2rem;
+                            page-break-inside: avoid;
+                        }
+
+                        .recommendations-title {
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            color: #1e293b;
+                            margin-bottom: 1rem;
+                            border-bottom: 2px solid #3b82f6;
+                            padding-bottom: 0.5rem;
+                        }
+
+                        .recommendation-item {
+                            margin-bottom: 1rem;
+                            padding: 1rem;
+                            border-radius: 0.5rem;
+                            border-left: 4px solid;
+                            page-break-inside: avoid;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .priority-critical {
+                            background: #fef2f2;
+                            border-color: #dc2626;
+                        }
+
+                        .priority-high {
+                            background: #fff7ed;
+                            border-color: #ea580c;
+                        }
+
+                        .priority-medium {
+                            background: #fefce8;
+                            border-color: #ca8a04;
+                        }
+
+                        .priority-low {
+                            background: #f0fdf4;
+                            border-color: #16a34a;
+                        }
+
+                        .recommendation-header {
+                            font-weight: 700;
+                            margin-bottom: 0.5rem;
+                            color: #1e293b;
+                            font-size: 0.95rem;
+                        }
+
+                        .recommendation-text {
+                            font-size: 0.85rem;
+                            color: #475569;
+                            line-height: 1.4;
+                            margin: 0;
+                        }
+
+                        /* === RISK ASSESSMENT MATRIX === */
+                        .risk-matrix {
+                            margin: 30px 0;
+                            page-break-inside: avoid;
+                        }
+
+                        .matrix-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 15px 0;
+                        }
+
+                        .matrix-table th,
+                        .matrix-table td {
+                            padding: 8px;
+                            text-align: center;
+                            border: 1px solid #333;
+                            font-size: 9pt;
+                            font-weight: bold;
+                        }
+
+                        .matrix-table th {
+                            background: #333;
+                            color: white;
+                        }
+
+                        .matrix-low { background: #d4edda; }
+                        .matrix-medium { background: #fff3cd; }
+                        .matrix-high { background: #f8d7da; }
+                        .matrix-critical { background: #dc3545; color: white; }
+
+                        /* === CHARTS AND VISUALS === */
+                        .chart-container {
+                            page-break-inside: avoid;
+                            margin: 1.5rem 0;
+                            text-align: center;
+                        }
+
+                        .chart-title {
+                            font-size: 1rem;
+                            font-weight: 600;
+                            color: #1e293b;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        /* === FOOTER === */
+                        /* === SIGNATURE SECTION === */
+                        .signature-section {
+                            margin-top: 40px;
+                            page-break-inside: avoid;
+                        }
+
+                        .signature-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        .signature-table td {
+                            padding: 20px 10px;
+                            border-bottom: 1px solid #333;
+                            width: 33.33%;
+                        }
+
+                        .signature-label {
+                            font-size: 9pt;
+                            color: #666;
+                            margin-top: 5px;
+                        }
+
+                        .footer {
+                            margin-top: 40px;
+                            padding-top: 20px;
+                            border-top: 1px solid #ddd;
+                            text-align: center;
+                            font-size: 9pt;
+                            color: #666;
+                            page-break-inside: avoid;
+                        }
+
+                        .confidential-marking {
+                            font-weight: bold;
+                            color: #dc3545;
+                            margin-bottom: 10px;
+                        }
+
+                        .report-metadata {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-top: 0.5rem;
+                            font-size: 0.65rem;
+                        }
+
+                        /* === UTILITY CLASSES === */
+                        .page-break-before { page-break-before: always; }
+                        .page-break-after { page-break-after: always; }
+                        .page-break-inside-avoid { page-break-inside: avoid; }
+                        .no-break { page-break-inside: avoid; }
+
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .font-bold { font-weight: 700; }
+                        .font-medium { font-weight: 500; }
+
+                        .mt-1 { margin-top: 0.5rem; }
+                        .mt-2 { margin-top: 1rem; }
+                        .mb-1 { margin-bottom: 0.5rem; }
+                        .mb-2 { margin-bottom: 1rem; }
+
+                        /* === RESPONSIVE ADJUSTMENTS === */
+                        @media screen and (max-width: 768px) {
+                            .header {
+                                padding: 1rem;
+                            }
+                            
+                            .report-title {
+                                font-size: 1.25rem;
+                            }
+                            
+                            .risk-score-large {
+                                font-size: 2rem;
+                            }
+                            
+                            .info-table, .categories-table {
+                                font-size: 0.8rem;
+                            }
+                            
+                            .recommendation-item {
+                                padding: 0.75rem;
+                            }
+                        }
+
+                        /* === PRINT OPTIMIZATION === */
+                        @media print {
+                            /* Hide non-essential elements */
+                            .no-print { display: none !important; }
+                            
+                            /* Optimize colors and backgrounds */
+                            body { 
+                                print-color-adjust: exact;
+                                -webkit-print-color-adjust: exact;
+                                color-adjust: exact;
+                            }
+                            
+                            /* Ensure proper page breaks */
+                            .header, .executive-summary, .recommendation-item, .chart-container {
+                                page-break-inside: avoid;
+                            }
+                            
+                            .section-header {
+                                page-break-after: avoid;
+                            }
+                            
+                            /* Optimize table printing */
+                            .info-table, .categories-table {
+                                page-break-inside: auto;
+                            }
+                            
+                            .info-table thead, .categories-table thead {
+                                display: table-header-group;
+                            }
+                            
+                            .info-table tbody, .categories-table tbody {
+                                display: table-row-group;
+                            }
+                            
+                            /* Adjust margins for print */
+                            .report-container {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            
+                            /* Optimize font sizes for print */
+                            body {
+                                font-size: 10pt;
+                                line-height: 1.4;
+                            }
+                            
+                            .report-title {
+                                font-size: 14pt;
+                            }
+                            
+                            .risk-score-large {
+                                font-size: 24pt;
+                            }
+                            
+                            .section-header {
+                                font-size: 12pt;
+                            }
+                            
+                            /* Remove shadows and effects that don't print well */
+                            .executive-summary,
+                            .info-table,
+                            .categories-table,
+                            .recommendation-item {
+                                box-shadow: none;
+                            }
+                            
+                            /* Ensure borders are visible */
+                            .info-table, .categories-table {
+                                border: 1px solid #e2e8f0;
+                            }
+                            
+                            .info-table th, .info-table td,
+                            .categories-table th, .categories-table td {
+                                border: 1px solid #e2e8f0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="report-container">
+                        <div class="header">
+                            <h1 class="report-title">{{REPORT_TITLE}}</h1>
+                            <p class="report-subtitle">Enterprise Security Analysis Report</p>
+                            <p class="report-date">Generated: {{REPORT_DATE}}</p>
+                        </div>
+                        
+                        <div class="executive-summary">
+                            <h2 class="summary-title">Executive Summary</h2>
+                            <div class="risk-score-summary">
+                                <div class="risk-score-large">{{RISK_SCORE}}</div>
+                                <div class="risk-classification">
+                                    <div class="risk-level-badge">{{RISK_LEVEL}}</div>
+                                    <div class="risk-description">Immediate Action Required</div>
+                                </div>
+                            </div>
+                            <div class="critical-alert">
+                                <div class="alert-text">
+                                    ⚠️ WARNING: {{RISK_DESCRIPTION}}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h2 class="section-header">Tool Information</h2>
+                        <table class="info-table">
+                            <tbody>
+                                <tr><th>Tool Name</th><td>{{TOOL_NAME}}</td></tr>
+                                <tr><th>Category</th><td>{{CATEGORY}}</td></tr>
+                                <tr><th>Use Case</th><td>{{USE_CASE}}</td></tr>
+                                <tr><th>Data Classification</th><td><strong style="color: #dc2626;">{{DATA_CLASSIFICATION}}</strong></td></tr>
+                                <tr><th>Assessment Date</th><td>{{ASSESSMENT_DATE}}</td></tr>
+                                <tr><th>Assessment ID</th><td>{{ASSESSMENT_ID}}</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="risk-matrix">
+                            <h2 class="section-header">Risk Assessment Matrix</h2>
+                            <table class="matrix-table">
+                                <tr>
+                                    <th>Impact →<br>Likelihood ↓</th>
+                                    <th>Low (1-2)</th>
+                                    <th>Medium (3-4)</th>
+                                    <th>High (5-6)</th>
+                                    <th>Critical (7-8)</th>
+                                </tr>
+                                <tr>
+                                    <th>Very Likely</th>
+                                    <td class="matrix-medium">Medium</td>
+                                    <td class="matrix-high">High</td>
+                                    <td class="matrix-critical">Critical</td>
+                                    <td class="matrix-critical">Critical</td>
+                                </tr>
+                                <tr>
+                                    <th>Likely</th>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-medium">Medium</td>
+                                    <td class="matrix-high">High</td>
+                                    <td class="matrix-critical">Critical ★</td>
+                                </tr>
+                                <tr>
+                                    <th>Possible</th>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-medium">Medium</td>
+                                    <td class="matrix-high">High</td>
+                                </tr>
+                                <tr>
+                                    <th>Unlikely</th>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-low">Low</td>
+                                    <td class="matrix-medium">Medium</td>
+                                </tr>
+                            </table>
+                            <p style="font-size: 9pt; margin-top: 10px;">★ Current Risk Level: Score {{RISK_SCORE}} falls in {{RISK_LEVEL}} category</p>
+                        </div>
+                        
+                        <h2 class="section-header">Security Category Breakdown</h2>
+                        <table class="categories-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">Category</th>
+                                    <th style="width: 15%;">Score</th>
+                                    <th style="width: 15%;">Risk Level</th>
+                                    <th style="width: 40%;">Assessment Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{RISK_CATEGORIES}}
+                            </tbody>
+                        </table>
+                        
+                        <div class="recommendations-section">
+                            <h2 class="section-header">Recommendations & Action Items</h2>
+                            {{RECOMMENDATIONS}}
+                        </div>
+
+                        <div class="signature-section">
+                            <h2 class="section-header">Assessment Approval</h2>
+                            <table class="signature-table">
+                                <tr>
+                                    <td>
+                                        <div style="height: 40px;"></div>
+                                        <div class="signature-label">Security Analyst</div>
+                                    </td>
+                                    <td>
+                                        <div style="height: 40px;"></div>
+                                        <div class="signature-label">CISO Approval</div>
+                                    </td>
+                                    <td>
+                                        <div style="height: 40px;"></div>
+                                        <div class="signature-label">Date</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="footer">
+                            <div class="confidential-marking">CONFIDENTIAL - INTERNAL USE ONLY</div>
+                            <div>AI Tool Risk Assessment Framework v2.0</div>
+                            <div>Assessment ID: {{ASSESSMENT_ID}} | Generated: {{REPORT_DATE}}</div>
+                        </div>
+                    </div>
+                </body>
+                </html>`;
+            }
+
+            generateReport(data) {
+                let html = this.template;
+                
+                // Risk color mapping
+                const riskColors = {
+                    'critical': { color: '#dc2626', bg: '#fef2f2', border: '#dc2626' },
+                    'high': { color: '#ea580c', bg: '#fff7ed', border: '#ea580c' },
+                    'medium': { color: '#ca8a04', bg: '#fefce8', border: '#ca8a04' },
+                    'low': { color: '#16a34a', bg: '#f0fdf4', border: '#16a34a' }
+                };
+                
+                const riskStyle = riskColors[data.riskLevel.toLowerCase()] || riskColors['medium'];
+                
+                // Replace placeholders
+                html = html.replace(/\{\{REPORT_TITLE\}\}/g, 'AI TOOL SECURITY RISK ASSESSMENT');
+                html = html.replace(/\{\{REPORT_DATE\}\}/g, new Date().toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                }));
+                html = html.replace(/\{\{RISK_SCORE\}\}/g, data.riskScore);
+                html = html.replace(/\{\{RISK_LEVEL\}\}/g, data.riskLevel.toUpperCase());
+                html = html.replace(/\{\{RISK_DESCRIPTION\}\}/g, data.riskDescription);
+                html = html.replace(/\{\{RISK_COLOR\}\}/g, riskStyle.color);
+                html = html.replace(/\{\{RISK_BG_COLOR\}\}/g, riskStyle.bg);
+                html = html.replace(/\{\{RISK_BORDER_COLOR\}\}/g, riskStyle.border);
+                html = html.replace(/\{\{TOOL_NAME\}\}/g, data.toolName);
+                html = html.replace(/\{\{CATEGORY\}\}/g, data.category || 'Not specified');
+                html = html.replace(/\{\{USE_CASE\}\}/g, data.useCase || 'Not specified');
+                html = html.replace(/\{\{DATA_CLASSIFICATION\}\}/g, data.dataClassification);
+                html = html.replace(/\{\{ASSESSMENT_DATE\}\}/g, new Date().toLocaleDateString());
+                html = html.replace(/\{\{ASSESSMENT_ID\}\}/g, Date.now());
+                
+                // Generate categories table
+                const categoriesHtml = data.categories.map(cat => {
+                    const scoreNum = parseInt(cat.score.split('/')[0]);
+                    const maxScore = parseInt(cat.score.split('/')[1]);
+                    const scorePercent = scoreNum / maxScore;
+                    
+                    let riskLevel = 'low';
+                    if (scorePercent > 0.7) riskLevel = 'critical';
+                    else if (scorePercent > 0.4) riskLevel = 'high';
+                    else if (scorePercent > 0.2) riskLevel = 'medium';
+                    
+                    return `
+                        <tr>
+                            <td><strong>${cat.name}</strong></td>
+                            <td class="score-cell score-${riskLevel}">${cat.score}</td>
+                            <td class="score-cell score-${riskLevel}">${riskLevel.toUpperCase()}</td>
+                            <td>${cat.description}</td>
+                        </tr>
+                    `;
+                }).join('');
+                html = html.replace(/\{\{RISK_CATEGORIES\}\}/g, categoriesHtml);
+                
+                // Generate recommendations
+                const recommendationsHtml = data.recommendations.map((rec, index) => {
+                    const priority = this.determinePriority(rec);
+                    const priorityText = priority.toUpperCase();
+                    return `
+                        <div class="recommendation-item priority-${priority}">
+                            <div class="recommendation-header">${index + 1}. ${this.getActionTitle(rec)} (Priority: ${priorityText})</div>
+                            <div class="recommendation-text">${rec}</div>
+                        </div>
+                    `;
+                }).join('');
+                html = html.replace(/\{\{RECOMMENDATIONS\}\}/g, recommendationsHtml);
+                
+                return html;
+            }
+            
+            determinePriority(recommendation) {
+                const rec = recommendation.toLowerCase();
+                if (rec.includes('immediate') || rec.includes('critical') || rec.includes('blocking')) {
+                    return 'critical';
+                } else if (rec.includes('significant') || rec.includes('high')) {
+                    return 'high';
+                } else {
+                    return 'medium';
+                }
+            }
+
+            getActionTitle(recommendation) {
+                const rec = recommendation.toLowerCase();
+                if (rec.includes('immediate') || rec.includes('blocking')) {
+                    return 'IMMEDIATE ACTION REQUIRED';
+                } else if (rec.includes('enterprise') || rec.includes('alternatives')) {
+                    return 'ENTERPRISE ALTERNATIVES';
+                } else if (rec.includes('policy') || rec.includes('framework')) {
+                    return 'POLICY DEVELOPMENT';
+                } else if (rec.includes('training') || rec.includes('education')) {
+                    return 'STAFF TRAINING';
+                } else {
+                    return 'SECURITY ENHANCEMENT';
+                }
+            }
+        }
+
+        // === ENHANCED PDF EXPORT OPTIONS ===
+        class EnhancedPDFExporter {
+            
+            // Option 1: HTML Template + Print (Best for production)
+            exportTemplatedPDF(assessmentData) {
+                const generator = new AIRiskReportGenerator();
+                const reportData = this.convertAssessmentData(assessmentData);
+                const html = generator.generateReport(reportData);
+                
+                // Create new window with report
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                // Add print button to the report
+                const printButton = printWindow.document.createElement('button');
+                printButton.textContent = '🖨️ Print PDF';
+                printButton.className = 'no-print';
+                printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                printButton.onclick = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+                printWindow.document.body.appendChild(printButton);
+                
+                // Auto-print after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+            }
+            
+            // Option 2: jsPDF Enhanced (Current working version)
+            exportJsPDF(assessmentData) {
+                return generatePDFReportOriginal(assessmentData); // Use existing function
+            }
+            
+            // Option 3: Save as HTML file
+            exportHTML(assessmentData) {
+                const generator = new AIRiskReportGenerator();
+                const reportData = this.convertAssessmentData(assessmentData);
+                const html = generator.generateReport(reportData);
+                
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ai-risk-assessment-${reportData.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            convertAssessmentData(assessment) {
+                const riskDescriptions = {
+                    'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                    'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                    'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                    'low': 'Basic monitoring sufficient. Tool meets security standards.'
+                };
+                
+                const dataLabels = {
+                    'phi': 'Protected Health Information (PHI)',
+                    'financial': 'Financial/Payment Data',
+                    'trade-secrets': 'Trade Secrets/Intellectual Property',
+                    'pii': 'Personally Identifiable Information',
+                    'public': 'Public/Marketing Data'
+                };
+                
+                const toolName = assessment.results.toolName + 
+                    (assessment.formData.toolVersion === 'enterprise' && 
+                     !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+                
+                return {
+                    toolName: toolName,
+                    category: assessment.formData.toolCategory,
+                    useCase: getUseCaseLabel(assessment.formData.useCase),
+                    dataClassification: dataLabels[assessment.formData.dataClassification] || 'Unknown',
+                    riskScore: assessment.results.finalScore,
+                    riskLevel: assessment.results.riskLevel,
+                    riskDescription: riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.',
+                    categories: Object.entries(assessment.results.breakdown).map(([name, data]) => ({
+                        name: name,
+                        score: data.score,
+                        description: data.description
+                    })),
+                    recommendations: assessment.results.recommendations || []
+                };
+            }
+        }
+
+        function generatePDFReportOriginal(assessment) {
+            console.log('🔧 Starting PDF generation...', assessment);
+            
+            // Check if jsPDF is available (correct property: window.jspdf)
+            if (typeof window.jspdf === 'undefined') {
                 throw new Error('jsPDF library not loaded. Please refresh the page and try again.');
             }
             
-            const { jsPDF } = window;
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            let yPosition = 20;
             
-            // Page dimensions
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 20;
-            const contentWidth = pageWidth - (margin * 2);
+            console.log('✅ jsPDF initialized');
             
-            let currentY = margin;
+            // === HEADER WITH BRANDING ===
+            // Background header
+            doc.setFillColor(59, 130, 246); // Blue background
+            doc.rect(0, 0, 210, 45, 'F');
             
-            // Helper functions
-            function addText(text, x, y, options = {}) {
-                doc.setFont(options.font || 'helvetica', options.style || 'normal');
-                doc.setFontSize(options.size || 12);
-                if (options.color) doc.setTextColor(...options.color);
-                else doc.setTextColor(0, 0, 0);
-                
-                if (options.align === 'center') {
-                    const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-                    x = (pageWidth - textWidth) / 2;
-                }
-                
-                doc.text(text, x, y);
-                return y + (options.lineHeight || 7);
-            }
+            // Company logo area
+            doc.setFillColor(255, 255, 255, 0.1);
+            doc.rect(15, 8, 35, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI RISK', 17, 16);
+            doc.text('FRAMEWORK', 17, 22);
             
-            function addLine(x1, y1, x2, y2, color = [200, 200, 200]) {
-                doc.setDrawColor(...color);
-                doc.line(x1, y1, x2, y2);
-            }
+            // Main title
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI TOOL SECURITY RISK ASSESSMENT', 105, 18, { align: 'center' });
             
-            function addRect(x, y, width, height, fillColor, borderColor = [200, 200, 200]) {
-                if (fillColor) {
-                    doc.setFillColor(...fillColor);
-                    doc.rect(x, y, width, height, 'F');
-                }
-                doc.setDrawColor(...borderColor);
-                doc.rect(x, y, width, height);
-            }
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Enterprise Security Analysis Report', 105, 28, { align: 'center' });
             
-            function checkPageBreak(neededSpace) {
-                if (currentY + neededSpace > pageHeight - margin) {
-                    doc.addPage();
-                    currentY = margin;
-                    return true;
-                }
-                return false;
-            }
-            
-            // === HEADER ===
-            // Company Logo Area (placeholder)
-            addRect(margin, currentY, 40, 20, [59, 130, 246, 0.1]);
-            currentY = addText('AI RISK', margin + 5, currentY + 8, { 
-                font: 'helvetica', style: 'bold', size: 10, color: [59, 130, 246] 
-            });
-            currentY = addText('FRAMEWORK', margin + 5, currentY - 2, { 
-                font: 'helvetica', style: 'bold', size: 8, color: [59, 130, 246] 
-            });
-            
-            // Report Title
-            currentY = addText('AI TOOL SECURITY RISK ASSESSMENT', pageWidth/2, margin + 10, { 
-                font: 'helvetica', style: 'bold', size: 16, align: 'center' 
-            });
-            
-            currentY = addText('Enterprise Security Analysis Report', pageWidth/2, currentY, { 
-                font: 'helvetica', style: 'normal', size: 12, align: 'center', color: [107, 114, 128] 
-            });
-            
-            // Date and Assessment Info
-            const assessmentDate = new Date().toLocaleDateString('en-US', {
+            const currentDate = new Date().toLocaleDateString('en-US', {
                 year: 'numeric', month: 'long', day: 'numeric'
             });
-            currentY = addText(`Generated: ${assessmentDate}`, pageWidth/2, currentY + 5, { 
-                size: 10, align: 'center', color: [107, 114, 128] 
-            });
+            doc.setFontSize(10);
+            doc.text(`Generated: ${currentDate}`, 105, 38, { align: 'center' });
             
-            currentY += 10;
-            addLine(margin, currentY, pageWidth - margin, currentY);
-            currentY += 15;
+            // Reset text color and position
+            doc.setTextColor(0, 0, 0);
+            yPosition = 55;
             
-            // === EXECUTIVE SUMMARY ===
-            currentY = addText('EXECUTIVE SUMMARY', margin, currentY, { 
-                font: 'helvetica', style: 'bold', size: 14 
-            });
-            currentY += 5;
+            // === TOOL INFORMATION BOX ===
+            // Background box
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 45, 'FD');
             
-            // Tool Info Box
-            addRect(margin, currentY, contentWidth, 35, [248, 250, 252]);
-            currentY += 8;
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('TOOL INFORMATION', 20, yPosition + 10);
+            yPosition += 20;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
             
             const toolName = assessment.results.toolName + 
                 (assessment.formData.toolVersion === 'enterprise' && 
                  !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
             
-            currentY = addText(`Tool: ${toolName}`, margin + 10, currentY, { 
-                font: 'helvetica', style: 'bold', size: 12 
-            });
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text(`Tool Name: ${toolName}`, 20, yPosition);
+            yPosition += 7;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
             
             if (assessment.formData.toolCategory) {
-                currentY = addText(`Category: ${assessment.formData.toolCategory}`, margin + 10, currentY, { size: 10 });
+                doc.text(`Category: ${assessment.formData.toolCategory}`, 20, yPosition);
+                yPosition += 7;
             }
             
             if (assessment.formData.useCase) {
-                currentY = addText(`Use Case: ${getUseCaseLabel(assessment.formData.useCase)}`, margin + 10, currentY, { size: 10 });
+                doc.text(`Use Case: ${getUseCaseLabel(assessment.formData.useCase)}`, 20, yPosition);
+                yPosition += 7;
             }
             
-            // Data Classification
-            const dataClassificationLabels = {
+            // Data Classification with colored badge
+            const dataLabels = {
                 'phi': 'Protected Health Information (PHI)',
                 'financial': 'Financial/Payment Data',
                 'trade-secrets': 'Trade Secrets/Intellectual Property',
@@ -1990,22 +3218,22 @@
                 'public': 'Public/Marketing Data'
             };
             
-            const dataLabel = dataClassificationLabels[assessment.formData.dataClassification] || 'Unknown';
-            currentY = addText(`Data Classification: ${dataLabel}`, margin + 10, currentY, { 
-                size: 10, color: [220, 38, 38] 
-            });
+            const dataType = dataLabels[assessment.formData.dataClassification] || 'Unknown';
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(220, 38, 38);
+            doc.text(`Data Classification: ${dataType}`, 20, yPosition);
             
-            currentY += 15;
+            doc.setTextColor(0, 0, 0);
+            yPosition += 20;
             
-            // === RISK SCORE SECTION ===
-            checkPageBreak(80);
+            // === RISK SCORE PANEL ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('RISK ASSESSMENT RESULTS', 20, yPosition);
+            yPosition += 15;
             
-            currentY = addText('RISK ASSESSMENT RESULTS', margin, currentY, { 
-                font: 'helvetica', style: 'bold', size: 14 
-            });
-            currentY += 10;
-            
-            // Risk Score Circle (simplified as text box)
+            // Risk color mapping
             const riskColors = {
                 'critical': [220, 38, 38],
                 'high': [234, 88, 12],
@@ -2013,28 +3241,51 @@
                 'low': [22, 163, 74]
             };
             
+            const riskBgColors = {
+                'critical': [254, 242, 242],
+                'high': [255, 247, 237],
+                'medium': [254, 252, 232],
+                'low': [240, 253, 244]
+            };
+            
             const riskLabels = {
                 'critical': 'CRITICAL RISK',
-                'high': 'HIGH RISK', 
+                'high': 'HIGH RISK',
                 'medium': 'MEDIUM RISK',
                 'low': 'LOW RISK'
             };
             
-            const riskColor = riskColors[assessment.results.riskLevel];
-            const riskLabel = riskLabels[assessment.results.riskLevel];
+            const riskColor = riskColors[assessment.results.riskLevel] || [0, 0, 0];
+            const riskBgColor = riskBgColors[assessment.results.riskLevel] || [248, 250, 252];
+            const riskLabel = riskLabels[assessment.results.riskLevel] || 'UNKNOWN RISK';
             
-            // Risk Score Box
-            addRect(margin, currentY, contentWidth, 40, [riskColor[0]/255, riskColor[1]/255, riskColor[2]/255, 0.1]);
+            // Risk score background box
+            doc.setFillColor(...riskBgColor);
+            doc.setDrawColor(...riskColor);
+            doc.setLineWidth(2);
+            doc.rect(15, yPosition, 180, 35, 'FD');
+            doc.setLineWidth(0.5);
             
-            currentY = addText(`RISK SCORE: ${assessment.results.finalScore}`, margin + 10, currentY + 15, { 
-                font: 'helvetica', style: 'bold', size: 20, color: riskColor 
-            });
+            // Large risk score number
+            doc.setTextColor(...riskColor);
+            doc.setFontSize(32);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${assessment.results.finalScore}`, 25, yPosition + 20);
             
-            currentY = addText(riskLabel, margin + 10, currentY + 5, { 
-                font: 'helvetica', style: 'bold', size: 14, color: riskColor 
-            });
+            // Risk score label
+            doc.setFontSize(20);
+            doc.text('RISK SCORE', 25, yPosition + 30);
             
-            // Risk Descriptions
+            // Risk level label on the right
+            doc.setFontSize(18);
+            doc.text(riskLabel, 120, yPosition + 20);
+            
+            yPosition += 45;
+            
+            // Risk description box
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
             const riskDescriptions = {
                 'critical': 'Immediate blocking required. This tool poses severe security risks.',
                 'high': 'Significant controls needed before use. Enhanced monitoring required.',
@@ -2042,92 +3293,186 @@
                 'low': 'Basic monitoring sufficient. Tool meets security standards.'
             };
             
-            currentY = addText(riskDescriptions[assessment.results.riskLevel], margin + 10, currentY + 5, { 
-                size: 10, color: [75, 85, 99] 
-            });
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 15, 'FD');
+            doc.text(riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.', 20, yPosition + 8);
+            yPosition += 25;
             
-            currentY += 20;
+            // === BREAKDOWN TABLE ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('SECURITY CATEGORY BREAKDOWN', 20, yPosition);
+            yPosition += 15;
             
-            // === DETAILED BREAKDOWN ===
-            checkPageBreak(100);
+            // Table header
+            doc.setFillColor(59, 130, 246);
+            doc.rect(15, yPosition, 180, 12, 'F');
             
-            currentY = addText('SECURITY CATEGORY BREAKDOWN', margin, currentY, { 
-                font: 'helvetica', style: 'bold', size: 14 
-            });
-            currentY += 10;
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CATEGORY', 20, yPosition + 8);
+            doc.text('SCORE', 120, yPosition + 8);
+            doc.text('ASSESSMENT', 140, yPosition + 8);
+            yPosition += 12;
             
-            // Breakdown Table Header
-            addRect(margin, currentY, contentWidth, 12, [59, 130, 246]);
-            currentY = addText('Category', margin + 5, currentY + 8, { 
-                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
-            });
-            addText('Score', margin + 120, currentY - 8, { 
-                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
-            });
-            addText('Assessment', margin + 160, currentY - 8, { 
-                color: [255, 255, 255], font: 'helvetica', style: 'bold', size: 10 
-            });
-            
-            currentY += 2;
-            
-            // Breakdown Rows
-            Object.entries(assessment.results.breakdown).forEach(([category, data], index) => {
-                checkPageBreak(15);
+            // Table rows
+            const categories = Object.entries(assessment.results.breakdown);
+            categories.forEach(([category, data], index) => {
+                if (yPosition > 240) {
+                    doc.addPage();
+                    yPosition = 20;
+                    
+                    // Redraw header on new page
+                    doc.setFillColor(59, 130, 246);
+                    doc.rect(15, yPosition, 180, 12, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CATEGORY', 20, yPosition + 8);
+                    doc.text('SCORE', 120, yPosition + 8);
+                    doc.text('ASSESSMENT', 140, yPosition + 8);
+                    yPosition += 12;
+                }
                 
-                const bgColor = index % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
-                addRect(margin, currentY, contentWidth, 12, bgColor);
+                // Alternating row colors
+                const rowColor = index % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+                doc.setFillColor(...rowColor);
+                doc.rect(15, yPosition, 180, 20, 'F');
                 
-                currentY = addText(category, margin + 5, currentY + 8, { size: 9, font: 'helvetica', style: 'bold' });
-                addText(data.score, margin + 120, currentY - 8, { size: 9 });
+                // Row border
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(15, yPosition, 180, 20);
                 
-                // Wrap long descriptions
-                const desc = data.description.length > 45 ? 
+                // Category name
+                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text(category, 18, yPosition + 8);
+                
+                // Score with color coding
+                const scoreNum = parseInt(data.score.split('/')[0]);
+                const maxScore = parseInt(data.score.split('/')[1]);
+                const scorePercent = scoreNum / maxScore;
+                
+                let scoreColor = [22, 163, 74]; // Green (good)
+                if (scorePercent > 0.7) scoreColor = [220, 38, 38]; // Red (bad)
+                else if (scorePercent > 0.4) scoreColor = [234, 88, 12]; // Orange (medium)
+                
+                doc.setTextColor(...scoreColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(data.score, 122, yPosition + 8);
+                
+                // Description
+                doc.setTextColor(75, 85, 99);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                const description = data.description.length > 45 ? 
                     data.description.substring(0, 45) + '...' : data.description;
-                addText(desc, margin + 160, currentY - 8, { size: 8, color: [75, 85, 99] });
                 
-                currentY += 2;
+                // Word wrap for description
+                const lines = doc.splitTextToSize(description, 50);
+                let lineY = yPosition + 6;
+                lines.slice(0, 2).forEach(line => {
+                    doc.text(line, 142, lineY);
+                    lineY += 5;
+                });
+                
+                yPosition += 20;
             });
             
-            currentY += 10;
+            yPosition += 10;
             
             // === RECOMMENDATIONS ===
-            if (assessment.results.recommendations.length > 0) {
-                checkPageBreak(50);
+            if (assessment.results.recommendations && assessment.results.recommendations.length > 0) {
+                if (yPosition > 200) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
                 
-                currentY = addText('RECOMMENDATIONS', margin, currentY, { 
-                    font: 'helvetica', style: 'bold', size: 14 
-                });
-                currentY += 5;
+                // Recommendations header
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(30, 41, 59);
+                doc.text('RECOMMENDATIONS', 20, yPosition);
+                yPosition += 15;
+                
+                // Recommendations box
+                const recHeight = Math.min(assessment.results.recommendations.length * 12 + 10, 60);
+                doc.setFillColor(255, 251, 235);
+                doc.setDrawColor(251, 191, 36);
+                doc.rect(15, yPosition, 180, recHeight, 'FD');
+                
+                yPosition += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(146, 64, 14);
                 
                 assessment.results.recommendations.forEach((rec, index) => {
-                    checkPageBreak(15);
-                    currentY = addText(`${index + 1}. ${rec}`, margin + 5, currentY + 5, { 
-                        size: 10, color: [75, 85, 99] 
+                    if (yPosition > 270) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    // Bullet point with icon
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${index + 1}.`, 20, yPosition);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    const recLines = doc.splitTextToSize(rec, 160);
+                    recLines.slice(0, 2).forEach((line, lineIndex) => {
+                        doc.text(line, 30, yPosition + (lineIndex * 4));
                     });
+                    yPosition += Math.min(recLines.length * 4, 8) + 4;
                 });
                 
-                currentY += 10;
+                yPosition += 10;
             }
             
-            // === FOOTER ===
-            const footerY = pageHeight - 30;
-            addLine(margin, footerY, pageWidth - margin, footerY);
+            // === PROFESSIONAL FOOTER ===
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                
+                // Footer background
+                doc.setFillColor(248, 250, 252);
+                doc.rect(0, 275, 210, 22, 'F');
+                
+                // Footer line
+                doc.setDrawColor(59, 130, 246);
+                doc.setLineWidth(1);
+                doc.line(15, 278, 195, 278);
+                doc.setLineWidth(0.5);
+                
+                // Footer text
+                doc.setFontSize(8);
+                doc.setTextColor(75, 85, 99);
+                doc.setFont('helvetica', 'normal');
+                doc.text('AI Tool Risk Assessment Framework v2.0', 20, 285);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(220, 38, 38);
+                doc.text('CONFIDENTIAL - Internal Use Only', 105, 285, { align: 'center' });
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(75, 85, 99);
+                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
+                
+                // Assessment ID
+                doc.setFontSize(7);
+                doc.setTextColor(156, 163, 175);
+                doc.text(`Assessment ID: ${Date.now()}`, 105, 292, { align: 'center' });
+            }
             
-            addText('AI Tool Risk Assessment Framework v2.0', margin, footerY + 10, { 
-                size: 8, color: [107, 114, 128] 
-            });
-            
-            addText(`Assessment ID: ${Date.now()}`, pageWidth - margin - 50, footerY + 10, { 
-                size: 8, color: [107, 114, 128] 
-            });
-            
-            addText('CONFIDENTIAL - Internal Use Only', pageWidth/2, footerY + 20, { 
-                size: 8, align: 'center', color: [220, 38, 38], font: 'helvetica', style: 'bold' 
-            });
-            
-            // Save PDF
+            // === SAVE PDF ===
             const fileName = `ai-risk-assessment-${toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            
+            console.log('💾 Saving PDF as:', fileName);
             doc.save(fileName);
+            console.log('✅ PDF generation complete!');
         }
 
         function startNewAssessment() {
@@ -2139,17 +3484,36 @@
             showStep(1);
         }
 
-        // Initialize
+        // Global template manager
+        let templateManager = null;
+
+        // Initialize template system when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize template manager with error handling
+            try {
+                if (typeof PDFTemplateManager !== 'undefined') {
+                    templateManager = new PDFTemplateManager();
+                    console.log('✅ PDF Template System loaded');
+                    console.log('Available templates:', templateManager.list());
+                } else {
+                    console.warn('⚠️ PDF Template System not available - using legacy system');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing PDF Template System:', error);
+                templateManager = null;
+            }
+            
             showStep(1);
             updateUIForAuth(); // Initialize auth UI
             
             // Check PDF library loading after page loads
             setTimeout(() => {
-                if (window.jsPDFLoaded && typeof window.jsPDF !== 'undefined') {
+                if (window.jsPDFLoaded && typeof window.jspdf !== 'undefined') {
                     console.log('✅ PDF export functionality ready');
+                    console.log('jsPDF available at:', window.jspdf);
                 } else {
                     console.warn('⚠️ PDF library still loading... Export will retry automatically');
+                    console.log('window.jspdf:', typeof window.jspdf);
                 }
             }, 3000);
         });
