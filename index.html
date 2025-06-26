@@ -1169,45 +1169,60 @@
         }
 
         async function generateAssessmentResults(formData) {
-            // Try to get tool from database first
-            const baseScoreResult = await getToolFromDatabase(formData);
-            const baseScore = baseScoreResult.score;
-            const source = baseScoreResult.source;
+            console.log('🚀 Starting assessment generation for:', formData.toolName);
             
-            const adjustedScore = applyMultipliers(baseScore, formData);
-            
-            // Debug logging
-            console.log('=== TARGETED MULTIPLIER DEBUG ===');
-            console.log('Tool:', formData.toolName, formData.toolVersion);
-            console.log('Base Score:', baseScore, 'Source:', source);
-            console.log('Data Classification:', formData.dataClassification, 'Multiplier:', DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification]);
-            console.log('Use Case:', formData.useCase, 'Multiplier:', USE_CASE_MULTIPLIERS[formData.useCase]);
-            
-            // Show which sections are affected
-            const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
-            const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
-            console.log('🎯 Sections affected by Data Classification multiplier:', 'Data Storage & Compliance Risk');
-            console.log('🎯 Sections affected by Use Case multiplier:', 'Compliance Risk & Access Controls');
-            console.log('📊 Final Score:', Math.min(100, Math.round(adjustedScore)));
-            console.log('==========================================');
-            
-            // Store tool data for breakdown generation
-            window.lastToolData = baseScoreResult;
-            
-            const riskLevel = getRiskLevel(adjustedScore);
-            const breakdown = await generateBreakdown(formData);
-            
-            return {
-                toolName: formData.toolName,
-                baseScore: baseScore,
-                finalScore: Math.min(100, Math.round(adjustedScore)),
-                riskLevel: riskLevel,
-                breakdown: breakdown,
-                recommendations: generateRecommendations(adjustedScore, formData),
-                timestamp: new Date().toISOString(),
-                source: source,
-                enhancedInfo: window.currentEnhancedInfo || null
-            };
+            try {
+                // Try to get tool from database first
+                const baseScoreResult = await getToolFromDatabase(formData);
+                const baseScore = baseScoreResult.score;
+                const source = baseScoreResult.source;
+                
+                console.log('📊 Base score retrieved:', baseScore, 'from', source);
+                
+                const adjustedScore = applyMultipliers(baseScore, formData);
+                
+                // Debug logging
+                console.log('=== TARGETED MULTIPLIER DEBUG ===');
+                console.log('Tool:', formData.toolName, formData.toolVersion);
+                console.log('Base Score:', baseScore, 'Source:', source);
+                console.log('Data Classification:', formData.dataClassification, 'Multiplier:', DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification]);
+                console.log('Use Case:', formData.useCase, 'Multiplier:', USE_CASE_MULTIPLIERS[formData.useCase]);
+                
+                // Show which sections are affected
+                const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
+                const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
+                console.log('🎯 Sections affected by Data Classification multiplier:', 'Data Storage & Compliance Risk');
+                console.log('🎯 Sections affected by Use Case multiplier:', 'Compliance Risk & Access Controls');
+                console.log('📊 Final Score:', Math.min(100, Math.round(adjustedScore)));
+                console.log('==========================================');
+                
+                // Store tool data for breakdown generation
+                window.lastToolData = baseScoreResult;
+                
+                const riskLevel = getRiskLevel(adjustedScore);
+                
+                console.log('📋 Generating breakdown...');
+                const breakdown = await generateBreakdown(formData);
+                console.log('✅ Breakdown complete');
+                
+                const recommendations = generateRecommendations(adjustedScore, formData);
+                console.log('✅ Assessment complete');
+                
+                return {
+                    toolName: formData.toolName,
+                    baseScore: baseScore,
+                    finalScore: Math.min(100, Math.round(adjustedScore)),
+                    riskLevel: riskLevel,
+                    breakdown: breakdown,
+                    recommendations: recommendations,
+                    timestamp: new Date().toISOString(),
+                    source: source,
+                    enhancedInfo: window.currentEnhancedInfo || null
+                };
+            } catch (error) {
+                console.error('❌ Error in assessment generation:', error);
+                throw error; // Re-throw so the calling function can handle it
+            }
         }
 
         async function getToolFromDatabase(formData) {
@@ -1397,31 +1412,53 @@
         }
 
         async function generateBreakdown(formData) {
+            console.log('🔍 Starting breakdown generation...');
+            
             // Check if we have detailed assessment data from previous query
             if (window.lastToolData && window.lastToolData.hasDetailedAssessment) {
+                console.log('✅ Using detailed assessment from cache');
                 return generateDetailedBreakdown(window.lastToolData.toolData, formData);
             }
             
-            // Try to get detailed breakdown from database
+            // Try to get detailed breakdown from database with timeout
             try {
+                console.log('🔍 Attempting database lookup for breakdown...');
                 const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
                 
+                // Add timeout to prevent hanging
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Database query timeout')), 5000)
+                );
+                
                 for (const searchTerm of searchTerms) {
-                    const { data, error } = await supabase
+                    const queryPromise = supabase
                         .from('ai_tools')
                         .select('breakdown, details, detailed_assessment')
                         .ilike('name', `%${searchTerm}%`)
                         .limit(1);
                     
-                    if (data && data.length > 0) {
-                        // Prefer detailed assessment if available
-                        if (data[0].detailed_assessment) {
-                            return generateDetailedBreakdown(data[0], formData);
+                    try {
+                        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+                        
+                        if (error) {
+                            console.warn('Supabase breakdown query error:', error.message);
+                            continue;
                         }
-                        // Fall back to simple breakdown
-                        if (data[0].breakdown) {
-                            return data[0].breakdown;
+                        
+                        if (data && data.length > 0) {
+                            console.log('✅ Found breakdown data in database');
+                            // Prefer detailed assessment if available
+                            if (data[0].detailed_assessment) {
+                                return generateDetailedBreakdown(data[0], formData);
+                            }
+                            // Fall back to simple breakdown
+                            if (data[0].breakdown) {
+                                return data[0].breakdown;
+                            }
                         }
+                    } catch (timeoutError) {
+                        console.warn('Database query timed out, using fallback');
+                        break;
                     }
                 }
             } catch (error) {
@@ -1429,6 +1466,7 @@
             }
             
             // Fallback to generic breakdown
+            console.log('📊 Using generic breakdown fallback');
             return generateGenericBreakdown(formData);
         }
 
