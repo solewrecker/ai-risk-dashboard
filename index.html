@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
     <title>AI Tool Risk Assessment</title>
     
     <!-- Add Supabase Client Library -->
@@ -845,9 +845,13 @@
     </div>
 
     <script>
+        // Global state (declared first to avoid initialization errors)
+        let currentStep = 1;
+        let currentAssessment = null;
+        
         // Configuration
-        const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co/functions/v1/smooth-processor';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoYmhwbnhxaGt6cnJlZ2xmbGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM2NzIwMzMsImV4cCI6MjA0OTI0ODAzM30.5TxB80D6HKZZHKIjAuQe5C0BsVfNF_dD-cTNrUX_pXg';
+        const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
         
         // Initialize Supabase with CORS options
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -1037,9 +1041,7 @@
             'midjourney enterprise': { score: 50, name: 'Midjourney Enterprise' }
         };
 
-        // Global state
-        let currentStep = 1;
-        let currentAssessment = null;
+        // Global state variables moved to top of script
 
         // Step navigation
         function nextStep() {
