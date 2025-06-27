@@ -614,55 +614,10 @@
         <div class="risk-breakdown">
             <h2 class="section-title">🔍 Security Risk Analysis</h2>
             
-            <div class="categories-grid">
-                <div class="category-card medium">
-                    <div class="category-header">
-                        <div class="category-name">Data Storage & Security</div>
-                        <div class="category-score medium">6/25</div>
-                    </div>
-                    <div class="category-description">
-                        Medium risk identified in data handling practices. Enhanced encryption and access controls recommended for financial data protection.
-                    </div>
-                </div>
-
-                <div class="category-card medium">
-                    <div class="category-header">
-                        <div class="category-name">Training Data Usage</div>
-                        <div class="category-score medium">7/25</div>
-                    </div>
-                    <div class="category-description">
-                        Review required for training data policies to ensure compliance with financial data regulations and privacy requirements.
-                    </div>
-                </div>
-
-                <div class="category-card low">
-                    <div class="category-header">
-                        <div class="category-name">Access Controls</div>
-                        <div class="category-score low">Pending</div>
-                    </div>
-                    <div class="category-description">
-                        Assessment in progress. Initial indicators suggest adequate enterprise-level access management capabilities.
-                    </div>
-                </div>
-
-                <div class="category-card low">
-                    <div class="category-header">
-                        <div class="category-name">Compliance Risk</div>
-                        <div class="category-score low">Pending</div>
-                    </div>
-                    <div class="category-description">
-                        Compliance framework assessment underway. PCI-DSS and SOX requirements need verification.
-                    </div>
-                </div>
-
-                <div class="category-card low">
-                    <div class="category-header">
-                        <div class="category-name">Vendor Transparency</div>
-                        <div class="category-score low">Pending</div>
-                    </div>
-                    <div class="category-description">
-                        Vendor documentation and transparency assessment scheduled. Initial review shows standard enterprise disclosures.
-                    </div>
+            <div class="categories-grid" id="securityCategoriesGrid">
+                <!-- Security categories will be populated dynamically -->
+                <div class="loading-message" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #64748b;">
+                    Loading security assessment data...
                 </div>
             </div>
         </div>
@@ -757,5 +712,224 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Initialize Supabase (use your existing configuration)
+        const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Risk level calculation function
+        function calculateRiskLevel(score, maxScore = 25) {
+            if (!score || score === 0) return 'LOW';
+            
+            const percentage = (score / maxScore) * 100;
+            
+            if (percentage >= 60) return 'HIGH';
+            if (percentage >= 30) return 'MEDIUM';
+            return 'LOW';
+        }
+
+        // Get CSS class for risk level
+        function getRiskLevelClass(riskLevel) {
+            switch(riskLevel.toLowerCase()) {
+                case 'high': return 'high';
+                case 'medium': return 'medium';
+                case 'low': return 'low';
+                default: return 'low';
+            }
+        }
+
+        // Get risk level badge HTML
+        function getRiskLevelBadge(riskLevel) {
+            const className = getRiskLevelClass(riskLevel);
+            return `<div class="category-score ${className}">${riskLevel}</div>`;
+        }
+
+        // Security category descriptions
+        const categoryDescriptions = {
+            'dataStorage': {
+                name: 'Data Storage & Security',
+                description: 'Encryption, data residency, and storage practices'
+            },
+            'trainingUsage': {
+                name: 'Training Data Usage', 
+                description: 'Model training and data utilization policies'
+            },
+            'accessControls': {
+                name: 'Access Controls',
+                description: 'Authentication, authorization, and user management'
+            },
+            'complianceRisk': {
+                name: 'Compliance Risk',
+                description: 'Regulatory compliance and audit readiness'
+            },
+            'vendorTransparency': {
+                name: 'Vendor Transparency',
+                description: 'Documentation, SLAs, and incident response'
+            }
+        };
+
+        // Generate detailed description based on breakdown data
+        function generateDescription(categoryKey, score, breakdownData) {
+            const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
+            const riskLevel = calculateRiskLevel(score);
+            
+            if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
+                const subScores = breakdownData.subScores[categoryKey];
+                const details = [];
+                
+                // Extract key insights from sub-scores
+                Object.keys(subScores).forEach(subKey => {
+                    if (subScores[subKey] && subScores[subKey].note) {
+                        const note = subScores[subKey].note;
+                        if (note.length > 50) {
+                            details.push(note.substring(0, 100) + '...');
+                        }
+                    }
+                });
+                
+                if (details.length > 0) {
+                    return `${riskLevel.toLowerCase() === 'high' ? 'High' : riskLevel.toLowerCase() === 'medium' ? 'Medium' : 'Low'} risk identified. ${details[0]}`;
+                }
+            }
+            
+            // Fallback descriptions based on risk level
+            switch(riskLevel) {
+                case 'HIGH':
+                    return `High risk identified in ${baseDesc.toLowerCase()}. Immediate attention and remediation required.`;
+                case 'MEDIUM':
+                    return `Medium risk identified in ${baseDesc.toLowerCase()}. Enhanced controls and monitoring recommended.`;
+                case 'LOW':
+                default:
+                    return `Low risk assessment for ${baseDesc.toLowerCase()}. Standard monitoring and periodic review recommended.`;
+            }
+        }
+
+        // Load security assessment data
+        async function loadSecurityAssessment() {
+            try {
+                // Get the tool name from the page (you may need to adjust this selector)
+                const toolNameElement = document.querySelector('.tool-name');
+                const toolName = toolNameElement ? toolNameElement.textContent.trim() : 'ChatGPT Enterprise';
+                
+                console.log('Loading security assessment for:', toolName);
+                
+                // Query Supabase for the tool data
+                const { data: tools, error } = await supabase
+                    .from('ai_tools')
+                    .select('*')
+                    .ilike('name', `%${toolName}%`)
+                    .limit(1);
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    showError('Unable to load assessment data from database');
+                    return;
+                }
+
+                if (!tools || tools.length === 0) {
+                    console.warn('No tool data found for:', toolName);
+                    showError('No assessment data found for this tool');
+                    return;
+                }
+
+                const toolData = tools[0];
+                console.log('Tool data loaded:', toolData);
+
+                // Generate security categories
+                generateSecurityCategories(toolData);
+
+            } catch (error) {
+                console.error('Error loading security assessment:', error);
+                showError('Failed to load security assessment data');
+            }
+        }
+
+        // Generate security categories HTML
+        function generateSecurityCategories(toolData) {
+            const categoriesGrid = document.getElementById('securityCategoriesGrid');
+            
+            if (!categoriesGrid) {
+                console.error('Categories grid not found');
+                return;
+            }
+
+            // Extract scores from tool data
+            const scores = {
+                dataStorage: toolData.data_storage_score || 0,
+                trainingUsage: toolData.training_usage_score || 0,
+                accessControls: toolData.access_controls_score || 0,
+                complianceRisk: toolData.compliance_score || 0,
+                vendorTransparency: toolData.vendor_transparency_score || 0
+            };
+
+            // Parse breakdown data if available
+            let breakdownData = null;
+            try {
+                if (toolData.breakdown && typeof toolData.breakdown === 'string') {
+                    breakdownData = JSON.parse(toolData.breakdown);
+                } else if (toolData.breakdown && typeof toolData.breakdown === 'object') {
+                    breakdownData = toolData.breakdown;
+                }
+            } catch (e) {
+                console.warn('Could not parse breakdown data:', e);
+            }
+
+            console.log('Scores extracted:', scores);
+            console.log('Breakdown data:', breakdownData);
+
+            // Generate HTML for each category
+            let categoriesHTML = '';
+            
+            Object.keys(scores).forEach(categoryKey => {
+                const score = scores[categoryKey];
+                const riskLevel = calculateRiskLevel(score);
+                const riskClass = getRiskLevelClass(riskLevel);
+                const categoryInfo = categoryDescriptions[categoryKey];
+                const description = generateDescription(categoryKey, score, breakdownData);
+
+                categoriesHTML += `
+                    <div class="category-card ${riskClass}">
+                        <div class="category-header">
+                            <div class="category-name">${categoryInfo.name}</div>
+                            ${getRiskLevelBadge(riskLevel)}
+                        </div>
+                        <div class="category-description">
+                            ${description}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update the grid
+            categoriesGrid.innerHTML = categoriesHTML;
+            
+            console.log('Security categories generated successfully');
+        }
+
+        // Show error message
+        function showError(message) {
+            const categoriesGrid = document.getElementById('securityCategoriesGrid');
+            if (categoriesGrid) {
+                categoriesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #dc2626; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Assessment Data Unavailable</div>
+                        <div style="font-size: 0.9rem;">${message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing security assessment...');
+            loadSecurityAssessment();
+        });
+    </script>
 </body>
 </html>
