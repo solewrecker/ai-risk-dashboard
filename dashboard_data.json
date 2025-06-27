@@ -135,7 +135,7 @@
             "score": 6
           },
           "encryption": {
-            "note": "The transmitted data is encrypted both in transit and at rest; Copilot-related data is encrypted in transit using transport layer security (TLS), and for any data we retain at rest using Microsoft Azure’s data encryption (FIPS Publication 140-2 standards)",
+            "note": "The transmitted data is encrypted both in transit and at rest; Copilot-related data is encrypted in transit using transport layer security (TLS), and for any data we retain at rest using Microsoft Azure's data encryption (FIPS Publication 140-2 standards)",
             "score": 2
           },
           "geographic": {
@@ -530,7 +530,7 @@
             "score": 6
           },
           "encryption": {
-            "note": "The transmitted data is encrypted both in transit and at rest; Copilot-related data is encrypted in transit using transport layer security (TLS), and for any data we retain at rest using Microsoft Azure’s data encryption (FIPS Publication 140-2 standards)",
+            "note": "The transmitted data is encrypted both in transit and at rest; Copilot-related data is encrypted in transit using transport layer security (TLS), and for any data we retain at rest using Microsoft Azure's data encryption (FIPS Publication 140-2 standards)",
             "score": 2
           },
           "geographic": {
