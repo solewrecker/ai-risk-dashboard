@@ -130,71 +130,69 @@
             align-items: center;
         }
 
-        /* Enhanced Circular Risk Score */
+        /* Simplified Risk Score Card */
         .risk-score-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .risk-score-circle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: conic-gradient(var(--risk-color, #3b82f6) 0deg, var(--risk-color, #3b82f6) var(--risk-degrees, 180deg), #e8f4f8 var(--risk-degrees, 180deg), #e8f4f8 360deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        .risk-score-inner {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--risk-color, #3b82f6) 0%, var(--risk-color-light, #60a5fa) 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
         }
 
         .risk-score-number {
-            font-size: 2.5rem;
+            font-size: 4rem;
             font-weight: 800;
-            color: var(--risk-color, #3b82f6);
             line-height: 1;
+            margin-bottom: 0.5rem;
         }
 
         .risk-score-total {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-top: 0.25rem;
-        }
-
-        .risk-status {
-            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
         }
 
         .risk-level-badge {
-            background: var(--risk-color, #3b82f6);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: inline-block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(10px);
         }
 
         .risk-description {
-            color: #64748b;
-            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Risk Level Color Variables */
+        .risk-low {
+            --risk-color: #10b981;
+            --risk-color-light: #34d399;
+        }
+
+        .risk-medium {
+            --risk-color: #f59e0b;
+            --risk-color-light: #fbbf24;
+        }
+
+        .risk-high {
+            --risk-color: #ef4444;
+            --risk-color-light: #f87171;
+        }
+
+        .risk-critical {
+            --risk-color: #dc2626;
+            --risk-color-light: #ef4444;
         }
 
         .summary-insights {
@@ -695,18 +693,13 @@
                 font-size: 2rem;
             }
             
-            .risk-score-circle {
-                width: 120px;
-                height: 120px;
-            }
-
-            .risk-score-inner {
-                width: 90px;
-                height: 90px;
+            .risk-score-display {
+                min-width: auto;
+                padding: 1.5rem;
             }
 
             .risk-score-number {
-                font-size: 2rem;
+                font-size: 3rem;
             }
         }
 
@@ -767,17 +760,11 @@
             </div>
             
             <div class="summary-grid">
-                <div class="risk-score-display">
-                    <div class="risk-score-circle">
-                        <div class="risk-score-inner">
-                            <div class="risk-score-number" id="riskScore">--</div>
-                            <div class="risk-score-total">/100</div>
-                        </div>
-                    </div>
-                    <div class="risk-status">
-                        <div class="risk-level-badge" id="riskLevel">LOADING</div>
-                        <div class="risk-description" id="riskDescription">Loading risk assessment...</div>
-                    </div>
+                <div class="risk-score-display" id="riskScoreCard">
+                    <div class="risk-score-number" id="riskScore">--</div>
+                    <div class="risk-score-total">/100</div>
+                    <div class="risk-level-badge" id="riskLevel">LOADING</div>
+                    <div class="risk-description" id="riskDescription">Loading risk assessment...</div>
                 </div>
                 
                 <div class="summary-insights" id="summaryInsights">
@@ -880,10 +867,10 @@
                 <table class="matrix-table">
                     <tr>
                         <th>Impact → Likelihood ↓</th>
-                        <th>Low (1-25)</th>
-                        <th>Medium (26-50)</th>
-                        <th>High (51-75)</th>
-                        <th>Critical (76-100)</th>
+                        <th>Low (0-34)</th>
+                        <th>Medium (35-59)</th>
+                        <th>High (60-79)</th>
+                        <th>Critical (80-100)</th>
                     </tr>
                     <tr>
                         <th>Very Likely</th>
@@ -972,15 +959,15 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Risk level calculation function based on your data
+        // Risk level calculation function for individual categories (using percentage)
         function calculateRiskLevel(score, maxScore = 25) {
             if (!score || score === 0) return 'LOW';
             
             const percentage = (score / maxScore) * 100;
             
-            if (percentage >= 60) return 'HIGH';
-            if (percentage >= 30) return 'MEDIUM';
-            return 'LOW';
+            if (percentage >= 80) return 'HIGH';    // 80%+ of max score
+            if (percentage >= 60) return 'MEDIUM';  // 60-79% of max score  
+            return 'LOW';                           // < 60% of max score
         }
 
         // Get CSS class for risk level
@@ -1171,6 +1158,15 @@
             document.getElementById('riskLevel').textContent = `${riskLevel} RISK`;
             document.getElementById('riskDescription').textContent = getRiskDescription(riskLevel, totalScore);
             
+            // Apply risk level styling to the card
+            const riskCard = document.getElementById('riskScoreCard');
+            if (riskCard) {
+                // Remove any existing risk classes
+                riskCard.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                // Add the appropriate risk class
+                riskCard.classList.add(`risk-${riskLevel.toLowerCase()}`);
+            }
+            
             // Generate Security Status
             const securityStatus = generateSecurityStatus(toolData, riskLevel);
             document.getElementById('securityStatusText').textContent = securityStatus;
@@ -1346,25 +1342,25 @@
             console.log('Recommendations generated successfully');
         }
 
-        // Helper functions
+        // Helper functions - Updated to match your risk framework
         function getRiskLevelFromScore(score) {
-            if (score >= 75) return 'CRITICAL';
-            if (score >= 50) return 'HIGH';
-            if (score >= 25) return 'MEDIUM';
-            return 'LOW';
+            if (score >= 80) return 'CRITICAL';
+            if (score >= 60) return 'HIGH';
+            if (score >= 35) return 'MEDIUM';
+            return 'LOW'; // 0-34 points
         }
 
         function getRiskDescription(riskLevel, score) {
             switch(riskLevel) {
                 case 'CRITICAL':
-                    return 'Critical security risks requiring immediate remediation';
+                    return 'Immediate blocking required - critical security risks identified';
                 case 'HIGH':
-                    return 'Significant security risks requiring prompt attention';
+                    return 'Significant controls needed before use - high security risks';
                 case 'MEDIUM':
-                    return 'Moderate security risks requiring monitoring and controls';
+                    return 'Standard enterprise controls required - moderate security risks';
                 case 'LOW':
                 default:
-                    return 'Acceptable risk level with standard monitoring recommended';
+                    return 'Basic monitoring sufficient - acceptable risk level';
             }
         }
 
