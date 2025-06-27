@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Risk Assessment Report - {{toolName}}</title>
+    <title>AI Risk Assessment Report</title>
     <style>
         /* === DYNAMIC VARIABLES === */
         :root {
@@ -743,15 +743,15 @@
                 <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
                 <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
                 <div class="tool-highlight">
-                    <div class="tool-name">{{toolName}}</div>
+                    <div class="tool-name" id="headerToolName">Loading...</div>
                     <div class="tool-subtitle">Risk Assessment Report</div>
                 </div>
                 <div class="report-meta">
                     <div>
-                        <strong>Assessment ID:</strong> {{assessmentId}}
+                        <strong>Assessment ID:</strong> <span id="headerAssessmentId">Loading...</span>
                     </div>
                     <div>
-                        <strong>Generated:</strong> {{generatedDate}}
+                        <strong>Generated:</strong> <span id="headerGeneratedDate">Loading...</span>
                     </div>
                     <div>
                         <strong>Framework:</strong> v2.1
@@ -770,30 +770,30 @@
                 <div class="risk-score-display">
                     <div class="risk-score-circle">
                         <div class="risk-score-inner">
-                            <div class="risk-score-number">{{riskScore}}</div>
+                            <div class="risk-score-number" id="riskScore">--</div>
                             <div class="risk-score-total">/100</div>
                         </div>
                     </div>
                     <div class="risk-status">
-                        <div class="risk-level-badge">{{riskLevel}}</div>
-                        <div class="risk-description">{{riskDescription}}</div>
+                        <div class="risk-level-badge" id="riskLevel">LOADING</div>
+                        <div class="risk-description" id="riskDescription">Loading risk assessment...</div>
                     </div>
                 </div>
                 
-                <div class="summary-insights">
+                <div class="summary-insights" id="summaryInsights">
                     <div class="insight-card">
                         <div class="insight-title">Security Status</div>
-                        <div class="insight-text">{{securityStatusText}}</div>
+                        <div class="insight-text" id="securityStatusText">Loading security status...</div>
                     </div>
                     
                     <div class="insight-card">
                         <div class="insight-title">Compliance Impact</div>
-                        <div class="insight-text">{{complianceImpactText}}</div>
+                        <div class="insight-text" id="complianceImpactText">Loading compliance assessment...</div>
                     </div>
                     
                     <div class="insight-card">
                         <div class="insight-title">Recommendation</div>
-                        <div class="insight-text">{{mainRecommendationText}}</div>
+                        <div class="insight-text" id="mainRecommendationText">Loading recommendations...</div>
                     </div>
                 </div>
             </div>
@@ -802,8 +802,8 @@
                 <div class="findings-title">
                     ⚠️ Key Security Findings
                 </div>
-                <div class="findings-list">
-                    {{keyFindings}}
+                <div class="findings-list" id="keyFindings">
+                    Loading key security findings...
                 </div>
             </div>
         </div>
@@ -812,37 +812,37 @@
         <div class="tool-info-section">
             <div class="tool-card">
                 <div class="tool-header">
-                    <div class="tool-icon">{{toolIconText}}</div>
+                    <div class="tool-icon" id="toolIcon">AI</div>
                     <div class="tool-details">
-                        <div class="tool-name">{{toolName}}</div>
-                        <div class="tool-category">{{toolCategory}}</div>
+                        <div class="tool-name" id="toolName">Loading...</div>
+                        <div class="tool-category" id="toolCategory">Loading category...</div>
                     </div>
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Primary Use Case</span>
-                        <span class="info-value">{{primaryUseCase}}</span>
+                        <span class="info-value" id="primaryUseCase">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Data Classification</span>
-                        <span class="info-value {{dataClassificationClass}}">{{dataClassification}}</span>
+                        <span class="info-value" id="dataClassification">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Assessment Date</span>
-                        <span class="info-value">{{assessmentDate}}</span>
+                        <span class="info-value" id="assessmentDate">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Risk Category</span>
-                        <span class="info-value">{{riskCategory}}</span>
+                        <span class="info-value" id="riskCategory">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Vendor</span>
-                        <span class="info-value">{{vendor}}</span>
+                        <span class="info-value" id="vendor">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">License Type</span>
-                        <span class="info-value">{{licenseType}}</span>
+                        <span class="info-value" id="licenseType">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -852,8 +852,10 @@
         <div class="permissions-section">
             <div class="permissions-card">
                 <h2 class="section-title">🔐 Azure AD Permissions Assessment</h2>
-                <div class="permissions-grid">
-                    {{azurePermissions}}
+                <div class="permissions-grid" id="azurePermissions">
+                    <div style="text-align: center; padding: 2rem; color: #64748b;">
+                        Loading Azure AD permissions assessment...
+                    </div>
                 </div>
             </div>
         </div>
@@ -899,7 +901,7 @@
                     </tr>
                     <tr>
                         <th>Possible</th>
-                        <td class="matrix-low {{currentRiskClass}}">Low</td>
+                        <td class="matrix-low" id="currentRiskMatrixCell">Low</td>
                         <td class="matrix-low">Low</td>
                         <td class="matrix-medium">Medium</td>
                         <td class="matrix-high">High</td>
@@ -913,8 +915,8 @@
                     </tr>
                 </table>
                 
-                <p style="font-size: 0.9rem; color: #64748b; text-align: center; margin-top: 1rem;">
-                    ★ Current Risk Level: Score {{riskScore}} falls in {{riskLevel}} category
+                <p style="font-size: 0.9rem; color: #64748b; text-align: center; margin-top: 1rem;" id="matrixDescription">
+                    ★ Current Risk Level: Loading assessment data...
                 </p>
             </div>
         </div>
@@ -923,8 +925,10 @@
         <div class="recommendations-section">
             <h2 class="section-title">🎯 Action Items & Recommendations</h2>
             
-            <div class="recommendations-grid">
-                {{recommendations}}
+            <div class="recommendations-grid" id="recommendationsGrid">
+                <div style="text-align: center; padding: 2rem; color: #64748b;">
+                    Loading action items and recommendations...
+                </div>
             </div>
         </div>
 
@@ -941,7 +945,7 @@
                 </div>
                 <div class="footer-section">
                     <h4>Next Review</h4>
-                    <p>Scheduled: {{nextReviewDate}}</p>
+                    <p>Scheduled: <span id="nextReviewDate">Loading...</span></p>
                     <p>Quarterly Assessment Cycle</p>
                 </div>
                 <div class="footer-section">
@@ -952,7 +956,7 @@
             </div>
             <div style="margin-top: 1rem; font-size: 0.9rem;">
                 AI Tool Risk Assessment Framework v2.1<br>
-                Assessment ID: {{assessmentId}} | Generated: {{generatedDate}}<br>
+                Assessment ID: <span id="footerAssessmentId">Loading...</span> | Generated: <span id="footerGeneratedDate">Loading...</span><br>
                 © 2025 Enterprise Security Office
             </div>
         </div>
@@ -1053,13 +1057,9 @@
         async function loadSecurityAssessment() {
             try {
                 // Try to get tool name from template variable first, then fallback to DOM
-                let toolName = '{{toolName}}';
-                
-                // If template variable not replaced, try to get from DOM
-                if (toolName.includes('{{')) {
-                    const toolNameElement = document.querySelector('.tool-name');
-                    toolName = toolNameElement ? toolNameElement.textContent.trim() : 'ChatGPT Enterprise';
-                }
+                // Get tool name from URL parameters or use default for testing
+                const urlParams = new URLSearchParams(window.location.search);
+                let toolName = urlParams.get('tool') || 'ChatGPT Enterprise'; // Default for testing
                 
                 console.log('Loading security assessment for:', toolName);
                 
@@ -1085,8 +1085,13 @@
                 const toolData = tools[0];
                 console.log('Tool data loaded:', toolData);
 
-                // Generate security categories
+                // Generate all dynamic content
                 generateSecurityCategories(toolData);
+                populateExecutiveSummary(toolData);
+                populateToolInformation(toolData);
+                updateRiskMatrix(toolData);
+                generateAzurePermissions(toolData);
+                generateRecommendations(toolData);
 
             } catch (error) {
                 console.error('Error loading security assessment:', error);
@@ -1154,6 +1159,286 @@
             categoriesGrid.innerHTML = categoriesHTML;
             
             console.log('Security categories generated successfully');
+        }
+
+        // Populate Executive Summary section
+        function populateExecutiveSummary(toolData) {
+            const totalScore = toolData.total_score || 0;
+            const riskLevel = getRiskLevelFromScore(totalScore);
+            
+            // Update risk score display
+            document.getElementById('riskScore').textContent = totalScore;
+            document.getElementById('riskLevel').textContent = `${riskLevel} RISK`;
+            document.getElementById('riskDescription').textContent = getRiskDescription(riskLevel, totalScore);
+            
+            // Generate Security Status
+            const securityStatus = generateSecurityStatus(toolData, riskLevel);
+            document.getElementById('securityStatusText').textContent = securityStatus;
+            
+            // Generate Compliance Impact
+            const complianceImpact = generateComplianceImpact(toolData);
+            document.getElementById('complianceImpactText').textContent = complianceImpact;
+            
+            // Generate Main Recommendation
+            const mainRecommendation = generateMainRecommendation(toolData, riskLevel);
+            document.getElementById('mainRecommendationText').textContent = mainRecommendation;
+            
+            // Generate Key Findings
+            const keyFindings = generateKeyFindings(toolData);
+            document.getElementById('keyFindings').innerHTML = keyFindings;
+            
+            console.log('Executive summary populated successfully');
+        }
+
+        // Populate Tool Information section
+        function populateToolInformation(toolData) {
+            const currentDate = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            
+            // Header information
+            document.getElementById('headerToolName').textContent = toolData.name || 'Unknown Tool';
+            const assessmentId = `ASS-${Date.now()}`;
+            document.getElementById('headerAssessmentId').textContent = assessmentId;
+            document.getElementById('headerGeneratedDate').textContent = currentDate;
+            
+            // Footer information
+            document.getElementById('footerAssessmentId').textContent = assessmentId;
+            document.getElementById('footerGeneratedDate').textContent = currentDate;
+            
+            // Next review date (3 months from now)
+            const nextReview = new Date();
+            nextReview.setMonth(nextReview.getMonth() + 3);
+            document.getElementById('nextReviewDate').textContent = nextReview.toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            
+            // Tool name and category
+            document.getElementById('toolName').textContent = toolData.name || 'Unknown Tool';
+            document.getElementById('toolCategory').textContent = toolData.category || 'AI Platform';
+            
+            // Generate tool icon from name
+            const toolIcon = generateToolIcon(toolData.name);
+            document.getElementById('toolIcon').textContent = toolIcon;
+            
+            // Tool information
+            document.getElementById('primaryUseCase').textContent = 'Enterprise Productivity'; // Default - we'll add to DB later
+            document.getElementById('dataClassification').textContent = 'Confidential'; // Default - we'll add to DB later
+            document.getElementById('assessmentDate').textContent = currentDate;
+            document.getElementById('riskCategory').textContent = toolData.category || 'AI Platform';
+            document.getElementById('vendor').textContent = extractVendor(toolData.name);
+            document.getElementById('licenseType').textContent = toolData.name.includes('Enterprise') ? 'Enterprise License' : 'Standard License';
+            
+            console.log('Tool information populated successfully');
+        }
+
+        // Update risk matrix display
+        function updateRiskMatrix(toolData) {
+            const totalScore = toolData.total_score || 0;
+            const riskLevel = getRiskLevelFromScore(totalScore);
+            
+            // Update matrix description
+            document.getElementById('matrixDescription').textContent = 
+                `★ Current Risk Level: Score ${totalScore} falls in ${riskLevel} category`;
+            
+            // Update current risk cell highlighting (you can enhance this logic)
+            const matrixCell = document.getElementById('currentRiskMatrixCell');
+            if (matrixCell) {
+                // Remove any existing classes and add current risk indicator
+                matrixCell.className = `matrix-${riskLevel.toLowerCase()}`;
+                matrixCell.innerHTML = `${riskLevel.toLowerCase().charAt(0).toUpperCase() + riskLevel.toLowerCase().slice(1)} ★`;
+            }
+            
+            console.log('Risk matrix updated successfully');
+        }
+
+        // Generate Azure permissions (placeholder for now)
+        function generateAzurePermissions(toolData) {
+            const permissionsHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b;">
+                    <div style="margin-bottom: 1rem;">🔐 Azure AD Integration Assessment</div>
+                    <div style="font-size: 0.9rem;">
+                        This section will be populated with Azure AD permissions analysis<br>
+                        when integration is configured. Contact IT Security for setup.
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('azurePermissions').innerHTML = permissionsHTML;
+            console.log('Azure permissions section updated');
+        }
+
+        // Generate recommendations based on tool data
+        function generateRecommendations(toolData) {
+            const recommendations = [];
+            const totalScore = toolData.total_score || 0;
+            const riskLevel = getRiskLevelFromScore(totalScore);
+            
+            // Generate recommendations based on scores and risk levels
+            if (toolData.compliance_score > 10) {
+                recommendations.push({
+                    title: 'PCI-DSS Compliance Verification',
+                    priority: 'HIGH',
+                    icon: '💳',
+                    description: 'Conduct comprehensive PCI-DSS compliance audit to ensure financial data handling meets regulatory requirements. Verify data encryption, access logging, and secure transmission protocols.',
+                    timeline: '30 days',
+                    owner: 'Security Team'
+                });
+            }
+            
+            if (toolData.compliance_score > 8) {
+                recommendations.push({
+                    title: 'SOX Controls Implementation',
+                    priority: 'HIGH',
+                    icon: '📊',
+                    description: 'Implement Sarbanes-Oxley controls for financial reporting data processed through the AI tool. Establish audit trails, data integrity checks, and access accountability measures.',
+                    timeline: '45 days',
+                    owner: 'Compliance Team'
+                });
+            }
+            
+            if (toolData.data_storage_score > 8) {
+                recommendations.push({
+                    title: 'Enhanced Data Loss Prevention (DLP)',
+                    priority: 'MEDIUM',
+                    icon: '🛡️',
+                    description: 'Configure advanced DLP policies to monitor and prevent sensitive data from being inadvertently shared through AI interactions.',
+                    timeline: '60 days',
+                    owner: 'IT Security'
+                });
+            }
+            
+            if (riskLevel === 'HIGH' || riskLevel === 'MEDIUM') {
+                recommendations.push({
+                    title: 'AI Governance Committee',
+                    priority: 'MEDIUM',
+                    icon: '👥',
+                    description: 'Create a cross-functional AI governance committee to oversee AI tool usage, establish usage policies, and conduct regular risk assessments.',
+                    timeline: '90 days',
+                    owner: 'Executive Team'
+                });
+            }
+            
+            recommendations.push({
+                title: 'Usage Analytics Dashboard',
+                priority: 'LOW',
+                icon: '📈',
+                description: 'Deploy comprehensive usage analytics to track AI tool utilization patterns, identify potential security anomalies, and generate compliance reports.',
+                timeline: '120 days',
+                owner: 'IT Operations'
+            });
+            
+            // Generate HTML for recommendations
+            const recommendationsHTML = recommendations.map(rec => `
+                <div class="recommendation-card priority-${rec.priority.toLowerCase()}">
+                    <div class="recommendation-header">
+                        <div class="recommendation-title">${rec.title}</div>
+                        <div class="priority-badge priority-${rec.priority.toLowerCase()}">${rec.priority}</div>
+                    </div>
+                    <div class="recommendation-text">
+                        ${rec.icon} ${rec.description}
+                        <br><br><strong>Timeline:</strong> ${rec.timeline} | <strong>Owner:</strong> ${rec.owner}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('recommendationsGrid').innerHTML = recommendationsHTML;
+            console.log('Recommendations generated successfully');
+        }
+
+        // Helper functions
+        function getRiskLevelFromScore(score) {
+            if (score >= 75) return 'CRITICAL';
+            if (score >= 50) return 'HIGH';
+            if (score >= 25) return 'MEDIUM';
+            return 'LOW';
+        }
+
+        function getRiskDescription(riskLevel, score) {
+            switch(riskLevel) {
+                case 'CRITICAL':
+                    return 'Critical security risks requiring immediate remediation';
+                case 'HIGH':
+                    return 'Significant security risks requiring prompt attention';
+                case 'MEDIUM':
+                    return 'Moderate security risks requiring monitoring and controls';
+                case 'LOW':
+                default:
+                    return 'Acceptable risk level with standard monitoring recommended';
+            }
+        }
+
+        function generateSecurityStatus(toolData, riskLevel) {
+            if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                return 'Tool poses significant security risks requiring immediate attention and enhanced controls before deployment.';
+            } else if (riskLevel === 'MEDIUM') {
+                return 'Tool meets basic security standards with some areas requiring attention for enterprise deployment.';
+            } else {
+                return 'Tool demonstrates acceptable security posture with standard enterprise controls and monitoring.';
+            }
+        }
+
+        function generateComplianceImpact(toolData) {
+            const complianceScore = toolData.compliance_score || 0;
+            if (complianceScore > 15) {
+                return 'Significant compliance gaps identified. HIPAA, PCI-DSS, and SOX verification required before handling regulated data.';
+            } else if (complianceScore > 8) {
+                return 'PCI-DSS and SOX compliance verification needed due to financial data classification and regulatory requirements.';
+            } else {
+                return 'Standard compliance controls applicable. Regular compliance monitoring and documentation recommended.';
+            }
+        }
+
+        function generateMainRecommendation(toolData, riskLevel) {
+            if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                return 'Immediate security review and remediation required before deployment authorization.';
+            } else if (riskLevel === 'MEDIUM') {
+                return 'Implement enhanced monitoring and compliance controls before full deployment.';
+            } else {
+                return 'Standard deployment procedures with ongoing monitoring and periodic risk assessments.';
+            }
+        }
+
+        function generateKeyFindings(toolData) {
+            const findings = [];
+            
+            if (toolData.data_storage_score > 8) {
+                findings.push('Data storage practices require enhanced security controls');
+            }
+            if (toolData.training_usage_score > 8) {
+                findings.push('Training data usage policies require review and restrictions');
+            }
+            if (toolData.access_controls_score > 8) {
+                findings.push('Access controls need enterprise-grade authentication and authorization');
+            }
+            if (toolData.compliance_score > 8) {
+                findings.push('Compliance framework verification needed for regulated data handling');
+            }
+            if (toolData.vendor_transparency_score > 5) {
+                findings.push('Vendor transparency and documentation assessments pending');
+            }
+            
+            if (findings.length === 0) {
+                findings.push('Standard security controls adequate for current risk profile');
+            }
+            
+            return '• ' + findings.join('<br>• ');
+        }
+
+        function generateToolIcon(toolName) {
+            if (toolName.toLowerCase().includes('chatgpt')) return 'GPT';
+            if (toolName.toLowerCase().includes('claude')) return 'CLD';
+            if (toolName.toLowerCase().includes('copilot')) return 'CP';
+            if (toolName.toLowerCase().includes('gemini')) return 'GEM';
+            return 'AI';
+        }
+
+        function extractVendor(toolName) {
+            if (toolName.toLowerCase().includes('chatgpt')) return 'OpenAI';
+            if (toolName.toLowerCase().includes('claude')) return 'Anthropic';
+            if (toolName.toLowerCase().includes('copilot')) return 'Microsoft/GitHub';
+            if (toolName.toLowerCase().includes('gemini')) return 'Google';
+            return 'Unknown Vendor';
         }
 
         // Show error message
