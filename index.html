@@ -2114,6 +2114,7 @@
                     console.warn('Template system not loaded, falling back to legacy method');
                     const exporter = new EnhancedPDFExporter();
                     await exporter.exportTemplatedPDF(currentAssessment);
+                    showMessage('📄 Generated using fallback template system', 'warning');
                     return;
                 }
 
@@ -2142,14 +2143,15 @@
                 showMessage('🌟 Professional PDF report generated with new template system!', 'success');
             } catch (error) {
                 console.error('Template PDF generation error:', error);
-                showMessage('Failed to generate templated PDF: ' + error.message, 'error');
+                showMessage('Main template failed, trying fallback...', 'warning');
                 
-                // Fallback to legacy system
+                // Fallback to legacy system only if main fails
                 try {
                     const exporter = new EnhancedPDFExporter();
                     await exporter.exportTemplatedPDF(currentAssessment);
                     showMessage('📄 Generated using fallback template system', 'warning');
                 } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
                     showMessage('All PDF generation methods failed', 'error');
                 }
             }
