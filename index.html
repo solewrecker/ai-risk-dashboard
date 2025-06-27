@@ -16,7 +16,7 @@
     <script>
         // Try to load PDF template system, but don't break if it fails
         const templateScript = document.createElement('script');
-        templateScript.src = 'pdf-templates.js';
+        templateScript.src = './templates/pdf-templates.js';
         templateScript.onerror = function() {
             console.warn('PDF template system not available - using fallback');
             window.PDFTemplateManager = null;
