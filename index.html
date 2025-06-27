@@ -2113,7 +2113,7 @@
                 if (!templateManager) {
                     console.warn('Template system not loaded, falling back to legacy method');
                     const exporter = new EnhancedPDFExporter();
-                    exporter.exportTemplatedPDF(currentAssessment);
+                    await exporter.exportTemplatedPDF(currentAssessment);
                     return;
                 }
 
@@ -2147,7 +2147,7 @@
                 // Fallback to legacy system
                 try {
                     const exporter = new EnhancedPDFExporter();
-                    exporter.exportTemplatedPDF(currentAssessment);
+                    await exporter.exportTemplatedPDF(currentAssessment);
                     showMessage('📄 Generated using fallback template system', 'warning');
                 } catch (fallbackError) {
                     showMessage('All PDF generation methods failed', 'error');
@@ -2421,15 +2421,25 @@
         class EnhancedPDFExporter {
             
             // Option 1: HTML Template + Print (Best for production)
-            exportTemplatedPDF(assessmentData) {
-                const generator = new AIRiskReportGenerator();
-                const reportData = this.convertAssessmentData(assessmentData);
-                const html = generator.generateReport(reportData);
-                
-                // Create new window with report
-                const printWindow = window.open('', '_blank', 'width=800,height=600');
-                printWindow.document.write(html);
-                printWindow.document.close();
+            async exportTemplatedPDF(assessmentData) {
+                try {
+                    // Use the actual template binding system
+                    if (typeof TemplateBindingEngine !== 'undefined') {
+                        const engine = new TemplateBindingEngine();
+                        const html = await engine.generateHTMLReport(assessmentData);
+                        
+                        // Create new window with report
+                        const printWindow = window.open('', '_blank', 'width=800,height=600');
+                        printWindow.document.write(html);
+                        printWindow.document.close();
+                    } else {
+                        throw new Error('Template system not loaded');
+                    }
+                } catch (error) {
+                    console.error('Template PDF failed, using fallback:', error);
+                    // Fallback to jsPDF
+                    return this.exportJsPDF(assessmentData);
+                }
                 
                 // Add print button to the report
                 const printButton = printWindow.document.createElement('button');
