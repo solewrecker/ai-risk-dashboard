@@ -2426,41 +2426,48 @@
             async exportTemplatedPDF(assessmentData) {
                 try {
                     // Use the actual template binding system
-                    if (typeof TemplateBindingEngine !== 'undefined') {
-                        const engine = new TemplateBindingEngine();
+                    if (typeof window.TemplateBindingEngine !== 'undefined') {
+                        const engine = new window.TemplateBindingEngine();
                         const html = await engine.generateHTMLReport(assessmentData);
                         
                         // Create new window with report
                         const printWindow = window.open('', '_blank', 'width=800,height=600');
                         printWindow.document.write(html);
                         printWindow.document.close();
+                        
+                        // Add print button to the report
+                        const printButton = printWindow.document.createElement('button');
+                        printButton.textContent = '🖨️ Print PDF';
+                        printButton.className = 'no-print';
+                        printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                        printButton.onclick = () => {
+                            printWindow.focus();
+                            printWindow.print();
+                        };
+                        printWindow.document.body.appendChild(printButton);
+                        
+                        // Auto-print after load
+                        printWindow.onload = () => {
+                            setTimeout(() => {
+                                printWindow.focus();
+                                printWindow.print();
+                            }, 500);
+                        };
+                        
+                        return; // Success, exit here
                     } else {
                         throw new Error('Template system not loaded');
                     }
                 } catch (error) {
-                    console.error('Template PDF failed, using fallback:', error);
+                    console.error('Template PDF failed:', error);
+                    console.log('Available systems:', {
+                        TemplateBindingEngine: typeof window.TemplateBindingEngine,
+                        templateManager: typeof window.templateManager,
+                        jsPDF: typeof window.jspdf
+                    });
                     // Fallback to jsPDF
                     return this.exportJsPDF(assessmentData);
                 }
-                
-                // Add print button to the report
-                const printButton = printWindow.document.createElement('button');
-                printButton.textContent = '🖨️ Print PDF';
-                printButton.className = 'no-print';
-                printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;';
-                printButton.onclick = () => {
-                    printWindow.focus();
-                    printWindow.print();
-                };
-                printWindow.document.body.appendChild(printButton);
-                
-                // Auto-print after load
-                printWindow.onload = () => {
-                    setTimeout(() => {
-                        printWindow.focus();
-                        printWindow.print();
-                    }, 500);
-                };
             }
             
             // Option 2: jsPDF Enhanced (Current working version)
