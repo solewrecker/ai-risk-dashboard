@@ -1803,7 +1803,39 @@
             return recommendations;
         }
 
-        function displayResults(results) {
+        // Display results with enterprise template
+        async function displayResults(results) {
+            console.log('🏢 Loading Enterprise Results Template');
+            
+            try {
+                // Load enterprise template
+                const response = await fetch('./templates/results-enterprise.html');
+                if (!response.ok) throw new Error('Template not found');
+                
+                const templateHTML = await response.text();
+                
+                // Insert template into results container
+                document.getElementById('resultsContent').innerHTML = templateHTML;
+                
+                // Wait for template to load and initialize
+                setTimeout(() => {
+                    if (window.EnterpriseResultsTemplate) {
+                        window.EnterpriseResultsTemplate.init(results);
+                        console.log('✅ Enterprise template initialized successfully');
+                    } else {
+                        console.warn('⚠️ Enterprise template not available, using fallback');
+                        displayBasicResults(results);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.warn('❌ Could not load enterprise template:', error);
+                displayBasicResults(results);
+            }
+        }
+
+        // Fallback basic results display
+        function displayBasicResults(results) {
             const riskLevel = results.riskLevel;
             const riskLabels = {
                 'critical': 'CRITICAL RISK',

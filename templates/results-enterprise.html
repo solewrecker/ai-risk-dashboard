@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* === ENTERPRISE RESULTS STYLING === */
+        .enterprise-results {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        /* Risk Score Display */
+        .enterprise-risk-display {
+            background: linear-gradient(135deg, var(--risk-color, #3b82f6) 0%, var(--risk-color-light, #60a5fa) 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enterprise-risk-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .enterprise-risk-number {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .enterprise-risk-total {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .enterprise-risk-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+
+        .enterprise-risk-description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            line-height: 1.5;
+            position: relative;
+            z-index: 2;
+        }
+
+        .enterprise-verified-badge {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Risk Level Colors */
+        .enterprise-results.risk-low {
+            --risk-color: #10b981;
+            --risk-color-light: #34d399;
+        }
+
+        .enterprise-results.risk-medium {
+            --risk-color: #f59e0b;
+            --risk-color-light: #fbbf24;
+        }
+
+        .enterprise-results.risk-high {
+            --risk-color: #ef4444;
+            --risk-color-light: #f87171;
+        }
+
+        .enterprise-results.risk-critical {
+            --risk-color: #dc2626;
+            --risk-color-light: #ef4444;
+        }
+
+        /* Categories Section */
+        .enterprise-categories {
+            padding: 2rem;
+        }
+
+        .enterprise-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .enterprise-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .enterprise-category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #e2e8f0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #f1f5f9;
+        }
+
+        .enterprise-category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .enterprise-category-card.detailed {
+            border-top-color: #10b981;
+        }
+
+        .enterprise-category-card.medium {
+            border-top-color: #f59e0b;
+        }
+
+        .enterprise-category-card.high {
+            border-top-color: #ef4444;
+        }
+
+        .enterprise-category-card.low {
+            border-top-color: #10b981;
+        }
+
+        .enterprise-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .enterprise-category-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
+
+        .enterprise-category-score {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .enterprise-category-score.detailed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .enterprise-category-score.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .enterprise-category-score.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .enterprise-category-score.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .enterprise-category-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .enterprise-subcategory {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            font-size: 0.9rem;
+        }
+
+        .enterprise-subcategory-header {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .enterprise-subcategory-score {
+            font-size: 0.8rem;
+            background: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            color: #64748b;
+        }
+
+        .enterprise-subcategory-text {
+            color: #64748b;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Enhanced Sections */
+        .enterprise-enhanced-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .enterprise-enhanced-section.strengths {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border-left-color: #10b981;
+        }
+
+        .enterprise-enhanced-section.monitoring {
+            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+            border-left-color: #f59e0b;
+        }
+
+        .enterprise-enhanced-section.recommendations {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left-color: #3b82f6;
+        }
+
+        .enterprise-enhanced-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .enterprise-enhanced-title.strengths {
+            color: #065f46;
+        }
+
+        .enterprise-enhanced-title.monitoring {
+            color: #92400e;
+        }
+
+        .enterprise-enhanced-title.recommendations {
+            color: #1e40af;
+        }
+
+        .enterprise-enhanced-list {
+            margin: 0;
+            padding-left: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .enterprise-enhanced-list.strengths {
+            color: #064e3b;
+        }
+
+        .enterprise-enhanced-list.monitoring {
+            color: #78350f;
+        }
+
+        .enterprise-enhanced-list.recommendations {
+            color: #1e3a8a;
+        }
+
+        .enterprise-enhanced-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Executive Summary */
+        .enterprise-executive-summary {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .enterprise-executive-title {
+            color: #4338ca;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .enterprise-executive-text {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .enterprise-categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .enterprise-risk-number {
+                font-size: 3rem;
+            }
+            
+            .enterprise-risk-display {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="enterprise-results" id="enterpriseResults">
+        <!-- Risk Score Display -->
+        <div class="enterprise-risk-display" id="enterpriseRiskDisplay">
+            <div class="enterprise-risk-number" id="enterpriseRiskNumber">--</div>
+            <div class="enterprise-risk-total">/100</div>
+            <div class="enterprise-risk-badge" id="enterpriseRiskBadge">LOADING</div>
+            <div class="enterprise-risk-description" id="enterpriseRiskDescription">Loading assessment...</div>
+            <div class="enterprise-verified-badge">
+                ✓ Enterprise Assessment Data
+            </div>
+        </div>
+
+        <!-- Categories Analysis -->
+        <div class="enterprise-categories">
+            <h2 class="enterprise-section-title">🔍 Detailed Security Analysis</h2>
+            <div class="enterprise-categories-grid" id="enterpriseCategoriesGrid">
+                <!-- Categories will be populated dynamically -->
+            </div>
+
+            <!-- Enhanced Sections -->
+            <div id="enterpriseEnhancedSections">
+                <!-- Enhanced sections will be populated if available -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enterprise Results Template Functions
+        window.EnterpriseResultsTemplate = {
+            
+            // Initialize the enterprise results display
+            init: function(assessmentData) {
+                console.log('🏢 Initializing Enterprise Results Template');
+                this.populateRiskScore(assessmentData);
+                this.populateCategories(assessmentData);
+                this.populateEnhancedSections(assessmentData);
+            },
+
+            // Populate the main risk score display
+            populateRiskScore: function(data) {
+                const riskLevel = this.getRiskLevel(data.finalScore);
+                
+                // Update risk display
+                document.getElementById('enterpriseRiskNumber').textContent = data.finalScore;
+                document.getElementById('enterpriseRiskBadge').textContent = `${riskLevel.toUpperCase()} RISK`;
+                document.getElementById('enterpriseRiskDescription').textContent = this.getRiskDescription(riskLevel);
+                
+                // Apply risk level styling
+                const resultsContainer = document.getElementById('enterpriseResults');
+                resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                resultsContainer.classList.add(`risk-${riskLevel}`);
+            },
+
+            // Populate detailed categories
+            populateCategories: function(data) {
+                const categoriesGrid = document.getElementById('enterpriseCategoriesGrid');
+                if (!categoriesGrid || !data.breakdown) return;
+
+                let categoriesHTML = '';
+                
+                Object.entries(data.breakdown).forEach(([categoryName, categoryData]) => {
+                    const riskClass = this.getCategoryRiskClass(categoryData);
+                    
+                    categoriesHTML += `
+                        <div class="enterprise-category-card ${riskClass}">
+                            <div class="enterprise-category-header">
+                                <div class="enterprise-category-name">${categoryName}</div>
+                                <div class="enterprise-category-score ${riskClass}">${categoryData.score}</div>
+                            </div>
+                            <div class="enterprise-category-description">${categoryData.description}</div>
+                            ${categoryData.subcategories ? this.generateSubcategories(categoryData.subcategories) : ''}
+                        </div>
+                    `;
+                });
+
+                categoriesGrid.innerHTML = categoriesHTML;
+            },
+
+            // Generate subcategory displays
+            generateSubcategories: function(subcategories) {
+                if (!subcategories || Object.keys(subcategories).length === 0) {
+                    return '';
+                }
+
+                let subcategoryHTML = '';
+                
+                Object.entries(subcategories).forEach(([subKey, subData]) => {
+                    if (subData && subData.justification) {
+                        subcategoryHTML += `
+                            <div class="enterprise-subcategory">
+                                <div class="enterprise-subcategory-header">
+                                    <span>${subKey.charAt(0).toUpperCase() + subKey.slice(1)}</span>
+                                    <span class="enterprise-subcategory-score">${subData.score} pts</span>
+                                </div>
+                                <div class="enterprise-subcategory-text">${subData.justification}</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                return subcategoryHTML;
+            },
+
+            // Populate enhanced sections (strengths, monitoring, recommendations)
+            populateEnhancedSections: function(data) {
+                const enhancedContainer = document.getElementById('enterpriseEnhancedSections');
+                if (!enhancedContainer) return;
+
+                let sectionsHTML = '';
+
+                // Check if we have enhanced info from the global variable
+                const enhancedInfo = window.currentEnhancedInfo;
+
+                if (enhancedInfo) {
+                    // Key Strengths
+                    if (enhancedInfo.keyStrengths && enhancedInfo.keyStrengths.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section strengths">
+                                <h4 class="enterprise-enhanced-title strengths">✅ Key Strengths</h4>
+                                <ul class="enterprise-enhanced-list strengths">
+                                    ${enhancedInfo.keyStrengths.map(strength => `<li>${strength}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Areas for Monitoring
+                    if (enhancedInfo.areasForMonitoring && enhancedInfo.areasForMonitoring.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section monitoring">
+                                <h4 class="enterprise-enhanced-title monitoring">⚠️ Areas for Monitoring</h4>
+                                <ul class="enterprise-enhanced-list monitoring">
+                                    ${enhancedInfo.areasForMonitoring.map(area => `<li>${area}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Implementation Recommendations
+                    if (enhancedInfo.recommendations && enhancedInfo.recommendations.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section recommendations">
+                                <h4 class="enterprise-enhanced-title recommendations">🎯 Implementation Recommendations</h4>
+                                <ul class="enterprise-enhanced-list recommendations">
+                                    ${enhancedInfo.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Executive Summary
+                    if (enhancedInfo.executiveSummary) {
+                        sectionsHTML += `
+                            <div class="enterprise-executive-summary">
+                                <h4 class="enterprise-executive-title">📋 Executive Summary</h4>
+                                <div class="enterprise-executive-text">${enhancedInfo.executiveSummary}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                enhancedContainer.innerHTML = sectionsHTML;
+            },
+
+            // Helper functions
+            getRiskLevel: function(score) {
+                if (score >= 80) return 'critical';
+                if (score >= 60) return 'high';
+                if (score >= 35) return 'medium';
+                return 'low';
+            },
+
+            getRiskDescription: function(riskLevel) {
+                const descriptions = {
+                    'critical': 'Immediate blocking required - critical security risks identified',
+                    'high': 'Significant controls needed before use - high security risks',
+                    'medium': 'Standard enterprise controls required - moderate security risks',
+                    'low': 'Basic monitoring sufficient - acceptable risk level'
+                };
+                return descriptions[riskLevel] || 'Risk assessment complete';
+            },
+
+            getCategoryRiskClass: function(categoryData) {
+                if (categoryData.isDetailed) return 'detailed';
+                
+                // Extract numeric score if available
+                const scoreMatch = categoryData.score?.match(/(\d+)\/\d+/);
+                if (scoreMatch) {
+                    const score = parseInt(scoreMatch[1]);
+                    const percentage = (score / 25) * 100; // Assuming max 25 for most categories
+                    
+                    if (percentage >= 80) return 'high';
+                    if (percentage >= 60) return 'medium';
+                    return 'low';
+                }
+                
+                return 'low';
+            }
+        };
+    </script>
+</body>
+</html> 
