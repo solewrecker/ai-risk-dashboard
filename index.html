@@ -499,7 +499,15 @@
         .breakdown-description {
             font-size: 0.875rem;
             color: #64748b;
-            line-height: 1.5;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.375rem;
+            border-left: 3px solid #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         /* Messages */
@@ -1408,10 +1416,10 @@
         }
 
         function getRiskLevel(score) {
-            if (score >= 80) return 'critical';
-            if (score >= 60) return 'high';
-            if (score >= 35) return 'medium';
-            return 'low';
+            if (score >= 80) return 'critical';  // 80-100: CRITICAL RISK
+            if (score >= 60) return 'high';      // 60-79: HIGH RISK  
+            if (score >= 35) return 'medium';    // 35-59: MEDIUM RISK
+            return 'low';                        // 0-34: LOW RISK
         }
 
         function getUseCaseLabel(useCase) {
@@ -1492,36 +1500,93 @@
 
         function convertDatabaseBreakdown(breakdown, formData) {
             // Convert database breakdown format to display format
-            if (!breakdown || !breakdown.scores) {
-                console.warn('Invalid breakdown structure:', breakdown);
+            if (!breakdown) {
+                console.warn('No breakdown data available');
                 return generateGenericBreakdown(formData);
             }
-            
-            const scores = breakdown.scores;
-            const isEnterprise = formData.toolVersion === 'enterprise';
-            
-            return {
-                'Data Storage & Security': {
-                    score: `${scores.dataStorage || 0}/25`,
-                    description: isEnterprise ? 'Better data residency controls and encryption' : 'Limited visibility into data storage practices'
-                },
-                'Training Data Usage': {
-                    score: `${scores.trainingUsage || 0}/25`,
-                    description: isEnterprise ? 'Typically offers training opt-out options' : 'High risk - data may be used for model training'
-                },
-                'Access Controls': {
-                    score: `${scores.accessControls || 0}/20`,
-                    description: isEnterprise ? 'Enhanced admin controls and user management' : 'Limited enterprise admin controls available'
-                },
-                'Compliance Risk': {
-                    score: `${scores.complianceRisk || 0}/20`,
-                    description: isEnterprise ? 'Better compliance frameworks and certifications' : 'Potential regulatory compliance gaps'
-                },
-                'Vendor Transparency': {
-                    score: `${scores.vendorTransparency || 0}/10`,
-                    description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices'
+
+            // Parse breakdown if it's a string
+            let breakdownData = breakdown;
+            if (typeof breakdown === 'string') {
+                try {
+                    breakdownData = JSON.parse(breakdown);
+                } catch (e) {
+                    console.warn('Could not parse breakdown JSON:', e);
+                    return generateGenericBreakdown(formData);
                 }
+            }
+
+            const scores = breakdownData.scores || {};
+            const subScores = breakdownData.subScores || {};
+            
+            console.log('📊 Breakdown scores:', scores);
+            console.log('📋 Breakdown subScores:', subScores);
+            
+            // Category mapping
+            const categoryMapping = {
+                'dataStorage': 'Data Storage & Security',
+                'trainingUsage': 'Training Data Usage',
+                'accessControls': 'Access Controls',
+                'complianceRisk': 'Compliance Risk',
+                'vendorTransparency': 'Vendor Transparency'
             };
+
+            const result = {};
+            
+            // Build detailed breakdown with real notes from subScores
+            Object.keys(categoryMapping).forEach(key => {
+                const displayName = categoryMapping[key];
+                const score = scores[key] || 0;
+                const maxScore = getMaxScoreForCategory(key);
+                
+                // Extract detailed description from subScores
+                let description = 'Assessment data not available';
+                let subcategories = {};
+                let isDetailed = false;
+                
+                if (subScores[key]) {
+                    isDetailed = true;
+                    const categorySubScores = subScores[key];
+                    const descriptions = [];
+                    
+                    // Extract all notes from subcategories
+                    Object.keys(categorySubScores).forEach(subKey => {
+                        const subData = categorySubScores[subKey];
+                        if (subData && subData.note) {
+                            descriptions.push(`• ${subKey.charAt(0).toUpperCase() + subKey.slice(1)}: ${subData.note}`);
+                            subcategories[subKey] = {
+                                score: subData.score || 0,
+                                justification: subData.note
+                            };
+                        }
+                    });
+                    
+                    if (descriptions.length > 0) {
+                        description = descriptions.join('\n\n');
+                    }
+                }
+                
+                result[displayName] = {
+                    score: `${score}/${maxScore}`,
+                    description: description,
+                    subcategories: subcategories,
+                    isDetailed: isDetailed
+                };
+            });
+            
+            return result;
+        }
+
+        // Helper function to get max scores for each category
+        function getMaxScoreForCategory(category) {
+            const maxScores = {
+                'dataStorage': 25,
+                'trainingUsage': 25,
+                'accessControls': 20,
+                'complianceRisk': 20,
+                'vendorTransparency': 10
+            };
+            return maxScores[category] || 25;
         }
 
         function generateDetailedBreakdown(toolData, formData) {
@@ -1748,10 +1813,10 @@
             };
             
             const riskDescriptions = {
-                'critical': 'Immediate blocking required. This tool poses severe security risks.',
-                'high': 'Significant controls needed before use. Enhanced monitoring required.',
-                'medium': 'Standard enterprise controls required. Regular audit recommended.',
-                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+                'critical': 'Immediate blocking required - critical security risks identified',
+                'high': 'Significant controls needed before use - high security risks',
+                'medium': 'Standard enterprise controls required - moderate security risks',
+                'low': 'Basic monitoring sufficient - acceptable risk level'
             };
 
             // Get data classification display name
@@ -1861,16 +1926,21 @@
                     return `
                         <div style="
                             margin-top: 0.75rem; 
-                            padding: 0.5rem; 
+                            padding: 1rem; 
                             background: #f8fafc; 
-                            border-radius: 0.375rem; 
-                            border-left: 3px solid #3b82f6;
+                            border-radius: 0.5rem; 
+                            border-left: 4px solid #3b82f6;
                             font-size: 0.875rem;
                         ">
-                            <div style="font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">
+                            <div style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">
                                 ${subKey.charAt(0).toUpperCase() + subKey.slice(1)} (${subData.score} pts)
                             </div>
-                            <div style="color: #64748b;">
+                            <div style="
+                                color: #64748b; 
+                                line-height: 1.6; 
+                                white-space: pre-wrap; 
+                                word-wrap: break-word;
+                            ">
                                 ${subData.justification}
                             </div>
                         </div>
