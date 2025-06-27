@@ -392,10 +392,25 @@
         }
 
         .categories-grid {
+            /* CURRENT: Stacked List Layout - Best for long descriptions */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            
+            /* OPTION 2: Two-Column Grid - Balanced space
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            */
+            
+            /* OPTION 3: Original Three-Column Grid - Compact
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
+            */
         }
 
         .category-card {
@@ -472,7 +487,10 @@
         .category-description {
             color: #64748b;
             font-size: 0.9rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f1f5f9;
         }
 
         /* === RISK MATRIX === */
@@ -1009,14 +1027,8 @@
                 Object.keys(subScores).forEach(subKey => {
                     if (subScores[subKey] && subScores[subKey].note) {
                         const note = subScores[subKey].note;
-                        // Take first meaningful part of the note
-                        if (note.length > 50) {
-                            const truncated = note.substring(0, 120);
-                            const lastSpace = truncated.lastIndexOf(' ');
-                            details.push(truncated.substring(0, lastSpace) + '...');
-                        } else {
-                            details.push(note);
-                        }
+                        // Use full note without truncation
+                        details.push(note);
                     }
                 });
                 
