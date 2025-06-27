@@ -1803,6 +1803,186 @@
             return recommendations;
         }
 
+        // Enterprise Results Template Functions
+        window.EnterpriseResultsTemplate = {
+            
+            // Initialize the enterprise results display
+            init: function(assessmentData) {
+                console.log('🏢 Initializing Enterprise Results Template');
+                this.populateRiskScore(assessmentData);
+                this.populateCategories(assessmentData);
+                this.populateEnhancedSections(assessmentData);
+            },
+
+            // Populate the main risk score display
+            populateRiskScore: function(data) {
+                const riskLevel = this.getRiskLevel(data.finalScore);
+                
+                // Update risk display
+                const riskNumber = document.getElementById('enterpriseRiskNumber');
+                const riskBadge = document.getElementById('enterpriseRiskBadge');
+                const riskDescription = document.getElementById('enterpriseRiskDescription');
+                
+                if (riskNumber) riskNumber.textContent = data.finalScore;
+                if (riskBadge) riskBadge.textContent = `${riskLevel.toUpperCase()} RISK`;
+                if (riskDescription) riskDescription.textContent = this.getRiskDescription(riskLevel);
+                
+                // Apply risk level styling
+                const resultsContainer = document.getElementById('enterpriseResults');
+                if (resultsContainer) {
+                    resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                    resultsContainer.classList.add(`risk-${riskLevel}`);
+                }
+            },
+
+            // Populate detailed categories
+            populateCategories: function(data) {
+                const categoriesGrid = document.getElementById('enterpriseCategoriesGrid');
+                if (!categoriesGrid || !data.breakdown) return;
+
+                let categoriesHTML = '';
+                
+                Object.entries(data.breakdown).forEach(([categoryName, categoryData]) => {
+                    const riskClass = this.getCategoryRiskClass(categoryData);
+                    
+                    categoriesHTML += `
+                        <div class="enterprise-category-card ${riskClass}">
+                            <div class="enterprise-category-header">
+                                <div class="enterprise-category-name">${categoryName}</div>
+                                <div class="enterprise-category-score ${riskClass}">${categoryData.score}</div>
+                            </div>
+                            <div class="enterprise-category-description">${categoryData.description}</div>
+                            ${categoryData.subcategories ? this.generateSubcategories(categoryData.subcategories) : ''}
+                        </div>
+                    `;
+                });
+
+                categoriesGrid.innerHTML = categoriesHTML;
+            },
+
+            // Generate subcategory displays
+            generateSubcategories: function(subcategories) {
+                if (!subcategories || Object.keys(subcategories).length === 0) {
+                    return '';
+                }
+
+                let subcategoryHTML = '';
+                
+                Object.entries(subcategories).forEach(([subKey, subData]) => {
+                    if (subData && subData.justification) {
+                        subcategoryHTML += `
+                            <div class="enterprise-subcategory">
+                                <div class="enterprise-subcategory-header">
+                                    <span>${subKey.charAt(0).toUpperCase() + subKey.slice(1)}</span>
+                                    <span class="enterprise-subcategory-score">${subData.score} pts</span>
+                                </div>
+                                <div class="enterprise-subcategory-text">${subData.justification}</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                return subcategoryHTML;
+            },
+
+            // Populate enhanced sections (strengths, monitoring, recommendations)
+            populateEnhancedSections: function(data) {
+                const enhancedContainer = document.getElementById('enterpriseEnhancedSections');
+                if (!enhancedContainer) return;
+
+                let sectionsHTML = '';
+
+                // Check if we have enhanced info from the data
+                const enhancedInfo = data.enhancedInfo;
+
+                if (enhancedInfo) {
+                    // Key Strengths
+                    if (enhancedInfo.keyStrengths && enhancedInfo.keyStrengths.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section strengths">
+                                <h4 class="enterprise-enhanced-title strengths">✅ Key Strengths</h4>
+                                <ul class="enterprise-enhanced-list strengths">
+                                    ${enhancedInfo.keyStrengths.map(strength => `<li>${strength}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Areas for Monitoring
+                    if (enhancedInfo.areasForMonitoring && enhancedInfo.areasForMonitoring.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section monitoring">
+                                <h4 class="enterprise-enhanced-title monitoring">⚠️ Areas for Monitoring</h4>
+                                <ul class="enterprise-enhanced-list monitoring">
+                                    ${enhancedInfo.areasForMonitoring.map(area => `<li>${area}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Implementation Recommendations
+                    if (enhancedInfo.recommendations && enhancedInfo.recommendations.length > 0) {
+                        sectionsHTML += `
+                            <div class="enterprise-enhanced-section recommendations">
+                                <h4 class="enterprise-enhanced-title recommendations">🎯 Implementation Recommendations</h4>
+                                <ul class="enterprise-enhanced-list recommendations">
+                                    ${enhancedInfo.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    // Executive Summary
+                    if (enhancedInfo.executiveSummary) {
+                        sectionsHTML += `
+                            <div class="enterprise-executive-summary">
+                                <h4 class="enterprise-executive-title">📋 Executive Summary</h4>
+                                <div class="enterprise-executive-text">${enhancedInfo.executiveSummary}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                enhancedContainer.innerHTML = sectionsHTML;
+            },
+
+            // Helper functions
+            getRiskLevel: function(score) {
+                if (score >= 80) return 'critical';
+                if (score >= 60) return 'high';
+                if (score >= 35) return 'medium';
+                return 'low';
+            },
+
+            getRiskDescription: function(riskLevel) {
+                const descriptions = {
+                    'critical': 'Immediate blocking required - critical security risks identified',
+                    'high': 'Significant controls needed before use - high security risks',
+                    'medium': 'Standard enterprise controls required - moderate security risks',
+                    'low': 'Basic monitoring sufficient - acceptable risk level'
+                };
+                return descriptions[riskLevel] || 'Risk assessment complete';
+            },
+
+            getCategoryRiskClass: function(categoryData) {
+                if (categoryData.isDetailed) return 'detailed';
+                
+                // Extract numeric score if available
+                const scoreMatch = categoryData.score?.match(/(\d+)\/?\d*/);
+                if (scoreMatch) {
+                    const score = parseInt(scoreMatch[1]);
+                    // For our framework, max is typically 25 per category
+                    const percentage = (score / 25) * 100;
+                    
+                    if (percentage >= 80) return 'high';
+                    if (percentage >= 60) return 'medium';
+                    return 'low';
+                }
+                
+                return 'low';
+            }
+        };
+
         // Display results with enterprise template
         async function displayResults(results) {
             console.log('🏢 Loading Enterprise Results Template');
@@ -1814,19 +1994,20 @@
                 
                 const templateHTML = await response.text();
                 
-                // Insert template into results container
-                document.getElementById('resultsContent').innerHTML = templateHTML;
+                // Remove the script tag from the template HTML since we have the JS functions above
+                const cleanTemplateHTML = templateHTML.replace(/<script[\s\S]*?<\/script>/gi, '');
                 
-                // Wait for template to load and initialize
-                setTimeout(() => {
-                    if (window.EnterpriseResultsTemplate) {
-                        window.EnterpriseResultsTemplate.init(results);
-                        console.log('✅ Enterprise template initialized successfully');
-                    } else {
-                        console.warn('⚠️ Enterprise template not available, using fallback');
-                        displayBasicResults(results);
-                    }
-                }, 100);
+                // Insert template into results container
+                document.getElementById('resultsContent').innerHTML = cleanTemplateHTML;
+                
+                // Initialize the template immediately since the functions are now available
+                if (window.EnterpriseResultsTemplate) {
+                    window.EnterpriseResultsTemplate.init(results);
+                    console.log('✅ Enterprise template initialized successfully');
+                } else {
+                    console.warn('⚠️ Enterprise template functions not found, using fallback');
+                    displayBasicResults(results);
+                }
                 
             } catch (error) {
                 console.warn('❌ Could not load enterprise template:', error);
