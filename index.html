@@ -26,6 +26,20 @@
         };
         document.head.appendChild(templateScript);
     </script>
+
+    <!-- Add New Template Binding System -->
+    <script>
+        // Load the new template binding system
+        const bindingScript = document.createElement('script');
+        bindingScript.src = './templates/template-binding.js';
+        bindingScript.onload = function() {
+            console.log('✅ Template Binding System loaded successfully');
+        };
+        bindingScript.onerror = function() {
+            console.warn('Template binding system failed to load');
+        };
+        document.head.appendChild(bindingScript);
+    </script>
     
     <!-- Add jsPDF for PDF Export with fallback -->
     <script>
@@ -698,7 +712,7 @@
                             <button type="button" class="btn btn-secondary" onclick="prevStep()">
                                 ← Back
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="startAssessment()">
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">
                                 Start Assessment →
                             </button>
                         </div>
@@ -2298,7 +2312,7 @@
             }
         }
 
-        // Option 2: HTML Export
+        // Option 2: HTML Export (Updated to use new template system)
         async function exportHTML() {
             if (!currentAssessment) {
                 showMessage('No assessment to export', 'error');
@@ -2306,9 +2320,18 @@
             }
 
             try {
-                const exporter = new EnhancedPDFExporter();
-                exporter.exportHTML(currentAssessment);
-                showMessage('HTML report downloaded successfully!', 'success');
+                // Use new template binding system if available
+                if (window.TemplateBindingEngine) {
+                    const engine = new window.TemplateBindingEngine();
+                    const result = await engine.exportHTMLReport(currentAssessment);
+                    showMessage(`HTML report downloaded successfully! (${result.fileName})`, 'success');
+                } else {
+                    // Fallback to old system if new one isn't loaded
+                    console.warn('New template system not available, using fallback');
+                    const exporter = new EnhancedPDFExporter();
+                    exporter.exportHTML(currentAssessment);
+                    showMessage('HTML report downloaded successfully!', 'success');
+                }
             } catch (error) {
                 console.error('HTML export error:', error);
                 showMessage('Failed to export HTML: ' + error.message, 'error');
@@ -2380,730 +2403,17 @@
             URL.revokeObjectURL(url);
         }
 
-        // === TEMPLATE-BASED PDF GENERATION (Production Ready) ===
+        // === LEGACY HTML TEMPLATE (Simplified - Now using separate template system) ===
         class AIRiskReportGenerator {
             constructor() {
-                this.template = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>AI Risk Assessment Report</title>
-                    <style>
-                        /* === PDF PAGE SETUP === */
-                        @page {
-                            size: A4;
-                            margin: 0.75in;
-                            @top-center {
-                                content: "Risk Assessment Report";
-                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                                font-size: 10pt;
-                                color: #64748b;
-                            }
-                            @bottom-center {
-                                content: "Page " counter(page) " of " counter(pages);
-                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                                font-size: 9pt;
-                                color: #64748b;
-                            }
-                        }
-
-                        /* === BASE STYLES === */
-                        * {
-                            box-sizing: border-box;
-                        }
-
-                        body {
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-                            line-height: 1.5;
-                            color: #1a1a1a;
-                            margin: 0;
-                            padding: 0;
-                            font-size: 11pt;
-                            background: white;
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                        }
-
-                        .report-container {
-                            max-width: 100%;
-                            margin: 0 auto;
-                            position: relative;
-                        }
-
-                        /* === HEADER SECTION === */
-                        .header {
-                            background: #1a365d;
-                            color: white;
-                            padding: 40px 30px;
-                            text-align: center;
-                            margin-bottom: 0;
-                            page-break-inside: avoid;
-                        }
-
-                        .report-title {
-                            font-size: 28pt;
-                            font-weight: bold;
-                            margin-bottom: 8px;
-                            letter-spacing: 1px;
-                            line-height: 1.2;
-                        }
-
-                        .report-subtitle {
-                            font-size: 14pt;
-                            font-weight: normal;
-                            opacity: 0.9;
-                            margin: 0;
-                        }
-
-                        .report-date {
-                            font-size: 10pt;
-                            margin-top: 15px;
-                            opacity: 0.8;
-                            font-weight: 300;
-                        }
-
-                        /* === EXECUTIVE SUMMARY === */
-                        .executive-summary {
-                            background: #f8f9fa;
-                            border: 2px solid {{RISK_BORDER_COLOR}};
-                            border-radius: 8px;
-                            padding: 25px;
-                            margin: 30px 0;
-                            page-break-inside: avoid;
-                        }
-
-                        .summary-title {
-                            font-size: 16pt;
-                            font-weight: bold;
-                            color: {{RISK_COLOR}};
-                            margin-bottom: 15px;
-                            text-transform: uppercase;
-                        }
-
-                        .risk-score-summary {
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            margin-bottom: 20px;
-                        }
-
-                        .risk-score-large {
-                            font-size: 48pt;
-                            font-weight: bold;
-                            color: {{RISK_COLOR}};
-                            line-height: 1;
-                        }
-
-                        .risk-classification {
-                            text-align: right;
-                        }
-
-                        .risk-level-badge {
-                            background: {{RISK_COLOR}};
-                            color: white;
-                            padding: 8px 16px;
-                            border-radius: 4px;
-                            font-weight: bold;
-                            font-size: 12pt;
-                            display: inline-block;
-                            margin-bottom: 8px;
-                            text-transform: uppercase;
-                            letter-spacing: 0.05em;
-                        }
-
-                        .risk-description {
-                            font-size: 10pt;
-                            color: #666;
-                            line-height: 1.4;
-                        }
-
-                        .critical-alert {
-                            background: #fff3cd;
-                            border: 1px solid #ffeaa7;
-                            border-radius: 4px;
-                            padding: 15px;
-                            margin-top: 15px;
-                        }
-
-                        .alert-text {
-                            color: #856404;
-                            font-weight: bold;
-                            font-size: 10pt;
-                        }
-
-                        /* === SECTION HEADERS === */
-                        .section-header {
-                            font-size: 14pt;
-                            font-weight: bold;
-                            color: #1a365d;
-                            margin: 30px 0 15px 0;
-                            border-bottom: 2px solid #1a365d;
-                            padding-bottom: 5px;
-                            page-break-after: avoid;
-                        }
-
-                        /* === TABLES === */
-                        .info-table, .categories-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 1.5rem;
-                            font-size: 0.9rem;
-                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                            page-break-inside: avoid;
-                        }
-
-                        .info-table th, .info-table td,
-                        .categories-table th, .categories-table td {
-                            padding: 0.6rem 0.75rem;
-                            text-align: left;
-                            border-bottom: 1px solid #e2e8f0;
-                            vertical-align: top;
-                        }
-
-                        .info-table th, .categories-table th {
-                            background: #1a365d;
-                            color: white;
-                            font-weight: bold;
-                            font-size: 0.85rem;
-                            text-transform: uppercase;
-                            letter-spacing: 0.025em;
-                        }
-
-                        .info-table tbody tr:nth-child(even),
-                        .categories-table tbody tr:nth-child(even) {
-                            background: #f8fafc;
-                        }
-
-                        .info-table tbody tr:hover,
-                        .categories-table tbody tr:hover {
-                            background: #f1f5f9;
-                        }
-
-                        .score-cell {
-                            font-weight: 700;
-                            text-align: center;
-                            font-size: 0.95rem;
-                        }
-
-                        /* === RISK COLOR CODING === */
-                        .score-critical {
-                            background: #dc3545 !important;
-                            color: white !important;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-
-                        .score-high {
-                            background: #fd7e14 !important;
-                            color: white !important;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-
-                        .score-medium {
-                            background: #ffc107 !important;
-                            color: #333 !important;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-
-                        .score-low {
-                            background: #28a745 !important;
-                            color: white !important;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-
-                        /* === RECOMMENDATIONS === */
-                        .recommendations-section {
-                            margin-top: 2rem;
-                            page-break-inside: avoid;
-                        }
-
-                        .recommendations-title {
-                            font-size: 1.25rem;
-                            font-weight: 700;
-                            color: #1e293b;
-                            margin-bottom: 1rem;
-                            border-bottom: 2px solid #3b82f6;
-                            padding-bottom: 0.5rem;
-                        }
-
-                        .recommendation-item {
-                            margin-bottom: 1rem;
-                            padding: 1rem;
-                            border-radius: 0.5rem;
-                            border-left: 4px solid;
-                            page-break-inside: avoid;
-                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                        }
-
-                        .priority-critical {
-                            background: #fef2f2;
-                            border-color: #dc2626;
-                        }
-
-                        .priority-high {
-                            background: #fff7ed;
-                            border-color: #ea580c;
-                        }
-
-                        .priority-medium {
-                            background: #fefce8;
-                            border-color: #ca8a04;
-                        }
-
-                        .priority-low {
-                            background: #f0fdf4;
-                            border-color: #16a34a;
-                        }
-
-                        .recommendation-header {
-                            font-weight: 700;
-                            margin-bottom: 0.5rem;
-                            color: #1e293b;
-                            font-size: 0.95rem;
-                        }
-
-                        .recommendation-text {
-                            font-size: 0.85rem;
-                            color: #475569;
-                            line-height: 1.4;
-                            margin: 0;
-                        }
-
-                        /* === RISK ASSESSMENT MATRIX === */
-                        .risk-matrix {
-                            margin: 30px 0;
-                            page-break-inside: avoid;
-                        }
-
-                        .matrix-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin: 15px 0;
-                        }
-
-                        .matrix-table th,
-                        .matrix-table td {
-                            padding: 8px;
-                            text-align: center;
-                            border: 1px solid #333;
-                            font-size: 9pt;
-                            font-weight: bold;
-                        }
-
-                        .matrix-table th {
-                            background: #333;
-                            color: white;
-                        }
-
-                        .matrix-low { background: #d4edda; }
-                        .matrix-medium { background: #fff3cd; }
-                        .matrix-high { background: #f8d7da; }
-                        .matrix-critical { background: #dc3545; color: white; }
-
-                        /* === CHARTS AND VISUALS === */
-                        .chart-container {
-                            page-break-inside: avoid;
-                            margin: 1.5rem 0;
-                            text-align: center;
-                        }
-
-                        .chart-title {
-                            font-size: 1rem;
-                            font-weight: 600;
-                            color: #1e293b;
-                            margin-bottom: 0.5rem;
-                        }
-
-                        /* === FOOTER === */
-                        /* === SIGNATURE SECTION === */
-                        .signature-section {
-                            margin-top: 40px;
-                            page-break-inside: avoid;
-                        }
-
-                        .signature-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-
-                        .signature-table td {
-                            padding: 20px 10px;
-                            border-bottom: 1px solid #333;
-                            width: 33.33%;
-                        }
-
-                        .signature-label {
-                            font-size: 9pt;
-                            color: #666;
-                            margin-top: 5px;
-                        }
-
-                        .footer {
-                            margin-top: 40px;
-                            padding-top: 20px;
-                            border-top: 1px solid #ddd;
-                            text-align: center;
-                            font-size: 9pt;
-                            color: #666;
-                            page-break-inside: avoid;
-                        }
-
-                        .confidential-marking {
-                            font-weight: bold;
-                            color: #dc3545;
-                            margin-bottom: 10px;
-                        }
-
-                        .report-metadata {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            margin-top: 0.5rem;
-                            font-size: 0.65rem;
-                        }
-
-                        /* === UTILITY CLASSES === */
-                        .page-break-before { page-break-before: always; }
-                        .page-break-after { page-break-after: always; }
-                        .page-break-inside-avoid { page-break-inside: avoid; }
-                        .no-break { page-break-inside: avoid; }
-
-                        .text-center { text-align: center; }
-                        .text-right { text-align: right; }
-                        .font-bold { font-weight: 700; }
-                        .font-medium { font-weight: 500; }
-
-                        .mt-1 { margin-top: 0.5rem; }
-                        .mt-2 { margin-top: 1rem; }
-                        .mb-1 { margin-bottom: 0.5rem; }
-                        .mb-2 { margin-bottom: 1rem; }
-
-                        /* === RESPONSIVE ADJUSTMENTS === */
-                        @media screen and (max-width: 768px) {
-                            .header {
-                                padding: 1rem;
-                            }
-                            
-                            .report-title {
-                                font-size: 1.25rem;
-                            }
-                            
-                            .risk-score-large {
-                                font-size: 2rem;
-                            }
-                            
-                            .info-table, .categories-table {
-                                font-size: 0.8rem;
-                            }
-                            
-                            .recommendation-item {
-                                padding: 0.75rem;
-                            }
-                        }
-
-                        /* === PRINT OPTIMIZATION === */
-                        @media print {
-                            /* Hide non-essential elements */
-                            .no-print { display: none !important; }
-                            
-                            /* Optimize colors and backgrounds */
-                            body { 
-                                print-color-adjust: exact;
-                                -webkit-print-color-adjust: exact;
-                                color-adjust: exact;
-                            }
-                            
-                            /* Ensure proper page breaks */
-                            .header, .executive-summary, .recommendation-item, .chart-container {
-                                page-break-inside: avoid;
-                            }
-                            
-                            .section-header {
-                                page-break-after: avoid;
-                            }
-                            
-                            /* Optimize table printing */
-                            .info-table, .categories-table {
-                                page-break-inside: auto;
-                            }
-                            
-                            .info-table thead, .categories-table thead {
-                                display: table-header-group;
-                            }
-                            
-                            .info-table tbody, .categories-table tbody {
-                                display: table-row-group;
-                            }
-                            
-                            /* Adjust margins for print */
-                            .report-container {
-                                margin: 0;
-                                padding: 0;
-                            }
-                            
-                            /* Optimize font sizes for print */
-                            body {
-                                font-size: 10pt;
-                                line-height: 1.4;
-                            }
-                            
-                            .report-title {
-                                font-size: 14pt;
-                            }
-                            
-                            .risk-score-large {
-                                font-size: 24pt;
-                            }
-                            
-                            .section-header {
-                                font-size: 12pt;
-                            }
-                            
-                            /* Remove shadows and effects that don't print well */
-                            .executive-summary,
-                            .info-table,
-                            .categories-table,
-                            .recommendation-item {
-                                box-shadow: none;
-                            }
-                            
-                            /* Ensure borders are visible */
-                            .info-table, .categories-table {
-                                border: 1px solid #e2e8f0;
-                            }
-                            
-                            .info-table th, .info-table td,
-                            .categories-table th, .categories-table td {
-                                border: 1px solid #e2e8f0;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="report-container">
-                        <div class="header">
-                            <h1 class="report-title">{{REPORT_TITLE}}</h1>
-                            <p class="report-subtitle">Enterprise Security Analysis Report</p>
-                            <p class="report-date">Generated: {{REPORT_DATE}}</p>
-                        </div>
-                        
-                        <div class="executive-summary">
-                            <h2 class="summary-title">Executive Summary</h2>
-                            <div class="risk-score-summary">
-                                <div class="risk-score-large">{{RISK_SCORE}}</div>
-                                <div class="risk-classification">
-                                    <div class="risk-level-badge">{{RISK_LEVEL}}</div>
-                                    <div class="risk-description">Immediate Action Required</div>
-                                </div>
-                            </div>
-                            <div class="critical-alert">
-                                <div class="alert-text">
-                                    ⚠️ WARNING: {{RISK_DESCRIPTION}}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <h2 class="section-header">Tool Information</h2>
-                        <table class="info-table">
-                            <tbody>
-                                <tr><th>Tool Name</th><td>{{TOOL_NAME}}</td></tr>
-                                <tr><th>Category</th><td>{{CATEGORY}}</td></tr>
-                                <tr><th>Use Case</th><td>{{USE_CASE}}</td></tr>
-                                <tr><th>Data Classification</th><td><strong style="color: #dc2626;">{{DATA_CLASSIFICATION}}</strong></td></tr>
-                                <tr><th>Assessment Date</th><td>{{ASSESSMENT_DATE}}</td></tr>
-                                <tr><th>Assessment ID</th><td>{{ASSESSMENT_ID}}</td></tr>
-                            </tbody>
-                        </table>
-
-                        <div class="risk-matrix">
-                            <h2 class="section-header">Risk Assessment Matrix</h2>
-                            <table class="matrix-table">
-                                <tr>
-                                    <th>Impact →<br>Likelihood ↓</th>
-                                    <th>Low (1-2)</th>
-                                    <th>Medium (3-4)</th>
-                                    <th>High (5-6)</th>
-                                    <th>Critical (7-8)</th>
-                                </tr>
-                                <tr>
-                                    <th>Very Likely</th>
-                                    <td class="matrix-medium">Medium</td>
-                                    <td class="matrix-high">High</td>
-                                    <td class="matrix-critical">Critical</td>
-                                    <td class="matrix-critical">Critical</td>
-                                </tr>
-                                <tr>
-                                    <th>Likely</th>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-medium">Medium</td>
-                                    <td class="matrix-high">High</td>
-                                    <td class="matrix-critical">Critical ★</td>
-                                </tr>
-                                <tr>
-                                    <th>Possible</th>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-medium">Medium</td>
-                                    <td class="matrix-high">High</td>
-                                </tr>
-                                <tr>
-                                    <th>Unlikely</th>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-low">Low</td>
-                                    <td class="matrix-medium">Medium</td>
-                                </tr>
-                            </table>
-                            <p style="font-size: 9pt; margin-top: 10px;">★ Current Risk Level: Score {{RISK_SCORE}} falls in {{RISK_LEVEL}} category</p>
-                        </div>
-                        
-                        <h2 class="section-header">Security Category Breakdown</h2>
-                        <table class="categories-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 30%;">Category</th>
-                                    <th style="width: 15%;">Score</th>
-                                    <th style="width: 15%;">Risk Level</th>
-                                    <th style="width: 40%;">Assessment Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{RISK_CATEGORIES}}
-                            </tbody>
-                        </table>
-                        
-                        <div class="recommendations-section">
-                            <h2 class="section-header">Recommendations & Action Items</h2>
-                            {{RECOMMENDATIONS}}
-                        </div>
-
-                        <div class="signature-section">
-                            <h2 class="section-header">Assessment Approval</h2>
-                            <table class="signature-table">
-                                <tr>
-                                    <td>
-                                        <div style="height: 40px;"></div>
-                                        <div class="signature-label">Security Analyst</div>
-                                    </td>
-                                    <td>
-                                        <div style="height: 40px;"></div>
-                                        <div class="signature-label">CISO Approval</div>
-                                    </td>
-                                    <td>
-                                        <div style="height: 40px;"></div>
-                                        <div class="signature-label">Date</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        
-                        <div class="footer">
-                            <div class="confidential-marking">CONFIDENTIAL - INTERNAL USE ONLY</div>
-                            <div>AI Tool Risk Assessment Framework v2.0</div>
-                            <div>Assessment ID: {{ASSESSMENT_ID}} | Generated: {{REPORT_DATE}}</div>
-                        </div>
-                    </div>
-                </body>
-                </html>`;
+                console.warn('AIRiskReportGenerator is deprecated. Use TemplateBindingEngine instead.');
+                // Minimal template for fallback compatibility
+                this.template = '<html><head><title>Legacy Report</title></head><body><h1>Please use new template system</h1></body></html>';
             }
 
             generateReport(data) {
-                let html = this.template;
-                
-                // Risk color mapping
-                const riskColors = {
-                    'critical': { color: '#dc2626', bg: '#fef2f2', border: '#dc2626' },
-                    'high': { color: '#ea580c', bg: '#fff7ed', border: '#ea580c' },
-                    'medium': { color: '#ca8a04', bg: '#fefce8', border: '#ca8a04' },
-                    'low': { color: '#16a34a', bg: '#f0fdf4', border: '#16a34a' }
-                };
-                
-                const riskStyle = riskColors[data.riskLevel.toLowerCase()] || riskColors['medium'];
-                
-                // Replace placeholders
-                html = html.replace(/\{\{REPORT_TITLE\}\}/g, 'AI TOOL SECURITY RISK ASSESSMENT');
-                html = html.replace(/\{\{REPORT_DATE\}\}/g, new Date().toLocaleDateString('en-US', {
-                    year: 'numeric', month: 'long', day: 'numeric'
-                }));
-                html = html.replace(/\{\{RISK_SCORE\}\}/g, data.riskScore);
-                html = html.replace(/\{\{RISK_LEVEL\}\}/g, data.riskLevel.toUpperCase());
-                html = html.replace(/\{\{RISK_DESCRIPTION\}\}/g, data.riskDescription);
-                html = html.replace(/\{\{RISK_COLOR\}\}/g, riskStyle.color);
-                html = html.replace(/\{\{RISK_BG_COLOR\}\}/g, riskStyle.bg);
-                html = html.replace(/\{\{RISK_BORDER_COLOR\}\}/g, riskStyle.border);
-                html = html.replace(/\{\{TOOL_NAME\}\}/g, data.toolName);
-                html = html.replace(/\{\{CATEGORY\}\}/g, data.category || 'Not specified');
-                html = html.replace(/\{\{USE_CASE\}\}/g, data.useCase || 'Not specified');
-                html = html.replace(/\{\{DATA_CLASSIFICATION\}\}/g, data.dataClassification);
-                html = html.replace(/\{\{ASSESSMENT_DATE\}\}/g, new Date().toLocaleDateString());
-                html = html.replace(/\{\{ASSESSMENT_ID\}\}/g, Date.now());
-                
-                // Generate categories table
-                const categoriesHtml = data.categories.map(cat => {
-                    const scoreNum = parseInt(cat.score.split('/')[0]);
-                    const maxScore = parseInt(cat.score.split('/')[1]);
-                    const scorePercent = scoreNum / maxScore;
-                    
-                    let riskLevel = 'low';
-                    if (scorePercent > 0.7) riskLevel = 'critical';
-                    else if (scorePercent > 0.4) riskLevel = 'high';
-                    else if (scorePercent > 0.2) riskLevel = 'medium';
-                    
-                    return `
-                        <tr>
-                            <td><strong>${cat.name}</strong></td>
-                            <td class="score-cell score-${riskLevel}">${cat.score}</td>
-                            <td class="score-cell score-${riskLevel}">${riskLevel.toUpperCase()}</td>
-                            <td>${cat.description}</td>
-                        </tr>
-                    `;
-                }).join('');
-                html = html.replace(/\{\{RISK_CATEGORIES\}\}/g, categoriesHtml);
-                
-                // Generate recommendations
-                const recommendationsHtml = data.recommendations.map((rec, index) => {
-                    const priority = this.determinePriority(rec);
-                    const priorityText = priority.toUpperCase();
-                    return `
-                        <div class="recommendation-item priority-${priority}">
-                            <div class="recommendation-header">${index + 1}. ${this.getActionTitle(rec)} (Priority: ${priorityText})</div>
-                            <div class="recommendation-text">${rec}</div>
-                        </div>
-                    `;
-                }).join('');
-                html = html.replace(/\{\{RECOMMENDATIONS\}\}/g, recommendationsHtml);
-                
-                return html;
-            }
-            
-            determinePriority(recommendation) {
-                const rec = recommendation.toLowerCase();
-                if (rec.includes('immediate') || rec.includes('critical') || rec.includes('blocking')) {
-                    return 'critical';
-                } else if (rec.includes('significant') || rec.includes('high')) {
-                    return 'high';
-                } else {
-                    return 'medium';
-                }
-            }
-
-            getActionTitle(recommendation) {
-                const rec = recommendation.toLowerCase();
-                if (rec.includes('immediate') || rec.includes('blocking')) {
-                    return 'IMMEDIATE ACTION REQUIRED';
-                } else if (rec.includes('enterprise') || rec.includes('alternatives')) {
-                    return 'ENTERPRISE ALTERNATIVES';
-                } else if (rec.includes('policy') || rec.includes('framework')) {
-                    return 'POLICY DEVELOPMENT';
-                } else if (rec.includes('training') || rec.includes('education')) {
-                    return 'STAFF TRAINING';
-                } else {
-                    return 'SECURITY ENHANCEMENT';
-                }
+                console.warn('Using deprecated generateReport. Please use TemplateBindingEngine instead.');
+                return this.template;
             }
         }
 
@@ -3156,7 +2466,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `ai-risk-assessment-${reportData.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.html`;
+                a.download = 'ai-risk-assessment-' + reportData.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-' + new Date().toISOString().split('T')[0] + '.html';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);

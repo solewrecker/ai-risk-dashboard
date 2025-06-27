@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Assessment Report - ChatGPT Enterprise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .report-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .report-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 3px solid #27ae60;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .summary-title {
+            font-size: 1.8rem;
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        .risk-score-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .risk-score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#27ae60 0deg, #27ae60 49deg, #e8f5e8 49deg, #e8f5e8 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .risk-score-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .risk-score-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #27ae60;
+        }
+
+        .risk-score-total {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .risk-status {
+            text-align: center;
+        }
+
+        .risk-badge {
+            background: #27ae60;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .risk-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .summary-insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .insight-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .insight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .insight-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        /* Tool Information */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .info-value.critical {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+
+        /* Azure Permissions */
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .permission-item {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .permission-item.granted {
+            background: #d4edda;
+            border: 2px solid #27ae60;
+        }
+
+        .permission-item.limited {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .permission-item.denied {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .permission-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .permission-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Category Breakdown */
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .category-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .category-score {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .score-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .score-badge.low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .score-badge.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .score-badge.high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .score-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .recommendations-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendation-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-item.priority-high {
+            border-left-color: #e74c3c;
+            background: linear-gradient(135deg, #ffebee 0%, #f8f9fa 100%);
+        }
+
+        .recommendation-item.priority-medium {
+            border-left-color: #f39c12;
+            background: linear-gradient(135deg, #fff8e1 0%, #f8f9fa 100%);
+        }
+
+        .recommendation-item.priority-low {
+            border-left-color: #27ae60;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f8f9fa 100%);
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .priority-tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-tag.high {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .priority-tag.medium {
+            background: #f39c12;
+            color: white;
+        }
+
+        .priority-tag.low {
+            background: #27ae60;
+            color: white;
+        }
+
+        .recommendation-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Risk Matrix */
+        .risk-matrix {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-weight: 600;
+        }
+
+        .matrix-table th {
+            background: #2c3e50;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .matrix-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .matrix-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .matrix-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .matrix-critical {
+            background: #dc3545;
+            color: white;
+            font-weight: 700;
+        }
+
+        .current-position {
+            position: relative;
+        }
+
+        .current-position::after {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #f39c12;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .footer-section p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .confidential {
+            border-top: 1px solid #34495e;
+            padding-top: 20px;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .risk-score-display {
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
+                <p class="report-subtitle">Enterprise Security Analysis Report</p>
+                <div class="report-meta">
+                    <div>
+                        <strong>Assessment ID:</strong> 1750965226763
+                    </div>
+                    <div>
+                        <strong>Generated:</strong> June 26, 2025
+                    </div>
+                    <div>
+                        <strong>Version:</strong> 2.1
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="executive-summary">
+            <div class="summary-header">
+                <h2 class="summary-title">📊 Executive Summary</h2>
+                <div class="risk-score-display">
+                    <div class="risk-score-circle">
+                        <div class="risk-score-inner">
+                            <div class="risk-score-number">34</div>
+                            <div class="risk-score-total">/100</div>
+                        </div>
+                    </div>
+                    <div class="risk-status">
+                        <div class="risk-badge">LOW RISK</div>
+                        <div class="risk-description">Acceptable with monitoring</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-insights">
+                <div class="insight-card">
+                    <div class="insight-value">2</div>
+                    <div class="insight-label">Critical Issues</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">5</div>
+                    <div class="insight-label">Categories Assessed</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">Financial</div>
+                    <div class="insight-label">Data Classification</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">Enterprise</div>
+                    <div class="insight-label">License Tier</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Tool Information -->
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="card-icon">ℹ️</span>
+                    Tool Information
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Tool Name</div>
+                        <div class="info-value">ChatGPT Enterprise</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Category</div>
+                        <div class="info-value">Conversational AI</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Primary Use Case</div>
+                        <div class="info-value">Legal/Compliance/Audit</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Data Classification</div>
+                        <div class="info-value critical">Financial/Payment Data</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Vendor</div>
+                        <div class="info-value">OpenAI</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">License Type</div>
+                        <div class="info-value">Enterprise SaaS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Azure Permissions (Estimated) -->
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="card-icon">🔐</span>
+                    Azure AD Permissions (Estimated)
+                </h3>
+                <div class="permissions-grid">
+                    <div class="permission-item granted">
+                        <div class="permission-title">User.Read</div>
+                        <div class="permission-status">Granted</div>
+                    </div>
+                    <div class="permission-item limited">
+                        <div class="permission-title">Files.Read</div>
+                        <div class="permission-status">Limited</div>
+                    </div>
+                    <div class="permission-item denied">
+                        <div class="permission-title">Mail.Send</div>
+                        <div class="permission-status">Denied</div>
+                    </div>
+                    <div class="permission-item granted">
+                        <div class="permission-title">Profile.Read</div>
+                        <div class="permission-status">Granted</div>
+                    </div>
+                    <div class="permission-item limited">
+                        <div class="permission-title">Calendar.Read</div>
+                        <div class="permission-status">Limited</div>
+                    </div>
+                    <div class="permission-item denied">
+                        <div class="permission-title">Directory.Read</div>
+                        <div class="permission-status">Denied</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Categories -->
+        <div class="card">
+            <h3 class="card-title">
+                <span class="card-icon">🛡️</span>
+                Security Category Assessment
+            </h3>
+            <div class="category-item">
+                <div class="category-info">
+                    <div class="category-name">Data Storage & Security</div>
+                    <div class="category-description">Encryption, data residency, and storage practices</div>
+                </div>
+                <div class="category-score">
+                    <div class="score-value">6/25</div>
+                    <div class="score-badge medium">MEDIUM</div>
+                </div>
+            </div>
+            <div class="category-item">
+                <div class="category-info">
+                    <div class="category-name">Training Data Usage</div>
+                    <div class="category-description">Model training and data utilization policies</div>
+                </div>
+                <div class="category-score">
+                    <div class="score-value">7/25</div>
+                    <div class="score-badge medium">MEDIUM</div>
+                </div>
+            </div>
+            <div class="category-item">
+                <div class="category-info">
+                    <div class="category-name">Access Controls</div>
+                    <div class="category-description">Authentication, authorization, and user management</div>
+                </div>
+                <div class="category-score">
+                    <div class="score-value">8/25</div>
+                    <div class="score-badge low">LOW</div>
+                </div>
+            </div>
+            <div class="category-item">
+                <div class="category-info">
+                    <div class="category-name">Compliance Risk</div>
+                    <div class="category-description">Regulatory compliance and audit readiness</div>
+                </div>
+                <div class="category-score">
+                    <div class="score-value">6/25</div>
+                    <div class="score-badge medium">MEDIUM</div>
+                </div>
+            </div>
+            <div class="category-item">
+                <div class="category-info">
+                    <div class="category-name">Vendor Transparency</div>
+                    <div class="category-description">Documentation, SLAs, and incident response</div>
+                </div>
+                <div class="category-score">
+                    <div class="score-value">7/25</div>
+                    <div class="score-badge low">LOW</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Matrix -->
+        <div class="risk-matrix">
+            <h3 class="card-title">
+                <span class="card-icon">📈</span>
+                Risk Assessment Matrix
+            </h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Impact →<br>Likelihood ↓</th>
+                        <th>Low (1-2)</th>
+                        <th>Medium (3-4)</th>
+                        <th>High (5-6)</th>
+                        <th>Critical (7-8)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Very Likely</th>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                        <td class="matrix-critical">Critical</td>
+                        <td class="matrix-critical">Critical</td>
+                    </tr>
+                    <tr>
+                        <th>Likely</th>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                        <td class="matrix-critical">Critical</td>
+                    </tr>
+                    <tr>
+                        <th>Possible</th>
+                        <td class="matrix-low current-position">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                    </tr>
+                    <tr>
+                        <th>Unlikely</th>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+                ★ Current Risk Position: Score 34 places this tool in the <strong>LOW RISK</strong> category
+            </p>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations">
+            <h3 class="recommendations-title">
+                <span class="card-icon">💡</span>
+                Recommendations & Action Items
+            </h3>
+            
+            <div class="recommendation-item priority-high">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Implement PCI-DSS Compliance Verification</div>
+                    <div class="priority-tag high">HIGH</div>
+                </div>
+                <div class="recommendation-description">
+                    Given the financial/payment data classification, establish formal PCI-DSS compliance verification processes. This includes regular audits, secure data handling procedures, and encrypted transmission protocols for all financial data interactions with the AI tool.
+                </div>
+            </div>
+
+            <div class="recommendation-item priority-high">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Deploy SOX Controls Framework</div>
+                    <div class="priority-tag high">HIGH</div>
+                </div>
+                <div class="recommendation-description">
+                    Implement Sarbanes-Oxley compliance controls including access logging, data retention policies, and audit trails for all AI-generated content related to financial reporting and compliance activities.
+                </div>
+            </div>
+
+            <div class="recommendation-item priority-medium">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Enhance Data Loss Prevention (DLP)</div>
+                    <div class="priority-tag medium">MEDIUM</div>
+                </div>
+                <div class="recommendation-description">
+                    Configure advanced DLP policies to monitor and prevent sensitive financial data from being inadvertently shared through AI interactions. Include pattern recognition for credit card numbers, SSNs, and other PII.
+                </div>
+            </div>
+
+            <div class="recommendation-item priority-medium">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Establish AI Governance Committee</div>
+                    <div class="priority-tag medium">MEDIUM</div>
+                </div>
+                <div class="recommendation-description">
+                    Create a cross-functional AI governance committee to oversee AI tool usage, establish usage policies, and conduct regular risk assessments. Include representatives from Legal, Compliance, IT Security, and Business units.
+                </div>
+            </div>
+
+            <div class="recommendation-item priority-low">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Implement Usage Analytics Dashboard</div>
+                    <div class="priority-tag low">LOW</div>
+                </div>
+                <div class="recommendation-description">
+                    Deploy comprehensive usage analytics to track AI tool utilization patterns, identify potential security anomalies, and generate compliance reports for audit purposes.
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Assessment Framework</h4>
+                    <p>AI Tool Risk Assessment Framework v2.1</p>
+                    <p>ISO 27001 Aligned</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Next Review</h4>
+                    <p>Scheduled: September 26, 2025</p>
+                    <p>Quarterly Assessment Cycle</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Security Team: security@company.com</p>
+                    <p>CISO Office: ciso@company.com</p>
+                </div>
+            </div>
+            <div class="confidential">
+                🔒 CONFIDENTIAL - INTERNAL USE ONLY
+            </div>
+        </div>
+    </div>
+</body>
+</html>

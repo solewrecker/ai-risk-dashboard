@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Assessment Report - {{toolName}}</title>
+    <style>
+        /* === DYNAMIC VARIABLES === */
+        :root {
+            --risk-color: #3b82f6;
+            --risk-degrees: 180deg;
+        }
+
+        /* === BASE STYLES === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* === HEADER === */
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .report-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .report-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-highlight {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .tool-highlight .tool-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-highlight .tool-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        /* === EXECUTIVE SUMMARY === */
+        .executive-summary {
+            padding: 2rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        /* Enhanced Circular Risk Score */
+        .risk-score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .risk-score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: conic-gradient(var(--risk-color, #3b82f6) 0deg, var(--risk-color, #3b82f6) var(--risk-degrees, 180deg), #e8f4f8 var(--risk-degrees, 180deg), #e8f4f8 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .risk-score-inner {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .risk-score-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--risk-color, #3b82f6);
+            line-height: 1;
+        }
+
+        .risk-score-total {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .risk-status {
+            text-align: center;
+        }
+
+        .risk-level-badge {
+            background: var(--risk-color, #3b82f6);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .risk-description {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .summary-insights {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .insight-text {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .key-findings {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .findings-title {
+            color: #92400e;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .findings-list {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* === TOOL INFORMATION === */
+        .tool-info-section {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .tool-details {
+            flex: 1;
+        }
+
+        .tool-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-category {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .info-value.critical {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        /* === AZURE PERMISSIONS === */
+        .permissions-section {
+            padding: 2rem;
+        }
+
+        .permissions-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .permission-item {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .permission-item.granted {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+
+        .permission-item.limited {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .permission-item.denied {
+            background: #fecaca;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .permission-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .permission-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* === RISK BREAKDOWN === */
+        .risk-breakdown {
+            padding: 2rem;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card.low {
+            border-top-color: #10b981;
+        }
+
+        .category-card.medium {
+            border-top-color: #f59e0b;
+        }
+
+        .category-card.high {
+            border-top-color: #ef4444;
+        }
+
+        .category-card.critical {
+            border-top-color: #dc2626;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .category-score {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .category-score.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .category-score.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-score.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .category-score.critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .category-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* === RISK MATRIX === */
+        .risk-matrix-section {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .matrix-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .matrix-table th {
+            background: #1e40af;
+            color: white;
+        }
+
+        .matrix-low { 
+            background: #dcfce7; 
+            color: #166534; 
+        }
+
+        .matrix-medium { 
+            background: #fef3c7; 
+            color: #92400e; 
+        }
+
+        .matrix-high { 
+            background: #fecaca; 
+            color: #991b1b; 
+        }
+
+        .matrix-critical { 
+            background: #dc2626; 
+            color: white; 
+        }
+
+        .current-risk {
+            position: relative;
+            font-weight: 800;
+        }
+
+        .current-risk::after {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+
+        /* === RECOMMENDATIONS === */
+        .recommendations-section {
+            padding: 2rem;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .recommendation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+            transition: transform 0.2s ease;
+        }
+
+        .recommendation-card:hover {
+            transform: translateX(4px);
+        }
+
+        .recommendation-card.priority-high {
+            border-left-color: #dc2626;
+            background: linear-gradient(to right, #fef2f2, white);
+        }
+
+        .recommendation-card.priority-medium {
+            border-left-color: #f59e0b;
+            background: linear-gradient(to right, #fef9e7, white);
+        }
+
+        .recommendation-card.priority-low {
+            border-left-color: #16a34a;
+            background: linear-gradient(to right, #f0fdf4, white);
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-title {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .priority-badge.priority-high {
+            background: #dc2626;
+            color: white;
+        }
+
+        .priority-badge.priority-medium {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .priority-badge.priority-low {
+            background: #16a34a;
+            color: white;
+        }
+
+        .recommendation-text {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* === FOOTER === */
+        .footer {
+            background: #1e293b;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .confidential-banner {
+            background: #dc2626;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section h4 {
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .info-grid,
+            .categories-grid,
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-title {
+                font-size: 2rem;
+            }
+            
+            .risk-score-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .risk-score-inner {
+                width: 90px;
+                height: 90px;
+            }
+
+            .risk-score-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* === PRINT OPTIMIZATION === */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .report-container {
+                box-shadow: none;
+            }
+
+            .category-card,
+            .recommendation-card {
+                page-break-inside: avoid;
+            }
+
+            .section-title {
+                page-break-after: avoid;
+            }
+
+            .risk-matrix-section {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
+                <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
+                <div class="tool-highlight">
+                    <div class="tool-name">{{toolName}}</div>
+                    <div class="tool-subtitle">Risk Assessment Report</div>
+                </div>
+                <div class="report-meta">
+                    <div>
+                        <strong>Assessment ID:</strong> {{assessmentId}}
+                    </div>
+                    <div>
+                        <strong>Generated:</strong> {{generatedDate}}
+                    </div>
+                    <div>
+                        <strong>Framework:</strong> v2.1
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="executive-summary">
+            <div class="summary-header">
+                <h2 class="section-title">📊 Executive Summary</h2>
+            </div>
+            
+            <div class="summary-grid">
+                <div class="risk-score-display">
+                    <div class="risk-score-circle">
+                        <div class="risk-score-inner">
+                            <div class="risk-score-number">{{riskScore}}</div>
+                            <div class="risk-score-total">/100</div>
+                        </div>
+                    </div>
+                    <div class="risk-status">
+                        <div class="risk-level-badge">{{riskLevel}}</div>
+                        <div class="risk-description">{{riskDescription}}</div>
+                    </div>
+                </div>
+                
+                <div class="summary-insights">
+                    <div class="insight-card">
+                        <div class="insight-title">Security Status</div>
+                        <div class="insight-text">{{securityStatusText}}</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">Compliance Impact</div>
+                        <div class="insight-text">{{complianceImpactText}}</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">Recommendation</div>
+                        <div class="insight-text">{{mainRecommendationText}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-findings">
+                <div class="findings-title">
+                    ⚠️ Key Security Findings
+                </div>
+                <div class="findings-list">
+                    {{keyFindings}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool Information -->
+        <div class="tool-info-section">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">{{toolIconText}}</div>
+                    <div class="tool-details">
+                        <div class="tool-name">{{toolName}}</div>
+                        <div class="tool-category">{{toolCategory}}</div>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Primary Use Case</span>
+                        <span class="info-value">{{primaryUseCase}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Data Classification</span>
+                        <span class="info-value {{dataClassificationClass}}">{{dataClassification}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Assessment Date</span>
+                        <span class="info-value">{{assessmentDate}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Risk Category</span>
+                        <span class="info-value">{{riskCategory}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Vendor</span>
+                        <span class="info-value">{{vendor}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">License Type</span>
+                        <span class="info-value">{{licenseType}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azure Permissions -->
+        <div class="permissions-section">
+            <div class="permissions-card">
+                <h2 class="section-title">🔐 Azure AD Permissions Assessment</h2>
+                <div class="permissions-grid">
+                    {{azurePermissions}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Breakdown -->
+        <div class="risk-breakdown">
+            <h2 class="section-title">🔍 Security Risk Analysis</h2>
+            
+            <div class="categories-grid">
+                {{categoryBreakdown}}
+            </div>
+        </div>
+
+        <!-- Risk Matrix -->
+        <div class="risk-matrix-section">
+            <div class="matrix-container">
+                <h2 class="section-title">📈 Risk Assessment Matrix</h2>
+                
+                <table class="matrix-table">
+                    <tr>
+                        <th>Impact → Likelihood ↓</th>
+                        <th>Low (1-25)</th>
+                        <th>Medium (26-50)</th>
+                        <th>High (51-75)</th>
+                        <th>Critical (76-100)</th>
+                    </tr>
+                    <tr>
+                        <th>Very Likely</th>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                        <td class="matrix-critical">Critical</td>
+                        <td class="matrix-critical">Critical</td>
+                    </tr>
+                    <tr>
+                        <th>Likely</th>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                        <td class="matrix-critical">Critical</td>
+                    </tr>
+                    <tr>
+                        <th>Possible</th>
+                        <td class="matrix-low {{currentRiskClass}}">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                        <td class="matrix-high">High</td>
+                    </tr>
+                    <tr>
+                        <th>Unlikely</th>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-low">Low</td>
+                        <td class="matrix-medium">Medium</td>
+                    </tr>
+                </table>
+                
+                <p style="font-size: 0.9rem; color: #64748b; text-align: center; margin-top: 1rem;">
+                    ★ Current Risk Level: Score {{riskScore}} falls in {{riskLevel}} category
+                </p>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section">
+            <h2 class="section-title">🎯 Action Items & Recommendations</h2>
+            
+            <div class="recommendations-grid">
+                {{recommendations}}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="confidential-banner">
+                🔒 Confidential - Internal Use Only
+            </div>
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Assessment Framework</h4>
+                    <p>AI Tool Risk Assessment Framework v2.1</p>
+                    <p>ISO 27001 Aligned</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Next Review</h4>
+                    <p>Scheduled: {{nextReviewDate}}</p>
+                    <p>Quarterly Assessment Cycle</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Security Team: security@company.com</p>
+                    <p>CISO Office: ciso@company.com</p>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.9rem;">
+                AI Tool Risk Assessment Framework v2.1<br>
+                Assessment ID: {{assessmentId}} | Generated: {{generatedDate}}<br>
+                © 2025 Enterprise Security Office
+            </div>
+        </div>
+    </div>
+</body>
+</html>
