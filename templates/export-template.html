@@ -1018,25 +1018,45 @@
                 Object.keys(subScores).forEach(subKey => {
                     if (subScores[subKey] && subScores[subKey].note) {
                         const note = subScores[subKey].note;
-                        // Use full note without truncation
                         details.push(note);
                     }
                 });
                 
                 if (details.length > 0) {
-                    return `${riskLevel.toLowerCase() === 'high' ? 'High' : riskLevel.toLowerCase() === 'medium' ? 'Medium' : 'Low'} risk identified. ${details[0]}`;
+                    // Use the actual detailed note without generic prefixes
+                    return details[0];
                 }
             }
             
-            // Fallback descriptions based on risk level
-            switch(riskLevel) {
-                case 'HIGH':
-                    return `High risk identified in ${baseDesc.toLowerCase()}. Immediate attention and remediation required.`;
-                case 'MEDIUM':
-                    return `Medium risk identified in ${baseDesc.toLowerCase()}. Enhanced controls and monitoring recommended.`;
-                case 'LOW':
+            // Check if there's a details field for this category (from your data structure)
+            if (breakdownData && breakdownData.details && breakdownData.details[categoryKey]) {
+                return breakdownData.details[categoryKey];
+            }
+            
+            // Fallback descriptions based on risk level and category
+            switch(categoryKey) {
+                case 'dataStorage':
+                    return `${getQualitativeRisk(riskLevel)} data storage assessment. Encryption, retention, and geographic controls evaluated.`;
+                case 'trainingUsage':
+                    return `${getQualitativeRisk(riskLevel)} training data usage assessment. Model training and data sharing policies reviewed.`;
+                case 'accessControls':
+                    return `${getQualitativeRisk(riskLevel)} access controls assessment. Authentication, authorization, and audit capabilities evaluated.`;
+                case 'complianceRisk':
+                    return `${getQualitativeRisk(riskLevel)} compliance assessment. Regulatory requirements and frameworks reviewed.`;
+                case 'vendorTransparency':
+                    return `${getQualitativeRisk(riskLevel)} vendor transparency assessment. Documentation, support, and transparency evaluated.`;
                 default:
-                    return `Low risk assessment for ${baseDesc.toLowerCase()}. Standard monitoring and periodic review recommended.`;
+                    return `${getQualitativeRisk(riskLevel)} assessment for ${baseDesc.toLowerCase()}.`;
+            }
+        }
+
+        // Helper function to get qualitative risk description
+        function getQualitativeRisk(riskLevel) {
+            switch(riskLevel) {
+                case 'HIGH': return 'High-risk';
+                case 'MEDIUM': return 'Medium-risk';
+                case 'LOW': return 'Low-risk';
+                default: return 'Standard';
             }
         }
 
