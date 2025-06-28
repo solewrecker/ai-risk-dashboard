@@ -454,6 +454,44 @@ class TemplateBindingEngine {
     }
 
     /**
+     * Embed assessment data directly into template JavaScript
+     */
+    embedAssessmentData(template, assessmentData) {
+        // Create embedded data object with all the information the template needs
+        const embeddedData = {
+            toolName: assessmentData.results.toolName,
+            toolVersion: assessmentData.formData.toolVersion,
+            toolData: {
+                name: assessmentData.results.toolName + 
+                    (assessmentData.formData.toolVersion === 'enterprise' && 
+                     !assessmentData.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                total_score: assessmentData.results.finalScore,
+                data_storage_score: assessmentData.results.breakdown?.dataStorage || 0,
+                training_usage_score: assessmentData.results.breakdown?.trainingUsage || 0,
+                access_controls_score: assessmentData.results.breakdown?.accessControls || 0,
+                compliance_score: assessmentData.results.breakdown?.complianceRisk || 0,
+                vendor_transparency_score: assessmentData.results.breakdown?.vendorTransparency || 0,
+                breakdown: assessmentData.results.breakdown,
+                category: assessmentData.formData.toolCategory || 'AI Platform',
+                notes: assessmentData.results.keyFindings || ''
+            }
+        };
+
+        // Inject this data into the template's JavaScript
+        const dataScript = `
+        <script>
+        // Embedded assessment data from index.html - no need to query database
+        window.EMBEDDED_ASSESSMENT_DATA = ${JSON.stringify(embeddedData, null, 2)};
+        console.log('✅ Using embedded assessment data:', window.EMBEDDED_ASSESSMENT_DATA);
+        </script>`;
+
+        // Insert the script before the closing head tag
+        const result = template.replace('</head>', dataScript + '\n</head>');
+        
+        return result;
+    }
+
+    /**
      * Main function: Generate complete HTML report
      */
     async generateHTMLReport(assessmentData, templatePath) {
@@ -461,11 +499,14 @@ class TemplateBindingEngine {
             // Load template
             const template = await this.loadTemplate(templatePath);
             
-            // Bind assessment data to template variables
+            // Embed assessment data directly into template JavaScript
+            const templateWithData = this.embedAssessmentData(template, assessmentData);
+            
+            // Bind assessment data to template variables (for any remaining {{}} placeholders)
             const templateData = this.bindAssessmentData(assessmentData);
             
             // Replace variables in template
-            const finalHTML = this.replaceTemplateVariables(template, templateData);
+            const finalHTML = this.replaceTemplateVariables(templateWithData, templateData);
             
             return finalHTML;
         } catch (error) {
