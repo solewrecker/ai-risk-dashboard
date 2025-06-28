@@ -2236,6 +2236,14 @@
                 // Convert assessment data for new template system
                 const templateData = convertAssessmentForTemplate(currentAssessment);
                 
+                // Embed assessment data for template access
+                window.EMBEDDED_TOOL_INFO = {
+                    ...currentAssessment.formData,
+                    ...templateData,
+                    isFreeVersion: false,
+                    enterpriseFeatures: true
+                };
+                
                 // Generate report using new template system (default: enterprise-report)
                 const html = templateManager.generateReport(templateData, 'enterprise-report');
                 
