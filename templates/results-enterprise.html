@@ -714,26 +714,14 @@
 </head>
 <body>
     <div class="report-container" id="enterpriseResults">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <h1 class="report-title">AI Tool Security Risk Assessment</h1>
-                <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
-                <div class="tool-highlight" id="toolHighlight">
-                    <div class="tool-name" id="headerToolName">Loading Tool...</div>
-                    <div class="tool-subtitle">Risk Assessment Report</div>
-                </div>
-                <div class="report-meta">
-                    <div>
-                        <strong>Assessment ID:</strong> <span id="headerAssessmentId">Loading...</span>
-                    </div>
-                    <div>
-                        <strong>Generated:</strong> <span id="headerGeneratedDate">Loading...</span>
-                    </div>
-                    <div>
-                        <strong>Framework:</strong> v2.1
-                    </div>
-                </div>
+        <!-- Simple Header -->
+        <div style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; padding: 2rem; text-align: center;">
+            <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;" id="enterpriseRiskNumber">--</div>
+            <div style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">/100</div>
+            <div style="background: rgba(255, 255, 255, 0.2); padding: 0.75rem 1.5rem; border-radius: 25px; font-weight: 700; font-size: 1rem; display: inline-block; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em;" id="enterpriseRiskBadge">LOADING</div>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.5;" id="enterpriseRiskDescription">Loading assessment...</div>
+            <div style="margin-top: 1rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);">
+                ✓ Enterprise Assessment Data
             </div>
         </div>
 
@@ -814,7 +802,7 @@
                 <h2 class="section-title">🔐 Azure AD Permissions Assessment</h2>
                 <div class="permissions-grid" id="azurePermissions">
                     <div style="text-align: center; padding: 2rem; color: #64748b;">
-                        Azure AD permissions assessment - Integration pending
+                        <span id="azurePermissionsStatus">Azure AD permissions assessment - Integration pending</span>
                     </div>
                 </div>
             </div>
@@ -904,7 +892,7 @@
             <div class="footer-grid">
                 <div class="footer-section">
                     <h4>Assessment Framework</h4>
-                    <p>AI Tool Risk Assessment Framework v2.1</p>
+                    <p>AI Tool Risk Assessment Framework <span id="frameworkVersionFooter">v2.1</span></p>
                     <p>ISO 27001 Aligned</p>
                 </div>
                 <div class="footer-section">
@@ -914,14 +902,14 @@
                 </div>
                 <div class="footer-section">
                     <h4>Contact</h4>
-                    <p>Security Team: security@company.com</p>
-                    <p>CISO Office: ciso@company.com</p>
+                    <p>Security Team: <span id="securityEmail">security@company.com</span></p>
+                    <p>CISO Office: <span id="cisoEmail">ciso@company.com</span></p>
                 </div>
             </div>
             <div style="margin-top: 1rem; font-size: 0.9rem;">
-                AI Tool Risk Assessment Framework v2.1<br>
+                AI Tool Risk Assessment Framework <span id="frameworkVersionBottom">v2.1</span><br>
                 Assessment ID: <span id="footerAssessmentId">Loading...</span> | Generated: <span id="footerGeneratedDate">Loading...</span><br>
-                © 2025 Enterprise Security Office
+                © 2025 <span id="companyName">Enterprise Security Office</span>
             </div>
         </div>
     </div>
