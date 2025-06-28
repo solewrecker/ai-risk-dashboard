@@ -1018,11 +1018,32 @@
             });
             
             // Try to extract detailed sub-category notes from your breakdown structure
-            if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
-                const subScores = breakdownData.subScores[categoryKey];
+            // Handle both camelCase keys (dataStorage) and human-readable keys ("Data Storage & Security")
+            const categoryKeyMap = {
+                'dataStorage': 'Data Storage & Security',
+                'trainingUsage': 'Training Data Usage', 
+                'accessControls': 'Access Controls',
+                'complianceRisk': 'Compliance Risk',
+                'vendorTransparency': 'Vendor Transparency'
+            };
+            
+            const humanReadableKey = categoryKeyMap[categoryKey];
+            let targetCategory = null;
+            
+            // First try the database format with subScores
+            if (breakdownData && breakdownData.subScores) {
+                targetCategory = breakdownData.subScores[categoryKey] || breakdownData.subScores[humanReadableKey];
+            }
+            
+            // If not found, try direct category access (alternative breakdown format)
+            if (!targetCategory && breakdownData) {
+                targetCategory = breakdownData[categoryKey] || breakdownData[humanReadableKey];
+            }
+            
+            if (targetCategory) {
                 const subCategoryDetails = [];
                 
-                console.log(`✅ Found subScores for ${categoryKey}:`, subScores);
+                console.log(`✅ Found category data for ${categoryKey} (using key: ${targetCategory === breakdownData[humanReadableKey] ? humanReadableKey : categoryKey}):`, targetCategory);
                 
                 // Map sub-score keys to readable names
                 const subCategoryNames = {
@@ -1040,10 +1061,24 @@
                 };
                 
                 // Extract and format each sub-category
-                Object.keys(subScores).forEach(subKey => {
-                    if (subScores[subKey] && subScores[subKey].note) {
+                Object.keys(targetCategory).forEach(subKey => {
+                    const subItem = targetCategory[subKey];
+                    
+                    // Handle different data structures
+                    let note = null;
+                    if (subItem && typeof subItem === 'object' && subItem.note) {
+                        // Standard structure: {retention: {note: "...", score: 5}}
+                        note = subItem.note;
+                    } else if (subItem && typeof subItem === 'string') {
+                        // Simple structure: {retention: "Some note"}
+                        note = subItem;
+                    } else if (subItem && subItem.description) {
+                        // Alternative structure: {retention: {description: "..."}}
+                        note = subItem.description;
+                    }
+                    
+                    if (note) {
                         const displayName = subCategoryNames[subKey] || `📌 ${subKey.charAt(0).toUpperCase() + subKey.slice(1)}`;
-                        const note = subScores[subKey].note;
                         subCategoryDetails.push(`<strong>${displayName}:</strong> ${note}`);
                         console.log(`📝 Added note for ${subKey}: ${note.substring(0, 50)}...`);
                     }
@@ -1053,10 +1088,10 @@
                     console.log(`✅ Returning ${subCategoryDetails.length} detailed notes for ${categoryKey}`);
                     return subCategoryDetails.join('<br><br>');
                 } else {
-                    console.log(`⚠️ No notes found in subScores for ${categoryKey}`);
+                    console.log(`⚠️ No notes found in category data for ${categoryKey}`);
                 }
             } else {
-                console.log(`❌ No subScores structure found for ${categoryKey}. Falling back to generic description.`);
+                console.log(`❌ No category data found for ${categoryKey} (tried keys: ${categoryKey}, ${humanReadableKey}). Falling back to generic description.`);
             }
             
             // Check if there's a details field for this category (from your data structure)
