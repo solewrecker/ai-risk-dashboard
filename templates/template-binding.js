@@ -456,8 +456,42 @@ class TemplateBindingEngine {
     /**
      * Embed assessment data directly into template JavaScript
      */
-    embedAssessmentData(template, assessmentData) {
+    async embedAssessmentData(template, assessmentData) {
         // Create embedded data object with all the information the template needs
+        let detailedBreakdown = assessmentData.results.breakdown;
+        
+        // Try to fetch detailed breakdown from database for tools that have it
+        try {
+            const toolNameForQuery = assessmentData.results.toolName + 
+                (assessmentData.formData.toolVersion === 'enterprise' && 
+                 !assessmentData.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            console.log(`🔍 Fetching detailed breakdown for: ${toolNameForQuery}`);
+            
+            // Query database for detailed breakdown
+            if (window.supabase) {
+                const { data: tools, error } = await window.supabase
+                    .from('ai_tools')
+                    .select('breakdown, notes')
+                    .ilike('name', `%${toolNameForQuery}%`)
+                    .limit(1);
+
+                if (!error && tools && tools.length > 0 && tools[0].breakdown) {
+                    console.log('📋 Using detailed database breakdown for export');
+                    detailedBreakdown = tools[0].breakdown;
+                    // Also use database notes if available
+                    if (tools[0].notes) {
+                        assessmentData.results.keyFindings = tools[0].notes;
+                    }
+                } else {
+                    console.log('⚠️ No detailed breakdown found in database, using assessment breakdown');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to fetch detailed breakdown:', error);
+            console.log('⚠️ Using simplified breakdown - detailed notes may not be available');
+        }
+
         const embeddedData = {
             toolName: assessmentData.results.toolName,
             toolVersion: assessmentData.formData.toolVersion,
@@ -471,7 +505,7 @@ class TemplateBindingEngine {
                 access_controls_score: assessmentData.results.breakdown?.accessControls || 0,
                 compliance_score: assessmentData.results.breakdown?.complianceRisk || 0,
                 vendor_transparency_score: assessmentData.results.breakdown?.vendorTransparency || 0,
-                breakdown: assessmentData.results.breakdown,
+                breakdown: detailedBreakdown, // Use detailed breakdown with notes
                 category: assessmentData.formData.toolCategory || 'AI Platform',
                 notes: assessmentData.results.keyFindings || ''
             }
@@ -483,6 +517,7 @@ class TemplateBindingEngine {
         // Embedded assessment data from index.html - no need to query database
         window.EMBEDDED_ASSESSMENT_DATA = ${JSON.stringify(embeddedData, null, 2)};
         console.log('✅ Using embedded assessment data:', window.EMBEDDED_ASSESSMENT_DATA);
+        console.log('📊 Breakdown structure:', window.EMBEDDED_ASSESSMENT_DATA.toolData.breakdown);
         </script>`;
 
         // Insert the script before the closing head tag
@@ -500,7 +535,7 @@ class TemplateBindingEngine {
             const template = await this.loadTemplate(templatePath);
             
             // Embed assessment data directly into template JavaScript
-            const templateWithData = this.embedAssessmentData(template, assessmentData);
+            const templateWithData = await this.embedAssessmentData(template, assessmentData);
             
             // Bind assessment data to template variables (for any remaining {{}} placeholders)
             const templateData = this.bindAssessmentData(assessmentData);
