@@ -2777,13 +2777,30 @@
                     throw new Error('Authentication required');
                 }
                 
+                console.log('🔑 DEBUG: Session check:', {
+                    hasSession: !!session,
+                    hasAccessToken: !!session?.access_token,
+                    tokenLength: session?.access_token?.length,
+                    userEmail: session?.user?.email,
+                    userTier: session?.user?.user_metadata?.tier
+                });
+                
+                const headers = {
+                    'authorization': `Bearer ${session.access_token}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
+                };
+                
+                console.log('🔑 DEBUG: Request headers:', {
+                    hasAuth: !!headers.authorization,
+                    hasApikey: !!headers.apikey,
+                    authPrefix: headers.authorization?.substring(0, 20) + '...',
+                    url: `${SUPABASE_URL}/functions/v1/generate-premium-pdf`
+                });
+                
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
                     method: 'POST',
-                    headers: {
-                        'authorization': `Bearer ${session.access_token}`,
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Content-Type': 'application/json',
-                    },
+                    headers: headers,
                     body: JSON.stringify({
                         assessmentData: {
                             toolName: currentAssessment.results.toolName,
@@ -2800,9 +2817,23 @@
                     })
                 });
 
+                console.log('🔑 DEBUG: Response received:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Server-side PDF generation failed');
+                    const errorText = await response.text();
+                    console.error('🔑 DEBUG: Error response body:', errorText);
+                    
+                    try {
+                        const error = JSON.parse(errorText);
+                        throw new Error(error.error || 'Server-side PDF generation failed');
+                    } catch (jsonError) {
+                        throw new Error(`Server error (${response.status}): ${errorText}`);
+                    }
                 }
 
                 // Get HTML content and open in new window for client-side PDF generation
