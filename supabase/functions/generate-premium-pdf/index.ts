@@ -483,7 +483,9 @@ function generateFreePdfHTML(data: any) {
             console.log('Library check:', {
                 jspdf: typeof window.jspdf,
                 jsPDF: typeof window.jsPDF,
-                html2canvas: typeof html2canvas
+                html2canvas: typeof html2canvas,
+                jspdfHasConstructor: !!(window.jspdf && (window.jspdf.jsPDF || typeof window.jspdf === 'function')),
+                windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('jspdf') || k.toLowerCase().includes('pdf'))
             });
             
             if (!jspdfAvailable || !html2canvasAvailable) {
@@ -541,7 +543,18 @@ function generateFreePdfHTML(data: any) {
                 });
                 
                 // Create PDF with optimal settings
-                const jsPDFLib = window.jsPDF || window.jspdf?.jsPDF || window.jspdf;
+                let jsPDFLib;
+                if (window.jsPDF) {
+                    jsPDFLib = window.jsPDF;
+                } else if (window.jspdf && window.jspdf.jsPDF) {
+                    jsPDFLib = window.jspdf.jsPDF;
+                } else if (window.jspdf) {
+                    jsPDFLib = window.jspdf;
+                } else {
+                    throw new Error('jsPDF library not found');
+                }
+                
+                console.log('📄 Using jsPDF constructor:', typeof jsPDFLib);
                 const pdf = new jsPDFLib({
                     orientation: 'portrait',
                     unit: 'mm',
