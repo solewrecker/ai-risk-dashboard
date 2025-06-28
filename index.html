@@ -964,7 +964,7 @@
                                         📄 <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="handleEnterpriseExport(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="exportPremiumPDF(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -991,7 +991,7 @@
                                         📄 <strong>PDF Report (jsPDF)</strong><br>
                                         <small style="color: #64748b;">Manual layout</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="exportHTML(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="exportPremiumHTML(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -2745,6 +2745,155 @@
                 setTimeout(() => {
                     loginSection.style.backgroundColor = '';
                 }, 1000);
+            }
+        }
+
+        // NEW: Server-side Premium Export Functions
+        async function exportPremiumPDF() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            // Check authentication first
+            if (!currentUser) {
+                showAuthRequiredModal('premium PDF export');
+                return;
+            }
+
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            if (userTier !== 'enterprise') {
+                showEnterpriseExportPaywall();
+                return;
+            }
+
+            try {
+                showMessage('🚀 Generating premium PDF with Puppeteer...', 'info');
+                
+                // Get auth token
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Authentication required');
+                }
+                
+                const response = await fetch(`${supabaseUrl}/functions/v1/generate-premium-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        assessmentData: {
+                            toolName: currentAssessment.results.toolName,
+                            toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                            finalScore: currentAssessment.results.finalScore,
+                            riskLevel: currentAssessment.results.riskLevel,
+                            baseScore: currentAssessment.results.baseScore,
+                            componentScores: window.currentScoreBreakdown,
+                            formData: currentAssessment.formData,
+                            dataClassification: currentAssessment.formData.dataClassification,
+                            useCase: currentAssessment.formData.useCase
+                        },
+                        exportType: 'pdf'
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Server-side PDF generation failed');
+                }
+
+                // Download the PDF
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentAssessment.results.toolName}-premium-assessment.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showMessage('✅ Premium PDF generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Premium PDF error:', error);
+                showMessage('Premium PDF failed: ' + error.message, 'error');
+            }
+        }
+
+        async function exportPremiumHTML() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            // Check authentication first
+            if (!currentUser) {
+                showAuthRequiredModal('premium HTML export');
+                return;
+            }
+
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            if (userTier !== 'enterprise') {
+                showEnterpriseExportPaywall();
+                return;
+            }
+
+            try {
+                showMessage('🚀 Generating premium HTML report...', 'info');
+                
+                // Get auth token
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Authentication required');
+                }
+                
+                const response = await fetch(`${supabaseUrl}/functions/v1/generate-premium-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        assessmentData: {
+                            toolName: currentAssessment.results.toolName,
+                            toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                            finalScore: currentAssessment.results.finalScore,
+                            riskLevel: currentAssessment.results.riskLevel,
+                            baseScore: currentAssessment.results.baseScore,
+                            componentScores: window.currentScoreBreakdown,
+                            formData: currentAssessment.formData,
+                            dataClassification: currentAssessment.formData.dataClassification,
+                            useCase: currentAssessment.formData.useCase
+                        },
+                        exportType: 'html'
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Server-side HTML generation failed');
+                }
+
+                // Download the HTML
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentAssessment.results.toolName}-premium-assessment.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showMessage('✅ Premium HTML report generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Premium HTML error:', error);
+                showMessage('Premium HTML failed: ' + error.message, 'error');
             }
         }
 
