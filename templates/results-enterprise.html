@@ -32,74 +32,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* === HEADER === */
-        .header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: white;
-            padding: 3rem 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(50px, -50px);
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .report-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
-        }
-
-        .report-subtitle {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            font-weight: 300;
-            margin-bottom: 1.5rem;
-        }
-
-        .tool-highlight {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-        }
-
-        .tool-highlight .tool-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .tool-highlight .tool-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        .report-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-        }
+        /* === HEADER REMOVED === */
 
         /* === EXECUTIVE SUMMARY === */
         .executive-summary {
@@ -714,16 +647,7 @@
 </head>
 <body>
     <div class="report-container" id="enterpriseResults">
-        <!-- Simple Header -->
-        <div style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; padding: 2rem; text-align: center;">
-            <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;" id="enterpriseRiskNumber">--</div>
-            <div style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">/100</div>
-            <div style="background: rgba(255, 255, 255, 0.2); padding: 0.75rem 1.5rem; border-radius: 25px; font-weight: 700; font-size: 1rem; display: inline-block; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.1em;" id="enterpriseRiskBadge">LOADING</div>
-            <div style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; line-height: 1.5;" id="enterpriseRiskDescription">Loading assessment...</div>
-            <div style="margin-top: 1rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);">
-                ✓ Enterprise Assessment Data
-            </div>
-        </div>
+        <!-- Header removed per user request -->
 
         <!-- Executive Summary -->
         <div class="executive-summary">
