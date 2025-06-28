@@ -647,7 +647,37 @@
 </head>
 <body>
     <div class="report-container" id="enterpriseResults">
-        <!-- Header removed per user request -->
+        
+        <!-- Simple Risk Score Display -->
+        <div style="
+            text-align: center; 
+            padding: 2rem; 
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%); 
+            color: white; 
+            margin-bottom: 2rem;
+        ">
+            <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;" id="enterpriseRiskNumber">--</div>
+            <div style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">/100</div>
+            <div style="
+                background: rgba(255, 255, 255, 0.2); 
+                padding: 0.75rem 1.5rem; 
+                border-radius: 25px; 
+                font-weight: 700; 
+                font-size: 1rem; 
+                display: inline-block; 
+                margin-bottom: 1rem; 
+                text-transform: uppercase; 
+                letter-spacing: 0.1em;
+            " id="enterpriseRiskBadge">LOADING</div>
+            <div style="
+                color: rgba(255, 255, 255, 0.9); 
+                font-size: 1rem; 
+                line-height: 1.5;
+            " id="enterpriseRiskDescription">Loading assessment...</div>
+            <div style="margin-top: 1rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);">
+                ✓ Enterprise Assessment Data
+            </div>
+        </div>
 
         <!-- Executive Summary -->
         <div class="executive-summary">

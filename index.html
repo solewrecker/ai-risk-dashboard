@@ -2392,16 +2392,14 @@
                 // Insert template into results container
                 document.getElementById('resultsContent').innerHTML = cleanTemplateHTML;
                 
-                // Wait for DOM to render, then initialize template
-                requestAnimationFrame(() => {
-                    if (window.EnterpriseResultsTemplate) {
-                        window.EnterpriseResultsTemplate.init(results);
-                        console.log('✅ Enterprise template initialized successfully');
-                    } else {
-                        console.warn('⚠️ Enterprise template functions not found, using fallback');
-                        displayBasicResults(results);
-                    }
-                });
+                // Initialize the template immediately since the functions are now available
+                if (window.EnterpriseResultsTemplate) {
+                    window.EnterpriseResultsTemplate.init(results);
+                    console.log('✅ Enterprise template initialized successfully');
+                } else {
+                    console.warn('⚠️ Enterprise template functions not found, using fallback');
+                    displayBasicResults(results);
+                }
                 
             } catch (error) {
                 console.warn('❌ Could not load enterprise template:', error);
