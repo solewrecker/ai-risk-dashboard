@@ -1097,83 +1097,86 @@
             return searchTerms;
         }
 
-        // Load security assessment data from Supabase
+        // Load security assessment data - prioritize embedded data over database queries
         async function loadSecurityAssessment() {
             try {
-                // Try to get tool name from template variable first, then fallback to DOM
-                // Get tool name and version from URL parameters or extract from filename
-                const urlParams = new URLSearchParams(window.location.search);
-                let toolName = urlParams.get('tool');
-                let toolVersion = urlParams.get('version') || 'free'; // Default to free
-                
-                // If no URL parameters, extract from filename
-                if (!toolName) {
-                    const pathname = window.location.pathname;
-                    const filename = pathname.split('/').pop(); // Get filename
-                    console.log('🔍 Parsing filename:', filename);
-                    
-                    // Extract tool name and version from filename patterns
-                    if (filename.includes('claude-ai') || filename.includes('claude')) {
-                        toolName = 'Claude.ai';
-                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
-                        console.log('✅ Detected Claude.ai tool, version:', toolVersion);
-                    } else if (filename.includes('chatgpt')) {
-                        toolName = 'ChatGPT';
-                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
-                        console.log('✅ Detected ChatGPT tool, version:', toolVersion);
-                    } else if (filename.includes('copilot')) {
-                        toolName = 'GitHub Copilot';
-                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
-                        console.log('✅ Detected Copilot tool, version:', toolVersion);
-                    } else if (filename.includes('maestro')) {
-                        toolName = 'Maestro Labs Notetaker';
-                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
-                        console.log('✅ Detected Maestro tool, version:', toolVersion);
-                    } else {
-                        toolName = 'ChatGPT'; // Default fallback
-                        toolVersion = 'free';
-                        console.log('⚠️ Using fallback: ChatGPT Free');
-                    }
-                }
-                
-                // Use the same buildSearchTerms approach as index.html
-                const searchTerms = buildSearchTerms(toolName, toolVersion);
-                console.log('🔍 Generated search terms:', searchTerms);
-                console.log('🎯 Looking for tool:', toolName, 'version:', toolVersion);
-                
-                // Try each search term until we find a match
                 let toolData = null;
-                for (const searchTerm of searchTerms) {
-                    console.log(`🔍 Trying search term: "${searchTerm}"`);
-                    const { data: tools, error } = await supabase
-                        .from('ai_tools')
-                        .select('*')
-                        .ilike('name', `%${searchTerm}%`)
-                        .limit(1);
 
-                    if (error) {
-                        console.warn('❌ Supabase query error for term:', searchTerm, error);
-                        continue;
-                    }
-
-                    console.log(`📊 Query results for "${searchTerm}":`, tools);
+                // PRIORITY 1: Check for embedded assessment data from index.html
+                if (window.EMBEDDED_ASSESSMENT_DATA) {
+                    console.log('✅ Using embedded assessment data from index.html');
+                    toolData = window.EMBEDDED_ASSESSMENT_DATA.toolData;
+                    console.log('📊 Embedded tool data:', toolData);
+                } else {
+                    console.log('⚠️ No embedded data found, falling back to database query');
                     
-                    if (tools && tools.length > 0) {
-                        toolData = tools[0];
-                        console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
-                        break;
-                    } else {
-                        console.log(`❌ No results for "${searchTerm}"`);
+                    // FALLBACK: Try to get tool name from URL parameters or extract from filename
+                    const urlParams = new URLSearchParams(window.location.search);
+                    let toolName = urlParams.get('tool');
+                    let toolVersion = urlParams.get('version') || 'free';
+                    
+                    // If no URL parameters, extract from filename
+                    if (!toolName) {
+                        const pathname = window.location.pathname;
+                        const filename = pathname.split('/').pop();
+                        console.log('🔍 Parsing filename:', filename);
+                        
+                        // Extract tool name and version from filename patterns
+                        if (filename.includes('claude-ai') || filename.includes('claude')) {
+                            toolName = 'Claude.ai';
+                            toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                            console.log('✅ Detected Claude.ai tool, version:', toolVersion);
+                        } else if (filename.includes('chatgpt')) {
+                            toolName = 'ChatGPT';
+                            toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                            console.log('✅ Detected ChatGPT tool, version:', toolVersion);
+                        } else if (filename.includes('copilot')) {
+                            toolName = 'GitHub Copilot';
+                            toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                            console.log('✅ Detected Copilot tool, version:', toolVersion);
+                        } else if (filename.includes('maestro')) {
+                            toolName = 'Maestro Labs Notetaker';
+                            toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                            console.log('✅ Detected Maestro tool, version:', toolVersion);
+                        } else {
+                            toolName = 'ChatGPT';
+                            toolVersion = 'free';
+                            console.log('⚠️ Using fallback: ChatGPT Free');
+                        }
+                    }
+                    
+                    // Use database query as fallback
+                    const searchTerms = buildSearchTerms(toolName, toolVersion);
+                    console.log('🔍 Generated search terms:', searchTerms);
+                    
+                    for (const searchTerm of searchTerms) {
+                        console.log(`🔍 Trying search term: "${searchTerm}"`);
+                        const { data: tools, error } = await supabase
+                            .from('ai_tools')
+                            .select('*')
+                            .ilike('name', `%${searchTerm}%`)
+                            .limit(1);
+
+                        if (error) {
+                            console.warn('❌ Supabase query error for term:', searchTerm, error);
+                            continue;
+                        }
+
+                        if (tools && tools.length > 0) {
+                            toolData = tools[0];
+                            console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
+                            break;
+                        }
+                    }
+
+                    if (!toolData) {
+                        console.warn('No tool data found for search terms:', searchTerms);
+                        showError(`No assessment data found for: ${searchTerms.join(' or ')}`);
+                        return;
                     }
                 }
 
-                if (!toolData) {
-                    console.warn('No tool data found for search terms:', searchTerms);
-                    showError(`No assessment data found for: ${searchTerms.join(' or ')}`);
-                    return;
-                }
-
-                console.log('Tool data loaded:', toolData);
+                console.log('📋 Final tool data being used:', toolData);
 
                 // Generate all dynamic content
                 generateSecurityCategories(toolData);
