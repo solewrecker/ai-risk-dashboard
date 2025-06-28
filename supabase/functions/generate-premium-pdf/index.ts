@@ -70,41 +70,81 @@ serve(async (req) => {
       });
     }
     
-    const { assessmentData, exportType } = await req.json();
+    const requestBody = await req.json();
+    const { assessmentData, exportType } = requestBody;
     
-    // Handle different export types properly
-    if (exportType === 'free-pdf' || exportType === 'pdf') {
-      const freePdfHtml = generateFreePdfHTML(assessmentData);
-      return new Response(freePdfHtml, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'text/html; charset=utf-8',
-          // Remove Content-Disposition for HTML that generates PDF client-side
-          'Cache-Control': 'no-cache'
-        }
+    // Enhanced debugging for export type
+    console.log('=== REQUEST BODY DEBUG ===');
+    console.log('Full request body:', JSON.stringify(requestBody, null, 2));
+    console.log('Export type received:', exportType);
+    console.log('Export type type:', typeof exportType);
+    console.log('Assessment data keys:', assessmentData ? Object.keys(assessmentData) : 'undefined');
+    console.log('Tool name:', assessmentData?.toolName);
+    
+    // Validation
+    if (!assessmentData) {
+      console.error('Missing assessment data');
+      return new Response(JSON.stringify({
+        error: 'Missing assessment data'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
-    // For HTML export
-    if (exportType === 'html') {
-      const htmlContent = generatePremiumHTML(assessmentData);
-      return new Response(htmlContent, {
-        headers: {
+    // Enhanced export type handling with explicit switch
+    let responseContent;
+    let responseHeaders;
+    
+    console.log('=== EXPORT TYPE PROCESSING ===');
+    
+    switch (exportType) {
+      case 'pdf':
+      case 'free-pdf':
+        console.log('Processing PDF export');
+        responseContent = generateFreePdfHTML(assessmentData);
+        responseHeaders = {
+          ...corsHeaders,
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache'
+        };
+        break;
+        
+      case 'html':
+        console.log('Processing HTML export');
+        responseContent = generatePremiumHTML(assessmentData);
+        responseHeaders = {
           ...corsHeaders,
           'Content-Type': 'text/html; charset=utf-8',
           'Content-Disposition': `attachment; filename="${assessmentData.toolName}-assessment.html"`
-        }
-      });
+        };
+        break;
+        
+      case undefined:
+      case null:
+        console.log('Export type is undefined/null, defaulting to HTML for enterprise user');
+        responseContent = generatePremiumHTML(assessmentData);
+        responseHeaders = {
+          ...corsHeaders,
+          'Content-Type': 'text/html; charset=utf-8'
+        };
+        break;
+        
+      default:
+        console.log(`Unknown export type: ${exportType}, defaulting to HTML`);
+        responseContent = generatePremiumHTML(assessmentData);
+        responseHeaders = {
+          ...corsHeaders,
+          'Content-Type': 'text/html; charset=utf-8'
+        };
+        break;
     }
     
-    // Default to premium HTML
-    const htmlContent = generatePremiumHTML(assessmentData);
-    return new Response(htmlContent, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'text/html; charset=utf-8'
-      }
-    });
+    console.log('=== RESPONSE PREPARATION ===');
+    console.log('Response content type:', responseHeaders['Content-Type']);
+    console.log('Response content length:', responseContent.length);
+    
+    return new Response(responseContent, { headers: responseHeaders });
     
   } catch (error) {
     console.error('Export generation error:', error);
@@ -122,15 +162,26 @@ serve(async (req) => {
 });
 
 function generateFreePdfHTML(data: any) {
-  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : 
-                   data.riskLevel === 'MODERATE' ? '#f59e0b' : 
-                   data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
+  // Normalize and format data with defaults
+  const normalizedData = {
+    toolName: data.toolName || 'Unknown Tool',
+    toolCategory: data.toolCategory || 'AI Platform',
+    finalScore: data.finalScore || 0,
+    riskLevel: (data.riskLevel || 'unknown').toUpperCase(),
+    baseScore: data.baseScore || 0,
+    dataClassification: data.dataClassification || 'public',
+    useCase: data.useCase || 'general'
+  };
+  
+  const riskColor = normalizedData.riskLevel === 'LOW' ? '#10b981' : 
+                   normalizedData.riskLevel === 'MODERATE' ? '#f59e0b' : 
+                   normalizedData.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
   
   return `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Enterprise AI Risk Assessment - ${data.toolName}</title>
+    <title>Enterprise AI Risk Assessment - ${normalizedData.toolName}</title>
     <!-- Reliable CDN links without integrity checks -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -226,7 +277,7 @@ function generateFreePdfHTML(data: any) {
         .details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.5rem;
             margin: 2rem 0;
         }
         
@@ -423,34 +474,34 @@ function generateFreePdfHTML(data: any) {
         
         <div class="content">
             <div class="risk-display">
-                <div class="risk-score">${data.finalScore}</div>
-                <div class="risk-level">${data.riskLevel} RISK</div>
+                <div class="risk-score">${normalizedData.finalScore}</div>
+                <div class="risk-level">${normalizedData.riskLevel} RISK</div>
             </div>
             
             <div class="details-grid">
                 <div class="detail-card">
                     <div class="detail-label">Tool Name</div>
-                    <div class="detail-value">${data.toolName}</div>
+                    <div class="detail-value">${normalizedData.toolName}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">Category</div>
-                    <div class="detail-value">${data.toolCategory}</div>
+                    <div class="detail-value">${normalizedData.toolCategory}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">Data Classification</div>
-                    <div class="detail-value">${data.dataClassification}</div>
+                    <div class="detail-value">${normalizedData.dataClassification.toUpperCase()}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">Use Case</div>
-                    <div class="detail-value">${data.useCase}</div>
+                    <div class="detail-value">${normalizedData.useCase.replace('-', ' ').toUpperCase()}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">Base Score</div>
-                    <div class="detail-value">${data.baseScore}</div>
+                    <div class="detail-value">${normalizedData.baseScore}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">Final Score</div>
-                    <div class="detail-value">${data.finalScore}</div>
+                    <div class="detail-value">${normalizedData.finalScore}</div>
                 </div>
             </div>
             
