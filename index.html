@@ -2780,7 +2780,8 @@
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${session.access_token}`,
+                        'authorization': `Bearer ${session.access_token}`,
+                        'apikey': SUPABASE_ANON_KEY,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
@@ -2854,7 +2855,8 @@
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${session.access_token}`,
+                        'authorization': `Bearer ${session.access_token}`,
+                        'apikey': SUPABASE_ANON_KEY,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
