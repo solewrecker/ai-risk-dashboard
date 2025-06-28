@@ -1004,27 +1004,42 @@
             }
         };
 
-        // Generate intelligent description from your breakdown data
+        // Generate detailed breakdown with sub-categories from your data
         function generateDescription(categoryKey, score, breakdownData) {
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
-            // Try to extract detailed notes from your breakdown structure
+            // Try to extract detailed sub-category notes from your breakdown structure
             if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
                 const subScores = breakdownData.subScores[categoryKey];
-                const details = [];
+                const subCategoryDetails = [];
                 
-                // Extract key insights from sub-scores
+                // Map sub-score keys to readable names
+                const subCategoryNames = {
+                    'retention': '📅 Data Retention',
+                    'encryption': '🔒 Encryption',
+                    'geographic': '🌍 Geographic Controls',
+                    'sharing': '🔄 Data Sharing',
+                    'training': '🤖 Training Usage',
+                    'admin': '👥 Admin Controls',
+                    'audit': '📊 Audit & Monitoring',
+                    'integration': '🔗 Integration',
+                    'violations': '⚠️ Compliance Violations',
+                    'transparency': '📋 Policy Transparency',
+                    'score': '📈 Overall Assessment'
+                };
+                
+                // Extract and format each sub-category
                 Object.keys(subScores).forEach(subKey => {
                     if (subScores[subKey] && subScores[subKey].note) {
+                        const displayName = subCategoryNames[subKey] || `📌 ${subKey.charAt(0).toUpperCase() + subKey.slice(1)}`;
                         const note = subScores[subKey].note;
-                        details.push(note);
+                        subCategoryDetails.push(`<strong>${displayName}:</strong> ${note}`);
                     }
                 });
                 
-                if (details.length > 0) {
-                    // Use the actual detailed note without generic prefixes
-                    return details[0];
+                if (subCategoryDetails.length > 0) {
+                    return subCategoryDetails.join('<br><br>');
                 }
             }
             
