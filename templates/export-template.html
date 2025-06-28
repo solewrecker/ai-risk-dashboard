@@ -1024,7 +1024,7 @@
                 });
                 
                 if (details.length > 0) {
-                    return `${riskLevel.toLowerCase() === 'high' ? 'High' : riskLevel.toLowerCase() === 'medium' ? 'Medium' : 'Low'} risk identified. ${details[0]}`;
+                    return details[0]; // Just return the actual detailed notes without the redundant risk prefix
                 }
             }
             
