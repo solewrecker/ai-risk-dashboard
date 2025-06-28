@@ -1433,27 +1433,64 @@
         function generateKeyFindings(toolData) {
             const findings = [];
             
-            if (toolData.data_storage_score > 8) {
-                findings.push('Data storage practices require enhanced security controls');
-            }
-            if (toolData.training_usage_score > 8) {
-                findings.push('Training data usage policies require review and restrictions');
-            }
-            if (toolData.access_controls_score > 8) {
-                findings.push('Access controls need enterprise-grade authentication and authorization');
-            }
-            if (toolData.compliance_score > 8) {
-                findings.push('Compliance framework verification needed for regulated data handling');
-            }
-            if (toolData.vendor_transparency_score > 5) {
-                findings.push('Vendor transparency and documentation assessments pending');
+            // First, try to use the dedicated notes field from database
+            if (toolData.notes && toolData.notes.trim().length > 0) {
+                // Split notes by common separators and add each as a finding
+                const noteFindings = toolData.notes
+                    .split(/[;|\n|•]/) // Split on semicolon, newline, or bullet points
+                    .map(note => note.trim())
+                    .filter(note => note.length > 10) // Filter out very short notes
+                    .slice(0, 5); // Limit to 5 findings
+                    
+                if (noteFindings.length > 0) {
+                    return '• ' + noteFindings.join('<br>• ');
+                }
             }
             
+            // Fallback: Extract critical findings from breakdown data (NO TRUNCATION)
+            if (toolData.breakdown && toolData.breakdown.subScores) {
+                const subScores = toolData.breakdown.subScores;
+                
+                // Look for critical findings in each category
+                Object.keys(subScores).forEach(categoryKey => {
+                    const category = subScores[categoryKey];
+                    
+                    Object.keys(category).forEach(subKey => {
+                        const item = category[subKey];
+                        if (item && item.note) {
+                            const note = item.note.toLowerCase();
+                            
+                            // Extract critical/important findings based on keywords
+                            if (note.includes('critical gap') || note.includes('critical:') || 
+                                note.includes('hipaa') || note.includes('not compliant') ||
+                                note.includes('indefinite retention') || note.includes('no enterprise') ||
+                                note.includes('major compliance barriers') || note.includes('high gdpr risk') ||
+                                note.includes('no audit trail') || note.includes('basic oauth only') ||
+                                note.includes('unclear server locations') || note.includes('lacks enterprise-grade')) {
+                                
+                                // Add the full finding WITHOUT truncation
+                                findings.push(item.note);
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // If no critical findings found, add general findings based on scores
             if (findings.length === 0) {
-                findings.push('Standard security controls adequate for current risk profile');
+                if (toolData.total_score < 35) {
+                    findings.push('Acceptable security controls with standard enterprise monitoring requirements');
+                    findings.push('Regular assessment and compliance review recommended');
+                } else {
+                    findings.push('Enhanced security controls and compliance verification required');
+                    findings.push('Detailed risk mitigation plan needed before deployment');
+                }
             }
             
-            return '• ' + findings.join('<br>• ');
+            // Limit to top 5 findings (but keep full text)
+            const limitedFindings = findings.slice(0, 5);
+            
+            return '• ' + limitedFindings.join('<br>• ');
         }
 
         function generateToolIcon(toolName) {
