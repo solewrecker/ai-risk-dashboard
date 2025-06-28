@@ -1075,36 +1075,92 @@
             }
         }
 
+        // Build search terms using the same logic as index.html
+        function buildSearchTerms(toolName, toolVersion) {
+            const cleanToolName = toolName.trim();
+            const searchTerms = [];
+            
+            const versionSuffix = toolVersion === 'enterprise' ? 'Enterprise' : 'Free';
+            
+            // Check if tool name already includes the version suffix
+            const toolNameLower = cleanToolName.toLowerCase();
+            const suffixLower = versionSuffix.toLowerCase();
+            
+            if (!toolNameLower.includes(suffixLower)) {
+                // Only add suffix if not already present
+                searchTerms.push(`${cleanToolName} ${versionSuffix}`);
+            }
+            
+            // Always try exact name as entered
+            searchTerms.push(cleanToolName);
+            
+            return searchTerms;
+        }
+
         // Load security assessment data from Supabase
         async function loadSecurityAssessment() {
             try {
                 // Try to get tool name from template variable first, then fallback to DOM
-                // Get tool name from URL parameters or use default for testing
+                // Get tool name and version from URL parameters or extract from filename
                 const urlParams = new URLSearchParams(window.location.search);
-                let toolName = urlParams.get('tool') || 'ChatGPT Enterprise'; // Default for testing
+                let toolName = urlParams.get('tool');
+                let toolVersion = urlParams.get('version') || 'free'; // Default to free
                 
-                console.log('Loading security assessment for:', toolName);
+                // If no URL parameters, extract from filename
+                if (!toolName) {
+                    const pathname = window.location.pathname;
+                    const filename = pathname.split('/').pop(); // Get filename
+                    
+                    // Extract tool name and version from filename patterns
+                    if (filename.includes('claude-ai') || filename.includes('claude')) {
+                        toolName = 'Claude.ai';
+                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                    } else if (filename.includes('chatgpt')) {
+                        toolName = 'ChatGPT';
+                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                    } else if (filename.includes('copilot')) {
+                        toolName = 'GitHub Copilot';
+                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                    } else if (filename.includes('maestro')) {
+                        toolName = 'Maestro Labs Notetaker';
+                        toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                    } else {
+                        toolName = 'ChatGPT'; // Default fallback
+                        toolVersion = 'free';
+                    }
+                }
                 
-                // Query Supabase for the tool data
-                const { data: tools, error } = await supabase
-                    .from('ai_tools')
-                    .select('*')
-                    .ilike('name', `%${toolName}%`)
-                    .limit(1);
+                // Use the same buildSearchTerms approach as index.html
+                const searchTerms = buildSearchTerms(toolName, toolVersion);
+                console.log('Loading security assessment with search terms:', searchTerms);
+                
+                // Try each search term until we find a match
+                let toolData = null;
+                for (const searchTerm of searchTerms) {
+                    const { data: tools, error } = await supabase
+                        .from('ai_tools')
+                        .select('*')
+                        .ilike('name', `%${searchTerm}%`)
+                        .limit(1);
 
-                if (error) {
-                    console.error('Supabase error:', error);
-                    showError('Unable to load assessment data from database');
+                    if (error) {
+                        console.warn('Supabase query error for term:', searchTerm, error);
+                        continue;
+                    }
+
+                    if (tools && tools.length > 0) {
+                        toolData = tools[0];
+                        console.log(`Found tool data for "${searchTerm}":`, toolData.name);
+                        break;
+                    }
+                }
+
+                if (!toolData) {
+                    console.warn('No tool data found for search terms:', searchTerms);
+                    showError(`No assessment data found for: ${searchTerms.join(' or ')}`);
                     return;
                 }
 
-                if (!tools || tools.length === 0) {
-                    console.warn('No tool data found for:', toolName);
-                    showError('No assessment data found for this tool');
-                    return;
-                }
-
-                const toolData = tools[0];
                 console.log('Tool data loaded:', toolData);
 
                 // Generate all dynamic content
