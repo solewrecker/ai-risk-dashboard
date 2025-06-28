@@ -1802,35 +1802,79 @@
             // Initialize the enterprise results display
             init: function(assessmentData) {
                 console.log('🏢 Initializing Enterprise Results Template');
+                console.log('📊 Assessment data received:', assessmentData);
+                
+                // Add debug logging for each step
+                console.log('🎯 Step 1: Populating risk score...');
                 this.populateRiskScore(assessmentData);
+                
+                console.log('🎯 Step 2: Populating executive summary...');
                 this.populateExecutiveSummary(assessmentData);
+                
+                console.log('🎯 Step 3: Populating tool info...');
                 this.populateToolInfo(assessmentData);
+                
+                console.log('🎯 Step 4: Populating categories...');
                 this.populateCategories(assessmentData);
+                
+                console.log('🎯 Step 5: Populating risk matrix...');
                 this.populateRiskMatrix(assessmentData);
+                
+                console.log('🎯 Step 6: Populating recommendations...');
                 this.populateRecommendations(assessmentData);
+                
+                console.log('🎯 Step 7: Populating enhanced sections...');
                 this.populateEnhancedSections(assessmentData);
+                
+                console.log('🎯 Step 8: Populating footer...');
                 this.populateFooter(assessmentData);
+                
+                console.log('✅ All enterprise template sections populated');
             },
 
             // Populate the main risk score display
             populateRiskScore: function(data) {
+                console.log('🎯 populateRiskScore called with data:', data);
+                console.log('📊 Final score from data:', data.finalScore);
+                
                 const riskLevel = this.getRiskLevel(data.finalScore);
+                console.log('⚠️ Calculated risk level:', riskLevel);
                 
                 // Update risk display
                 const riskNumber = document.getElementById('enterpriseRiskNumber');
                 const riskBadge = document.getElementById('enterpriseRiskBadge');
                 const riskDescription = document.getElementById('enterpriseRiskDescription');
                 
-                if (riskNumber) riskNumber.textContent = data.finalScore;
-                if (riskBadge) riskBadge.textContent = `${riskLevel.toUpperCase()} RISK`;
-                if (riskDescription) riskDescription.textContent = this.getRiskDescription(riskLevel);
+                console.log('🔍 Risk display elements found:', {
+                    riskNumber: !!riskNumber,
+                    riskBadge: !!riskBadge,
+                    riskDescription: !!riskDescription
+                });
+                
+                if (riskNumber) {
+                    console.log('📊 Setting risk number to:', data.finalScore);
+                    riskNumber.textContent = data.finalScore;
+                }
+                if (riskBadge) {
+                    const badgeText = `${riskLevel.toUpperCase()} RISK`;
+                    console.log('🏷️ Setting risk badge to:', badgeText);
+                    riskBadge.textContent = badgeText;
+                }
+                if (riskDescription) {
+                    const descText = this.getRiskDescription(riskLevel);
+                    console.log('📝 Setting risk description to:', descText);
+                    riskDescription.textContent = descText;
+                }
                 
                 // Apply risk level styling to header
                 const resultsContainer = document.getElementById('enterpriseResults');
                 if (resultsContainer) {
+                    console.log('🎨 Applying risk styling:', `risk-${riskLevel}`);
                     resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
                     resultsContainer.classList.add(`risk-${riskLevel}`);
                 }
+                
+                console.log('✅ populateRiskScore completed');
             },
 
             // Populate executive summary
@@ -1862,6 +1906,8 @@
 
             // Populate tool information section
             populateToolInfo: function(data) {
+                console.log('🔧 populateToolInfo called with data:', data);
+                
                 const toolIcon = document.getElementById('toolIcon');
                 const toolName = document.getElementById('toolName');
                 const toolCategory = document.getElementById('toolCategory');
@@ -1872,18 +1918,69 @@
                 const vendor = document.getElementById('vendor');
                 const licenseType = document.getElementById('licenseType');
                 
+                console.log('🔍 DOM elements found:', {
+                    toolIcon: !!toolIcon,
+                    toolName: !!toolName,
+                    toolCategory: !!toolCategory,
+                    primaryUseCase: !!primaryUseCase,
+                    dataClassification: !!dataClassification,
+                    assessmentDate: !!assessmentDate,
+                    riskCategory: !!riskCategory,
+                    vendor: !!vendor,
+                    licenseType: !!licenseType
+                });
+                
                 // Get tool data from database if available
                 const toolData = this.getToolDataFromSource(data);
+                console.log('🗄️ Tool data from source:', toolData);
                 
-                if (toolIcon) toolIcon.textContent = this.getToolIcon(data.toolName);
-                if (toolName) toolName.textContent = data.toolName || 'Unknown Tool';
-                if (toolCategory) toolCategory.textContent = this.getToolCategoryFromData(toolData, data.toolName);
-                if (primaryUseCase) primaryUseCase.textContent = this.getPrimaryUseCase(data);
-                if (dataClassification) dataClassification.textContent = this.getDataClassification(data);
-                if (assessmentDate) assessmentDate.textContent = this.getAssessmentDate(toolData);
-                if (riskCategory) riskCategory.textContent = this.getRiskCategoryFromData(toolData, data.toolName);
-                if (vendor) vendor.textContent = this.getVendor(data.toolName);
-                if (licenseType) licenseType.textContent = this.getLicenseType(data.toolName);
+                if (toolIcon) {
+                    const iconText = this.getToolIcon(data.toolName);
+                    console.log('🎨 Setting tool icon to:', iconText);
+                    toolIcon.textContent = iconText;
+                }
+                if (toolName) {
+                    const nameText = data.toolName || 'Unknown Tool';
+                    console.log('🏷️ Setting tool name to:', nameText);
+                    toolName.textContent = nameText;
+                }
+                if (toolCategory) {
+                    const categoryText = this.getToolCategoryFromData(toolData, data.toolName);
+                    console.log('📂 Setting tool category to:', categoryText);
+                    toolCategory.textContent = categoryText;
+                }
+                if (primaryUseCase) {
+                    const useCaseText = this.getPrimaryUseCase(data);
+                    console.log('📋 Setting primary use case to:', useCaseText);
+                    primaryUseCase.textContent = useCaseText;
+                }
+                if (dataClassification) {
+                    const classificationText = this.getDataClassification(data);
+                    console.log('🔒 Setting data classification to:', classificationText);
+                    dataClassification.textContent = classificationText;
+                }
+                if (assessmentDate) {
+                    const dateText = this.getAssessmentDate(toolData);
+                    console.log('📅 Setting assessment date to:', dateText);
+                    assessmentDate.textContent = dateText;
+                }
+                if (riskCategory) {
+                    const riskCatText = this.getRiskCategoryFromData(toolData, data.toolName);
+                    console.log('⚠️ Setting risk category to:', riskCatText);
+                    riskCategory.textContent = riskCatText;
+                }
+                if (vendor) {
+                    const vendorText = this.getVendor(data.toolName);
+                    console.log('🏢 Setting vendor to:', vendorText);
+                    vendor.textContent = vendorText;
+                }
+                if (licenseType) {
+                    const licenseText = this.getLicenseType(data.toolName);
+                    console.log('📜 Setting license type to:', licenseText);
+                    licenseType.textContent = licenseText;
+                }
+                
+                console.log('✅ populateToolInfo completed');
             },
 
             // Populate risk matrix
