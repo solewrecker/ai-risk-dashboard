@@ -964,7 +964,7 @@
                                         📄 <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="showEnterpriseExportPaywall(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="handleEnterpriseExport(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -1090,12 +1090,17 @@
 
         // Authentication state  
         let currentUser = null;
-        let isAdmin = true; // TEMPORARY: Supabase server issues - enable admin mode
+        let isAdmin = false;
 
         // Check auth state on load
         supabase.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             isAdmin = session?.user?.user_metadata?.role === 'admin';
+            updateUIForAuth();
+        });
+
+        // Initialize auth UI when page loads
+        document.addEventListener('DOMContentLoaded', () => {
             updateUIForAuth();
         });
 
@@ -1114,22 +1119,66 @@
             
             if (loginSection) {
                 if (currentUser) {
+                    // User is logged in - show user info and account options
+                    const userTier = currentUser.user_metadata?.tier || 'free';
                     loginSection.innerHTML = `
                         <div style="text-align: center; margin-bottom: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 0.5rem; border: 1px solid #bbf7d0;">
-                            <span style="color: #166534;">✓ Logged in as: ${currentUser.email}</span>
-                            ${isAdmin ? '<span style="color: #dc2626; margin-left: 0.5rem;">[ADMIN]</span>' : ''}
-                            <button onclick="signOut()" style="margin-left: 1rem; padding: 0.25rem 0.5rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 0.25rem; color: #991b1b; cursor: pointer;">Sign Out</button>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                                <span style="color: #166534;">✓ ${currentUser.email}</span>
+                                <span style="background: ${userTier === 'enterprise' ? '#fbbf24' : '#94a3b8'}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                                    ${userTier}
+                                </span>
+                                ${isAdmin ? '<span style="color: #dc2626; font-weight: 600; font-size: 0.75rem;">[ADMIN]</span>' : ''}
+                            </div>
+                            <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+                                ${userTier === 'free' ? '<button onclick="showUpgradeModal()" style="padding: 0.25rem 0.75rem; background: #fbbf24; color: #92400e; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">⭐ Upgrade</button>' : ''}
+                                <button onclick="showDashboard()" style="padding: 0.25rem 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">📊 Dashboard</button>
+                                <button onclick="signOut()" style="padding: 0.25rem 0.75rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 0.25rem; color: #991b1b; cursor: pointer; font-size: 0.75rem;">Sign Out</button>
+                            </div>
                         </div>
                     `;
                 } else {
+                    // User not logged in - show auth options
                     loginSection.innerHTML = `
-                        <div id="authContainer" style="text-align: center; margin-bottom: 1rem; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; border: 1px solid #fecaca;">
-                            <div style="margin-bottom: 0.5rem; color: #dc2626; font-weight: 600;">⚠️ Database Service Temporarily Unavailable</div>
-                            <div style="font-size: 0.875rem; color: #991b1b; margin-bottom: 0.5rem;">
-                                Supabase authentication service is experiencing issues. Assessment functionality is available, but database saves are disabled.
+                        <div id="authContainer" style="text-align: center; margin-bottom: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 1px solid #dbeafe;">
+                            <div style="margin-bottom: 1rem;">
+                                <h3 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 1rem;">🔐 Sign in to save assessments & export reports</h3>
+                                <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Create an account to save your assessments and access professional exports</p>
                             </div>
-                            <div style="font-size: 0.875rem; color: #6b7280;">
-                                You can still perform risk assessments and export results. Database functionality will be restored once the service is back online.
+                            
+                            <div id="authTabs" style="margin-bottom: 1rem;">
+                                <button id="signInTab" onclick="showAuthTab('signin')" style="padding: 0.5rem 1rem; margin-right: 0.25rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer; font-weight: 600;">Sign In</button>
+                                <button id="signUpTab" onclick="showAuthTab('signup')" style="padding: 0.5rem 1rem; margin-left: 0.25rem; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer;">Sign Up</button>
+                            </div>
+                            
+                            <div id="signInForm" style="display: block;">
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="email" id="signInEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <input type="password" id="signInPassword" placeholder="Password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <button onclick="signInUser()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Sign In</button>
+                            </div>
+                            
+                            <div id="signUpForm" style="display: none;">
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="email" id="signUpEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="password" id="signUpPassword" placeholder="Create password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <select id="signUpTier" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                        <option value="free">🆓 Free Tier - Basic exports</option>
+                                        <option value="enterprise">⭐ Enterprise - $49/month</option>
+                                    </select>
+                                </div>
+                                <button onclick="signUpUser()" style="padding: 0.75rem 1.5rem; background: #10b981; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Create Account</button>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b;">
+                                Continue as guest to try the assessment tool
                             </div>
                         </div>
                     `;
@@ -1178,6 +1227,163 @@
                 console.error('Sign out error:', error);
                 showMessage('Sign out failed: ' + error.message, 'error');
             }
+        }
+
+        // NEW: Enhanced auth functions for regular users
+
+        function showAuthTab(tab) {
+            const signInTab = document.getElementById('signInTab');
+            const signUpTab = document.getElementById('signUpTab');
+            const signInForm = document.getElementById('signInForm');
+            const signUpForm = document.getElementById('signUpForm');
+            
+            if (tab === 'signin') {
+                signInTab.style.background = '#3b82f6';
+                signInTab.style.color = 'white';
+                signUpTab.style.background = '#f8fafc';
+                signUpTab.style.color = '#64748b';
+                signInForm.style.display = 'block';
+                signUpForm.style.display = 'none';
+            } else {
+                signUpTab.style.background = '#3b82f6';
+                signUpTab.style.color = 'white';
+                signInTab.style.background = '#f8fafc';
+                signInTab.style.color = '#64748b';
+                signUpForm.style.display = 'block';
+                signInForm.style.display = 'none';
+            }
+        }
+
+        async function signInUser() {
+            const email = document.getElementById('signInEmail').value.trim();
+            const password = document.getElementById('signInPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                showMessage('✅ Signed in successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Sign in error:', error);
+                showMessage('Sign in failed: ' + error.message, 'error');
+            }
+        }
+
+        async function signUpUser() {
+            const email = document.getElementById('signUpEmail').value.trim();
+            const password = document.getElementById('signUpPassword').value;
+            const tier = document.getElementById('signUpTier').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                // Sign up the user
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            tier: tier
+                        }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                if (data.user) {
+                    // Create user subscription record
+                    const { error: subError } = await supabase
+                        .from('user_subscriptions')
+                        .insert([
+                            {
+                                user_id: data.user.id,
+                                tier: tier
+                            }
+                        ]);
+                    
+                    if (subError) {
+                        console.warn('Failed to create subscription record:', subError);
+                        // Don't throw - user is still created successfully
+                    }
+                    
+                    if (data.user.email_confirmed_at) {
+                        showMessage('✅ Account created successfully!', 'success');
+                    } else {
+                        showMessage('📧 Account created! Please check your email to confirm your account.', 'success');
+                    }
+                } else {
+                    showMessage('Account created! Please check your email to confirm your account.', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Sign up error:', error);
+                showMessage('Sign up failed: ' + error.message, 'error');
+            }
+        }
+
+        function showUpgradeModal() {
+            const upgradeHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">⭐ Upgrade to Enterprise</h3>
+                        <p style="color: #64748b; margin-bottom: 2rem;">
+                            Get advanced features including server-generated PDFs, custom branding, assessment history, and priority support.
+                        </p>
+                        
+                        <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border-left: 3px solid #f59e0b;">
+                            <div style="font-weight: 600; color: #92400e; margin-bottom: 0.5rem;">🚧 Coming Soon</div>
+                            <div style="font-size: 0.875rem; color: #78350f;">
+                                Payment integration is being finalized. Contact us for early access pricing.
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="this.closest('div').closest('div').remove()" style="
+                                background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Maybe Later</button>
+                            <button onclick="contactSales()" style="
+                                background: #f59e0b; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Contact Sales</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', upgradeHTML);
+        }
+
+        function contactSales() {
+            // Remove modal
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            // For now, just show a message - later integrate with contact form or payment system
+            showMessage('📧 Please email sales@yourcompany.com for enterprise pricing', 'success');
+        }
+
+        function showDashboard() {
+            // For now, show a coming soon message - later we'll create dashboard.html
+            showMessage('📊 Dashboard feature coming soon! For now, continue using the assessment tool.', 'success');
+            
+            // TODO: Later redirect to dashboard.html
+            // window.location.href = 'dashboard.html';
         }
 
         // Data Classification Multipliers (hidden from UI)
@@ -2325,7 +2531,7 @@
 
         // === EXPORT FUNCTIONS ===
         
-        // NEW: Free Template Export (Basic professional PDF)
+        // NEW: Free Template Export (Print Current Results Page)
         async function exportFreeTemplate() {
             if (!currentAssessment) {
                 showMessage('No assessment to export', 'error');
@@ -2333,73 +2539,216 @@
             }
 
             try {
-                // Use simplified template for free users
-                if (window.TemplateBindingEngine) {
-                    const engine = new window.TemplateBindingEngine();
-                    
-                    // Create the correct data structure that template-binding.js expects
-                    const templateData = {
-                        // Add the results object that template-binding.js expects
-                        results: {
-                            toolName: currentAssessment.selectedTool?.name || currentAssessment.results.toolName,
-                            finalScore: currentAssessment.results.finalScore,
-                            riskLevel: currentAssessment.results.riskLevel,
-                            breakdown: currentAssessment.results.breakdown,
-                            recommendations: currentAssessment.results.recommendations || []
-                        },
-                        // Add form data
-                        formData: currentAssessment.formData,
-                        // Add selected tool data
-                        selectedTool: currentAssessment.selectedTool,
-                        // Free version flags
-                        isFreeVersion: true,
-                        enterpriseFeatures: false
-                    };
-                    
-                    console.log('📄 [FREE EXPORT] Template data structure:', templateData);
-                    
-                    // Embed assessment results for template
-                    window.EMBEDDED_TOOL_INFO = {
-                        ...currentAssessment.formData,
-                        ...templateData,
-                        isFreeVersion: true,
-                        enterpriseFeatures: false,
-                        // Include final calculated scores
-                        finalScore: currentAssessment.results.finalScore,
-                        baseScore: currentAssessment.results.baseScore,
-                        componentScores: window.currentScoreBreakdown,
-                        hasCalculatedScores: true
-                    };
-                    
-                    const html = await engine.generateHTMLReport(templateData, './templates/export-template.html');
-                    
-                    // Create new window with report
-                    const printWindow = window.open('', '_blank', 'width=800,height=600');
-                    printWindow.document.write(html);
-                    printWindow.document.close();
-                    
-                    addPrintControls(printWindow);
-                    
-                    printWindow.onload = () => {
-                        setTimeout(() => {
-                            printWindow.focus();
-                            printWindow.print();
-                        }, 500);
-                    };
-                    
-                    showMessage('📄 Free professional PDF generated successfully!', 'success');
-                } else {
-                    // Fallback to basic PDF
-                    generatePDFReportOriginal(currentAssessment);
-                    showMessage('📄 Basic PDF report generated!', 'success');
-                }
+                console.log('📄 [FREE EXPORT] Creating simple PDF from current results page');
+                
+                // Create a print-friendly version of the current results page
+                const currentResultsHTML = document.getElementById('resultsContent').innerHTML;
+                
+                // Get current form styles
+                const currentStyles = Array.from(document.styleSheets)
+                    .map(sheet => {
+                        try {
+                            return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
+                        } catch (e) {
+                            return '';
+                        }
+                    }).join('\n');
+
+                // Create a clean, print-ready HTML document
+                const printHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>AI Risk Assessment - ${currentAssessment.selectedTool?.name || currentAssessment.results.toolName}</title>
+                        <style>
+                            ${currentStyles}
+                            
+                            /* Print-specific styles */
+                            @media print {
+                                .no-print { display: none !important; }
+                                body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+                                .modern-results-container { max-width: none; margin: 0; }
+                            }
+                            
+                            /* Ensure good print layout */
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                line-height: 1.6;
+                                color: #333;
+                                margin: 2rem;
+                                background: white;
+                            }
+                            
+                            /* Add header */
+                            .print-header {
+                                text-align: center;
+                                margin-bottom: 2rem;
+                                padding-bottom: 1rem;
+                                border-bottom: 2px solid #e2e8f0;
+                            }
+                            
+                            .print-header h1 {
+                                color: #1e293b;
+                                margin: 0 0 0.5rem 0;
+                                font-size: 1.75rem;
+                            }
+                            
+                            .print-header p {
+                                color: #64748b;
+                                margin: 0;
+                                font-size: 0.9rem;
+                            }
+                            
+                            /* Add footer */
+                            .print-footer {
+                                margin-top: 3rem;
+                                padding-top: 1rem;
+                                border-top: 1px solid #e2e8f0;
+                                text-align: center;
+                                font-size: 0.8rem;
+                                color: #64748b;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="print-header">
+                            <h1>🔒 AI Tool Risk Assessment</h1>
+                            <p>Security Analysis Report • Generated ${new Date().toLocaleDateString('en-US', { 
+                                year: 'numeric', month: 'long', day: 'numeric' 
+                            })}</p>
+                        </div>
+                        
+                        ${currentResultsHTML}
+                        
+                        <div class="print-footer">
+                            <p>📄 Free Professional Report • For detailed analysis, upgrade to Enterprise</p>
+                            <p>Report ID: FREE-${Date.now()} • ${new Date().toLocaleString()}</p>
+                        </div>
+                        
+                        <!-- Print Controls -->
+                        <div class="no-print" style="
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            z-index: 1000;
+                            background: white;
+                            padding: 15px;
+                            border-radius: 10px;
+                            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                            border: 1px solid #ddd;
+                        ">
+                            <button onclick="window.print()" style="
+                                background: #3b82f6;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                margin-right: 10px;
+                                font-weight: 600;
+                                font-size: 14px;
+                            ">🖨️ Print/Save PDF</button>
+                            <button onclick="window.close()" style="
+                                background: #6b7280;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 14px;
+                            ">✕ Close</button>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                // Open in new window for printing
+                const printWindow = window.open('', '_blank', 'width=900,height=700');
+                printWindow.document.write(printHTML);
+                printWindow.document.close();
+                
+                // Auto-focus and show print dialog after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        // Don't auto-print, let user choose when to print
+                    }, 500);
+                };
+                
+                showMessage('📄 Free professional report ready for printing!', 'success');
+                
             } catch (error) {
-                console.error('Free template export error:', error);
-                showMessage('Free template export failed: ' + error.message, 'error');
+                console.error('Free export error:', error);
+                showMessage('Free export failed: ' + error.message, 'error');
             }
         }
 
-        // NEW: Enterprise Export Paywall
+        // NEW: Enterprise Export Access Control
+        async function handleEnterpriseExport() {
+            // Check if user is authenticated
+            if (!currentUser) {
+                showAuthRequiredModal('enterprise export');
+                return;
+            }
+            
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            
+            if (userTier === 'enterprise') {
+                // User has enterprise access - proceed directly
+                exportTemplated();
+                return;
+            }
+            
+            // Free user - show upgrade options
+            showEnterpriseExportPaywall();
+        }
+
+        function showAuthRequiredModal(featureName) {
+            const authModalHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">🔐 Sign In Required</h3>
+                        <p style="color: #64748b; margin-bottom: 2rem;">
+                            Please sign in or create an account to access ${featureName} features.
+                        </p>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="this.closest('div').closest('div').remove()" style="
+                                background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Cancel</button>
+                            <button onclick="scrollToAuth()" style="
+                                background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Sign In</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', authModalHTML);
+        }
+
+        function scrollToAuth() {
+            // Remove modal
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            // Scroll to auth section
+            const loginSection = document.getElementById('loginSection');
+            if (loginSection) {
+                loginSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Flash the auth section to draw attention
+                loginSection.style.transition = 'background-color 0.3s ease';
+                loginSection.style.backgroundColor = '#fef3c7';
+                setTimeout(() => {
+                    loginSection.style.backgroundColor = '';
+                }, 1000);
+            }
+        }
+
+        // Enterprise Export Paywall (for free users)
         async function showEnterpriseExportPaywall() {
             return new Promise((resolve) => {
                 const paywallHTML = `
