@@ -1006,64 +1006,47 @@
 
         // Generate intelligent description from your breakdown data
         function generateDescription(categoryKey, score, breakdownData) {
+            console.log(`🔍 generateDescription called for ${categoryKey}:`, { score, breakdownData });
+            
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
             // Try to extract detailed notes from your breakdown structure
             if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
                 const subScores = breakdownData.subScores[categoryKey];
+                console.log(`📋 Found subScores for ${categoryKey}:`, subScores);
                 const details = [];
                 
                 // Extract key insights from sub-scores
                 Object.keys(subScores).forEach(subKey => {
                     if (subScores[subKey] && subScores[subKey].note) {
                         const note = subScores[subKey].note;
-                        // Use full note without truncation
+                        console.log(`📝 Found note for ${categoryKey}.${subKey}:`, note);
                         details.push(note);
                     }
                 });
                 
                 if (details.length > 0) {
-                    return details[0]; // Just return the actual detailed notes without the redundant risk prefix
+                    console.log(`✅ Returning first note for ${categoryKey}:`, details[0]);
+                    return details[0];
                 }
             }
             
-            // Fallback descriptions based on risk level
+            console.log(`⚠️ Using fallback for ${categoryKey} - risk level: ${riskLevel}`);
+            // Fallback descriptions based on risk level (only used when no detailed data available)
             switch(riskLevel) {
                 case 'HIGH':
-                    return `High risk identified in ${baseDesc.toLowerCase()}. Immediate attention and remediation required.`;
+                    return `High risk - immediate attention required for ${baseDesc.toLowerCase()}.`;
                 case 'MEDIUM':
-                    return `Medium risk identified in ${baseDesc.toLowerCase()}. Enhanced controls and monitoring recommended.`;
+                    return `Medium risk - enhanced controls recommended for ${baseDesc.toLowerCase()}.`;
                 case 'LOW':
                 default:
-                    return `Low risk assessment for ${baseDesc.toLowerCase()}. Standard monitoring and periodic review recommended.`;
+                    return `Low risk - standard monitoring for ${baseDesc.toLowerCase()}.`;
             }
         }
 
-        // Check if template data is already populated (export mode)
-        function isExportMode() {
-            // Primary check: Look for export mode marker injected by template binding
-            const exportMarker = document.querySelector('meta[name="export-mode"]');
-            if (exportMarker) {
-                return true;
-            }
-            
-            // Fallback check: Look for populated data in key elements
-            const riskScoreElement = document.getElementById('riskScoreValue');
-            const toolNameElement = document.getElementById('toolNameValue');
-            
-            return (riskScoreElement && riskScoreElement.textContent.trim() !== 'Loading...' && riskScoreElement.textContent.trim() !== '') ||
-                   (toolNameElement && toolNameElement.textContent.trim() !== 'Loading...' && toolNameElement.textContent.trim() !== '');
-        }
-
-        // Load security assessment data from Supabase (only if not in export mode)
+        // Load security assessment data from Supabase
         async function loadSecurityAssessment() {
-            // Skip dynamic loading if this is an exported report with pre-populated data
-            if (isExportMode()) {
-                console.log('Export mode detected - skipping dynamic data loading');
-                return;
-            }
-
             try {
                 // Try to get tool name from template variable first, then fallback to DOM
                 // Get tool name from URL parameters or use default for testing
@@ -1475,13 +1458,7 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing security assessment...');
-            
-            // Only load dynamic content if not in export mode
-            if (!isExportMode()) {
-                loadSecurityAssessment();
-            } else {
-                console.log('Export mode detected - using pre-populated data');
-            }
+            loadSecurityAssessment();
         });
     </script>
 </body>
