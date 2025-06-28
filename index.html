@@ -1907,13 +1907,27 @@
             };
 
             // Get ACTUAL tool data from currentAssessment to ensure accuracy
-            const actualToolName = currentAssessment.selectedTool?.name || results.toolName;
+            let actualToolName = currentAssessment.selectedTool?.name || results.toolName;
+            
+            // Add version info for proper display (ChatGPT Free, Claude Enterprise, etc.)
+            if (currentAssessment.formData.toolVersion && actualToolName) {
+                const versionLabels = {
+                    'free': 'Free',
+                    'enterprise': 'Enterprise'
+                };
+                const versionLabel = versionLabels[currentAssessment.formData.toolVersion];
+                if (versionLabel && !actualToolName.toLowerCase().includes(versionLabel.toLowerCase())) {
+                    actualToolName = `${actualToolName} ${versionLabel}`;
+                }
+            }
+            
             const actualToolCategory = currentAssessment.selectedTool?.category || currentAssessment.formData.toolCategory;
             
             console.log('🎯 [RESULTS] Using actual tool data:', {
                 toolName: actualToolName,
                 category: actualToolCategory,
-                selectedTool: currentAssessment.selectedTool
+                selectedTool: currentAssessment.selectedTool,
+                toolVersion: currentAssessment.formData.toolVersion
             });
 
             // Get data classification display names  
@@ -1938,10 +1952,37 @@
             
             const dataClassificationColor = dataClassificationColors[currentAssessment.formData.dataClassification] || '#64748b';
 
-            // Generate summary insights based on actual scores
-            const totalComponents = Object.keys(results.breakdown).length;
-            const highRiskComponents = Object.values(results.breakdown).filter(comp => comp.score > 8).length;
-            const complianceScore = window.currentScoreBreakdown?.complianceRisk || 0;
+            // DEBUG: Check breakdown structure and calculate risk components properly
+            console.log('🔍 [BREAKDOWN DEBUG] Results breakdown:', results.breakdown);
+            console.log('🔍 [BREAKDOWN DEBUG] Window score breakdown:', window.currentScoreBreakdown);
+            
+            // Use actual calculated scores from currentScoreBreakdown for risk components
+            let totalComponents = 0;
+            let highRiskComponents = 0;
+            let complianceScore = 0;
+            
+            if (window.currentScoreBreakdown) {
+                const componentScores = window.currentScoreBreakdown;
+                totalComponents = Object.keys(componentScores).length;
+                highRiskComponents = Object.values(componentScores).filter(score => score > 8).length;
+                complianceScore = componentScores.complianceRisk || 0;
+                
+                console.log('🎯 [RISK COMPONENTS] Using actual scores:', {
+                    componentScores,
+                    totalComponents,
+                    highRiskComponents,
+                    complianceScore
+                });
+            } else {
+                // Fallback to results.breakdown if available
+                totalComponents = Object.keys(results.breakdown).length;
+                highRiskComponents = Object.values(results.breakdown).filter(comp => comp.score > 8).length;
+                
+                console.log('⚠️ [RISK COMPONENTS] Using fallback breakdown:', {
+                    totalComponents,
+                    highRiskComponents
+                });
+            }
             
             const resultsHTML = `
                 <div class="modern-results-container">
