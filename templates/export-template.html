@@ -1006,42 +1006,37 @@
 
         // Generate intelligent description from your breakdown data
         function generateDescription(categoryKey, score, breakdownData) {
-            console.log(`🔍 generateDescription called for ${categoryKey}:`, { score, breakdownData });
-            
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
             // Try to extract detailed notes from your breakdown structure
             if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
                 const subScores = breakdownData.subScores[categoryKey];
-                console.log(`📋 Found subScores for ${categoryKey}:`, subScores);
                 const details = [];
                 
                 // Extract key insights from sub-scores
                 Object.keys(subScores).forEach(subKey => {
                     if (subScores[subKey] && subScores[subKey].note) {
                         const note = subScores[subKey].note;
-                        console.log(`📝 Found note for ${categoryKey}.${subKey}:`, note);
+                        // Use full note without truncation
                         details.push(note);
                     }
                 });
                 
                 if (details.length > 0) {
-                    console.log(`✅ Returning first note for ${categoryKey}:`, details[0]);
-                    return details[0];
+                    return `${riskLevel.toLowerCase() === 'high' ? 'High' : riskLevel.toLowerCase() === 'medium' ? 'Medium' : 'Low'} risk identified. ${details[0]}`;
                 }
             }
             
-            console.log(`⚠️ Using fallback for ${categoryKey} - risk level: ${riskLevel}`);
-            // Fallback descriptions based on risk level (only used when no detailed data available)
+            // Fallback descriptions based on risk level
             switch(riskLevel) {
                 case 'HIGH':
-                    return `High risk - immediate attention required for ${baseDesc.toLowerCase()}.`;
+                    return `High risk identified in ${baseDesc.toLowerCase()}. Immediate attention and remediation required.`;
                 case 'MEDIUM':
-                    return `Medium risk - enhanced controls recommended for ${baseDesc.toLowerCase()}.`;
+                    return `Medium risk identified in ${baseDesc.toLowerCase()}. Enhanced controls and monitoring recommended.`;
                 case 'LOW':
                 default:
-                    return `Low risk - standard monitoring for ${baseDesc.toLowerCase()}.`;
+                    return `Low risk assessment for ${baseDesc.toLowerCase()}. Standard monitoring and periodic review recommended.`;
             }
         }
 
