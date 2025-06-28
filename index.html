@@ -12,19 +12,11 @@
     <!-- Add jsPDF (simple backup) -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
     
-    <!-- Add PDF Template System (conditional loading) -->
+    <!-- PDF Template System loading disabled to prevent templateManager conflicts -->
     <script>
-        // Try to load PDF template system, but don't break if it fails
-        const templateScript = document.createElement('script');
-        templateScript.src = './templates/pdf-templates.js';
-        templateScript.onerror = function() {
-            console.warn('PDF template system not available - using fallback');
-            window.PDFTemplateManager = null;
-        };
-        templateScript.onload = function() {
-            console.log('✅ PDF Template System loaded successfully');
-        };
-        document.head.appendChild(templateScript);
+        // PDF template system disabled - using inline enterprise template functions instead
+        console.warn('⚠️ PDF Template System disabled - using legacy system');
+        window.PDFTemplateManager = null;
     </script>
 
     <!-- Add New Template Binding System -->
