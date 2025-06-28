@@ -1110,33 +1110,41 @@
                 if (!toolName) {
                     const pathname = window.location.pathname;
                     const filename = pathname.split('/').pop(); // Get filename
+                    console.log('🔍 Parsing filename:', filename);
                     
                     // Extract tool name and version from filename patterns
                     if (filename.includes('claude-ai') || filename.includes('claude')) {
                         toolName = 'Claude.ai';
                         toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                        console.log('✅ Detected Claude.ai tool, version:', toolVersion);
                     } else if (filename.includes('chatgpt')) {
                         toolName = 'ChatGPT';
                         toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                        console.log('✅ Detected ChatGPT tool, version:', toolVersion);
                     } else if (filename.includes('copilot')) {
                         toolName = 'GitHub Copilot';
                         toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                        console.log('✅ Detected Copilot tool, version:', toolVersion);
                     } else if (filename.includes('maestro')) {
                         toolName = 'Maestro Labs Notetaker';
                         toolVersion = filename.includes('enterprise') ? 'enterprise' : 'free';
+                        console.log('✅ Detected Maestro tool, version:', toolVersion);
                     } else {
                         toolName = 'ChatGPT'; // Default fallback
                         toolVersion = 'free';
+                        console.log('⚠️ Using fallback: ChatGPT Free');
                     }
                 }
                 
                 // Use the same buildSearchTerms approach as index.html
                 const searchTerms = buildSearchTerms(toolName, toolVersion);
-                console.log('Loading security assessment with search terms:', searchTerms);
+                console.log('🔍 Generated search terms:', searchTerms);
+                console.log('🎯 Looking for tool:', toolName, 'version:', toolVersion);
                 
                 // Try each search term until we find a match
                 let toolData = null;
                 for (const searchTerm of searchTerms) {
+                    console.log(`🔍 Trying search term: "${searchTerm}"`);
                     const { data: tools, error } = await supabase
                         .from('ai_tools')
                         .select('*')
@@ -1144,14 +1152,18 @@
                         .limit(1);
 
                     if (error) {
-                        console.warn('Supabase query error for term:', searchTerm, error);
+                        console.warn('❌ Supabase query error for term:', searchTerm, error);
                         continue;
                     }
 
+                    console.log(`📊 Query results for "${searchTerm}":`, tools);
+                    
                     if (tools && tools.length > 0) {
                         toolData = tools[0];
-                        console.log(`Found tool data for "${searchTerm}":`, toolData.name);
+                        console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
                         break;
+                    } else {
+                        console.log(`❌ No results for "${searchTerm}"`);
                     }
                 }
 
