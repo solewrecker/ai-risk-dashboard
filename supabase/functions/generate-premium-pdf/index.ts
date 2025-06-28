@@ -1,95 +1,98 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-interface AssessmentData {
-  toolName: string
-  toolCategory: string
-  finalScore: number
-  riskLevel: string
-  baseScore: number
-  componentScores: any
-  formData: any
-  dataClassification: string
-  useCase: string
-}
-
-serve(async (req) => {
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
+};
+serve(async (req)=>{
+  console.log('=== EDGE FUNCTION START ===');
+  console.log('Environment check:');
+  console.log('SUPABASE_URL:', Deno.env.get('SUPABASE_URL') ? 'Present' : 'MISSING');
+  console.log('SUPABASE_ANON_KEY:', Deno.env.get('SUPABASE_ANON_KEY') ? 'Present' : 'MISSING');
+  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+  console.log('Authorization header:', authHeader ? 'Present' : 'MISSING');
+  
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', {
+      headers: corsHeaders
+    });
   }
-
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
+    const supabaseClient = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+      global: {
+        headers: {
+          Authorization: authHeader
+        }
       }
-    )
-
-    const { data: { user } } = await supabaseClient.auth.getUser()
+    });
+    console.log('Supabase client created, getting user...');
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+    console.log('User result:', user ? 'User found' : 'No user');
+    console.log('Auth error:', error);
     if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
-        status: 401, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      })
+      return new Response(JSON.stringify({
+        error: 'Unauthorized'
+      }), {
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
     }
-
-    const userTier = user.user_metadata?.tier || 'free'
+    console.log('User metadata:', user.user_metadata);
+    console.log('Raw user metadata:', user.raw_user_meta_data);
+    const userTier = user.raw_user_meta_data?.tier || user.user_metadata?.tier || 'free';
+    console.log('Detected tier:', userTier);
     if (userTier !== 'enterprise') {
-      return new Response(JSON.stringify({ error: 'Enterprise subscription required' }), { 
-        status: 403, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      })
+      return new Response(JSON.stringify({
+        error: 'Enterprise subscription required'
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
     }
-
-    const { assessmentData, exportType } = await req.json() as {
-      assessmentData: AssessmentData
-      exportType: 'html' | 'pdf' | 'free-pdf'
-    }
-
+    const { assessmentData, exportType } = await req.json();
     // Free PDF generation (client-side)
     if (exportType === 'free-pdf' || exportType === 'pdf') {
-      const freePdfHtml = generateFreePdfHTML(assessmentData)
+      const freePdfHtml = generateFreePdfHTML(assessmentData);
       return new Response(freePdfHtml, {
         headers: {
           ...corsHeaders,
-          'Content-Type': 'text/html',
+          'Content-Type': 'text/html'
         }
-      })
+      });
     }
-
     // Regular HTML export
-    const htmlContent = generatePremiumHTML(assessmentData)
+    const htmlContent = generatePremiumHTML(assessmentData);
     return new Response(htmlContent, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/html',
         'Content-Disposition': `attachment; filename="${assessmentData.toolName}-assessment.html"`
       }
-    })
-
+    });
   } catch (error) {
-    console.error('Export generation error:', error)
-    return new Response(
-      JSON.stringify({ error: 'Export generation failed', details: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    console.error('Export generation error:', error);
+    return new Response(JSON.stringify({
+      error: 'Export generation failed',
+      details: error.message
+    }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    });
   }
-})
-
-function generateFreePdfHTML(data: AssessmentData): string {
-  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : 
-                   data.riskLevel === 'MODERATE' ? '#f59e0b' : 
-                   data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626'
-  
+});
+function generateFreePdfHTML(data) {
+  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : data.riskLevel === 'MODERATE' ? '#f59e0b' : data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -541,14 +544,11 @@ function generateFreePdfHTML(data: AssessmentData): string {
         document.head.appendChild(style);
     </script>
 </body>
-</html>`
+</html>`;
 }
-
-function generatePremiumHTML(data: AssessmentData): string {
-  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : 
-                   data.riskLevel === 'MODERATE' ? '#f59e0b' : 
-                   data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626'
-  
+function generatePremiumHTML(data) {
+  // Your existing function
+  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : data.riskLevel === 'MODERATE' ? '#f59e0b' : data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -580,5 +580,5 @@ function generatePremiumHTML(data: AssessmentData): string {
         <div class="detail-row"><span>Final Score:</span><span>${data.finalScore}</span></div>
     </div>
 </body>
-</html>`
+</html>`;
 }
