@@ -1009,6 +1009,15 @@
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
+            // Handle both camelCase keys (dataStorage) and human-readable keys ("Data Storage & Security")
+            const categoryKeyMap = {
+                'dataStorage': 'Data Storage & Security',
+                'trainingUsage': 'Training Data Usage', 
+                'accessControls': 'Access Controls',
+                'complianceRisk': 'Compliance Risk',
+                'vendorTransparency': 'Vendor Transparency'
+            };
+            
             console.log(`🔍 generateDescription called for ${categoryKey}:`, {
                 score,
                 riskLevel,
@@ -1029,14 +1038,6 @@
             }
             
             // Try to extract detailed sub-category notes from your breakdown structure
-            // Handle both camelCase keys (dataStorage) and human-readable keys ("Data Storage & Security")
-            const categoryKeyMap = {
-                'dataStorage': 'Data Storage & Security',
-                'trainingUsage': 'Training Data Usage', 
-                'accessControls': 'Access Controls',
-                'complianceRisk': 'Compliance Risk',
-                'vendorTransparency': 'Vendor Transparency'
-            };
             
             const humanReadableKey = categoryKeyMap[categoryKey];
             let targetCategory = null;
