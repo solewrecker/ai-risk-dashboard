@@ -1017,6 +1017,17 @@
                 categoryExists: !!(breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey])
             });
             
+            // DEBUG: Show actual breakdown structure
+            if (breakdownData) {
+                console.log(`🔍 Available breakdown keys:`, Object.keys(breakdownData));
+                const humanReadableKey = categoryKeyMap[categoryKey];
+                console.log(`🔍 Looking for keys: "${categoryKey}" or "${humanReadableKey}"`);
+                console.log(`🔍 Direct category access: breakdownData["${humanReadableKey}"] =`, breakdownData[humanReadableKey]);
+                if (breakdownData.subScores) {
+                    console.log(`🔍 subScores keys:`, Object.keys(breakdownData.subScores));
+                }
+            }
+            
             // Try to extract detailed sub-category notes from your breakdown structure
             // Handle both camelCase keys (dataStorage) and human-readable keys ("Data Storage & Security")
             const categoryKeyMap = {
