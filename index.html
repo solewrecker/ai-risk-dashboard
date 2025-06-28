@@ -2777,7 +2777,7 @@
                     throw new Error('Authentication required');
                 }
                 
-                const response = await fetch(`${supabaseUrl}/functions/v1/generate-premium-pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${session.access_token}`,
@@ -2851,7 +2851,7 @@
                     throw new Error('Authentication required');
                 }
                 
-                const response = await fetch(`${supabaseUrl}/functions/v1/generate-premium-pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${session.access_token}`,
