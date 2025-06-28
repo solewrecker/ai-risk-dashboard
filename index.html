@@ -12,11 +12,19 @@
     <!-- Add jsPDF (simple backup) -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
     
-    <!-- PDF Template System loading disabled to prevent templateManager conflicts -->
+    <!-- Add PDF Template System (conditional loading) -->
     <script>
-        // PDF template system disabled - using inline enterprise template functions instead
-        console.warn('⚠️ PDF Template System disabled - using legacy system');
-        window.PDFTemplateManager = null;
+        // Try to load PDF template system, but don't break if it fails
+        const templateScript = document.createElement('script');
+        templateScript.src = './templates/pdf-templates.js';
+        templateScript.onerror = function() {
+            console.warn('PDF template system not available - using fallback');
+            window.PDFTemplateManager = null;
+        };
+        templateScript.onload = function() {
+            console.log('✅ PDF Template System loaded successfully');
+        };
+        document.head.appendChild(templateScript);
     </script>
 
     <!-- Add New Template Binding System -->
@@ -1234,7 +1242,6 @@
                     recommendations: recommendations,
                     timestamp: new Date().toISOString(),
                     source: source,
-                    toolData: baseScoreResult.toolData || null, // Include database tool data
                     enhancedInfo: window.currentEnhancedInfo || null
                 };
             } catch (error) {
@@ -1796,752 +1803,7 @@
             return recommendations;
         }
 
-        // Enterprise Results Template Functions
-        window.EnterpriseResultsTemplate = {
-            
-            // Initialize the enterprise results display
-            init: function(assessmentData) {
-                console.log('🏢 Initializing Enterprise Results Template');
-                console.log('📊 Assessment data received:', assessmentData);
-                
-                // Add debug logging for each step
-                console.log('🎯 Step 1: Populating risk score...');
-                this.populateRiskScore(assessmentData);
-                
-                console.log('🎯 Step 2: Populating executive summary...');
-                this.populateExecutiveSummary(assessmentData);
-                
-                console.log('🎯 Step 3: Populating tool info...');
-                this.populateToolInfo(assessmentData);
-                
-                console.log('🎯 Step 4: Populating categories...');
-                this.populateCategories(assessmentData);
-                
-                console.log('🎯 Step 5: Populating risk matrix...');
-                this.populateRiskMatrix(assessmentData);
-                
-                console.log('🎯 Step 6: Populating recommendations...');
-                this.populateRecommendations(assessmentData);
-                
-                console.log('🎯 Step 7: Populating enhanced sections...');
-                this.populateEnhancedSections(assessmentData);
-                
-                console.log('🎯 Step 8: Populating footer...');
-                this.populateFooter(assessmentData);
-                
-                console.log('✅ All enterprise template sections populated');
-            },
-
-            // Populate the main risk score display
-            populateRiskScore: function(data) {
-                console.log('🎯 populateRiskScore called with data:', data);
-                console.log('📊 Final score from data:', data.finalScore);
-                
-                const riskLevel = this.getRiskLevel(data.finalScore);
-                console.log('⚠️ Calculated risk level:', riskLevel);
-                
-                // Update risk display
-                const riskNumber = document.getElementById('enterpriseRiskNumber');
-                const riskBadge = document.getElementById('enterpriseRiskBadge');
-                const riskDescription = document.getElementById('enterpriseRiskDescription');
-                
-                console.log('🔍 Risk display elements found:', {
-                    riskNumber: !!riskNumber,
-                    riskBadge: !!riskBadge,
-                    riskDescription: !!riskDescription
-                });
-                
-                if (riskNumber) {
-                    console.log('📊 Setting risk number to:', data.finalScore);
-                    riskNumber.textContent = data.finalScore;
-                }
-                if (riskBadge) {
-                    const badgeText = `${riskLevel.toUpperCase()} RISK`;
-                    console.log('🏷️ Setting risk badge to:', badgeText);
-                    riskBadge.textContent = badgeText;
-                }
-                if (riskDescription) {
-                    const descText = this.getRiskDescription(riskLevel);
-                    console.log('📝 Setting risk description to:', descText);
-                    riskDescription.textContent = descText;
-                }
-                
-                // Apply risk level styling to header
-                const resultsContainer = document.getElementById('enterpriseResults');
-                if (resultsContainer) {
-                    console.log('🎨 Applying risk styling:', `risk-${riskLevel}`);
-                    resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
-                    resultsContainer.classList.add(`risk-${riskLevel}`);
-                }
-                
-                console.log('✅ populateRiskScore completed');
-            },
-
-            // Populate executive summary
-            populateExecutiveSummary: function(data) {
-                const riskLevel = this.getRiskLevel(data.finalScore);
-                
-                const securityStatusText = document.getElementById('securityStatusText');
-                const complianceImpactText = document.getElementById('complianceImpactText');
-                const mainRecommendationText = document.getElementById('mainRecommendationText');
-                const keyFindings = document.getElementById('keyFindings');
-                
-                if (securityStatusText) {
-                    securityStatusText.textContent = `Tool meets ${riskLevel === 'low' ? 'acceptable' : riskLevel === 'medium' ? 'basic' : 'minimal'} security standards with ${riskLevel === 'low' ? 'standard monitoring' : riskLevel === 'medium' ? 'enhanced controls' : 'immediate attention'} required.`;
-                }
-                
-                if (complianceImpactText) {
-                    complianceImpactText.textContent = data.finalScore >= 35 ? 'Enhanced compliance verification needed due to security risk level.' : 'Standard compliance monitoring sufficient for current risk profile.';
-                }
-                
-                if (mainRecommendationText) {
-                    mainRecommendationText.textContent = this.getMainRecommendation(riskLevel);
-                }
-                
-                if (keyFindings) {
-                    const findings = this.generateKeyFindings(data);
-                    keyFindings.innerHTML = findings;
-                }
-            },
-
-            // Populate tool information section
-            populateToolInfo: function(data) {
-                console.log('🔧 populateToolInfo called with data:', data);
-                
-                const toolIcon = document.getElementById('toolIcon');
-                const toolName = document.getElementById('displayToolName');
-                const toolCategory = document.getElementById('displayToolCategory');
-                const primaryUseCase = document.getElementById('primaryUseCase');
-                const dataClassification = document.getElementById('dataClassification');
-                const assessmentDate = document.getElementById('assessmentDate');
-                const riskCategory = document.getElementById('riskCategory');
-                const vendor = document.getElementById('vendor');
-                const licenseType = document.getElementById('licenseType');
-                
-                console.log('🔍 DOM elements found:', {
-                    toolIcon: !!toolIcon,
-                    toolName: !!toolName,
-                    toolCategory: !!toolCategory,
-                    primaryUseCase: !!primaryUseCase,
-                    dataClassification: !!dataClassification,
-                    assessmentDate: !!assessmentDate,
-                    riskCategory: !!riskCategory,
-                    vendor: !!vendor,
-                    licenseType: !!licenseType
-                });
-                
-                // Debug element details
-                if (toolName) {
-                    console.log('🔍 Tool name element details:', {
-                        tagName: toolName.tagName,
-                        id: toolName.id,
-                        className: toolName.className,
-                        currentText: toolName.textContent,
-                        parent: toolName.parentElement?.className
-                    });
-                }
-                if (toolCategory) {
-                    console.log('🔍 Tool category element details:', {
-                        tagName: toolCategory.tagName,
-                        id: toolCategory.id,
-                        className: toolCategory.className,
-                        currentText: toolCategory.textContent,
-                        parent: toolCategory.parentElement?.className
-                    });
-                }
-                
-                // Get tool data from database if available
-                const toolData = this.getToolDataFromSource(data);
-                console.log('🗄️ Tool data from source:', toolData);
-                
-                if (toolIcon) {
-                    const iconText = this.getToolIcon(data.toolName);
-                    console.log('🎨 Setting tool icon to:', iconText);
-                    toolIcon.textContent = iconText;
-                }
-                if (toolName) {
-                    const nameText = data.toolName || 'Unknown Tool';
-                    console.log('🏷️ Setting tool name to:', nameText);
-                    // Try multiple update methods to ensure it works
-                    toolName.textContent = nameText;
-                    toolName.innerHTML = nameText;
-                    toolName.innerText = nameText;
-                    // Force DOM refresh
-                    toolName.style.display = 'none';
-                    toolName.offsetHeight; // Trigger reflow
-                    toolName.style.display = '';
-                    console.log('🔄 Tool name after update:', toolName.textContent);
-                }
-                if (toolCategory) {
-                    const categoryText = this.getToolCategoryFromData(toolData, data.toolName);
-                    console.log('📂 Setting tool category to:', categoryText);
-                    // Try multiple update methods to ensure it works
-                    toolCategory.textContent = categoryText;
-                    toolCategory.innerHTML = categoryText;
-                    toolCategory.innerText = categoryText;
-                    // Force DOM refresh
-                    toolCategory.style.display = 'none';
-                    toolCategory.offsetHeight; // Trigger reflow
-                    toolCategory.style.display = '';
-                    console.log('🔄 Tool category after update:', toolCategory.textContent);
-                }
-                if (primaryUseCase) {
-                    const useCaseText = this.getPrimaryUseCase(data);
-                    console.log('📋 Setting primary use case to:', useCaseText);
-                    primaryUseCase.textContent = useCaseText;
-                }
-                if (dataClassification) {
-                    const classificationText = this.getDataClassification(data);
-                    console.log('🔒 Setting data classification to:', classificationText);
-                    dataClassification.textContent = classificationText;
-                }
-                if (assessmentDate) {
-                    const dateText = this.getAssessmentDate(toolData);
-                    console.log('📅 Setting assessment date to:', dateText);
-                    assessmentDate.textContent = dateText;
-                }
-                if (riskCategory) {
-                    const riskCatText = this.getRiskCategoryFromData(toolData, data.toolName);
-                    console.log('⚠️ Setting risk category to:', riskCatText);
-                    riskCategory.textContent = riskCatText;
-                }
-                if (vendor) {
-                    const vendorText = this.getVendor(data.toolName);
-                    console.log('🏢 Setting vendor to:', vendorText);
-                    vendor.textContent = vendorText;
-                }
-                if (licenseType) {
-                    const licenseText = this.getLicenseType(data.toolName);
-                    console.log('📜 Setting license type to:', licenseText);
-                    licenseType.textContent = licenseText;
-                }
-                
-                console.log('✅ populateToolInfo completed');
-            },
-
-            // Populate risk matrix
-            populateRiskMatrix: function(data) {
-                const currentRiskMatrixCell = document.getElementById('currentRiskMatrixCell');
-                const matrixDescription = document.getElementById('matrixDescription');
-                
-                const riskLevel = this.getRiskLevel(data.finalScore);
-                
-                if (currentRiskMatrixCell) {
-                    // Remove current-risk class from all cells first
-                    document.querySelectorAll('.current-risk').forEach(cell => {
-                        cell.classList.remove('current-risk');
-                    });
-                    
-                    // Add current-risk class to appropriate cell based on score
-                    currentRiskMatrixCell.classList.add('current-risk');
-                }
-                
-                if (matrixDescription) {
-                    matrixDescription.innerHTML = `★ Current Risk Level: Score ${data.finalScore} falls in ${riskLevel.toUpperCase()} category`;
-                }
-            },
-
-            // Populate recommendations section  
-            populateRecommendations: function(data) {
-                const recommendationsGrid = document.getElementById('recommendationsGrid');
-                if (!recommendationsGrid) return;
-                
-                const recommendations = this.generateRecommendations(data);
-                let recommendationsHTML = '';
-                
-                recommendations.forEach(rec => {
-                    recommendationsHTML += `
-                        <div class="recommendation-card priority-${rec.priority}">
-                            <div class="recommendation-header">
-                                <div class="recommendation-title">${rec.title}</div>
-                                <div class="priority-badge priority-${rec.priority}">${rec.priority.toUpperCase()} Priority</div>
-                            </div>
-                            <div class="recommendation-text">
-                                ${rec.description}
-                                <br><br><strong>Timeline:</strong> ${rec.timeline} | <strong>Owner:</strong> ${rec.owner}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                recommendationsGrid.innerHTML = recommendationsHTML;
-            },
-
-            // Populate footer
-            populateFooter: function(data) {
-                const nextReviewDate = document.getElementById('nextReviewDate');
-                const footerAssessmentId = document.getElementById('footerAssessmentId');
-                const footerGeneratedDate = document.getElementById('footerGeneratedDate');
-                const frameworkVersionFooter = document.getElementById('frameworkVersionFooter');
-                const frameworkVersionBottom = document.getElementById('frameworkVersionBottom');
-                
-                // Generate assessment ID based on current timestamp  
-                const assessmentId = Date.now().toString();
-                const currentDate = new Date().toLocaleDateString();
-                
-                if (nextReviewDate) {
-                    const nextDate = new Date();
-                    nextDate.setMonth(nextDate.getMonth() + 3); // 3 months from now
-                    nextReviewDate.textContent = nextDate.toLocaleDateString();
-                }
-                
-                if (footerAssessmentId) footerAssessmentId.textContent = assessmentId;
-                if (footerGeneratedDate) footerGeneratedDate.textContent = currentDate;
-                
-                // Set framework version consistently
-                const frameworkVersion = 'v2.1';
-                if (frameworkVersionFooter) frameworkVersionFooter.textContent = frameworkVersion;
-                if (frameworkVersionBottom) frameworkVersionBottom.textContent = frameworkVersion;
-                
-                // Set configurable company/contact information
-                this.populateConfigurableElements();
-            },
-
-            // Populate detailed categories
-            populateCategories: function(data) {
-                const categoriesGrid = document.getElementById('enterpriseCategoriesGrid');
-                if (!categoriesGrid || !data.breakdown) return;
-
-                let categoriesHTML = '';
-                
-                Object.entries(data.breakdown).forEach(([categoryName, categoryData]) => {
-                    const riskClass = this.getCategoryRiskClass(categoryData);
-                    
-                    categoriesHTML += `
-                        <div class="enterprise-category-card ${riskClass}">
-                            <div class="enterprise-category-header">
-                                <div class="enterprise-category-name">${categoryName}</div>
-                                <div class="enterprise-category-score ${riskClass}">${categoryData.score}</div>
-                            </div>
-                            <div class="enterprise-category-description">${categoryData.description}</div>
-                            ${categoryData.subcategories ? this.generateSubcategories(categoryData.subcategories) : ''}
-                        </div>
-                    `;
-                });
-
-                categoriesGrid.innerHTML = categoriesHTML;
-            },
-
-            // Generate subcategory displays
-            generateSubcategories: function(subcategories) {
-                if (!subcategories || Object.keys(subcategories).length === 0) {
-                    return '';
-                }
-
-                let subcategoryHTML = '';
-                
-                Object.entries(subcategories).forEach(([subKey, subData]) => {
-                    if (subData && subData.justification) {
-                        subcategoryHTML += `
-                            <div class="enterprise-subcategory">
-                                <div class="enterprise-subcategory-header">
-                                    <span>${subKey.charAt(0).toUpperCase() + subKey.slice(1)}</span>
-                                    <span class="enterprise-subcategory-score">${subData.score} pts</span>
-                                </div>
-                                <div class="enterprise-subcategory-text">${subData.justification}</div>
-                            </div>
-                        `;
-                    }
-                });
-
-                return subcategoryHTML;
-            },
-
-            // Populate enhanced sections (strengths, monitoring, recommendations)
-            populateEnhancedSections: function(data) {
-                const enhancedContainer = document.getElementById('enterpriseEnhancedSections');
-                if (!enhancedContainer) return;
-
-                let sectionsHTML = '';
-
-                // Check if we have enhanced info from the data
-                const enhancedInfo = data.enhancedInfo;
-
-                if (enhancedInfo) {
-                    // Key Strengths
-                    if (enhancedInfo.keyStrengths && enhancedInfo.keyStrengths.length > 0) {
-                        sectionsHTML += `
-                            <div class="enterprise-enhanced-section strengths">
-                                <h4 class="enterprise-enhanced-title strengths">✅ Key Strengths</h4>
-                                <ul class="enterprise-enhanced-list strengths">
-                                    ${enhancedInfo.keyStrengths.map(strength => `<li>${strength}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
-
-                    // Areas for Monitoring
-                    if (enhancedInfo.areasForMonitoring && enhancedInfo.areasForMonitoring.length > 0) {
-                        sectionsHTML += `
-                            <div class="enterprise-enhanced-section monitoring">
-                                <h4 class="enterprise-enhanced-title monitoring">⚠️ Areas for Monitoring</h4>
-                                <ul class="enterprise-enhanced-list monitoring">
-                                    ${enhancedInfo.areasForMonitoring.map(area => `<li>${area}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
-
-                    // Implementation Recommendations
-                    if (enhancedInfo.recommendations && enhancedInfo.recommendations.length > 0) {
-                        sectionsHTML += `
-                            <div class="enterprise-enhanced-section recommendations">
-                                <h4 class="enterprise-enhanced-title recommendations">🎯 Implementation Recommendations</h4>
-                                <ul class="enterprise-enhanced-list recommendations">
-                                    ${enhancedInfo.recommendations.map(rec => `<li>${rec}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
-
-                    // Executive Summary
-                    if (enhancedInfo.executiveSummary) {
-                        sectionsHTML += `
-                            <div class="enterprise-executive-summary">
-                                <h4 class="enterprise-executive-title">📋 Executive Summary</h4>
-                                <div class="enterprise-executive-text">${enhancedInfo.executiveSummary}</div>
-                            </div>
-                        `;
-                    }
-                }
-
-                enhancedContainer.innerHTML = sectionsHTML;
-            },
-
-            // Helper functions
-            getRiskLevel: function(score) {
-                if (score >= 80) return 'critical';
-                if (score >= 60) return 'high';
-                if (score >= 35) return 'medium';
-                return 'low';
-            },
-
-            getRiskDescription: function(riskLevel) {
-                const descriptions = {
-                    'critical': 'Immediate blocking required - critical security risks identified',
-                    'high': 'Significant controls needed before use - high security risks',
-                    'medium': 'Standard enterprise controls required - moderate security risks',
-                    'low': 'Basic monitoring sufficient - acceptable risk level'
-                };
-                return descriptions[riskLevel] || 'Risk assessment complete';
-            },
-
-            getCategoryRiskClass: function(categoryData) {
-                if (categoryData.isDetailed) return 'detailed';
-                
-                // Extract numeric score if available
-                const scoreMatch = categoryData.score?.match(/(\d+)\/?\d*/);
-                if (scoreMatch) {
-                    const score = parseInt(scoreMatch[1]);
-                    // For our framework, max is typically 25 per category
-                    const percentage = (score / 25) * 100;
-                    
-                    if (percentage >= 80) return 'high';
-                    if (percentage >= 60) return 'medium';
-                    return 'low';
-                }
-                
-                return 'low';
-            },
-
-            // Helper functions for tool information
-            getToolIcon: function(toolName) {
-                if (!toolName) return 'AI';
-                const name = toolName.toLowerCase();
-                if (name.includes('chatgpt') || name.includes('gpt')) return 'GPT';
-                if (name.includes('claude')) return 'CL';
-                if (name.includes('gemini')) return 'GM';
-                if (name.includes('copilot')) return 'CP';
-                return 'AI';
-            },
-
-            getToolCategory: function(toolName) {
-                if (!toolName) return 'AI Tool';
-                const name = toolName.toLowerCase();
-                if (name.includes('enterprise')) return 'Enterprise AI Platform';
-                return 'Conversational AI Platform';
-            },
-
-            // Database-driven helper functions
-            getToolDataFromSource: function(data) {
-                // Check if we have database tool data from the results
-                if (data.toolData && data.source === 'database') {
-                    return data.toolData;
-                }
-                
-                // Check if we have cached tool data from the assessment
-                if (window.lastToolData && window.lastToolData.toolData) {
-                    return window.lastToolData.toolData;
-                }
-                
-                return null;
-            },
-
-            getToolCategoryFromData: function(toolData, toolName) {
-                // Use database category if available
-                if (toolData && toolData.category) {
-                    return toolData.category;
-                }
-                
-                // Fallback to name-based detection
-                return this.getToolCategory(toolName);
-            },
-
-            getRiskCategoryFromData: function(toolData, toolName) {
-                // Use database category if available
-                if (toolData && toolData.category) {
-                    return toolData.category;
-                }
-                
-                // Fallback logic based on tool name
-                if (!toolName) return 'AI Tool';
-                const name = toolName.toLowerCase();
-                if (name.includes('chatgpt') || name.includes('claude') || name.includes('gemini')) {
-                    return 'Conversational AI';
-                }
-                if (name.includes('copilot') || name.includes('codeium')) {
-                    return 'Code Assistant';
-                }
-                if (name.includes('dalle') || name.includes('midjourney')) {
-                    return 'Image Generation';
-                }
-                return 'AI Tool';
-            },
-
-            getAssessmentDate: function(toolData) {
-                // Use database assessment date if available
-                if (toolData && toolData.created_at) {
-                    return new Date(toolData.created_at).toLocaleDateString();
-                }
-                
-                if (toolData && toolData.updated_at) {
-                    return new Date(toolData.updated_at).toLocaleDateString();
-                }
-                
-                // Fallback to current date
-                return new Date().toLocaleDateString();
-            },
-
-            getVendor: function(toolName) {
-                if (!toolName) return 'Unknown';
-                const name = toolName.toLowerCase();
-                if (name.includes('chatgpt') || name.includes('gpt')) return 'OpenAI';
-                if (name.includes('claude')) return 'Anthropic';
-                if (name.includes('gemini')) return 'Google';
-                if (name.includes('copilot')) return 'Microsoft';
-                return 'Various';
-            },
-
-            getLicenseType: function(toolName) {
-                if (!toolName) return 'Unknown';
-                const name = toolName.toLowerCase();
-                if (name.includes('enterprise')) return 'Enterprise License';
-                if (name.includes('free')) return 'Free Tier';
-                if (name.includes('plus') || name.includes('pro')) return 'Professional License';
-                return 'Standard License';
-            },
-
-            getPrimaryUseCase: function(data) {
-                // Try to get from current assessment data
-                if (window.currentAssessment && window.currentAssessment.formData && window.currentAssessment.formData.useCase) {
-                    const useCaseLabels = {
-                        'content-creation': 'Content Creation & Marketing',
-                        'data-analysis': 'Data Analysis & Insights',
-                        'customer-service': 'Customer Service & Support',
-                        'legal-compliance': 'Legal/Compliance/Audit',
-                        'hr-recruitment': 'HR & Recruitment',
-                        'sales-marketing': 'Sales & Marketing',
-                        'research-development': 'Research & Development',
-                        'it-operations': 'IT Operations & Development'
-                    };
-                    return useCaseLabels[window.currentAssessment.formData.useCase] || 'General Business Use';
-                }
-                return 'General Business Use';
-            },
-
-            getDataClassification: function(data) {
-                // Try to get from current assessment data
-                if (window.currentAssessment && window.currentAssessment.formData && window.currentAssessment.formData.dataClassification) {
-                    const dataLabels = {
-                        'phi': 'Protected Health Information (PHI)',
-                        'financial': 'Financial/Payment Data',
-                        'trade-secrets': 'Trade Secrets/Intellectual Property',
-                        'pii': 'Personally Identifiable Information',
-                        'public': 'Public/Marketing Data'
-                    };
-                    return dataLabels[window.currentAssessment.formData.dataClassification] || 'General Business Data';
-                }
-                return 'General Business Data';
-            },
-
-            getMainRecommendation: function(riskLevel) {
-                switch(riskLevel) {
-                    case 'critical':
-                        return 'Immediate blocking required - critical security controls must be implemented before any usage.';
-                    case 'high':
-                        return 'Significant security controls needed - enhanced monitoring and remediation required before deployment.';
-                    case 'medium':
-                        return 'Standard enterprise controls required - implement enhanced monitoring and compliance verification.';
-                    case 'low':
-                    default:
-                        return 'Basic monitoring sufficient - implement standard security controls and periodic review.';
-                }
-            },
-
-            generateKeyFindings: function(data) {
-                const findings = [];
-                const riskLevel = this.getRiskLevel(data.finalScore);
-                
-                // Add finding based on risk level
-                if (riskLevel === 'critical' || riskLevel === 'high') {
-                    findings.push(`${riskLevel.toUpperCase()} risk assessment requires immediate attention`);
-                }
-                
-                // Add data classification finding
-                const dataClass = this.getDataClassification(data);
-                if (dataClass.includes('Financial') || dataClass.includes('PHI')) {
-                    findings.push(`${dataClass} classification requires enhanced security controls`);
-                }
-                
-                // Add category-specific findings
-                if (data.breakdown) {
-                    Object.entries(data.breakdown).forEach(([category, categoryData]) => {
-                        const scoreMatch = categoryData.score?.match(/(\d+)/);
-                        if (scoreMatch && parseInt(scoreMatch[1]) >= 15) {
-                            findings.push(`${category} requires attention based on assessment results`);
-                        }
-                    });
-                }
-                
-                if (findings.length === 0) {
-                    findings.push('Assessment completed - standard monitoring recommended');
-                }
-                
-                return findings.map(finding => `• ${finding}`).join('<br>');
-            },
-
-            generateRecommendations: function(data) {
-                const recommendations = [];
-                const riskLevel = this.getRiskLevel(data.finalScore);
-                const dataClass = this.getDataClassification(data);
-                
-                // Risk-based recommendations
-                if (riskLevel === 'critical' || riskLevel === 'high') {
-                    recommendations.push({
-                        title: 'Immediate Security Assessment',
-                        description: `🚨 Conduct comprehensive security review to address ${riskLevel} risk findings. Implement blocking controls until issues are resolved.`,
-                        priority: 'high',
-                        timeline: '7 days',
-                        owner: 'Security Team'
-                    });
-                }
-                
-                if (riskLevel === 'medium' || riskLevel === 'high') {
-                    recommendations.push({
-                        title: 'Enhanced Monitoring Implementation',
-                        description: '⚠️ Deploy enhanced monitoring and logging capabilities. Establish regular security reviews and compliance checks.',
-                        priority: 'medium',
-                        timeline: '30 days',
-                        owner: 'IT Operations'
-                    });
-                }
-                
-                // Data classification recommendations
-                if (dataClass.includes('Financial')) {
-                    recommendations.push({
-                        title: 'PCI-DSS Compliance Verification',
-                        description: '💳 Conduct comprehensive PCI-DSS compliance audit for financial data handling. Verify encryption, access logging, and secure transmission protocols.',
-                        priority: dataClass.includes('Payment') ? 'high' : 'medium',
-                        timeline: '45 days',
-                        owner: 'Compliance Team'
-                    });
-                }
-                
-                if (dataClass.includes('PHI')) {
-                    recommendations.push({
-                        title: 'HIPAA Compliance Review',
-                        description: '🏥 Complete HIPAA compliance assessment and implement required safeguards for protected health information.',
-                        priority: 'high',
-                        timeline: '30 days',
-                        owner: 'Privacy Officer'
-                    });
-                }
-                
-                // Default recommendation if none added
-                if (recommendations.length === 0) {
-                    recommendations.push({
-                        title: 'Standard Security Monitoring',
-                        description: '✅ Implement standard security monitoring and periodic review processes. Maintain current security posture.',
-                        priority: 'low',
-                        timeline: '90 days',
-                        owner: 'Security Team'
-                    });
-                }
-                
-                return recommendations;
-            },
-
-            // Populate configurable elements (company info, contact details, etc.)
-            populateConfigurableElements: function() {
-                // These could be made configurable via environment variables or config file
-                const config = {
-                    companyName: 'Enterprise Security Office',
-                    securityEmail: 'security@company.com',
-                    cisoEmail: 'ciso@company.com',
-                    azurePermissionsStatus: 'Azure AD permissions assessment - Integration pending'
-                };
-                
-                // Company name
-                const companyName = document.getElementById('companyName');
-                if (companyName) companyName.textContent = config.companyName;
-                
-                // Contact emails
-                const securityEmail = document.getElementById('securityEmail');
-                if (securityEmail) securityEmail.textContent = config.securityEmail;
-                
-                const cisoEmail = document.getElementById('cisoEmail');
-                if (cisoEmail) cisoEmail.textContent = config.cisoEmail;
-                
-                // Azure permissions status
-                const azurePermissionsStatus = document.getElementById('azurePermissionsStatus');
-                if (azurePermissionsStatus) azurePermissionsStatus.textContent = config.azurePermissionsStatus;
-            }
-        };
-
-        // Display results with enterprise template
-        async function displayResults(results) {
-            console.log('🏢 Loading Enterprise Results Template');
-            
-            try {
-                // Load enterprise template
-                const response = await fetch('./templates/results-enterprise.html');
-                if (!response.ok) throw new Error('Template not found');
-                
-                const templateHTML = await response.text();
-                
-                // Remove the script tag from the template HTML since we have the JS functions above
-                const cleanTemplateHTML = templateHTML.replace(/<script[\s\S]*?<\/script>/gi, '');
-                
-                // Insert template into results container
-                document.getElementById('resultsContent').innerHTML = cleanTemplateHTML;
-                
-                // Initialize the template immediately since the functions are now available
-                if (window.EnterpriseResultsTemplate) {
-                    window.EnterpriseResultsTemplate.init(results);
-                    console.log('✅ Enterprise template initialized successfully');
-                } else {
-                    console.warn('⚠️ Enterprise template functions not found, using fallback');
-                    displayBasicResults(results);
-                }
-                
-            } catch (error) {
-                console.warn('❌ Could not load enterprise template:', error);
-                displayBasicResults(results);
-            }
-        }
-
-        // Fallback basic results display
-        function displayBasicResults(results) {
+        function displayResults(results) {
             const riskLevel = results.riskLevel;
             const riskLabels = {
                 'critical': 'CRITICAL RISK',
@@ -2917,12 +2179,38 @@
             }
 
             try {
-                // Template system disabled - use legacy PDF export only
-                console.warn('PDF Template system disabled, using legacy method');
-                const exporter = new EnhancedPDFExporter();
-                await exporter.exportTemplatedPDF(currentAssessment);
-                showMessage('📄 Generated using legacy PDF system', 'warning');
-                return;
+                // Check if template system is available
+                if (!templateManager) {
+                    console.warn('Template system not loaded, falling back to legacy method');
+                    const exporter = new EnhancedPDFExporter();
+                    await exporter.exportTemplatedPDF(currentAssessment);
+                    showMessage('📄 Generated using fallback template system', 'warning');
+                    return;
+                }
+
+                // Convert assessment data for new template system
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                
+                // Generate report using new template system (default: enterprise-report)
+                const html = templateManager.generateReport(templateData, 'enterprise-report');
+                
+                // Create new window with report
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                // Add print button and controls
+                addPrintControls(printWindow);
+                
+                // Auto-print after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage('🌟 Professional PDF report generated with new template system!', 'success');
             } catch (error) {
                 console.error('Template PDF generation error:', error);
                 showMessage('Main template failed, trying fallback...', 'warning');
@@ -3017,14 +2305,83 @@
             printWindow.document.body.insertAdjacentHTML('beforeend', controlsHTML);
         }
 
-        // Template selection disabled (using legacy PDF system only)
+        // Add template selection function (for future use)
         function showTemplateSelector() {
-            showMessage('Template selector disabled - using legacy PDF system', 'error');
+            if (!templateManager) {
+                showMessage('Template system not available', 'error');
+                return;
+            }
+
+            const templates = templateManager.list();
+            const selectorHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
+                        <h3 style="margin-bottom: 1rem;">Select PDF Template</h3>
+                        <div style="margin-bottom: 2rem;">
+                            ${templates.map(template => `
+                                <button onclick="exportWithTemplate('${template}')" style="
+                                    display: block;
+                                    width: 100%;
+                                    margin: 0.5rem 0;
+                                    padding: 1rem;
+                                    background: #f8fafc;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 0.5rem;
+                                    cursor: pointer;
+                                    text-align: left;
+                                ">
+                                    <strong>${template.replace('-', ' ').toUpperCase()}</strong><br>
+                                    <small style="color: #64748b;">Professional ${template} format</small>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="this.closest('div').parentElement.remove()" style="
+                            background: #6b7280;
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 0.5rem;
+                            cursor: pointer;
+                        ">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', selectorHTML);
         }
 
-        // Export with specific template (disabled)
+        // Export with specific template
         function exportWithTemplate(templateName) {
-            showMessage('Template export disabled - using legacy PDF system', 'error');
+            // Close selector
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                const html = templateManager.generateReport(templateData, templateName);
+                
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                addPrintControls(printWindow);
+                
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage(`📄 Generated ${templateName.replace('-', ' ')} template successfully!`, 'success');
+            } catch (error) {
+                console.error('Template export error:', error);
+                showMessage('Failed to export with selected template: ' + error.message, 'error');
+            }
         }
 
         // Option 2: HTML Export (Updated to use new template system)
@@ -3175,6 +2532,7 @@
                     console.error('Template PDF failed:', error);
                     console.log('Available systems:', {
                         TemplateBindingEngine: typeof window.TemplateBindingEngine,
+                        templateManager: typeof window.templateManager,
                         jsPDF: typeof window.jspdf
                     });
                     // Fallback to jsPDF
@@ -3603,9 +2961,24 @@
             showStep(1);
         }
 
-        // Initialize page when DOM loads
+        // Global template manager
+        let templateManager = null;
+
+        // Initialize template system when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Page initialized - Enterprise template system ready');
+            // Initialize template manager with error handling
+            try {
+                if (typeof PDFTemplateManager !== 'undefined') {
+                    templateManager = new PDFTemplateManager();
+                    console.log('✅ PDF Template System loaded');
+                    console.log('Available templates:', templateManager.list());
+                } else {
+                    console.warn('⚠️ PDF Template System not available - using legacy system');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing PDF Template System:', error);
+                templateManager = null;
+            }
             
             showStep(1);
             updateUIForAuth(); // Initialize auth UI
