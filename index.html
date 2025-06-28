@@ -753,7 +753,7 @@
                                     max-height: 300px;
                                     overflow-y: auto;
                                 ">
-                                    <button type="button" class="export-option" onclick="exportTemplated(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="exportFreeTemplate(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -762,9 +762,24 @@
                                         text-align: left;
                                         cursor: pointer;
                                         border-bottom: 1px solid #e2e8f0;
+                                        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
                                     ">
-                                        🌟 <strong>Professional PDF</strong><br>
-                                        <small style="color: #64748b;">Template-based (Recommended)</small>
+                                        📄 <strong>Free Professional PDF</strong><br>
+                                        <small style="color: #166534;">Basic template • Risk score • Categories</small>
+                                    </button>
+                                    <button type="button" class="export-option" onclick="showEnterpriseExportPaywall(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                                    ">
+                                        🌟 <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
+                                        <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
                                     </button>
                                     <button type="button" class="export-option" onclick="exportAssessment(); hideExportMenu();" style="
                                         display: block;
@@ -1138,13 +1153,7 @@
                 dataClassification: document.querySelector('input[name="dataClassification"]:checked').value
             };
 
-            // Check for Enterprise paywall
-            if (formData.toolVersion === 'enterprise') {
-                const shouldProceed = await showEnterprisePaywall();
-                if (!shouldProceed) {
-                    return; // User declined Enterprise assessment
-                }
-            }
+            // Note: All assessments are now free - paywall moved to export stage for better conversion
 
             showStep(3);
 
@@ -1632,8 +1641,8 @@
             };
         }
 
-        // Enterprise paywall function
-        async function showEnterprisePaywall() {
+        // OLD: Legacy enterprise assessment paywall (now deprecated)
+        async function showLegacyEnterprisePaywall() {
             return new Promise((resolve) => {
                 const paywallHTML = `
                     <div style="
@@ -2100,6 +2109,166 @@
         }
 
         // === EXPORT FUNCTIONS ===
+        
+        // NEW: Free Template Export (Basic professional PDF)
+        async function exportFreeTemplate() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                // Use simplified template for free users
+                if (window.TemplateBindingEngine) {
+                    const engine = new window.TemplateBindingEngine();
+                    const templateData = convertAssessmentForTemplate(currentAssessment);
+                    
+                    // Generate simplified version
+                    templateData.isFreeVersion = true;
+                    templateData.enterpriseFeatures = false;
+                    
+                    // Embed free version flag for template
+                    window.EMBEDDED_TOOL_INFO = {
+                        ...currentAssessment.formData,
+                        ...templateData,
+                        isFreeVersion: true,
+                        enterpriseFeatures: false
+                    };
+                    
+                    const html = await engine.generateHTMLReport(templateData, './templates/export-template.html');
+                    
+                    // Create new window with report
+                    const printWindow = window.open('', '_blank', 'width=800,height=600');
+                    printWindow.document.write(html);
+                    printWindow.document.close();
+                    
+                    addPrintControls(printWindow);
+                    
+                    printWindow.onload = () => {
+                        setTimeout(() => {
+                            printWindow.focus();
+                            printWindow.print();
+                        }, 500);
+                    };
+                    
+                    showMessage('📄 Free professional PDF generated successfully!', 'success');
+                } else {
+                    // Fallback to basic PDF
+                    generatePDFReportOriginal(currentAssessment);
+                    showMessage('📄 Basic PDF report generated!', 'success');
+                }
+            } catch (error) {
+                console.error('Free template export error:', error);
+                showMessage('Free template export failed: ' + error.message, 'error');
+            }
+        }
+
+        // NEW: Enterprise Export Paywall
+        async function showEnterpriseExportPaywall() {
+            return new Promise((resolve) => {
+                const paywallHTML = `
+                    <div style="
+                        position: fixed; 
+                        top: 0; left: 0; 
+                        width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        z-index: 1000;
+                    ">
+                        <div style="
+                            background: white; 
+                            padding: 2rem; 
+                            border-radius: 1rem; 
+                            max-width: 600px; 
+                            text-align: center;
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        ">
+                            <h3 style="color: #1e293b; margin-bottom: 1rem;">🌟 Enterprise PDF Export</h3>
+                            <p style="color: #64748b; margin-bottom: 2rem;">
+                                Get detailed, audit-ready reports with enterprise-grade analysis and compliance documentation.
+                            </p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #10b981;">
+                                    <h4 style="color: #059669; margin-bottom: 0.5rem;">✅ Free Version</h4>
+                                    <ul style="text-align: left; color: #64748b; font-size: 0.875rem; margin: 0; padding-left: 1rem;">
+                                        <li>Risk score & level</li>
+                                        <li>Category breakdown</li>
+                                        <li>Basic recommendations</li>
+                                        <li>Professional formatting</li>
+                                    </ul>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #f59e0b;">
+                                    <h4 style="color: #92400e; margin-bottom: 0.5rem;">🌟 Enterprise Version</h4>
+                                    <ul style="text-align: left; color: #92400e; font-size: 0.875rem; margin: 0; padding-left: 1rem;">
+                                        <li><strong>Detailed justifications</strong></li>
+                                        <li><strong>Compliance mapping</strong></li>
+                                        <li><strong>Sub-category analysis</strong></li>
+                                        <li><strong>Executive summary</strong></li>
+                                        <li><strong>Azure AD integration</strong></li>
+                                        <li><strong>Audit-ready format</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div style="
+                                background: #eff6ff; 
+                                padding: 1rem; 
+                                border-radius: 0.5rem; 
+                                margin-bottom: 2rem;
+                                border-left: 4px solid #3b82f6;
+                            ">
+                                <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">💼 Perfect for Enterprise Teams</p>
+                                <p style="font-size: 0.875rem; color: #1e3a8a; margin: 0;">
+                                    Detailed reports that security teams can present to executives and auditors with confidence.
+                                    Each assessment includes specific evidence and compliance justifications.
+                                </p>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="paywallUpgrade" style="
+                                    background: linear-gradient(135deg, #f59e0b, #d97706); 
+                                    color: white; 
+                                    border: none; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+                                ">🌟 Get Enterprise Export - $49/month</button>
+                                <button id="paywallFree" style="
+                                    background: #f8fafc; 
+                                    color: #475569; 
+                                    border: 1px solid #e2e8f0; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Use Free Version</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', paywallHTML);
+                
+                document.getElementById('paywallUpgrade').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    // TODO: Integrate with payment system
+                    showMessage('🚧 Payment integration coming soon! For now, contact sales@yourcompany.com', 'warning');
+                    resolve(false);
+                };
+                
+                document.getElementById('paywallFree').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    exportFreeTemplate(); // Export free version instead
+                    resolve(false);
+                };
+            });
+        }
         
         // Option 1: Template-based PDF (Recommended) - Updated to use new system
         async function exportTemplated() {
