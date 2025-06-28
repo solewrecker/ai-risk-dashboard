@@ -450,6 +450,9 @@ class TemplateBindingEngine {
         // Clean up any remaining unreplaced variables
         result = result.replace(/{{[^}]+}}/g, '');
         
+        // Add export mode marker to help template detect it's pre-populated
+        result = result.replace('</head>', '<meta name="export-mode" content="true"></head>');
+        
         return result;
     }
 
