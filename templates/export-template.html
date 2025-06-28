@@ -1040,8 +1040,30 @@
             }
         }
 
-        // Load security assessment data from Supabase
+        // Check if template data is already populated (export mode)
+        function isExportMode() {
+            // Primary check: Look for export mode marker injected by template binding
+            const exportMarker = document.querySelector('meta[name="export-mode"]');
+            if (exportMarker) {
+                return true;
+            }
+            
+            // Fallback check: Look for populated data in key elements
+            const riskScoreElement = document.getElementById('riskScoreValue');
+            const toolNameElement = document.getElementById('toolNameValue');
+            
+            return (riskScoreElement && riskScoreElement.textContent.trim() !== 'Loading...' && riskScoreElement.textContent.trim() !== '') ||
+                   (toolNameElement && toolNameElement.textContent.trim() !== 'Loading...' && toolNameElement.textContent.trim() !== '');
+        }
+
+        // Load security assessment data from Supabase (only if not in export mode)
         async function loadSecurityAssessment() {
+            // Skip dynamic loading if this is an exported report with pre-populated data
+            if (isExportMode()) {
+                console.log('Export mode detected - skipping dynamic data loading');
+                return;
+            }
+
             try {
                 // Try to get tool name from template variable first, then fallback to DOM
                 // Get tool name from URL parameters or use default for testing
@@ -1453,7 +1475,13 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing security assessment...');
-            loadSecurityAssessment();
+            
+            // Only load dynamic content if not in export mode
+            if (!isExportMode()) {
+                loadSecurityAssessment();
+            } else {
+                console.log('Export mode detected - using pre-populated data');
+            }
         });
     </script>
 </body>
