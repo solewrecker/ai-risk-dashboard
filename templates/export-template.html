@@ -1009,10 +1009,20 @@
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
+            console.log(`🔍 generateDescription called for ${categoryKey}:`, {
+                score,
+                riskLevel,
+                breakdownData: breakdownData,
+                hasSubScores: !!(breakdownData && breakdownData.subScores),
+                categoryExists: !!(breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey])
+            });
+            
             // Try to extract detailed sub-category notes from your breakdown structure
             if (breakdownData && breakdownData.subScores && breakdownData.subScores[categoryKey]) {
                 const subScores = breakdownData.subScores[categoryKey];
                 const subCategoryDetails = [];
+                
+                console.log(`✅ Found subScores for ${categoryKey}:`, subScores);
                 
                 // Map sub-score keys to readable names
                 const subCategoryNames = {
@@ -1035,12 +1045,18 @@
                         const displayName = subCategoryNames[subKey] || `📌 ${subKey.charAt(0).toUpperCase() + subKey.slice(1)}`;
                         const note = subScores[subKey].note;
                         subCategoryDetails.push(`<strong>${displayName}:</strong> ${note}`);
+                        console.log(`📝 Added note for ${subKey}: ${note.substring(0, 50)}...`);
                     }
                 });
                 
                 if (subCategoryDetails.length > 0) {
+                    console.log(`✅ Returning ${subCategoryDetails.length} detailed notes for ${categoryKey}`);
                     return subCategoryDetails.join('<br><br>');
+                } else {
+                    console.log(`⚠️ No notes found in subScores for ${categoryKey}`);
                 }
+            } else {
+                console.log(`❌ No subScores structure found for ${categoryKey}. Falling back to generic description.`);
             }
             
             // Check if there's a details field for this category (from your data structure)
@@ -1107,6 +1123,7 @@
                     console.log('✅ Using embedded assessment data from index.html');
                     toolData = window.EMBEDDED_ASSESSMENT_DATA.toolData;
                     console.log('📊 Embedded tool data:', toolData);
+                    console.log('📋 Embedded breakdown structure:', toolData.breakdown);
                 } else {
                     console.log('⚠️ No embedded data found, falling back to database query');
                     
