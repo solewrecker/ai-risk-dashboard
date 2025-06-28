@@ -1171,13 +1171,27 @@
             const toolNameLower = cleanToolName.toLowerCase();
             const suffixLower = versionSuffix.toLowerCase();
             
+            // PRIORITY 1: Try exact matches with version first
             if (!toolNameLower.includes(suffixLower)) {
-                // Only add suffix if not already present
-                searchTerms.push(`${cleanToolName} ${versionSuffix}`);
+                // Try common database naming patterns for the specific version
+                searchTerms.push(`${cleanToolName}.ai ${versionSuffix}`); // "Claude.ai Enterprise"
+                searchTerms.push(`${cleanToolName} ${versionSuffix}`);    // "Claude Enterprise"
+                
+                // Try variations of the tool name
+                if (cleanToolName.toLowerCase() === 'claude') {
+                    searchTerms.push(`Claude.ai ${versionSuffix}`);
+                } else if (cleanToolName.toLowerCase() === 'chatgpt') {
+                    searchTerms.push(`ChatGPT ${versionSuffix}`);
+                } else if (cleanToolName.toLowerCase().includes('copilot')) {
+                    searchTerms.push(`GitHub Copilot ${versionSuffix}`);
+                    searchTerms.push(`Microsoft Copilot ${versionSuffix}`);
+                }
             }
             
-            // Always try exact name as entered
+            // PRIORITY 2: Try exact name as entered (only if no version-specific matches)
             searchTerms.push(cleanToolName);
+            
+            console.log(`🔍 [TEMPLATE] Built search terms for "${toolName}" (${toolVersion}):`, searchTerms);
             
             return searchTerms;
         }
@@ -1237,12 +1251,18 @@
                 
                 let toolData = null;
                 for (const searchTerm of searchTerms) {
-                    console.log(`🔍 Trying search term: "${searchTerm}"`);
+                    console.log(`🔍 [TEMPLATE] Trying search term: "${searchTerm}"`);
+                    
+                    // Use enhanced search logic from index.html
+                    const orderField = toolVersion === 'enterprise' ? 'name' : 'name';
+                    const orderDirection = toolVersion === 'enterprise' ? 'desc' : 'asc';
+                    
                     const { data: tools, error } = await supabase
                         .from('ai_tools')
                         .select('*')
                         .ilike('name', `%${searchTerm}%`)
-                        .limit(1);
+                        .order(orderField, { ascending: orderDirection === 'asc' })
+                        .limit(3); // Get multiple results to find best match
 
                     if (error) {
                         console.warn('❌ Supabase query error for term:', searchTerm, error);
@@ -1250,8 +1270,29 @@
                     }
 
                     if (tools && tools.length > 0) {
-                        toolData = tools[0];
-                        console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
+                        console.log(`🔍 [TEMPLATE] Found ${tools.length} matches:`, tools.map(t => `${t.name} (${t.total_score})`));
+                        
+                        // Find the best match for the requested version (same logic as index.html)
+                        let bestMatch = tools[0]; // Default to first
+                        
+                        for (const tool of tools) {
+                            const toolNameLower = tool.name.toLowerCase();
+                            const requestedVersion = toolVersion.toLowerCase();
+                            
+                            // Prioritize exact version match
+                            if (requestedVersion === 'enterprise' && toolNameLower.includes('enterprise')) {
+                                bestMatch = tool;
+                                console.log(`✅ [TEMPLATE] ENTERPRISE MATCH FOUND: ${tool.name} (score: ${tool.total_score})`);
+                                break;
+                            } else if (requestedVersion === 'free' && (toolNameLower.includes('free') || !toolNameLower.includes('enterprise'))) {
+                                bestMatch = tool;
+                                console.log(`✅ [TEMPLATE] FREE MATCH FOUND: ${tool.name} (score: ${tool.total_score})`);
+                                break;
+                            }
+                        }
+                        
+                        toolData = bestMatch;
+                        console.log(`🎯 [TEMPLATE] SELECTED MATCH: ${bestMatch.name} (score: ${bestMatch.total_score})`);
                         break;
                     }
                 }

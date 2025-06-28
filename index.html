@@ -1267,11 +1267,18 @@
                 
                 // Try each search term until we find a match
                 for (const searchTerm of searchTerms) {
+                    console.log(`🔍 Trying Supabase search term: "${searchTerm}"`);
+                    
+                    // Order by name to prioritize enterprise versions when user selects enterprise
+                    const orderField = formData.toolVersion === 'enterprise' ? 'name' : 'name';
+                    const orderDirection = formData.toolVersion === 'enterprise' ? 'desc' : 'asc';
+                    
                     const { data, error } = await supabase
                         .from('ai_tools')
                         .select('name, total_score, detailed_assessment, breakdown, details, risk_level, compliance_score, data_storage_score, training_usage_score, access_controls_score, vendor_transparency_score')
                         .ilike('name', `%${searchTerm}%`)
-                        .limit(1);
+                        .order(orderField, { ascending: orderDirection === 'asc' })
+                        .limit(3); // Get top 3 to find best match
                     
                     if (error) {
                         console.warn('Supabase query error (likely CORS):', error.message);
@@ -1279,15 +1286,35 @@
                     }
                     
                     if (data && data.length > 0) {
-                        const tool = data[0];
-                        console.log(`Found tool in Supabase: ${tool.name} (score: ${tool.total_score})`);
-                        console.log('Detailed assessment available:', !!tool.detailed_assessment);
+                        console.log(`🔍 Found ${data.length} matches:`, data.map(t => `${t.name} (${t.total_score})`));
+                        
+                        // Find the best match for the requested version
+                        let bestMatch = data[0]; // Default to first
+                        
+                        for (const tool of data) {
+                            const toolNameLower = tool.name.toLowerCase();
+                            const requestedVersion = formData.toolVersion.toLowerCase();
+                            
+                            // Prioritize exact version match
+                            if (requestedVersion === 'enterprise' && toolNameLower.includes('enterprise')) {
+                                bestMatch = tool;
+                                console.log(`✅ ENTERPRISE MATCH FOUND: ${tool.name} (score: ${tool.total_score})`);
+                                break;
+                            } else if (requestedVersion === 'free' && (toolNameLower.includes('free') || !toolNameLower.includes('enterprise'))) {
+                                bestMatch = tool;
+                                console.log(`✅ FREE MATCH FOUND: ${tool.name} (score: ${tool.total_score})`);
+                                break;
+                            }
+                        }
+                        
+                        console.log(`🎯 SELECTED MATCH: ${bestMatch.name} (score: ${bestMatch.total_score})`);
+                        console.log('Detailed assessment available:', !!bestMatch.detailed_assessment);
                         
                         return { 
-                            score: tool.total_score, 
+                            score: bestMatch.total_score, 
                             source: 'database',
-                            toolData: tool,
-                            hasDetailedAssessment: !!tool.detailed_assessment
+                            toolData: bestMatch,
+                            hasDetailedAssessment: !!bestMatch.detailed_assessment
                         };
                     }
                 }
@@ -1341,13 +1368,27 @@
             const toolNameLower = cleanToolName.toLowerCase();
             const suffixLower = versionSuffix.toLowerCase();
             
+            // PRIORITY 1: Try exact matches with version first
             if (!toolNameLower.includes(suffixLower)) {
-                // Only add suffix if not already present
-                searchTerms.push(`${cleanToolName} ${versionSuffix}`);
+                // Try common database naming patterns for the specific version
+                searchTerms.push(`${cleanToolName}.ai ${versionSuffix}`); // "Claude.ai Enterprise"
+                searchTerms.push(`${cleanToolName} ${versionSuffix}`);    // "Claude Enterprise"
+                
+                // Try variations of the tool name
+                if (cleanToolName.toLowerCase() === 'claude') {
+                    searchTerms.push(`Claude.ai ${versionSuffix}`);
+                } else if (cleanToolName.toLowerCase() === 'chatgpt') {
+                    searchTerms.push(`ChatGPT ${versionSuffix}`);
+                } else if (cleanToolName.toLowerCase().includes('copilot')) {
+                    searchTerms.push(`GitHub Copilot ${versionSuffix}`);
+                    searchTerms.push(`Microsoft Copilot ${versionSuffix}`);
+                }
             }
             
-            // Always try exact name as entered
+            // PRIORITY 2: Try exact name as entered (only if no version-specific matches)
             searchTerms.push(cleanToolName);
+            
+            console.log(`🔍 Built search terms for "${toolName}" (${toolVersion}):`, searchTerms);
             
             return searchTerms;
         }
