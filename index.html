@@ -2457,6 +2457,22 @@
             try {
                 // Use new template binding system if available
                 if (window.TemplateBindingEngine) {
+                    // Embed assessment results for template access
+                    const templateData = convertAssessmentForTemplate(currentAssessment);
+                    window.EMBEDDED_TOOL_INFO = {
+                        ...currentAssessment.formData,
+                        ...templateData,
+                        isFreeVersion: false,
+                        enterpriseFeatures: true,
+                        // Include final calculated scores
+                        finalScore: currentAssessment.results.finalScore,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        hasCalculatedScores: true
+                    };
+                    
+                    console.log('📤 [HTML EXPORT] Embedded calculated scores:', window.EMBEDDED_TOOL_INFO);
+                    
                     const engine = new window.TemplateBindingEngine();
                     const result = await engine.exportHTMLReport(currentAssessment);
                     showMessage(`HTML report downloaded successfully! (${result.fileName})`, 'success');
