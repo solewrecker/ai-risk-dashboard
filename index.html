@@ -1809,30 +1809,139 @@
             // Initialize the enterprise results display
             init: function(assessmentData) {
                 console.log('🏢 Initializing Enterprise Results Template');
-                this.populateRiskScore(assessmentData);
+                this.populateHeader(assessmentData);
+                this.populateExecutiveSummary(assessmentData);
+                this.populateToolInfo(assessmentData);
                 this.populateCategories(assessmentData);
+                this.populateRiskMatrix(assessmentData);
+                this.populateRecommendations(assessmentData);
                 this.populateEnhancedSections(assessmentData);
+                this.populateFooter(assessmentData);
             },
 
-            // Populate the main risk score display
-            populateRiskScore: function(data) {
+            // Populate header section
+            populateHeader: function(data) {
+                const headerToolName = document.getElementById('headerToolName');
+                const headerAssessmentId = document.getElementById('headerAssessmentId');
+                const headerGeneratedDate = document.getElementById('headerGeneratedDate');
+                
+                if (headerToolName) headerToolName.textContent = data.toolName || 'Unknown Tool';
+                if (headerAssessmentId) headerAssessmentId.textContent = Date.now().toString();
+                if (headerGeneratedDate) headerGeneratedDate.textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            },
+
+            // Populate executive summary
+            populateExecutiveSummary: function(data) {
                 const riskLevel = this.getRiskLevel(data.finalScore);
                 
-                // Update risk display
-                const riskNumber = document.getElementById('enterpriseRiskNumber');
-                const riskBadge = document.getElementById('enterpriseRiskBadge');
-                const riskDescription = document.getElementById('enterpriseRiskDescription');
+                const securityStatusText = document.getElementById('securityStatusText');
+                const complianceImpactText = document.getElementById('complianceImpactText');
+                const mainRecommendationText = document.getElementById('mainRecommendationText');
+                const keyFindings = document.getElementById('keyFindings');
                 
-                if (riskNumber) riskNumber.textContent = data.finalScore;
-                if (riskBadge) riskBadge.textContent = `${riskLevel.toUpperCase()} RISK`;
-                if (riskDescription) riskDescription.textContent = this.getRiskDescription(riskLevel);
-                
-                // Apply risk level styling
-                const resultsContainer = document.getElementById('enterpriseResults');
-                if (resultsContainer) {
-                    resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
-                    resultsContainer.classList.add(`risk-${riskLevel}`);
+                if (securityStatusText) {
+                    securityStatusText.textContent = `Tool meets ${riskLevel === 'low' ? 'acceptable' : riskLevel === 'medium' ? 'basic' : 'minimal'} security standards with ${riskLevel === 'low' ? 'standard monitoring' : riskLevel === 'medium' ? 'enhanced controls' : 'immediate attention'} required.`;
                 }
+                
+                if (complianceImpactText) {
+                    complianceImpactText.textContent = data.finalScore >= 35 ? 'Enhanced compliance verification needed due to security risk level.' : 'Standard compliance monitoring sufficient for current risk profile.';
+                }
+                
+                if (mainRecommendationText) {
+                    mainRecommendationText.textContent = this.getMainRecommendation(riskLevel);
+                }
+                
+                if (keyFindings) {
+                    const findings = this.generateKeyFindings(data);
+                    keyFindings.innerHTML = findings;
+                }
+            },
+
+            // Populate tool information section
+            populateToolInfo: function(data) {
+                const toolIcon = document.getElementById('toolIcon');
+                const toolName = document.getElementById('toolName');
+                const toolCategory = document.getElementById('toolCategory');
+                const primaryUseCase = document.getElementById('primaryUseCase');
+                const dataClassification = document.getElementById('dataClassification');
+                const assessmentDate = document.getElementById('assessmentDate');
+                const riskCategory = document.getElementById('riskCategory');
+                const vendor = document.getElementById('vendor');
+                const licenseType = document.getElementById('licenseType');
+                
+                if (toolIcon) toolIcon.textContent = this.getToolIcon(data.toolName);
+                if (toolName) toolName.textContent = data.toolName || 'Unknown Tool';
+                if (toolCategory) toolCategory.textContent = this.getToolCategory(data.toolName);
+                if (primaryUseCase) primaryUseCase.textContent = this.getPrimaryUseCase(data);
+                if (dataClassification) dataClassification.textContent = this.getDataClassification(data);
+                if (assessmentDate) assessmentDate.textContent = new Date().toLocaleDateString();
+                if (riskCategory) riskCategory.textContent = 'Conversational AI';
+                if (vendor) vendor.textContent = this.getVendor(data.toolName);
+                if (licenseType) licenseType.textContent = this.getLicenseType(data.toolName);
+            },
+
+            // Populate risk matrix
+            populateRiskMatrix: function(data) {
+                const currentRiskMatrixCell = document.getElementById('currentRiskMatrixCell');
+                const matrixDescription = document.getElementById('matrixDescription');
+                
+                const riskLevel = this.getRiskLevel(data.finalScore);
+                
+                if (currentRiskMatrixCell) {
+                    // Remove current-risk class from all cells first
+                    document.querySelectorAll('.current-risk').forEach(cell => {
+                        cell.classList.remove('current-risk');
+                    });
+                    
+                    // Add current-risk class to appropriate cell based on score
+                    currentRiskMatrixCell.classList.add('current-risk');
+                }
+                
+                if (matrixDescription) {
+                    matrixDescription.innerHTML = `★ Current Risk Level: Score ${data.finalScore} falls in ${riskLevel.toUpperCase()} category`;
+                }
+            },
+
+            // Populate recommendations section  
+            populateRecommendations: function(data) {
+                const recommendationsGrid = document.getElementById('recommendationsGrid');
+                if (!recommendationsGrid) return;
+                
+                const recommendations = this.generateRecommendations(data);
+                let recommendationsHTML = '';
+                
+                recommendations.forEach(rec => {
+                    recommendationsHTML += `
+                        <div class="recommendation-card priority-${rec.priority}">
+                            <div class="recommendation-header">
+                                <div class="recommendation-title">${rec.title}</div>
+                                <div class="priority-badge priority-${rec.priority}">${rec.priority.toUpperCase()} Priority</div>
+                            </div>
+                            <div class="recommendation-text">
+                                ${rec.description}
+                                <br><br><strong>Timeline:</strong> ${rec.timeline} | <strong>Owner:</strong> ${rec.owner}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                recommendationsGrid.innerHTML = recommendationsHTML;
+            },
+
+            // Populate footer
+            populateFooter: function(data) {
+                const nextReviewDate = document.getElementById('nextReviewDate');
+                const footerAssessmentId = document.getElementById('footerAssessmentId');
+                const footerGeneratedDate = document.getElementById('footerGeneratedDate');
+                
+                if (nextReviewDate) {
+                    const nextDate = new Date();
+                    nextDate.setMonth(nextDate.getMonth() + 3); // 3 months from now
+                    nextReviewDate.textContent = nextDate.toLocaleDateString();
+                }
+                
+                if (footerAssessmentId) footerAssessmentId.textContent = Date.now().toString();
+                if (footerGeneratedDate) footerGeneratedDate.textContent = new Date().toLocaleDateString();
             },
 
             // Populate detailed categories
@@ -1980,6 +2089,183 @@
                 }
                 
                 return 'low';
+            },
+
+            // Helper functions for tool information
+            getToolIcon: function(toolName) {
+                if (!toolName) return 'AI';
+                const name = toolName.toLowerCase();
+                if (name.includes('chatgpt') || name.includes('gpt')) return 'GPT';
+                if (name.includes('claude')) return 'CL';
+                if (name.includes('gemini')) return 'GM';
+                if (name.includes('copilot')) return 'CP';
+                return 'AI';
+            },
+
+            getToolCategory: function(toolName) {
+                if (!toolName) return 'AI Tool';
+                const name = toolName.toLowerCase();
+                if (name.includes('enterprise')) return 'Enterprise AI Platform';
+                return 'Conversational AI Platform';
+            },
+
+            getVendor: function(toolName) {
+                if (!toolName) return 'Unknown';
+                const name = toolName.toLowerCase();
+                if (name.includes('chatgpt') || name.includes('gpt')) return 'OpenAI';
+                if (name.includes('claude')) return 'Anthropic';
+                if (name.includes('gemini')) return 'Google';
+                if (name.includes('copilot')) return 'Microsoft';
+                return 'Various';
+            },
+
+            getLicenseType: function(toolName) {
+                if (!toolName) return 'Unknown';
+                const name = toolName.toLowerCase();
+                if (name.includes('enterprise')) return 'Enterprise License';
+                if (name.includes('free')) return 'Free Tier';
+                if (name.includes('plus') || name.includes('pro')) return 'Professional License';
+                return 'Standard License';
+            },
+
+            getPrimaryUseCase: function(data) {
+                // Try to get from current assessment data
+                if (window.currentAssessment && window.currentAssessment.formData && window.currentAssessment.formData.useCase) {
+                    const useCaseLabels = {
+                        'content-creation': 'Content Creation & Marketing',
+                        'data-analysis': 'Data Analysis & Insights',
+                        'customer-service': 'Customer Service & Support',
+                        'legal-compliance': 'Legal/Compliance/Audit',
+                        'hr-recruitment': 'HR & Recruitment',
+                        'sales-marketing': 'Sales & Marketing',
+                        'research-development': 'Research & Development',
+                        'it-operations': 'IT Operations & Development'
+                    };
+                    return useCaseLabels[window.currentAssessment.formData.useCase] || 'General Business Use';
+                }
+                return 'General Business Use';
+            },
+
+            getDataClassification: function(data) {
+                // Try to get from current assessment data
+                if (window.currentAssessment && window.currentAssessment.formData && window.currentAssessment.formData.dataClassification) {
+                    const dataLabels = {
+                        'phi': 'Protected Health Information (PHI)',
+                        'financial': 'Financial/Payment Data',
+                        'trade-secrets': 'Trade Secrets/Intellectual Property',
+                        'pii': 'Personally Identifiable Information',
+                        'public': 'Public/Marketing Data'
+                    };
+                    return dataLabels[window.currentAssessment.formData.dataClassification] || 'General Business Data';
+                }
+                return 'General Business Data';
+            },
+
+            getMainRecommendation: function(riskLevel) {
+                switch(riskLevel) {
+                    case 'critical':
+                        return 'Immediate blocking required - critical security controls must be implemented before any usage.';
+                    case 'high':
+                        return 'Significant security controls needed - enhanced monitoring and remediation required before deployment.';
+                    case 'medium':
+                        return 'Standard enterprise controls required - implement enhanced monitoring and compliance verification.';
+                    case 'low':
+                    default:
+                        return 'Basic monitoring sufficient - implement standard security controls and periodic review.';
+                }
+            },
+
+            generateKeyFindings: function(data) {
+                const findings = [];
+                const riskLevel = this.getRiskLevel(data.finalScore);
+                
+                // Add finding based on risk level
+                if (riskLevel === 'critical' || riskLevel === 'high') {
+                    findings.push(`${riskLevel.toUpperCase()} risk assessment requires immediate attention`);
+                }
+                
+                // Add data classification finding
+                const dataClass = this.getDataClassification(data);
+                if (dataClass.includes('Financial') || dataClass.includes('PHI')) {
+                    findings.push(`${dataClass} classification requires enhanced security controls`);
+                }
+                
+                // Add category-specific findings
+                if (data.breakdown) {
+                    Object.entries(data.breakdown).forEach(([category, categoryData]) => {
+                        const scoreMatch = categoryData.score?.match(/(\d+)/);
+                        if (scoreMatch && parseInt(scoreMatch[1]) >= 15) {
+                            findings.push(`${category} requires attention based on assessment results`);
+                        }
+                    });
+                }
+                
+                if (findings.length === 0) {
+                    findings.push('Assessment completed - standard monitoring recommended');
+                }
+                
+                return findings.map(finding => `• ${finding}`).join('<br>');
+            },
+
+            generateRecommendations: function(data) {
+                const recommendations = [];
+                const riskLevel = this.getRiskLevel(data.finalScore);
+                const dataClass = this.getDataClassification(data);
+                
+                // Risk-based recommendations
+                if (riskLevel === 'critical' || riskLevel === 'high') {
+                    recommendations.push({
+                        title: 'Immediate Security Assessment',
+                        description: `🚨 Conduct comprehensive security review to address ${riskLevel} risk findings. Implement blocking controls until issues are resolved.`,
+                        priority: 'high',
+                        timeline: '7 days',
+                        owner: 'Security Team'
+                    });
+                }
+                
+                if (riskLevel === 'medium' || riskLevel === 'high') {
+                    recommendations.push({
+                        title: 'Enhanced Monitoring Implementation',
+                        description: '⚠️ Deploy enhanced monitoring and logging capabilities. Establish regular security reviews and compliance checks.',
+                        priority: 'medium',
+                        timeline: '30 days',
+                        owner: 'IT Operations'
+                    });
+                }
+                
+                // Data classification recommendations
+                if (dataClass.includes('Financial')) {
+                    recommendations.push({
+                        title: 'PCI-DSS Compliance Verification',
+                        description: '💳 Conduct comprehensive PCI-DSS compliance audit for financial data handling. Verify encryption, access logging, and secure transmission protocols.',
+                        priority: dataClass.includes('Payment') ? 'high' : 'medium',
+                        timeline: '45 days',
+                        owner: 'Compliance Team'
+                    });
+                }
+                
+                if (dataClass.includes('PHI')) {
+                    recommendations.push({
+                        title: 'HIPAA Compliance Review',
+                        description: '🏥 Complete HIPAA compliance assessment and implement required safeguards for protected health information.',
+                        priority: 'high',
+                        timeline: '30 days',
+                        owner: 'Privacy Officer'
+                    });
+                }
+                
+                // Default recommendation if none added
+                if (recommendations.length === 0) {
+                    recommendations.push({
+                        title: 'Standard Security Monitoring',
+                        description: '✅ Implement standard security monitoring and periodic review processes. Maintain current security posture.',
+                        priority: 'low',
+                        timeline: '90 days',
+                        owner: 'Security Team'
+                    });
+                }
+                
+                return recommendations;
             }
         };
 
