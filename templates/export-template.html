@@ -959,23 +959,8 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Multiplier constants (used only for fallback when no pre-calculated scores available)
-        const DATA_CLASSIFICATION_MULTIPLIERS = {
-            'phi': 1.4,
-            'financial': 1.3,
-            'trade-secrets': 1.25,
-            'pii': 1.2,
-            'public': 0.9
-        };
-
-        const USE_CASE_MULTIPLIERS = {
-            'legal-compliance': 1.3,
-            'finance-accounting': 1.2,
-            'hr-executive': 1.15,
-            'customer-support': 1.1,
-            'development': 0.95,
-            'marketing': 0.9
-        };
+        // Multiplier constants removed - no longer using fallback calculations
+        // Export-template.html now uses either pre-calculated scores OR raw database scores
 
         // Risk level calculation function for individual categories (using percentage)
         function calculateRiskLevel(score, maxScore = 25) {
@@ -998,54 +983,8 @@
             }
         }
 
-        // Apply multipliers (fallback function - only used when no pre-calculated scores available)
-        function applyMultipliers(baseScore, formData) {
-            // Break down the base score into components proportionally
-            // Based on framework: Data Storage(25), Training(25), Access(20), Compliance(20), Vendor(10)
-            const scoreBreakdown = {
-                dataStorage: Math.round(baseScore * 0.25), // 25% of total
-                trainingUsage: Math.round(baseScore * 0.25), // 25% of total
-                accessControls: Math.round(baseScore * 0.20), // 20% of total
-                complianceRisk: Math.round(baseScore * 0.20), // 20% of total
-                vendorTransparency: Math.round(baseScore * 0.10) // 10% of total
-            };
-            
-            // Apply targeted data classification multipliers
-            const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
-            scoreBreakdown.dataStorage *= dataMultiplier; // Data storage most affected by data type
-            scoreBreakdown.complianceRisk *= dataMultiplier; // Compliance risk varies by data type
-            
-            // Apply targeted use case multipliers  
-            const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
-            scoreBreakdown.complianceRisk *= useCaseMultiplier; // Legal use cases need higher compliance
-            scoreBreakdown.accessControls *= useCaseMultiplier; // Sensitive use cases need better controls
-            
-            // Round the final component scores
-            scoreBreakdown.dataStorage = Math.round(scoreBreakdown.dataStorage);
-            scoreBreakdown.trainingUsage = Math.round(scoreBreakdown.trainingUsage);
-            scoreBreakdown.accessControls = Math.round(scoreBreakdown.accessControls);
-            scoreBreakdown.complianceRisk = Math.round(scoreBreakdown.complianceRisk);
-            scoreBreakdown.vendorTransparency = Math.round(scoreBreakdown.vendorTransparency);
-            
-            // Store breakdown for use in results display
-            window.currentScoreBreakdown = scoreBreakdown;
-            
-            // Recalculate total score from adjusted components
-            const adjustedScore = scoreBreakdown.dataStorage + 
-                                scoreBreakdown.trainingUsage + 
-                                scoreBreakdown.accessControls + 
-                                scoreBreakdown.complianceRisk + 
-                                scoreBreakdown.vendorTransparency;
-            
-            console.log('🧮 [TEMPLATE] FALLBACK multiplier calculation (no pre-calculated scores found):');
-            console.log('Base score:', baseScore);
-            console.log('Data multiplier:', dataMultiplier, 'for', formData.dataClassification);
-            console.log('Use case multiplier:', useCaseMultiplier, 'for', formData.useCase);
-            console.log('Final breakdown:', scoreBreakdown);
-            console.log('Adjusted total:', adjustedScore);
-            
-            return adjustedScore;
-        }
+        // applyMultipliers function removed - no longer using fallback calculations
+        // All calculations now happen in index.html with actual user selections
 
         // Security category descriptions matching your data structure
         const categoryDescriptions = {
@@ -1299,20 +1238,13 @@
                     return;
                 }
 
-                // FALLBACK: Query database and calculate if no pre-calculated scores available
-                let toolName, toolVersion, formData = {};
+                // FALLBACK: Query database if no pre-calculated scores available
+                let toolName, toolVersion;
 
                 if (window.EMBEDDED_TOOL_INFO) {
                     console.log('⚠️ Found embedded tool info but no calculated scores, querying database');
                     toolName = window.EMBEDDED_TOOL_INFO.toolName;
                     toolVersion = window.EMBEDDED_TOOL_INFO.toolVersion;
-                    
-                    formData = {
-                        toolName: toolName,
-                        toolVersion: toolVersion,
-                        dataClassification: window.EMBEDDED_TOOL_INFO.dataClassification || 'public',
-                        useCase: window.EMBEDDED_TOOL_INFO.useCase || 'customer-support'
-                    };
                 } else {
                     console.log('⚠️ No embedded tool info, trying URL parameters or filename');
                     
@@ -1350,14 +1282,6 @@
                             console.log('⚠️ Using fallback: ChatGPT Free');
                         }
                     }
-                    
-                    // Set default form data for multiplier calculations
-                    formData = {
-                        toolName: toolName,
-                        toolVersion: toolVersion,
-                        dataClassification: 'public',
-                        useCase: 'customer-support'
-                    };
                 }
                 
                 // Now query database with the correct tool name and version
@@ -1416,25 +1340,10 @@
                     return;
                 }
 
-                console.log('📋 Raw tool data from database (fallback mode):', toolData);
-
-                // FALLBACK: Apply multipliers only when no pre-calculated scores available
-                const baseScore = toolData.total_score;
-                const adjustedScore = applyMultipliers(baseScore, formData);
+                console.log('📋 Using raw database scores (no multiplier fallback):', toolData);
                 
-                // Update tool data with adjusted score and component breakdown
-                toolData.total_score = adjustedScore;
-                
-                // Update individual component scores from multiplier calculation
-                if (window.currentScoreBreakdown) {
-                    toolData.data_storage_score = window.currentScoreBreakdown.dataStorage;
-                    toolData.training_usage_score = window.currentScoreBreakdown.trainingUsage;
-                    toolData.access_controls_score = window.currentScoreBreakdown.accessControls;
-                    toolData.compliance_score = window.currentScoreBreakdown.complianceRisk;
-                    toolData.vendor_transparency_score = window.currentScoreBreakdown.vendorTransparency;
-                }
-
-                console.log('📋 Final tool data after fallback calculation:', toolData);
+                // No multiplier calculation - just use raw database scores
+                // This is more honest than applying wrong multipliers with hardcoded defaults
 
                 // Generate all dynamic content
                 generateSecurityCategories(toolData);
