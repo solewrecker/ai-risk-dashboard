@@ -1242,6 +1242,7 @@
                     recommendations: recommendations,
                     timestamp: new Date().toISOString(),
                     source: source,
+                    toolData: baseScoreResult.toolData || null, // Include database tool data
                     enhancedInfo: window.currentEnhancedInfo || null
                 };
             } catch (error) {
@@ -1809,7 +1810,7 @@
             // Initialize the enterprise results display
             init: function(assessmentData) {
                 console.log('🏢 Initializing Enterprise Results Template');
-                this.populateHeader(assessmentData);
+                this.populateRiskScore(assessmentData);
                 this.populateExecutiveSummary(assessmentData);
                 this.populateToolInfo(assessmentData);
                 this.populateCategories(assessmentData);
@@ -1819,15 +1820,25 @@
                 this.populateFooter(assessmentData);
             },
 
-            // Populate header section
-            populateHeader: function(data) {
-                const headerToolName = document.getElementById('headerToolName');
-                const headerAssessmentId = document.getElementById('headerAssessmentId');
-                const headerGeneratedDate = document.getElementById('headerGeneratedDate');
+            // Populate the main risk score display
+            populateRiskScore: function(data) {
+                const riskLevel = this.getRiskLevel(data.finalScore);
                 
-                if (headerToolName) headerToolName.textContent = data.toolName || 'Unknown Tool';
-                if (headerAssessmentId) headerAssessmentId.textContent = Date.now().toString();
-                if (headerGeneratedDate) headerGeneratedDate.textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                // Update risk display
+                const riskNumber = document.getElementById('enterpriseRiskNumber');
+                const riskBadge = document.getElementById('enterpriseRiskBadge');
+                const riskDescription = document.getElementById('enterpriseRiskDescription');
+                
+                if (riskNumber) riskNumber.textContent = data.finalScore;
+                if (riskBadge) riskBadge.textContent = `${riskLevel.toUpperCase()} RISK`;
+                if (riskDescription) riskDescription.textContent = this.getRiskDescription(riskLevel);
+                
+                // Apply risk level styling to header
+                const resultsContainer = document.getElementById('enterpriseResults');
+                if (resultsContainer) {
+                    resultsContainer.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                    resultsContainer.classList.add(`risk-${riskLevel}`);
+                }
             },
 
             // Populate executive summary
@@ -1869,13 +1880,16 @@
                 const vendor = document.getElementById('vendor');
                 const licenseType = document.getElementById('licenseType');
                 
+                // Get tool data from database if available
+                const toolData = this.getToolDataFromSource(data);
+                
                 if (toolIcon) toolIcon.textContent = this.getToolIcon(data.toolName);
                 if (toolName) toolName.textContent = data.toolName || 'Unknown Tool';
-                if (toolCategory) toolCategory.textContent = this.getToolCategory(data.toolName);
+                if (toolCategory) toolCategory.textContent = this.getToolCategoryFromData(toolData, data.toolName);
                 if (primaryUseCase) primaryUseCase.textContent = this.getPrimaryUseCase(data);
                 if (dataClassification) dataClassification.textContent = this.getDataClassification(data);
-                if (assessmentDate) assessmentDate.textContent = new Date().toLocaleDateString();
-                if (riskCategory) riskCategory.textContent = 'Conversational AI';
+                if (assessmentDate) assessmentDate.textContent = this.getAssessmentDate(toolData);
+                if (riskCategory) riskCategory.textContent = this.getRiskCategoryFromData(toolData, data.toolName);
                 if (vendor) vendor.textContent = this.getVendor(data.toolName);
                 if (licenseType) licenseType.textContent = this.getLicenseType(data.toolName);
             },
@@ -1933,6 +1947,12 @@
                 const nextReviewDate = document.getElementById('nextReviewDate');
                 const footerAssessmentId = document.getElementById('footerAssessmentId');
                 const footerGeneratedDate = document.getElementById('footerGeneratedDate');
+                const frameworkVersionFooter = document.getElementById('frameworkVersionFooter');
+                const frameworkVersionBottom = document.getElementById('frameworkVersionBottom');
+                
+                // Generate assessment ID based on current timestamp  
+                const assessmentId = Date.now().toString();
+                const currentDate = new Date().toLocaleDateString();
                 
                 if (nextReviewDate) {
                     const nextDate = new Date();
@@ -1940,8 +1960,16 @@
                     nextReviewDate.textContent = nextDate.toLocaleDateString();
                 }
                 
-                if (footerAssessmentId) footerAssessmentId.textContent = Date.now().toString();
-                if (footerGeneratedDate) footerGeneratedDate.textContent = new Date().toLocaleDateString();
+                if (footerAssessmentId) footerAssessmentId.textContent = assessmentId;
+                if (footerGeneratedDate) footerGeneratedDate.textContent = currentDate;
+                
+                // Set framework version consistently
+                const frameworkVersion = 'v2.1';
+                if (frameworkVersionFooter) frameworkVersionFooter.textContent = frameworkVersion;
+                if (frameworkVersionBottom) frameworkVersionBottom.textContent = frameworkVersion;
+                
+                // Set configurable company/contact information
+                this.populateConfigurableElements();
             },
 
             // Populate detailed categories
@@ -2109,6 +2137,66 @@
                 return 'Conversational AI Platform';
             },
 
+            // Database-driven helper functions
+            getToolDataFromSource: function(data) {
+                // Check if we have database tool data from the results
+                if (data.toolData && data.source === 'database') {
+                    return data.toolData;
+                }
+                
+                // Check if we have cached tool data from the assessment
+                if (window.lastToolData && window.lastToolData.toolData) {
+                    return window.lastToolData.toolData;
+                }
+                
+                return null;
+            },
+
+            getToolCategoryFromData: function(toolData, toolName) {
+                // Use database category if available
+                if (toolData && toolData.category) {
+                    return toolData.category;
+                }
+                
+                // Fallback to name-based detection
+                return this.getToolCategory(toolName);
+            },
+
+            getRiskCategoryFromData: function(toolData, toolName) {
+                // Use database category if available
+                if (toolData && toolData.category) {
+                    return toolData.category;
+                }
+                
+                // Fallback logic based on tool name
+                if (!toolName) return 'AI Tool';
+                const name = toolName.toLowerCase();
+                if (name.includes('chatgpt') || name.includes('claude') || name.includes('gemini')) {
+                    return 'Conversational AI';
+                }
+                if (name.includes('copilot') || name.includes('codeium')) {
+                    return 'Code Assistant';
+                }
+                if (name.includes('dalle') || name.includes('midjourney')) {
+                    return 'Image Generation';
+                }
+                return 'AI Tool';
+            },
+
+            getAssessmentDate: function(toolData) {
+                // Use database assessment date if available
+                if (toolData && toolData.created_at) {
+                    return new Date(toolData.created_at).toLocaleDateString();
+                }
+                
+                if (toolData && toolData.updated_at) {
+                    return new Date(toolData.updated_at).toLocaleDateString();
+                }
+                
+                // Fallback to current date
+                return new Date().toLocaleDateString();
+            },
+
             getVendor: function(toolName) {
                 if (!toolName) return 'Unknown';
                 const name = toolName.toLowerCase();
@@ -2266,6 +2354,32 @@
                 }
                 
                 return recommendations;
+            },
+
+            // Populate configurable elements (company info, contact details, etc.)
+            populateConfigurableElements: function() {
+                // These could be made configurable via environment variables or config file
+                const config = {
+                    companyName: 'Enterprise Security Office',
+                    securityEmail: 'security@company.com',
+                    cisoEmail: 'ciso@company.com',
+                    azurePermissionsStatus: 'Azure AD permissions assessment - Integration pending'
+                };
+                
+                // Company name
+                const companyName = document.getElementById('companyName');
+                if (companyName) companyName.textContent = config.companyName;
+                
+                // Contact emails
+                const securityEmail = document.getElementById('securityEmail');
+                if (securityEmail) securityEmail.textContent = config.securityEmail;
+                
+                const cisoEmail = document.getElementById('cisoEmail');
+                if (cisoEmail) cisoEmail.textContent = config.cisoEmail;
+                
+                // Azure permissions status
+                const azurePermissionsStatus = document.getElementById('azurePermissionsStatus');
+                if (azurePermissionsStatus) azurePermissionsStatus.textContent = config.azurePermissionsStatus;
             }
         };
 
