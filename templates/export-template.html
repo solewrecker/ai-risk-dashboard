@@ -959,7 +959,7 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Multiplier constants (same as index.html)
+        // Multiplier constants (used only for fallback when no pre-calculated scores available)
         const DATA_CLASSIFICATION_MULTIPLIERS = {
             'phi': 1.4,
             'financial': 1.3,
@@ -998,7 +998,7 @@
             }
         }
 
-        // Apply multipliers (same logic as index.html)
+        // Apply multipliers (fallback function - only used when no pre-calculated scores available)
         function applyMultipliers(baseScore, formData) {
             // Break down the base score into components proportionally
             // Based on framework: Data Storage(25), Training(25), Access(20), Compliance(20), Vendor(10)
@@ -1037,7 +1037,7 @@
                                 scoreBreakdown.complianceRisk + 
                                 scoreBreakdown.vendorTransparency;
             
-            console.log('🧮 [TEMPLATE] Multiplier calculation:');
+            console.log('🧮 [TEMPLATE] FALLBACK multiplier calculation (no pre-calculated scores found):');
             console.log('Base score:', baseScore);
             console.log('Data multiplier:', dataMultiplier, 'for', formData.dataClassification);
             console.log('Use case multiplier:', useCaseMultiplier, 'for', formData.useCase);
@@ -1263,18 +1263,50 @@
             return searchTerms;
         }
 
-        // Load security assessment data and apply same multipliers as index.html
+        // Load security assessment data - use final calculated scores from index.html
         async function loadSecurityAssessment() {
             try {
+                // PRIORITY 1: Use pre-calculated scores from index.html (no recalculation needed)
+                if (window.EMBEDDED_TOOL_INFO && window.EMBEDDED_TOOL_INFO.hasCalculatedScores) {
+                    console.log('✅ Using pre-calculated scores from index.html:', window.EMBEDDED_TOOL_INFO);
+                    
+                    // Build tool data object using final calculated scores
+                    const toolData = {
+                        name: window.EMBEDDED_TOOL_INFO.toolName || 'Unknown Tool',
+                        category: window.EMBEDDED_TOOL_INFO.category || 'AI Platform',
+                        total_score: window.EMBEDDED_TOOL_INFO.finalScore, // Use final calculated score
+                        risk_level: window.EMBEDDED_TOOL_INFO.riskLevel?.toLowerCase() || 'low',
+                        // Use calculated component scores
+                        data_storage_score: window.EMBEDDED_TOOL_INFO.componentScores?.dataStorage || 0,
+                        training_usage_score: window.EMBEDDED_TOOL_INFO.componentScores?.trainingUsage || 0,
+                        access_controls_score: window.EMBEDDED_TOOL_INFO.componentScores?.accessControls || 0,
+                        compliance_score: window.EMBEDDED_TOOL_INFO.componentScores?.complianceRisk || 0,
+                        vendor_transparency_score: window.EMBEDDED_TOOL_INFO.componentScores?.vendorTransparency || 0,
+                        // Pass through any additional data
+                        breakdown: window.EMBEDDED_TOOL_INFO.breakdown || {}
+                    };
+                    
+                    console.log('🎯 Using final calculated scores (no recalculation):', toolData);
+                    
+                    // Generate all dynamic content using final scores
+                    generateSecurityCategories(toolData);
+                    populateExecutiveSummary(toolData);
+                    populateToolInformation(toolData);
+                    updateRiskMatrix(toolData);
+                    generateAzurePermissions(toolData);
+                    generateRecommendations(toolData);
+                    
+                    return;
+                }
+
+                // FALLBACK: Query database and calculate if no pre-calculated scores available
                 let toolName, toolVersion, formData = {};
 
-                // Get tool info from index.html
                 if (window.EMBEDDED_TOOL_INFO) {
-                    console.log('✅ Using tool info from index.html:', window.EMBEDDED_TOOL_INFO);
+                    console.log('⚠️ Found embedded tool info but no calculated scores, querying database');
                     toolName = window.EMBEDDED_TOOL_INFO.toolName;
                     toolVersion = window.EMBEDDED_TOOL_INFO.toolVersion;
                     
-                    // Get form data for multiplier calculations
                     formData = {
                         toolName: toolName,
                         toolVersion: toolVersion,
@@ -1384,9 +1416,9 @@
                     return;
                 }
 
-                console.log('📋 Raw tool data from database:', toolData);
+                console.log('📋 Raw tool data from database (fallback mode):', toolData);
 
-                // Apply same multipliers as index.html
+                // FALLBACK: Apply multipliers only when no pre-calculated scores available
                 const baseScore = toolData.total_score;
                 const adjustedScore = applyMultipliers(baseScore, formData);
                 
@@ -1402,7 +1434,7 @@
                     toolData.vendor_transparency_score = window.currentScoreBreakdown.vendorTransparency;
                 }
 
-                console.log('📋 Final tool data after multipliers:', toolData);
+                console.log('📋 Final tool data after fallback calculation:', toolData);
 
                 // Generate all dynamic content
                 generateSecurityCategories(toolData);

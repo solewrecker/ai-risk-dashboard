@@ -2073,12 +2073,17 @@
                     templateData.isFreeVersion = true;
                     templateData.enterpriseFeatures = false;
                     
-                    // Embed free version flag for template
+                    // Embed assessment results for template
                     window.EMBEDDED_TOOL_INFO = {
                         ...currentAssessment.formData,
                         ...templateData,
                         isFreeVersion: true,
-                        enterpriseFeatures: false
+                        enterpriseFeatures: false,
+                        // Include final calculated scores
+                        finalScore: currentAssessment.results.finalScore,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        hasCalculatedScores: true
                     };
                     
                     const html = await engine.generateHTMLReport(templateData, './templates/export-template.html');
@@ -2241,7 +2246,12 @@
                     ...currentAssessment.formData,
                     ...templateData,
                     isFreeVersion: false,
-                    enterpriseFeatures: true
+                    enterpriseFeatures: true,
+                    // Include final calculated scores
+                    finalScore: currentAssessment.results.finalScore,
+                    baseScore: currentAssessment.results.baseScore,
+                    componentScores: window.currentScoreBreakdown,
+                    hasCalculatedScores: true
                 };
                 
                 // Generate report using new template system (default: enterprise-report)
