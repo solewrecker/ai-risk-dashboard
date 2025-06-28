@@ -1930,6 +1930,26 @@
                     licenseType: !!licenseType
                 });
                 
+                // Debug element details
+                if (toolName) {
+                    console.log('🔍 Tool name element details:', {
+                        tagName: toolName.tagName,
+                        id: toolName.id,
+                        className: toolName.className,
+                        currentText: toolName.textContent,
+                        parent: toolName.parentElement?.className
+                    });
+                }
+                if (toolCategory) {
+                    console.log('🔍 Tool category element details:', {
+                        tagName: toolCategory.tagName,
+                        id: toolCategory.id,
+                        className: toolCategory.className,
+                        currentText: toolCategory.textContent,
+                        parent: toolCategory.parentElement?.className
+                    });
+                }
+                
                 // Get tool data from database if available
                 const toolData = this.getToolDataFromSource(data);
                 console.log('🗄️ Tool data from source:', toolData);
@@ -1942,12 +1962,28 @@
                 if (toolName) {
                     const nameText = data.toolName || 'Unknown Tool';
                     console.log('🏷️ Setting tool name to:', nameText);
+                    // Try multiple update methods to ensure it works
                     toolName.textContent = nameText;
+                    toolName.innerHTML = nameText;
+                    toolName.innerText = nameText;
+                    // Force DOM refresh
+                    toolName.style.display = 'none';
+                    toolName.offsetHeight; // Trigger reflow
+                    toolName.style.display = '';
+                    console.log('🔄 Tool name after update:', toolName.textContent);
                 }
                 if (toolCategory) {
                     const categoryText = this.getToolCategoryFromData(toolData, data.toolName);
                     console.log('📂 Setting tool category to:', categoryText);
+                    // Try multiple update methods to ensure it works
                     toolCategory.textContent = categoryText;
+                    toolCategory.innerHTML = categoryText;
+                    toolCategory.innerText = categoryText;
+                    // Force DOM refresh
+                    toolCategory.style.display = 'none';
+                    toolCategory.offsetHeight; // Trigger reflow
+                    toolCategory.style.display = '';
+                    console.log('🔄 Tool category after update:', toolCategory.textContent);
                 }
                 if (primaryUseCase) {
                     const useCaseText = this.getPrimaryUseCase(data);
