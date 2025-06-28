@@ -734,7 +734,7 @@
         <div class="header">
             <div class="header-content">
                 <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
-                <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
+                <p class="report-subtitle" id="reportSubtitle">Enterprise Security Analysis & Compliance Report</p>
                 <div class="tool-highlight">
                     <div class="tool-name" id="headerToolName">Loading...</div>
                     <div class="tool-subtitle">Risk Assessment Report</div>
@@ -1009,6 +1009,9 @@
             const baseDesc = categoryDescriptions[categoryKey]?.description || 'Assessment data analysis';
             const riskLevel = calculateRiskLevel(score);
             
+            // Check if this is a free version (embedded data from index.html)
+            const isFreeVersion = window.EMBEDDED_TOOL_INFO?.isFreeVersion || false;
+            
             // Handle both camelCase keys (dataStorage) and human-readable keys ("Data Storage & Security")
             const categoryKeyMap = {
                 'dataStorage': 'Data Storage & Security',
@@ -1112,19 +1115,38 @@
             }
             
             // Fallback descriptions based on risk level and category
-            switch(categoryKey) {
-                case 'dataStorage':
-                    return `${getQualitativeRisk(riskLevel)} data storage assessment. Encryption, retention, and geographic controls evaluated.`;
-                case 'trainingUsage':
-                    return `${getQualitativeRisk(riskLevel)} training data usage assessment. Model training and data sharing policies reviewed.`;
-                case 'accessControls':
-                    return `${getQualitativeRisk(riskLevel)} access controls assessment. Authentication, authorization, and audit capabilities evaluated.`;
-                case 'complianceRisk':
-                    return `${getQualitativeRisk(riskLevel)} compliance assessment. Regulatory requirements and frameworks reviewed.`;
-                case 'vendorTransparency':
-                    return `${getQualitativeRisk(riskLevel)} vendor transparency assessment. Documentation, support, and transparency evaluated.`;
-                default:
-                    return `${getQualitativeRisk(riskLevel)} assessment for ${baseDesc.toLowerCase()}.`;
+            if (isFreeVersion) {
+                // Simplified descriptions for free users
+                switch(categoryKey) {
+                    case 'dataStorage':
+                        return `${getQualitativeRisk(riskLevel)} data storage practices. Key security measures evaluated.`;
+                    case 'trainingUsage':
+                        return `${getQualitativeRisk(riskLevel)} training data usage. Model training policies assessed.`;
+                    case 'accessControls':
+                        return `${getQualitativeRisk(riskLevel)} access controls. User management and authentication reviewed.`;
+                    case 'complianceRisk':
+                        return `${getQualitativeRisk(riskLevel)} compliance assessment. Regulatory alignment evaluated.`;
+                    case 'vendorTransparency':
+                        return `${getQualitativeRisk(riskLevel)} vendor practices. Documentation and support reviewed.`;
+                    default:
+                        return `${getQualitativeRisk(riskLevel)} assessment completed.`;
+                }
+            } else {
+                // Detailed descriptions for enterprise users
+                switch(categoryKey) {
+                    case 'dataStorage':
+                        return `${getQualitativeRisk(riskLevel)} data storage assessment. Encryption, retention, and geographic controls evaluated.`;
+                    case 'trainingUsage':
+                        return `${getQualitativeRisk(riskLevel)} training data usage assessment. Model training and data sharing policies reviewed.`;
+                    case 'accessControls':
+                        return `${getQualitativeRisk(riskLevel)} access controls assessment. Authentication, authorization, and audit capabilities evaluated.`;
+                    case 'complianceRisk':
+                        return `${getQualitativeRisk(riskLevel)} compliance assessment. Regulatory requirements and frameworks reviewed.`;
+                    case 'vendorTransparency':
+                        return `${getQualitativeRisk(riskLevel)} vendor transparency assessment. Documentation, support, and transparency evaluated.`;
+                    default:
+                        return `${getQualitativeRisk(riskLevel)} assessment for ${baseDesc.toLowerCase()}.`;
+                }
             }
         }
 
@@ -1660,6 +1682,15 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing security assessment...');
+            
+            // Check if this is a free version and update header accordingly
+            const isFreeVersion = window.EMBEDDED_TOOL_INFO?.isFreeVersion || false;
+            const subtitleElement = document.getElementById('reportSubtitle');
+            
+            if (isFreeVersion && subtitleElement) {
+                subtitleElement.innerHTML = 'Enterprise Security Analysis & Compliance Report<br><span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; margin-top: 0.5rem; display: inline-block;">📄 Free Version - Upgrade for detailed analysis</span>';
+            }
+            
             loadSecurityAssessment();
         });
     </script>
