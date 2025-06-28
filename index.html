@@ -1002,73 +1002,7 @@
             'marketing': 0.9
         };
 
-        // Fallback database for when Supabase is unavailable (CORS issues)
-        const FALLBACK_TOOLS_DB = {
-            'chatgpt free': { score: 82, name: 'ChatGPT Free' },
-            'chatgpt enterprise': { score: 26, name: 'ChatGPT Enterprise' },
-            'claude free': { score: 68, name: 'Claude Free' },
-            'claude enterprise': { score: 35, name: 'Claude Enterprise' },
-            'github copilot free': { score: 56, name: 'GitHub Copilot Free' },
-            'github copilot enterprise': { score: 42, name: 'GitHub Copilot Enterprise' },
-            'fireflies.ai free': { score: 52, name: 'Fireflies.ai Free' },
-            'fireflies.ai enterprise': { 
-                score: 18, 
-                name: 'Fireflies.ai Enterprise',
-                detailed_assessment: {
-                    "assessment_date": "2025-01-15",
-                    "framework_version": "1.0",
-                    "categories": {
-                        "dataStorage": {
-                            "total_score": 8,
-                            "max_score": 25,
-                            "subcategories": {
-                                "geographic": {"score": 3, "justification": "US data centers with clear jurisdiction control"},
-                                "encryption": {"score": 2, "justification": "AES-256 encryption at rest and TLS in transit"},
-                                "retention": {"score": 3, "justification": "12-month default retention with user-controlled deletion"}
-                            }
-                        },
-                        "trainingUsage": {
-                            "total_score": 0,
-                            "max_score": 25,
-                            "subcategories": {
-                                "training": {"score": 0, "justification": "Contractual guarantee - no training use (0-day retention policy)"},
-                                "sharing": {"score": 0, "justification": "Business Associate Agreement with AI vendors prevents data sharing"}
-                            }
-                        },
-                        "accessControls": {
-                            "total_score": 8,
-                            "max_score": 20,
-                            "subcategories": {
-                                "admin": {"score": 0, "justification": "Super Admin controls with comprehensive user management"},
-                                "audit": {"score": 5, "justification": "Enhanced monitoring capabilities with activity logs"},
-                                "integration": {"score": 3, "justification": "SSO support with secure team access"}
-                            }
-                        },
-                        "complianceRisk": {
-                            "total_score": 2,
-                            "max_score": 20,
-                            "subcategories": {
-                                "violations": {"score": 0, "justification": "SOC 2 Type II, GDPR, and HIPAA-BAA compliant"},
-                                "transparency": {"score": 2, "justification": "Minor gaps in detailed implementation documentation"}
-                            }
-                        },
-                        "vendorTransparency": {
-                            "total_score": 0,
-                            "max_score": 10,
-                            "subcategories": {
-                                "documentation": {"score": 0, "justification": "Comprehensive security documentation and compliance certifications"}
-                            }
-                        }
-                    }
-                }
-            },
-            'cursor free': { score: 48, name: 'Cursor Free' },
-            'cursor enterprise': { score: 35, name: 'Cursor Enterprise' },
-            'read.ai free': { score: 61, name: 'Read.ai Free' },
-            'read.ai enterprise': { score: 45, name: 'Read.ai Enterprise' },
-            'midjourney free': { score: 65, name: 'Midjourney Free' },
-            'midjourney enterprise': { score: 50, name: 'Midjourney Enterprise' }
-        };
+        // Fallback database removed - using Supabase as primary data source for consistency
 
         // Global state variables moved to top of script
 
@@ -1252,13 +1186,8 @@
         }
 
         async function getToolFromDatabase(formData) {
-            // First try fallback database (handles CORS issues)
-            const fallbackResult = checkFallbackDatabase(formData);
-            if (fallbackResult.found) {
-                return fallbackResult;
-            }
-
-            // If not in fallback, try Supabase with detailed assessment data
+            // Try Supabase directly (fallback database removed for consistency)
+            console.log('🔍 Querying Supabase for tool data...');
             try {
                 // Build search term based on tool name and version
                 const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
@@ -1332,31 +1261,7 @@
             };
         }
 
-        function checkFallbackDatabase(formData) {
-            // Build search term based on tool name and version
-            const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
-            
-            console.log('Searching fallback database for:', searchTerms);
-            
-            // Try each search term until we find a match
-            for (const searchTerm of searchTerms) {
-                const key = searchTerm.toLowerCase();
-                if (FALLBACK_TOOLS_DB[key]) {
-                    const tool = FALLBACK_TOOLS_DB[key];
-                    console.log(`Found tool in fallback database: ${tool.name} (score: ${tool.score})`);
-                    return { 
-                        score: tool.score, 
-                        source: 'database',
-                        found: true,
-                        toolData: tool,
-                        hasDetailedAssessment: !!tool.detailed_assessment
-                    };
-                }
-            }
-            
-            console.log('Tool not found in fallback database');
-            return { found: false };
-        }
+        // checkFallbackDatabase function removed - using Supabase directly
 
         function buildSearchTerms(toolName, toolVersion) {
             const cleanToolName = toolName.trim();
