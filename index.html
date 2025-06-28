@@ -2295,11 +2295,27 @@
                 // Use simplified template for free users
                 if (window.TemplateBindingEngine) {
                     const engine = new window.TemplateBindingEngine();
-                    const templateData = convertAssessmentForTemplate(currentAssessment);
                     
-                    // Generate simplified version
-                    templateData.isFreeVersion = true;
-                    templateData.enterpriseFeatures = false;
+                    // Create the correct data structure that template-binding.js expects
+                    const templateData = {
+                        // Add the results object that template-binding.js expects
+                        results: {
+                            toolName: currentAssessment.selectedTool?.name || currentAssessment.results.toolName,
+                            finalScore: currentAssessment.results.finalScore,
+                            riskLevel: currentAssessment.results.riskLevel,
+                            breakdown: currentAssessment.results.breakdown,
+                            recommendations: currentAssessment.results.recommendations || []
+                        },
+                        // Add form data
+                        formData: currentAssessment.formData,
+                        // Add selected tool data
+                        selectedTool: currentAssessment.selectedTool,
+                        // Free version flags
+                        isFreeVersion: true,
+                        enterpriseFeatures: false
+                    };
+                    
+                    console.log('📄 [FREE EXPORT] Template data structure:', templateData);
                     
                     // Embed assessment results for template
                     window.EMBEDDED_TOOL_INFO = {
