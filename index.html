@@ -2805,18 +2805,13 @@
                     throw new Error(error.error || 'Server-side PDF generation failed');
                 }
 
-                // Download the PDF
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${currentAssessment.results.toolName}-premium-assessment.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                // Get HTML content and open in new window for client-side PDF generation
+                const htmlContent = await response.text();
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
 
-                showMessage('✅ Premium PDF generated successfully!', 'success');
+                showMessage('✅ Premium PDF generator opened in new window!', 'success');
 
             } catch (error) {
                 console.error('Premium PDF error:', error);
@@ -2880,8 +2875,9 @@
                     throw new Error(error.error || 'Server-side HTML generation failed');
                 }
 
-                // Download the HTML
-                const blob = await response.blob();
+                // Download the HTML file
+                const htmlContent = await response.text();
+                const blob = new Blob([htmlContent], { type: 'text/html' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;

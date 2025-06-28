@@ -28,7 +28,8 @@ serve(async (req)=>{
       }
     });
     console.log('Supabase client created, getting user...');
-    const { data: { user }, error } = await supabaseClient.auth.getUser();
+    const jwt = authHeader?.replace('Bearer ', '') || '';
+    const { data: { user }, error } = await supabaseClient.auth.getUser(jwt);
     console.log('User result:', user ? 'User found' : 'No user');
     console.log('Auth error:', error);
     if (!user) {
