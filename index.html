@@ -423,83 +423,280 @@
             display: block;
         }
 
-        .risk-score-display {
+        /* Modern Results Container */
+        .modern-results-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Results Header */
+        .results-header {
             text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
             margin-bottom: 2rem;
         }
 
-        .risk-score-number {
-            font-size: 4rem;
+        .tool-title-section {
+            margin-bottom: 1rem;
+        }
+
+        .tool-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .classification-badges {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .classification-badge {
+            display: inline-block;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .use-case-badge {
+            display: inline-block;
+            background: #64748b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .results-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Main Score Card */
+        .main-score-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .score-section {
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .score-number {
+            font-size: 4.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
-        .risk-score-label {
-            font-size: 1.25rem;
+        .score-label {
+            font-size: 1.125rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
         }
 
-        .risk-critical { color: #dc2626; }
-        .risk-high { color: #ea580c; }
-        .risk-medium { color: #ca8a04; }
-        .risk-low { color: #16a34a; }
+        .score-description {
+            flex: 1;
+            text-align: left;
+            padding-left: 2rem;
+            border-left: 1px solid #e2e8f0;
+        }
 
-        .risk-description {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
+        .score-description p {
+            font-size: 1.125rem;
+            margin: 0 0 1rem 0;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .data-source {
             font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            display: inline-block;
+            font-weight: 500;
         }
 
-        .risk-critical .risk-description { background: #fef2f2; color: #991b1b; }
-        .risk-high .risk-description { background: #fff7ed; color: #9a3412; }
-        .risk-medium .risk-description { background: #fefce8; color: #a16207; }
-        .risk-low .risk-description { background: #f0fdf4; color: #166534; }
+        .data-source.verified {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #bbf7d0;
+        }
 
-        /* Breakdown Cards */
-        .breakdown-grid {
+        .data-source.estimated {
+            background: #fefce8;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* Risk Level Colors */
+        .risk-critical .score-number { color: #dc2626; }
+        .risk-high .score-number { color: #ea580c; }
+        .risk-medium .score-number { color: #ca8a04; }
+        .risk-low .score-number { color: #16a34a; }
+
+        .risk-critical .score-label { color: #dc2626; }
+        .risk-high .score-label { color: #ea580c; }
+        .risk-medium .score-label { color: #ca8a04; }
+        .risk-low .score-label { color: #16a34a; }
+
+        /* Insights Grid */
+        .insights-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .breakdown-card {
+        .insight-card {
             background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             padding: 1.5rem;
-        }
-
-        .breakdown-header {
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .breakdown-title {
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #1e293b;
-            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.25rem;
         }
 
-        .breakdown-score {
+        .insight-value {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #3b82f6;
-            font-size: 1.125rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
         }
 
-        .breakdown-description {
-            font-size: 0.875rem;
+        .insight-description {
+            font-size: 0.8rem;
             color: #64748b;
+        }
+
+        /* Recommendations Section */
+        .recommendations-section {
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid #fde68a;
+        }
+
+        .recommendations-section h3 {
+            color: #92400e;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.6);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+
+        .recommendation-item.more-available {
+            background: rgba(245,158,11,0.1);
+            font-style: italic;
+        }
+
+        .rec-bullet {
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-top: 0.125rem;
+        }
+
+        .rec-text {
+            color: #78350f;
+            font-size: 0.95rem;
             line-height: 1.5;
+            flex: 1;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .main-score-card {
+                flex-direction: column;
+                gap: 1.5rem;
+                padding: 2rem;
+            }
+
+            .score-description {
+                text-align: center;
+                padding-left: 0;
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                padding-top: 1.5rem;
+            }
+
+            .tool-name {
+                font-size: 1.75rem;
+            }
+
+            .score-number {
+                font-size: 3.5rem;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Messages */
@@ -1703,19 +1900,29 @@
             };
             
             const riskDescriptions = {
-                'critical': 'Immediate blocking required. This tool poses severe security risks.',
-                'high': 'Significant controls needed before use. Enhanced monitoring required.',
-                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'critical': 'Immediate blocking required - critical security risks identified',
+                'high': 'Significant controls needed before use - high security risks',
+                'medium': 'Standard enterprise controls required - moderate security risks',
                 'low': 'Basic monitoring sufficient. Tool meets security standards.'
             };
 
-            // Get data classification display name
+            // Get ACTUAL tool data from currentAssessment to ensure accuracy
+            const actualToolName = currentAssessment.selectedTool?.name || results.toolName;
+            const actualToolCategory = currentAssessment.selectedTool?.category || currentAssessment.formData.toolCategory;
+            
+            console.log('🎯 [RESULTS] Using actual tool data:', {
+                toolName: actualToolName,
+                category: actualToolCategory,
+                selectedTool: currentAssessment.selectedTool
+            });
+
+            // Get data classification display names  
             const dataClassificationLabels = {
                 'phi': 'Protected Health Information (PHI)',
-                'financial': 'Financial/Payment Data',
-                'trade-secrets': 'Trade Secrets/Intellectual Property',
-                'pii': 'Personally Identifiable Information',
-                'public': 'Public/Marketing Data'
+                'financial': 'Finance/Accounting',
+                'trade-secrets': 'Trade Secrets/IP',
+                'pii': 'Personal Information',
+                'public': 'Public Data'
             };
             
             const dataClassificationLabel = dataClassificationLabels[currentAssessment.formData.dataClassification] || 'Unknown Data Type';
@@ -1731,76 +1938,97 @@
             
             const dataClassificationColor = dataClassificationColors[currentAssessment.formData.dataClassification] || '#64748b';
 
+            // Generate summary insights based on actual scores
+            const totalComponents = Object.keys(results.breakdown).length;
+            const highRiskComponents = Object.values(results.breakdown).filter(comp => comp.score > 8).length;
+            const complianceScore = window.currentScoreBreakdown?.complianceRisk || 0;
+            
             const resultsHTML = `
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                        ${results.toolName}${currentAssessment.formData.toolVersion === 'enterprise' && !results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''}
-                    </h2>
-                    <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                        <span style="
-                            display: inline-block;
-                            background: ${dataClassificationColor};
-                            color: white;
-                            padding: 0.375rem 0.75rem;
-                            border-radius: 1rem;
-                            font-size: 0.875rem;
-                            font-weight: 600;
-                            letter-spacing: 0.025em;
-                        ">
-                            🔒 ${dataClassificationLabel}
-                        </span>
-                        ${currentAssessment.formData.useCase ? `
-                        <span style="
-                            display: inline-block;
-                            background: #64748b;
-                            color: white;
-                            padding: 0.375rem 0.75rem;
-                            border-radius: 1rem;
-                            font-size: 0.875rem;
-                            font-weight: 600;
-                            letter-spacing: 0.025em;
-                        ">
-                            📋 ${getUseCaseLabel(currentAssessment.formData.useCase)}
-                        </span>
-                        ` : ''}
-                    </div>
-                    <p style="color: #64748b; font-size: 1rem;">Risk Assessment Results</p>
-                </div>
-                
-                <div class="risk-score-display risk-${riskLevel}">
-                    <div class="risk-score-number">${results.finalScore}</div>
-                    <div class="risk-score-label">${riskLabels[riskLevel]}</div>
-                    <div class="risk-description">${riskDescriptions[riskLevel]}</div>
-                    ${results.source === 'database' ? 
-                        '<div style="margin-top: 0.5rem; font-size: 0.75rem; color: #10b981;">✓ Verified Assessment Data</div>' : 
-                        '<div style="margin-top: 0.5rem; font-size: 0.75rem; color: #f59e0b;">⚠ Estimated Assessment</div>'
-                    }
-                </div>
-                
-                <div class="breakdown-grid">
-                    ${Object.entries(results.breakdown).map(([category, data]) => `
-                        <div class="breakdown-card">
-                            <div class="breakdown-header">
-                                <div class="breakdown-title">${category}</div>
-                                <div class="breakdown-score">${data.score}</div>
-                                ${data.isDetailed ? '<span style="color: #10b981; font-size: 0.75rem; margin-left: 0.5rem;">📊 Detailed</span>' : ''}
+                <div class="modern-results-container">
+                    <!-- Header Section -->
+                    <div class="results-header">
+                        <div class="tool-title-section">
+                            <h2 class="tool-name">${actualToolName}</h2>
+                            <div class="classification-badges">
+                                <span class="classification-badge" style="background: ${dataClassificationColor};">
+                                    🔒 ${dataClassificationLabel}
+                                </span>
+                                ${currentAssessment.formData.useCase ? `
+                                <span class="use-case-badge">
+                                    📋 ${getUseCaseLabel(currentAssessment.formData.useCase)}
+                                </span>
+                                ` : ''}
                             </div>
-                            <div class="breakdown-description">${data.description}</div>
-                            ${data.isDetailed && data.subcategories ? generateSubcategoryDisplay(data.subcategories) : ''}
+                            <p class="results-subtitle">Risk Assessment Results</p>
                         </div>
-                    `).join('')}
-                </div>
-                
-                ${results.enhancedInfo ? generateEnhancedSections(results.enhancedInfo) : ''}
-                
-                ${results.recommendations.length > 0 ? `
-                    <div class="message message-warning">
-                        <h4>🎯 Recommendations</h4>
-                        <ul style="margin: 0.5rem 0 0 1rem;">
-                            ${results.recommendations.map(rec => `<li>${rec}</li>`).join('')}
-                        </ul>
                     </div>
-                ` : ''}
+
+                    <!-- Main Score Card -->
+                    <div class="main-score-card risk-${riskLevel}">
+                        <div class="score-section">
+                            <div class="score-number">${results.finalScore}</div>
+                            <div class="score-label">${riskLabels[riskLevel]}</div>
+                        </div>
+                        <div class="score-description">
+                            <p>${riskDescriptions[riskLevel]}</p>
+                            ${results.source === 'database' ? 
+                                '<div class="data-source verified">✓ Verified Assessment Data</div>' : 
+                                '<div class="data-source estimated">⚠ Estimated Assessment</div>'
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Summary Insights -->
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-icon">📊</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Overall Security Score</div>
+                                <div class="insight-value">${results.finalScore}/100</div>
+                                <div class="insight-description">General security assessment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">✅</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Compliance Status</div>
+                                <div class="insight-value">${complianceScore < 10 ? '✓ Compliant' : '⚠ Needs Review'}</div>
+                                <div class="insight-description">Meets basic requirements</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">🎯</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Risk Components</div>
+                                <div class="insight-value">${totalComponents - highRiskComponents}/${totalComponents} OK</div>
+                                <div class="insight-description">${highRiskComponents > 0 ? `${highRiskComponents} areas need attention` : 'All areas acceptable'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Recommendations -->
+                    ${results.recommendations.length > 0 ? `
+                        <div class="recommendations-section">
+                            <h3>📋 Key Recommendations</h3>
+                            <div class="recommendations-list">
+                                ${results.recommendations.slice(0, 3).map(rec => `
+                                    <div class="recommendation-item">
+                                        <div class="rec-bullet">•</div>
+                                        <div class="rec-text">${rec}</div>
+                                    </div>
+                                `).join('')}
+                                ${results.recommendations.length > 3 ? `
+                                    <div class="recommendation-item more-available">
+                                        <div class="rec-bullet">+</div>
+                                        <div class="rec-text">${results.recommendations.length - 3} more recommendations available in detailed export</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
             `;
             
             document.getElementById('resultsContent').innerHTML = resultsHTML;
