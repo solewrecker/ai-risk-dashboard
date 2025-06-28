@@ -1163,21 +1163,20 @@
         // Load security assessment data - prioritize embedded data over database queries
         async function loadSecurityAssessment() {
             try {
-                let toolData = null;
+                let toolName, toolVersion;
 
-                // PRIORITY 1: Check for embedded assessment data from index.html
-                if (window.EMBEDDED_ASSESSMENT_DATA) {
-                    console.log('✅ Using embedded assessment data from index.html');
-                    toolData = window.EMBEDDED_ASSESSMENT_DATA.toolData;
-                    console.log('📊 Embedded tool data:', toolData);
-                    console.log('📋 Embedded breakdown structure:', toolData.breakdown);
+                // PRIORITY 1: Get tool info from index.html
+                if (window.EMBEDDED_TOOL_INFO) {
+                    console.log('✅ Using tool info from index.html:', window.EMBEDDED_TOOL_INFO);
+                    toolName = window.EMBEDDED_TOOL_INFO.toolName;
+                    toolVersion = window.EMBEDDED_TOOL_INFO.toolVersion;
                 } else {
-                    console.log('⚠️ No embedded data found, falling back to database query');
+                    console.log('⚠️ No embedded tool info, trying URL parameters or filename');
                     
-                    // FALLBACK: Try to get tool name from URL parameters or extract from filename
+                    // FALLBACK: Try URL parameters first
                     const urlParams = new URLSearchParams(window.location.search);
-                    let toolName = urlParams.get('tool');
-                    let toolVersion = urlParams.get('version') || 'free';
+                    toolName = urlParams.get('tool');
+                    toolVersion = urlParams.get('version') || 'free';
                     
                     // If no URL parameters, extract from filename
                     if (!toolName) {
@@ -1208,36 +1207,37 @@
                             console.log('⚠️ Using fallback: ChatGPT Free');
                         }
                     }
-                    
-                    // Use database query as fallback
-                    const searchTerms = buildSearchTerms(toolName, toolVersion);
-                    console.log('🔍 Generated search terms:', searchTerms);
-                    
-                    for (const searchTerm of searchTerms) {
-                        console.log(`🔍 Trying search term: "${searchTerm}"`);
-                        const { data: tools, error } = await supabase
-                            .from('ai_tools')
-                            .select('*')
-                            .ilike('name', `%${searchTerm}%`)
-                            .limit(1);
+                }
+                
+                // Now query database with the correct tool name and version
+                const searchTerms = buildSearchTerms(toolName, toolVersion);
+                console.log('🔍 Querying database with search terms:', searchTerms);
+                
+                let toolData = null;
+                for (const searchTerm of searchTerms) {
+                    console.log(`🔍 Trying search term: "${searchTerm}"`);
+                    const { data: tools, error } = await supabase
+                        .from('ai_tools')
+                        .select('*')
+                        .ilike('name', `%${searchTerm}%`)
+                        .limit(1);
 
-                        if (error) {
-                            console.warn('❌ Supabase query error for term:', searchTerm, error);
-                            continue;
-                        }
-
-                        if (tools && tools.length > 0) {
-                            toolData = tools[0];
-                            console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
-                            break;
-                        }
+                    if (error) {
+                        console.warn('❌ Supabase query error for term:', searchTerm, error);
+                        continue;
                     }
 
-                    if (!toolData) {
-                        console.warn('No tool data found for search terms:', searchTerms);
-                        showError(`No assessment data found for: ${searchTerms.join(' or ')}`);
-                        return;
+                    if (tools && tools.length > 0) {
+                        toolData = tools[0];
+                        console.log(`✅ FOUND MATCH! Term: "${searchTerm}" → Tool: "${toolData.name}" (Score: ${toolData.total_score})`);
+                        break;
                     }
+                }
+
+                if (!toolData) {
+                    console.warn('No tool data found for search terms:', searchTerms);
+                    showError(`No assessment data found for: ${searchTerms.join(' or ')}`);
+                    return;
                 }
 
                 console.log('📋 Final tool data being used:', toolData);

@@ -454,70 +454,21 @@ class TemplateBindingEngine {
     }
 
     /**
-     * Embed assessment data directly into template JavaScript
+     * Embed just the tool name and version - let export template query database directly
      */
-    async embedAssessmentData(template, assessmentData) {
-        // Create embedded data object with all the information the template needs
-        let detailedBreakdown = assessmentData.results.breakdown;
-        
-        // Try to fetch detailed breakdown from database for tools that have it
-        try {
-            const toolNameForQuery = assessmentData.results.toolName + 
-                (assessmentData.formData.toolVersion === 'enterprise' && 
-                 !assessmentData.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
-            
-            console.log(`🔍 Fetching detailed breakdown for: ${toolNameForQuery}`);
-            
-            // Query database for detailed breakdown
-            if (window.supabase) {
-                const { data: tools, error } = await window.supabase
-                    .from('ai_tools')
-                    .select('breakdown, notes')
-                    .ilike('name', `%${toolNameForQuery}%`)
-                    .limit(1);
-
-                if (!error && tools && tools.length > 0 && tools[0].breakdown) {
-                    console.log('📋 Using detailed database breakdown for export');
-                    detailedBreakdown = tools[0].breakdown;
-                    // Also use database notes if available
-                    if (tools[0].notes) {
-                        assessmentData.results.keyFindings = tools[0].notes;
-                    }
-                } else {
-                    console.log('⚠️ No detailed breakdown found in database, using assessment breakdown');
-                }
-            }
-        } catch (error) {
-            console.warn('Failed to fetch detailed breakdown:', error);
-            console.log('⚠️ Using simplified breakdown - detailed notes may not be available');
-        }
-
+    embedAssessmentData(template, assessmentData) {
+        // Simple approach: just pass tool name and version, let export do its own database query
         const embeddedData = {
             toolName: assessmentData.results.toolName,
-            toolVersion: assessmentData.formData.toolVersion,
-            toolData: {
-                name: assessmentData.results.toolName + 
-                    (assessmentData.formData.toolVersion === 'enterprise' && 
-                     !assessmentData.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
-                total_score: assessmentData.results.finalScore,
-                data_storage_score: assessmentData.results.breakdown?.dataStorage || 0,
-                training_usage_score: assessmentData.results.breakdown?.trainingUsage || 0,
-                access_controls_score: assessmentData.results.breakdown?.accessControls || 0,
-                compliance_score: assessmentData.results.breakdown?.complianceRisk || 0,
-                vendor_transparency_score: assessmentData.results.breakdown?.vendorTransparency || 0,
-                breakdown: detailedBreakdown, // Use detailed breakdown with notes
-                category: assessmentData.formData.toolCategory || 'AI Platform',
-                notes: assessmentData.results.keyFindings || ''
-            }
+            toolVersion: assessmentData.formData.toolVersion
         };
 
         // Inject this data into the template's JavaScript
         const dataScript = `
         <script>
-        // Embedded assessment data from index.html - no need to query database
-        window.EMBEDDED_ASSESSMENT_DATA = ${JSON.stringify(embeddedData, null, 2)};
-        console.log('✅ Using embedded assessment data:', window.EMBEDDED_ASSESSMENT_DATA);
-        console.log('📊 Breakdown structure:', window.EMBEDDED_ASSESSMENT_DATA.toolData.breakdown);
+        // Tool identification from index.html assessment - export will query database directly
+        window.EMBEDDED_TOOL_INFO = ${JSON.stringify(embeddedData, null, 2)};
+        console.log('✅ Tool info from index.html:', window.EMBEDDED_TOOL_INFO);
         </script>`;
 
         // Insert the script before the closing head tag
@@ -534,8 +485,8 @@ class TemplateBindingEngine {
             // Load template
             const template = await this.loadTemplate(templatePath);
             
-            // Embed assessment data directly into template JavaScript
-            const templateWithData = await this.embedAssessmentData(template, assessmentData);
+            // Embed just tool name and version into template JavaScript
+            const templateWithData = this.embedAssessmentData(template, assessmentData);
             
             // Bind assessment data to template variables (for any remaining {{}} placeholders)
             const templateData = this.bindAssessmentData(assessmentData);
