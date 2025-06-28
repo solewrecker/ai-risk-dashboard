@@ -2290,6 +2290,535 @@
             }
         }
 
+        // Generate complete standalone HTML with all data baked in (Option D + E)
+        async function generateStandaloneHTML(assessment) {
+            try {
+                // Load the template file
+                const templateResponse = await fetch('./templates/export-template.html');
+                if (!templateResponse.ok) {
+                    throw new Error('Failed to load export template');
+                }
+                let templateHTML = await templateResponse.text();
+                
+                // Extract assessment data
+                const toolData = {
+                    name: assessment.results.toolName,
+                    category: assessment.formData.toolCategory || 'AI Platform',
+                    total_score: assessment.results.finalScore, // Use calculated score
+                    risk_level: assessment.results.riskLevel.toLowerCase(),
+                    // Use calculated component scores
+                    data_storage_score: window.currentScoreBreakdown?.dataStorage || 0,
+                    training_usage_score: window.currentScoreBreakdown?.trainingUsage || 0,
+                    access_controls_score: window.currentScoreBreakdown?.accessControls || 0,
+                    compliance_score: window.currentScoreBreakdown?.complianceRisk || 0,
+                    vendor_transparency_score: window.currentScoreBreakdown?.vendorTransparency || 0,
+                    breakdown: assessment.results.breakdown || {}
+                };
+                
+                console.log('🏗️ [STANDALONE HTML] Using pre-calculated data:', toolData);
+                
+                // Replace the JavaScript section with pre-populated data and essential functions
+                const standaloneScript = `
+                <script>
+                    // Pre-calculated assessment data (no database queries needed)
+                    const PRECALCULATED_TOOL_DATA = ${JSON.stringify(toolData, null, 8)};
+                    
+                    console.log('✅ [STANDALONE] Using pre-calculated assessment data:', PRECALCULATED_TOOL_DATA);
+                    
+                    // Essential helper functions (copied from template)
+                    function calculateRiskLevel(score, maxScore = 25) {
+                        if (!score || score === 0) return 'LOW';
+                        const percentage = (score / maxScore) * 100;
+                        if (percentage >= 80) return 'HIGH';
+                        if (percentage >= 60) return 'MEDIUM';
+                        return 'LOW';
+                    }
+                    
+                    function getRiskLevelClass(riskLevel) {
+                        switch(riskLevel.toLowerCase()) {
+                            case 'high': return 'high';
+                            case 'medium': return 'medium';
+                            case 'low': return 'low';
+                            default: return 'low';
+                        }
+                    }
+                    
+                    function getRiskLevelFromScore(score) {
+                        if (score >= 80) return 'CRITICAL';
+                        if (score >= 60) return 'HIGH';
+                        if (score >= 35) return 'MEDIUM';
+                        return 'LOW';
+                    }
+                    
+                    function generateToolIcon(toolName) {
+                        if (toolName.toLowerCase().includes('chatgpt')) return 'GPT';
+                        if (toolName.toLowerCase().includes('claude')) return 'CLD';
+                        if (toolName.toLowerCase().includes('copilot')) return 'CP';
+                        if (toolName.toLowerCase().includes('gemini')) return 'GEM';
+                        return 'AI';
+                    }
+                    
+                    function extractVendor(toolName) {
+                        if (toolName.toLowerCase().includes('chatgpt')) return 'OpenAI';
+                        if (toolName.toLowerCase().includes('claude')) return 'Anthropic';
+                        if (toolName.toLowerCase().includes('copilot')) return 'Microsoft/GitHub';
+                        if (toolName.toLowerCase().includes('gemini')) return 'Google';
+                        return 'Unknown Vendor';
+                    }
+                    
+                    function getRiskDescription(riskLevel, score) {
+                        switch(riskLevel) {
+                            case 'CRITICAL':
+                                return 'Immediate blocking required - critical security risks identified';
+                            case 'HIGH':
+                                return 'Significant controls needed before use - high security risks';
+                            case 'MEDIUM':
+                                return 'Standard enterprise controls required - moderate security risks';
+                            case 'LOW':
+                            default:
+                                return 'Basic monitoring sufficient - acceptable risk level';
+                        }
+                    }
+                    
+                    function generateSecurityStatus(toolData, riskLevel) {
+                        if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                            return 'Tool poses significant security risks requiring immediate attention and enhanced controls before deployment.';
+                        } else if (riskLevel === 'MEDIUM') {
+                            return 'Tool meets basic security standards with some areas requiring attention for enterprise deployment.';
+                        } else {
+                            return 'Tool demonstrates acceptable security posture with standard enterprise controls and monitoring.';
+                        }
+                    }
+                    
+                    function generateComplianceImpact(toolData) {
+                        const complianceScore = toolData.compliance_score || 0;
+                        if (complianceScore > 15) {
+                            return 'Significant compliance gaps identified. HIPAA, PCI-DSS, and SOX verification required before handling regulated data.';
+                        } else if (complianceScore > 8) {
+                            return 'PCI-DSS and SOX compliance verification needed due to financial data classification and regulatory requirements.';
+                        } else {
+                            return 'Standard compliance controls applicable. Regular compliance monitoring and documentation recommended.';
+                        }
+                    }
+                    
+                    function generateMainRecommendation(toolData, riskLevel) {
+                        if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                            return 'Immediate security review and remediation required before deployment authorization.';
+                        } else if (riskLevel === 'MEDIUM') {
+                            return 'Implement enhanced monitoring and compliance controls before full deployment.';
+                        } else {
+                            return 'Standard deployment procedures with ongoing monitoring and periodic risk assessments.';
+                        }
+                    }
+                    
+                    function generateKeyFindings(toolData) {
+                        const findings = [];
+                        
+                        // Try to use the dedicated notes field from database
+                        if (toolData.notes && toolData.notes.trim().length > 0) {
+                            const noteFindings = toolData.notes
+                                .split(/[;|\\n|•]/)
+                                .map(note => note.trim())
+                                .filter(note => note.length > 10)
+                                .slice(0, 5);
+                                
+                            if (noteFindings.length > 0) {
+                                return '• ' + noteFindings.join('<br>• ');
+                            }
+                        }
+                        
+                        // Fallback: Extract critical findings from breakdown data
+                        if (toolData.breakdown && toolData.breakdown.subScores) {
+                            const subScores = toolData.breakdown.subScores;
+                            
+                            Object.keys(subScores).forEach(categoryKey => {
+                                const category = subScores[categoryKey];
+                                
+                                Object.keys(category).forEach(subKey => {
+                                    const item = category[subKey];
+                                    if (item && item.note) {
+                                        const note = item.note.toLowerCase();
+                                        
+                                        if (note.includes('critical gap') || note.includes('critical:') || 
+                                            note.includes('hipaa') || note.includes('not compliant') ||
+                                            note.includes('indefinite retention') || note.includes('no enterprise') ||
+                                            note.includes('major compliance barriers') || note.includes('high gdpr risk') ||
+                                            note.includes('no audit trail') || note.includes('basic oauth only') ||
+                                            note.includes('unclear server locations') || note.includes('lacks enterprise-grade')) {
+                                            
+                                            findings.push(item.note);
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                        
+                        // If no critical findings found, add general findings based on scores
+                        if (findings.length === 0) {
+                            if (toolData.total_score < 35) {
+                                findings.push('Acceptable security controls with standard enterprise monitoring requirements');
+                                findings.push('Regular assessment and compliance review recommended');
+                            } else {
+                                findings.push('Enhanced security controls and compliance verification required');
+                                findings.push('Detailed risk mitigation plan needed before deployment');
+                            }
+                        }
+                        
+                        const limitedFindings = findings.slice(0, 5);
+                        return '• ' + limitedFindings.join('<br>• ');
+                    }
+                    
+                    // Core category descriptions for display
+                    const categoryDescriptions = {
+                        dataStorage: { name: "Data Storage & Privacy" },
+                        trainingUsage: { name: "Training & Content Usage" },
+                        accessControls: { name: "Access Controls & Authentication" },
+                        complianceRisk: { name: "Compliance & Regulatory Risk" },
+                        vendorTransparency: { name: "Vendor Transparency & Trust" }
+                    };
+                    
+                    function generateDescription(categoryKey, score, breakdownData) {
+                        // Generate a basic description based on score
+                        if (score > 8) {
+                            return \`High risk identified (Score: \${score}). Enhanced controls required.\`;
+                        } else if (score > 5) {
+                            return \`Medium risk level (Score: \${score}). Standard monitoring recommended.\`;
+                        } else {
+                            return \`Low risk level (Score: \${score}). Basic controls sufficient.\`;
+                        }
+                    }
+                    
+                    // Generate security categories HTML based on your data structure
+                    function generateSecurityCategories(toolData) {
+                        const categoriesGrid = document.getElementById('securityCategoriesGrid');
+                        
+                        if (!categoriesGrid) {
+                            console.error('Categories grid not found');
+                            return;
+                        }
+
+                        // Extract scores from your data structure
+                        const scores = {
+                            dataStorage: toolData.data_storage_score || 0,
+                            trainingUsage: toolData.training_usage_score || 0,
+                            accessControls: toolData.access_controls_score || 0,
+                            complianceRisk: toolData.compliance_score || 0,
+                            vendorTransparency: toolData.vendor_transparency_score || 0
+                        };
+
+                        // Parse breakdown data
+                        let breakdownData = null;
+                        try {
+                            if (toolData.breakdown && typeof toolData.breakdown === 'string') {
+                                breakdownData = JSON.parse(toolData.breakdown);
+                            } else if (toolData.breakdown && typeof toolData.breakdown === 'object') {
+                                breakdownData = toolData.breakdown;
+                            }
+                        } catch (e) {
+                            console.warn('Could not parse breakdown data:', e);
+                        }
+
+                        console.log('Scores extracted:', scores);
+
+                        // Generate HTML for each category
+                        let categoriesHTML = '';
+                        
+                        Object.keys(scores).forEach(categoryKey => {
+                            const score = scores[categoryKey];
+                            const riskLevel = calculateRiskLevel(score);
+                            const riskClass = getRiskLevelClass(riskLevel);
+                            const categoryInfo = categoryDescriptions[categoryKey];
+                            const description = generateDescription(categoryKey, score, breakdownData);
+
+                            categoriesHTML += \`
+                                <div class="category-card \${riskClass}">
+                                    <div class="category-header">
+                                        <div class="category-name">\${categoryInfo.name}</div>
+                                        <div class="category-score \${riskClass}">\${riskLevel}</div>
+                                    </div>
+                                    <div class="category-description">
+                                        \${description}
+                                    </div>
+                                </div>
+                            \`;
+                        });
+
+                        // Update the grid
+                        categoriesGrid.innerHTML = categoriesHTML;
+                        
+                        console.log('Security categories generated successfully');
+                    }
+
+                    // Populate Executive Summary section
+                    function populateExecutiveSummary(toolData) {
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        // Update risk score display
+                        const riskScoreEl = document.getElementById('riskScore');
+                        const riskLevelEl = document.getElementById('riskLevel');
+                        const riskDescEl = document.getElementById('riskDescription');
+                        
+                        if (riskScoreEl) riskScoreEl.textContent = totalScore;
+                        if (riskLevelEl) riskLevelEl.textContent = \`\${riskLevel} RISK\`;
+                        if (riskDescEl) riskDescEl.textContent = getRiskDescription(riskLevel, totalScore);
+                        
+                        // Apply risk level styling to the card
+                        const riskCard = document.getElementById('riskScoreCard');
+                        if (riskCard) {
+                            riskCard.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                            riskCard.classList.add(\`risk-\${riskLevel.toLowerCase()}\`);
+                        }
+                        
+                        // Generate content
+                        const securityStatus = generateSecurityStatus(toolData, riskLevel);
+                        const complianceImpact = generateComplianceImpact(toolData);
+                        const mainRecommendation = generateMainRecommendation(toolData, riskLevel);
+                        const keyFindings = generateKeyFindings(toolData);
+                        
+                        const statusEl = document.getElementById('securityStatusText');
+                        const complianceEl = document.getElementById('complianceImpactText');
+                        const recommendationEl = document.getElementById('mainRecommendationText');
+                        const findingsEl = document.getElementById('keyFindings');
+                        
+                        if (statusEl) statusEl.textContent = securityStatus;
+                        if (complianceEl) complianceEl.textContent = complianceImpact;
+                        if (recommendationEl) recommendationEl.textContent = mainRecommendation;
+                        if (findingsEl) findingsEl.innerHTML = keyFindings;
+                        
+                        console.log('Executive summary populated successfully');
+                    }
+
+                    // Populate Tool Information section
+                    function populateToolInformation(toolData) {
+                        const currentDate = new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                        });
+                        
+                        // Generate assessment ID
+                        const assessmentId = \`ASS-\${Date.now()}\`;
+                        
+                        // Update all elements safely
+                        const elements = {
+                            'headerToolName': toolData.name || 'Unknown Tool',
+                            'headerAssessmentId': assessmentId,
+                            'headerGeneratedDate': currentDate,
+                            'footerAssessmentId': assessmentId,
+                            'footerGeneratedDate': currentDate,
+                            'toolName': toolData.name || 'Unknown Tool',
+                            'toolCategory': toolData.category || 'AI Platform',
+                            'primaryUseCase': 'Enterprise Productivity',
+                            'dataClassification': 'Confidential',
+                            'assessmentDate': currentDate,
+                            'riskCategory': toolData.category || 'AI Platform',
+                            'vendor': extractVendor(toolData.name),
+                            'licenseType': toolData.name.includes('Enterprise') ? 'Enterprise License' : 'Standard License'
+                        };
+                        
+                        // Next review date (3 months from now)
+                        const nextReview = new Date();
+                        nextReview.setMonth(nextReview.getMonth() + 3);
+                        elements['nextReviewDate'] = nextReview.toLocaleDateString('en-US', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                        });
+                        
+                        // Update all elements
+                        Object.keys(elements).forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.textContent = elements[id];
+                            }
+                        });
+                        
+                        // Tool icon
+                        const toolIconEl = document.getElementById('toolIcon');
+                        if (toolIconEl) {
+                            toolIconEl.textContent = generateToolIcon(toolData.name);
+                        }
+                        
+                        console.log('Tool information populated successfully');
+                    }
+
+                    // Update risk matrix display
+                    function updateRiskMatrix(toolData) {
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        const matrixDescEl = document.getElementById('matrixDescription');
+                        if (matrixDescEl) {
+                            matrixDescEl.textContent = \`★ Current Risk Level: Score \${totalScore} falls in \${riskLevel} category\`;
+                        }
+                        
+                        const matrixCell = document.getElementById('currentRiskMatrixCell');
+                        if (matrixCell) {
+                            matrixCell.className = \`matrix-\${riskLevel.toLowerCase()}\`;
+                            matrixCell.innerHTML = \`\${riskLevel.toLowerCase().charAt(0).toUpperCase() + riskLevel.toLowerCase().slice(1)} ★\`;
+                        }
+                        
+                        console.log('Risk matrix updated successfully');
+                    }
+
+                    // Generate Azure permissions (placeholder)
+                    function generateAzurePermissions(toolData) {
+                        const permissionsHTML = \`
+                            <div style="text-align: center; padding: 2rem; color: #64748b;">
+                                <div style="margin-bottom: 1rem;">🔐 Azure AD Integration Assessment</div>
+                                <div style="font-size: 0.9rem;">
+                                    This section will be populated with Azure AD permissions analysis<br>
+                                    when integration is configured. Contact IT Security for setup.
+                                </div>
+                            </div>
+                        \`;
+                        
+                        const azureEl = document.getElementById('azurePermissions');
+                        if (azureEl) {
+                            azureEl.innerHTML = permissionsHTML;
+                        }
+                        console.log('Azure permissions section updated');
+                    }
+
+                    // Generate recommendations based on tool data
+                    function generateRecommendations(toolData) {
+                        const recommendations = [];
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        // Generate recommendations based on scores and risk levels
+                        if (toolData.compliance_score > 10) {
+                            recommendations.push({
+                                title: 'PCI-DSS Compliance Verification',
+                                priority: 'HIGH',
+                                icon: '💳',
+                                description: 'Conduct comprehensive PCI-DSS compliance audit to ensure financial data handling meets regulatory requirements.',
+                                timeline: '30 days',
+                                owner: 'Security Team'
+                            });
+                        }
+                        
+                        if (toolData.compliance_score > 8) {
+                            recommendations.push({
+                                title: 'SOX Controls Implementation',
+                                priority: 'HIGH',
+                                icon: '📊',
+                                description: 'Implement Sarbanes-Oxley controls for financial reporting data processed through the AI tool.',
+                                timeline: '45 days',
+                                owner: 'Compliance Team'
+                            });
+                        }
+                        
+                        if (toolData.data_storage_score > 8) {
+                            recommendations.push({
+                                title: 'Enhanced Data Loss Prevention (DLP)',
+                                priority: 'MEDIUM',
+                                icon: '🛡️',
+                                description: 'Configure advanced DLP policies to monitor and prevent sensitive data from being inadvertently shared.',
+                                timeline: '60 days',
+                                owner: 'IT Security'
+                            });
+                        }
+                        
+                        if (riskLevel === 'HIGH' || riskLevel === 'MEDIUM') {
+                            recommendations.push({
+                                title: 'AI Governance Committee',
+                                priority: 'MEDIUM',
+                                icon: '👥',
+                                description: 'Create a cross-functional AI governance committee to oversee AI tool usage and establish policies.',
+                                timeline: '90 days',
+                                owner: 'Executive Team'
+                            });
+                        }
+                        
+                        recommendations.push({
+                            title: 'Usage Analytics Dashboard',
+                            priority: 'LOW',
+                            icon: '📈',
+                            description: 'Deploy comprehensive usage analytics to track AI tool utilization patterns.',
+                            timeline: '120 days',
+                            owner: 'IT Operations'
+                        });
+                        
+                        // Generate HTML for recommendations
+                        const recommendationsHTML = recommendations.map(rec => \`
+                            <div class="recommendation-card priority-\${rec.priority.toLowerCase()}">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">\${rec.title}</div>
+                                    <div class="priority-badge priority-\${rec.priority.toLowerCase()}">\${rec.priority}</div>
+                                </div>
+                                <div class="recommendation-text">
+                                    \${rec.icon} \${rec.description}
+                                    <br><br><strong>Timeline:</strong> \${rec.timeline} | <strong>Owner:</strong> \${rec.owner}
+                                </div>
+                            </div>
+                        \`).join('');
+                        
+                        const recommendationsEl = document.getElementById('recommendationsGrid');
+                        if (recommendationsEl) {
+                            recommendationsEl.innerHTML = recommendationsHTML;
+                        }
+                        console.log('Recommendations generated successfully');
+                    }
+                    
+                    // Load security assessment data - use pre-calculated data only
+                    async function loadSecurityAssessment() {
+                        try {
+                            console.log('🎯 [STANDALONE] Loading pre-calculated assessment data');
+                            
+                            // Use the pre-calculated data directly
+                            const toolData = PRECALCULATED_TOOL_DATA;
+                            
+                            // Generate all dynamic content using pre-calculated scores
+                            generateSecurityCategories(toolData);
+                            populateExecutiveSummary(toolData);
+                            populateToolInformation(toolData);
+                            updateRiskMatrix(toolData);
+                            generateAzurePermissions(toolData);
+                            generateRecommendations(toolData);
+                            
+                        } catch (error) {
+                            console.error('Error loading security assessment:', error);
+                            console.error('Failed to load pre-calculated assessment data');
+                        }
+                    }
+                    
+                    // Initialize when page loads
+                    document.addEventListener('DOMContentLoaded', function() {
+                        console.log('📋 [STANDALONE] DOM loaded, using pre-calculated data');
+                        loadSecurityAssessment();
+                    });
+                `;
+                
+                // Replace the existing script section with our standalone script
+                const scriptStartPattern = /<script>\s*\/\/\s*Initialize Supabase/;
+                const scriptEndPattern = /<\/script>\s*<\/body>/;
+                
+                const scriptStart = templateHTML.search(scriptStartPattern);
+                const scriptEnd = templateHTML.search(scriptEndPattern);
+                
+                if (scriptStart !== -1 && scriptEnd !== -1) {
+                    // Replace the entire script section
+                    templateHTML = templateHTML.substring(0, scriptStart) + 
+                                 standaloneScript + 
+                                 '\n                ' + templateHTML.substring(scriptEnd);
+                } else {
+                    // Fallback: inject before closing body tag
+                    templateHTML = templateHTML.replace('</body>', standaloneScript + '\n    </body>');
+                }
+                
+                // Remove Supabase dependency
+                templateHTML = templateHTML.replace(
+                    /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2"><\/script>/,
+                    '<!-- Supabase removed - using pre-calculated data -->'
+                );
+                
+                console.log('✅ [STANDALONE HTML] Generated complete standalone HTML file');
+                return templateHTML;
+                
+            } catch (error) {
+                console.error('Error generating standalone HTML:', error);
+                throw error;
+            }
+        }
+
         // Convert assessment data to new template format
         function convertAssessmentForTemplate(assessment) {
             const riskDescriptions = {
@@ -2447,7 +2976,7 @@
             }
         }
 
-        // Option 2: HTML Export (Updated to use new template system)
+        // Option 2: HTML Export (Generate complete standalone HTML with data baked in)
         async function exportHTML() {
             if (!currentAssessment) {
                 showMessage('No assessment to export', 'error');
@@ -2455,34 +2984,37 @@
             }
 
             try {
-                // Use new template binding system if available
-                if (window.TemplateBindingEngine) {
-                    // Embed assessment results for template access
-                    const templateData = convertAssessmentForTemplate(currentAssessment);
-                    window.EMBEDDED_TOOL_INFO = {
-                        ...currentAssessment.formData,
-                        ...templateData,
-                        isFreeVersion: false,
-                        enterpriseFeatures: true,
-                        // Include final calculated scores
-                        finalScore: currentAssessment.results.finalScore,
-                        baseScore: currentAssessment.results.baseScore,
-                        componentScores: window.currentScoreBreakdown,
-                        hasCalculatedScores: true
-                    };
-                    
-                    console.log('📤 [HTML EXPORT] Embedded calculated scores:', window.EMBEDDED_TOOL_INFO);
-                    
-                    const engine = new window.TemplateBindingEngine();
-                    const result = await engine.exportHTMLReport(currentAssessment);
-                    showMessage(`HTML report downloaded successfully! (${result.fileName})`, 'success');
-                } else {
-                    // Fallback to old system if new one isn't loaded
-                    console.warn('New template system not available, using fallback');
-                    const exporter = new EnhancedPDFExporter();
-                    exporter.exportHTML(currentAssessment);
-                    showMessage('HTML report downloaded successfully!', 'success');
-                }
+                console.log('📤 [HTML EXPORT] Generating standalone HTML with pre-calculated data');
+                
+                // Generate complete standalone HTML file
+                const completeHTML = await generateStandaloneHTML(currentAssessment);
+                
+                // Create blob and open as new window
+                const blob = new Blob([completeHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                // Open in new window
+                const htmlWindow = window.open(url, '_blank', 'width=1200,height=800');
+                
+                // Add print button after load
+                htmlWindow.onload = () => {
+                    setTimeout(() => {
+                        const printButton = htmlWindow.document.createElement('button');
+                        printButton.textContent = '🖨️ Print PDF';
+                        printButton.className = 'no-print';
+                        printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+                        printButton.onclick = () => {
+                            htmlWindow.focus();
+                            htmlWindow.print();
+                        };
+                        htmlWindow.document.body.appendChild(printButton);
+                    }, 500);
+                };
+                
+                // Clean up URL after a delay
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+                
+                showMessage('🌐 Standalone HTML report generated successfully!', 'success');
             } catch (error) {
                 console.error('HTML export error:', error);
                 showMessage('Failed to export HTML: ' + error.message, 'error');
