@@ -2811,10 +2811,10 @@
                     hasAuth: !!headers.authorization,
                     hasApikey: !!headers.apikey,
                     authPrefix: headers.authorization?.substring(0, 20) + '...',
-                    url: `${SUPABASE_URL}/functions/v1/generate-premium-pdf`
+                    url: `${SUPABASE_URL}/functions/v1/premium-template`
                 });
                 
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({
