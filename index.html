@@ -796,7 +796,7 @@
                                 <label class="form-label" for="toolVersion">Tool Version</label>
                                 <select id="toolVersion" name="toolVersion" class="form-select">
                                     <option value="free">Free/Personal Version</option>
-                                    <option value="enterprise">Enterprise Version 🔒</option>
+                                    <option value="enterprise">Enterprise Version</option>
                                 </select>
                             </div>
                         </div>
@@ -2811,28 +2811,26 @@
                     hasAuth: !!headers.authorization,
                     hasApikey: !!headers.apikey,
                     authPrefix: headers.authorization?.substring(0, 20) + '...',
-                    url: `${SUPABASE_URL}/functions/v1/generate-premium-pdf`
+                    url: `${SUPABASE_URL}/functions/v1/premium-template`
                 });
                 
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({
-                        assessmentData: {
-                            toolName: currentAssessment.results.toolName + 
-                                (currentAssessment.formData.toolVersion === 'enterprise' && 
-                                !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
-                            toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
-                            finalScore: currentAssessment.results.finalScore,
-                            riskLevel: currentAssessment.results.riskLevel,
-                            baseScore: currentAssessment.results.baseScore,
-                            componentScores: window.currentScoreBreakdown,
-                            breakdown: currentAssessment.results.breakdown,
-                            formData: currentAssessment.formData,
-                            dataClassification: currentAssessment.formData.dataClassification,
-                            useCase: currentAssessment.formData.useCase
-                        },
-                        exportType: 'pdf'
+                        toolName: currentAssessment.results.toolName + 
+                            (currentAssessment.formData.toolVersion === 'enterprise' && 
+                            !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                        toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                        finalScore: currentAssessment.results.finalScore,
+                        riskLevel: currentAssessment.results.riskLevel,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        breakdown: currentAssessment.results.breakdown,
+                        formData: currentAssessment.formData,
+                        dataClassification: currentAssessment.formData.dataClassification,
+                        useCase: currentAssessment.formData.useCase,
+                        reportType: 'pdf'
                     })
                 });
 
@@ -2897,7 +2895,7 @@
                     throw new Error('Authentication required');
                 }
                 
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-premium-pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
                     method: 'POST',
                     headers: {
                         'authorization': `Bearer ${session.access_token}`,
@@ -2905,21 +2903,19 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        assessmentData: {
-                            toolName: currentAssessment.results.toolName + 
-                                (currentAssessment.formData.toolVersion === 'enterprise' && 
-                                !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
-                            toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
-                            finalScore: currentAssessment.results.finalScore,
-                            riskLevel: currentAssessment.results.riskLevel,
-                            baseScore: currentAssessment.results.baseScore,
-                            componentScores: window.currentScoreBreakdown,
-                            breakdown: currentAssessment.results.breakdown,
-                            formData: currentAssessment.formData,
-                            dataClassification: currentAssessment.formData.dataClassification,
-                            useCase: currentAssessment.formData.useCase
-                        },
-                        exportType: 'html'
+                        toolName: currentAssessment.results.toolName + 
+                            (currentAssessment.formData.toolVersion === 'enterprise' && 
+                            !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                        toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                        finalScore: currentAssessment.results.finalScore,
+                        riskLevel: currentAssessment.results.riskLevel,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        breakdown: currentAssessment.results.breakdown,
+                        formData: currentAssessment.formData,
+                        dataClassification: currentAssessment.formData.dataClassification,
+                        useCase: currentAssessment.formData.useCase,
+                        reportType: 'html'
                     })
                 });
 
