@@ -2819,12 +2819,15 @@
                     headers: headers,
                     body: JSON.stringify({
                         assessmentData: {
-                            toolName: currentAssessment.results.toolName,
+                            toolName: currentAssessment.results.toolName + 
+                                (currentAssessment.formData.toolVersion === 'enterprise' && 
+                                !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
                             toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
                             finalScore: currentAssessment.results.finalScore,
                             riskLevel: currentAssessment.results.riskLevel,
                             baseScore: currentAssessment.results.baseScore,
                             componentScores: window.currentScoreBreakdown,
+                            breakdown: currentAssessment.results.breakdown,
                             formData: currentAssessment.formData,
                             dataClassification: currentAssessment.formData.dataClassification,
                             useCase: currentAssessment.formData.useCase
@@ -2903,12 +2906,15 @@
                     },
                     body: JSON.stringify({
                         assessmentData: {
-                            toolName: currentAssessment.results.toolName,
+                            toolName: currentAssessment.results.toolName + 
+                                (currentAssessment.formData.toolVersion === 'enterprise' && 
+                                !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
                             toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
                             finalScore: currentAssessment.results.finalScore,
                             riskLevel: currentAssessment.results.riskLevel,
                             baseScore: currentAssessment.results.baseScore,
                             componentScores: window.currentScoreBreakdown,
+                            breakdown: currentAssessment.results.breakdown,
                             formData: currentAssessment.formData,
                             dataClassification: currentAssessment.formData.dataClassification,
                             useCase: currentAssessment.formData.useCase

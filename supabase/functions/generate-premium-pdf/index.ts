@@ -161,7 +161,72 @@ serve(async (req) => {
   }
 });
 
+// Helper function to get CSS class for risk levels
+function getRiskLevelClass(riskLevel: string): string {
+  const level = (riskLevel || 'low').toLowerCase();
+  switch(level) {
+    case 'high': return 'high';
+    case 'medium': return 'medium';
+    case 'low': return 'low';
+    case 'critical': return 'critical';
+    default: return 'low';
+  }
+}
+
 function generateFreePdfHTML(data: any) {
+  console.log('🔍 [PDF] Received data structure:', Object.keys(data));
+  console.log('🔍 [PDF] Tool name received:', data.toolName);
+  console.log('🔍 [PDF] Component scores:', data.componentScores);
+  
+  // Extract breakdown data from the structure that index.html actually sends
+  const breakdown = data.breakdown || {};
+  console.log('🔍 [PDF] Breakdown keys:', Object.keys(breakdown));
+  
+  // Helper function to extract risk level from component scores
+  function getComponentRiskLevel(score) {
+    if (score >= 8) return 'HIGH';
+    if (score >= 5) return 'MEDIUM';
+    return 'LOW';
+  }
+  
+  // Helper function to extract details from breakdown
+  function getBreakdownDetails(categoryKey: string): string {
+    const category = breakdown[categoryKey];
+    if (!category) return 'Standard security practices apply.';
+    
+    // Extract sub-details if available
+    const details: string[] = [];
+    Object.entries(category).forEach(([subKey, subValue]) => {
+      if (subValue && typeof subValue === 'object' && (subValue as any).note) {
+        const icon = getSubCategoryIcon(subKey);
+        details.push(`<strong>${icon} ${formatSubCategoryName(subKey)}:</strong> ${(subValue as any).note}`);
+      }
+    });
+    
+    return details.length > 0 ? details.join('<br><br>') : 'Standard security practices apply.';
+  }
+  
+  // Helper functions for formatting
+  function getSubCategoryIcon(subKey) {
+    const icons = {
+      'retention': '📅', 'encryption': '🔒', 'geographic': '🌍',
+      'sharing': '🔄', 'training': '🎯', 'transparency': '📋',
+      'admin': '👥', 'audit': '📊', 'integration': '🔗',
+      'violations': '⚠️', 'score': '📈'
+    };
+    return icons[subKey] || '📌';
+  }
+  
+  function formatSubCategoryName(subKey) {
+    const names = {
+      'retention': 'Data Retention', 'encryption': 'Encryption', 'geographic': 'Geographic Controls',
+      'sharing': 'Data Sharing', 'training': 'Training Usage', 'transparency': 'Policy Transparency',
+      'admin': 'Admin Controls', 'audit': 'Audit & Monitoring', 'integration': 'Integration',
+      'violations': 'Compliance Violations', 'score': 'Overall Assessment'
+    };
+    return names[subKey] || subKey.charAt(0).toUpperCase() + subKey.slice(1);
+  }
+  
   // Normalize and format data with defaults
   const normalizedData = {
     toolName: data.toolName || 'Unknown Tool',
@@ -170,17 +235,40 @@ function generateFreePdfHTML(data: any) {
     riskLevel: (data.riskLevel || 'unknown').toUpperCase(),
     baseScore: data.baseScore || 0,
     dataClassification: data.dataClassification || 'public',
-    useCase: data.useCase || 'general'
+    useCase: data.useCase || 'general',
+    // Map component scores to risk levels and details
+    data_storage_risk_level: getComponentRiskLevel(data.componentScores?.dataStorage || 0),
+    data_storage_details: getBreakdownDetails('Data Storage & Security'),
+    training_usage_risk_level: getComponentRiskLevel(data.componentScores?.trainingUsage || 0),
+    training_usage_details: getBreakdownDetails('Training Data Usage'),
+    access_controls_risk_level: getComponentRiskLevel(data.componentScores?.accessControls || 0),
+    access_controls_details: getBreakdownDetails('Access Controls'),
+    compliance_risk_level: getComponentRiskLevel(data.componentScores?.complianceRisk || 0),
+    compliance_details: getBreakdownDetails('Compliance Risk'),
+    vendor_transparency_risk_level: getComponentRiskLevel(data.componentScores?.vendorTransparency || 0),
+    vendor_transparency_details: getBreakdownDetails('Vendor Transparency')
   };
+  
+  console.log('🎯 [PDF] Normalized data:', {
+    toolName: normalizedData.toolName,
+    riskLevels: {
+      dataStorage: normalizedData.data_storage_risk_level,
+      trainingUsage: normalizedData.training_usage_risk_level,
+      accessControls: normalizedData.access_controls_risk_level,
+      compliance: normalizedData.compliance_risk_level,
+      vendorTransparency: normalizedData.vendor_transparency_risk_level
+    }
+  });
   
   const riskColor = normalizedData.riskLevel === 'LOW' ? '#10b981' : 
                    normalizedData.riskLevel === 'MODERATE' ? '#f59e0b' : 
                    normalizedData.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
   
   return `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise AI Risk Assessment - ${normalizedData.toolName}</title>
     <!-- Reliable CDN links without integrity checks -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -204,173 +292,492 @@ function generateFreePdfHTML(data: any) {
         });
     </script>
     <style>
+        /* === DYNAMIC VARIABLES === */
+        :root {
+            --risk-color: ${riskColor};
+            --risk-color-light: ${riskColor}CC;
+        }
+
+        /* === BASE STYLES === */
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        
-        body { 
-            font-family: 'Arial', sans-serif; 
-            background: #f0f2f5;
-            padding: 20px;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.6;
+            color: #1e293b;
+            background: #f8fafc;
         }
-        
-        .container {
-            max-width: 900px;
+
+        .report-container {
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
-        .header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
+
+        /* === HEADER === */
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
             padding: 3rem 2rem;
-            text-align: center;
             position: relative;
+            overflow: hidden;
         }
-        
-        .header h1 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
         }
-        
-        .header p {
-            font-size: 1.3rem;
-            opacity: 0.95;
-        }
-        
-        .content {
-            padding: 2.5rem;
-        }
-        
-        .risk-display {
+
+        .header-content {
+            position: relative;
+            z-index: 2;
             text-align: center;
-            margin: 2rem 0 3rem 0;
-            padding: 2rem;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            border: 3px solid ${riskColor};
         }
-        
-        .risk-score { 
-            font-size: 5rem; 
-            color: ${riskColor}; 
-            font-weight: 900;
+
+        .report-title {
+            font-size: 2.5rem;
+            font-weight: 800;
             margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -0.025em;
         }
-        
-        .risk-level {
-            font-size: 2.2rem; 
-            color: ${riskColor};
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-        
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .detail-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1.5rem;
-            border-left: 4px solid #007bff;
-            transition: transform 0.2s ease;
-        }
-        
-        .detail-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .detail-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-        
-        .detail-value {
-            font-size: 1.2rem;
-            color: #212529;
-            font-weight: 600;
-        }
-        
-        .recommendations {
-            margin-top: 3rem;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-radius: 15px;
-            padding: 2.5rem;
-            border: 2px solid #2196f3;
-        }
-        
-        .recommendations h3 {
-            color: #1976d2;
-            font-size: 1.8rem;
+
+        .report-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 300;
             margin-bottom: 1.5rem;
+        }
+
+        .tool-highlight {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .tool-highlight .tool-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-highlight .tool-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        /* === EXECUTIVE SUMMARY === */
+        .executive-summary {
+            padding: 2rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .recommendations ul {
-            list-style: none;
-            padding: 0;
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            align-items: center;
         }
-        
-        .recommendations li {
-            margin: 1rem 0;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #2196f3;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .recommendations li::before {
-            content: '✓';
-            position: absolute;
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #2196f3;
+
+        /* Risk Score Card */
+        .risk-score-display {
+            background: linear-gradient(135deg, var(--risk-color) 0%, var(--risk-color-light) 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
             color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
+        }
+
+        .risk-score-number {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-score-total {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .risk-level-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .risk-description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .summary-insights {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .insight-text {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .key-findings {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .findings-title {
+            color: #92400e;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .findings-list {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* === TOOL INFORMATION === */
+        .tool-info-section {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            color: white;
+            font-size: 1.5rem;
             font-weight: bold;
         }
-        
+
+        .tool-details {
+            flex: 1;
+        }
+
+        .tool-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-category {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .info-value.critical {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        /* === SECURITY RISK ANALYSIS === */
+        .risk-breakdown {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .categories-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card.low {
+            border-top-color: #10b981;
+        }
+
+        .category-card.medium {
+            border-top-color: #f59e0b;
+        }
+
+        .category-card.high {
+            border-top-color: #ef4444;
+        }
+
+        .category-card.critical {
+            border-top-color: #dc2626;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .category-score {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .category-score.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .category-score.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-score.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .category-score.critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .category-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .category-description strong {
+            color: #374151;
+        }
+
+        /* === RECOMMENDATIONS === */
+        .recommendations-section {
+            padding: 2rem;
+            background: linear-gradient(to right, #f0fdf4, white);
+        }
+
+        .recommendation-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #16a34a;
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-title {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .priority-badge.priority-high {
+            background: #dc2626;
+            color: white;
+        }
+
+        .priority-badge.priority-medium {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .priority-badge.priority-low {
+            background: #16a34a;
+            color: white;
+        }
+
+        .recommendation-text {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* === FOOTER === */
         .footer {
-            background: #f8f9fa;
+            background: #1e293b;
+            color: white;
             padding: 2rem;
             text-align: center;
-            color: #6c757d;
-            border-top: 2px solid #e9ecef;
-            font-size: 1rem;
         }
-        
-        .footer strong {
-            color: #495057;
+
+        .confidential-banner {
+            background: #dc2626;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section h4 {
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section p {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         .controls {
@@ -466,62 +873,274 @@ function generateFreePdfHTML(data: any) {
         <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
     </div>
 
-    <div class="container" id="reportContent">
+    <div class="report-container" id="reportContent">
+        <!-- Header -->
         <div class="header">
-            <h1>Enterprise AI Risk Assessment</h1>
-            <p>Professional Security Analysis Report</p>
-        </div>
-        
-        <div class="content">
-            <div class="risk-display">
-                <div class="risk-score">${normalizedData.finalScore}</div>
-                <div class="risk-level">${normalizedData.riskLevel} RISK</div>
-            </div>
-            
-            <div class="details-grid">
-                <div class="detail-card">
-                    <div class="detail-label">Tool Name</div>
-                    <div class="detail-value">${normalizedData.toolName}</div>
+            <div class="header-content">
+                <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
+                <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
+                <div class="tool-highlight">
+                    <div class="tool-name">${normalizedData.toolName}</div>
+                    <div class="tool-subtitle">Risk Assessment Report</div>
                 </div>
-                <div class="detail-card">
-                    <div class="detail-label">Category</div>
-                    <div class="detail-value">${normalizedData.toolCategory}</div>
+                <div class="report-meta">
+                    <div>
+                        <strong>Assessment ID:</strong> ASS-${Date.now().toString().slice(-6)}
+                    </div>
+                    <div>
+                        <strong>Generated:</strong> ${new Date().toLocaleDateString()}
+                    </div>
+                    <div>
+                        <strong>Framework:</strong> v2.1
+                    </div>
                 </div>
-                <div class="detail-card">
-                    <div class="detail-label">Data Classification</div>
-                    <div class="detail-value">${normalizedData.dataClassification.toUpperCase()}</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-label">Use Case</div>
-                    <div class="detail-value">${normalizedData.useCase.replace('-', ' ').toUpperCase()}</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-label">Base Score</div>
-                    <div class="detail-value">${normalizedData.baseScore}</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-label">Final Score</div>
-                    <div class="detail-value">${normalizedData.finalScore}</div>
-                </div>
-            </div>
-            
-            <div class="recommendations">
-                <h3>🔒 Enterprise Security Recommendations</h3>
-                <ul>
-                    <li><strong>Access Control:</strong> Implement comprehensive role-based access controls with multi-factor authentication</li>
-                    <li><strong>Monitoring:</strong> Deploy continuous monitoring and real-time threat detection systems</li>
-                    <li><strong>Compliance:</strong> Conduct regular compliance reviews and security audits</li>
-                    <li><strong>Training:</strong> Provide mandatory security awareness training for all users</li>
-                    <li><strong>Incident Response:</strong> Establish clear incident response procedures and protocols</li>
-                    <li><strong>Data Protection:</strong> Implement encryption at rest and in transit for sensitive data</li>
-                </ul>
             </div>
         </div>
-        
+
+        <!-- Executive Summary -->
+        <div class="executive-summary">
+            <div class="summary-header">
+                <h2 class="section-title">📊 Executive Summary</h2>
+            </div>
+            
+            <div class="summary-grid">
+                <div class="risk-score-display">
+                    <div class="risk-score-number">${normalizedData.finalScore}</div>
+                    <div class="risk-score-total">/100</div>
+                    <div class="risk-level-badge">${normalizedData.riskLevel} RISK</div>
+                    <div class="risk-description">
+                        ${normalizedData.riskLevel === 'LOW' ? 'Low security risk with recommended monitoring practices.' :
+                          normalizedData.riskLevel === 'MODERATE' ? 'Moderate security risk requiring attention and mitigation.' :
+                          normalizedData.riskLevel === 'HIGH' ? 'High security risk requiring immediate action and controls.' :
+                          'Critical security risk requiring urgent intervention and comprehensive controls.'}
+                    </div>
+                </div>
+                
+                <div class="summary-insights">
+                    <div class="insight-card">
+                        <div class="insight-title">Security Status</div>
+                        <div class="insight-text">
+                            ${normalizedData.riskLevel === 'LOW' ? 'The tool demonstrates good security practices with minimal enterprise risks.' :
+                              normalizedData.riskLevel === 'MODERATE' ? 'The tool has acceptable security with some areas requiring attention.' :
+                              'The tool requires significant security improvements before enterprise deployment.'}
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">Compliance Impact</div>
+                        <div class="insight-text">
+                            ${normalizedData.dataClassification === 'PHI' ? 'PHI data processing requires HIPAA compliance measures and enhanced security controls.' :
+                              normalizedData.dataClassification === 'PCI' ? 'PCI data handling requires PCI DSS compliance and payment security protocols.' :
+                              normalizedData.dataClassification === 'PII' ? 'PII processing requires privacy controls and data protection measures.' :
+                              'Public data processing has minimal compliance requirements but should follow security best practices.'}
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">Recommendation</div>
+                        <div class="insight-text">
+                            ${normalizedData.riskLevel === 'LOW' ? 'Approved for enterprise use with standard monitoring and periodic reviews.' :
+                              normalizedData.riskLevel === 'MODERATE' ? 'Conditional approval pending implementation of recommended security controls.' :
+                              'Not recommended for enterprise use without significant security improvements and additional controls.'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-findings">
+                <div class="findings-title">
+                    ⚠️ Key Security Findings
+                </div>
+                <div class="findings-list">
+                    • Base security score: ${normalizedData.baseScore}/100<br>
+                    • Data classification: ${normalizedData.dataClassification.toUpperCase()} (${normalizedData.dataClassification === 'PHI' ? 'Healthcare data' : normalizedData.dataClassification === 'PCI' ? 'Payment data' : normalizedData.dataClassification === 'PII' ? 'Personal data' : 'Public data'})<br>
+                    • Use case: ${normalizedData.useCase.replace('-', ' ').toUpperCase()}<br>
+                    • Risk adjustment factor applied: ${Math.round((normalizedData.finalScore / normalizedData.baseScore) * 100)}%
+                </div>
+            </div>
+        </div>
+
+        <!-- Tool Information -->
+        <div class="tool-info-section">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">
+                        ${normalizedData.toolCategory === 'code-assistant' ? '🔧' : 
+                          normalizedData.toolCategory === 'conversational-ai' ? '💬' : 
+                          normalizedData.toolCategory === 'productivity' ? '📊' : '🤖'}
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">${normalizedData.toolName}</div>
+                        <div class="tool-category">${normalizedData.toolCategory.replace('-', ' ').toUpperCase()}</div>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Tool Category</span>
+                        <span class="info-value">${normalizedData.toolCategory.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Data Classification</span>
+                        <span class="info-value ${normalizedData.dataClassification === 'PHI' || normalizedData.dataClassification === 'PCI' ? 'critical' : ''}">${normalizedData.dataClassification.toUpperCase()}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Use Case</span>
+                        <span class="info-value">${normalizedData.useCase.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Base Score</span>
+                        <span class="info-value">${normalizedData.baseScore}/100</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Final Score</span>
+                        <span class="info-value ${normalizedData.finalScore >= 70 ? 'critical' : ''}">${normalizedData.finalScore}/100</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Risk Level</span>
+                        <span class="info-value ${normalizedData.riskLevel !== 'LOW' ? 'critical' : ''}">${normalizedData.riskLevel}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Risk Analysis -->
+        <div class="risk-breakdown">
+            <h2 class="section-title">🔍 Security Risk Analysis</h2>
+            
+            <div class="categories-grid">
+                <div class="category-card ${getRiskLevelClass(normalizedData.data_storage_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Data Storage & Security</div>
+                        <div class="category-score ${getRiskLevelClass(normalizedData.data_storage_risk_level || 'low')}">${(normalizedData.data_storage_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${normalizedData.data_storage_details || 'Standard data storage and security practices apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(normalizedData.training_usage_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Training Data Usage</div>
+                        <div class="category-score ${getRiskLevelClass(normalizedData.training_usage_risk_level || 'low')}">${(normalizedData.training_usage_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${normalizedData.training_usage_details || 'Standard training data usage policies apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(normalizedData.access_controls_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Access Controls</div>
+                        <div class="category-score ${getRiskLevelClass(normalizedData.access_controls_risk_level || 'low')}">${(normalizedData.access_controls_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${normalizedData.access_controls_details || 'Standard access control mechanisms apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(normalizedData.compliance_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Compliance Risk</div>
+                        <div class="category-score ${getRiskLevelClass(normalizedData.compliance_risk_level || 'low')}">${(normalizedData.compliance_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${normalizedData.compliance_details || 'Standard compliance requirements apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(normalizedData.vendor_transparency_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Vendor Transparency</div>
+                        <div class="category-score ${getRiskLevelClass(normalizedData.vendor_transparency_risk_level || 'low')}">${(normalizedData.vendor_transparency_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${normalizedData.vendor_transparency_details || 'Standard vendor transparency practices apply.'}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Recommendations -->
+        <div class="recommendations-section">
+            <h2 class="section-title">🔒 Security Recommendations</h2>
+            
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Access Control & Authentication</div>
+                    <div class="priority-badge priority-high">HIGH</div>
+                </div>
+                <div class="recommendation-text">
+                    Implement comprehensive role-based access controls with multi-factor authentication. Establish clear user provisioning and de-provisioning procedures. Monitor all access attempts and maintain detailed access logs.
+                </div>
+            </div>
+
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Data Protection & Encryption</div>
+                    <div class="priority-badge priority-high">HIGH</div>
+                </div>
+                <div class="recommendation-text">
+                    Ensure all sensitive data is encrypted at rest and in transit. Implement data loss prevention (DLP) controls and establish clear data handling procedures. Regular data classification reviews are essential.
+                </div>
+            </div>
+
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Monitoring & Incident Response</div>
+                    <div class="priority-badge priority-medium">MEDIUM</div>
+                </div>
+                <div class="recommendation-text">
+                    Deploy continuous monitoring and real-time threat detection systems. Establish clear incident response procedures and protocols. Conduct regular security audits and penetration testing.
+                </div>
+            </div>
+
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Compliance & Training</div>
+                    <div class="priority-badge priority-medium">MEDIUM</div>
+                </div>
+                <div class="recommendation-text">
+                    Conduct regular compliance reviews and security audits. Provide mandatory security awareness training for all users. Maintain comprehensive documentation of security controls and procedures.
+                </div>
+            </div>
+
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">Vendor Management</div>
+                    <div class="priority-badge priority-low">LOW</div>
+                </div>
+                <div class="recommendation-text">
+                    Establish clear vendor security requirements and regular security assessments. Maintain up-to-date vendor contracts with appropriate security clauses. Monitor vendor security posture continuously.
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
         <div class="footer">
-            <strong>Generated:</strong> ${new Date().toLocaleDateString()} | 
-            <strong>Enterprise AI Risk Framework v2.0</strong> | 
-            <strong>Confidential Security Report</strong>
+            <div class="confidential-banner">
+                🔒 CONFIDENTIAL SECURITY ASSESSMENT
+            </div>
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Assessment Details</h4>
+                    <p>Generated: ${new Date().toLocaleString()}</p>
+                    <p>Framework: Enterprise AI Risk v2.1</p>
+                    <p>Classification: Internal Use Only</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Information</h4>
+                    <p>Security Team: security@company.com</p>
+                    <p>Risk Assessment: risk@company.com</p>
+                    <p>Emergency: +1-800-SECURITY</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal Notice</h4>
+                    <p>This assessment is confidential and proprietary.</p>
+                    <p>Distribution is restricted to authorized personnel only.</p>
+                    <p>© 2024 Enterprise Security Framework</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -639,8 +1258,8 @@ function generateFreePdfHTML(data: any) {
                 
                 // Save with timestamp and sanitized filename
                 const timestamp = new Date().toISOString().slice(0, 10);
-                const sanitizedToolName = '${data.toolName}'.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const filename = sanitizedToolName + '-assessment-' + timestamp + '.pdf';
+                const sanitizedToolName = 'assessment'.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const filename = sanitizedToolName + '-report-' + timestamp + '.pdf';
                 
                 pdf.save(filename);
                 
@@ -725,9 +1344,88 @@ function generateFreePdfHTML(data: any) {
 }
 
 function generatePremiumHTML(data: any) {
-  const riskColor = data.riskLevel === 'LOW' ? '#10b981' : 
-                   data.riskLevel === 'MODERATE' ? '#f59e0b' : 
-                   data.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
+  console.log('🔍 [HTML] Received data structure:', Object.keys(data));
+  console.log('🔍 [HTML] Tool name received:', data.toolName);
+  console.log('🔍 [HTML] Component scores:', data.componentScores);
+  
+  // Extract breakdown data from the structure that index.html actually sends
+  const breakdown = data.breakdown || {};
+  console.log('🔍 [HTML] Breakdown keys:', Object.keys(breakdown));
+  
+  // Helper function to extract risk level from component scores
+  function getComponentRiskLevel(score: number): string {
+    if (score >= 8) return 'HIGH';
+    if (score >= 5) return 'MEDIUM';
+    return 'LOW';
+  }
+  
+  // Helper function to extract details from breakdown
+  function getBreakdownDetails(categoryKey: string): string {
+    const category = breakdown[categoryKey];
+    if (!category) return 'Standard security practices apply.';
+    
+    // Extract sub-details if available
+    const details: string[] = [];
+    Object.entries(category).forEach(([subKey, subValue]) => {
+      if (subValue && typeof subValue === 'object' && (subValue as any).note) {
+        const icon = getSubCategoryIcon(subKey);
+        details.push(`<strong>${icon} ${formatSubCategoryName(subKey)}:</strong> ${(subValue as any).note}`);
+      }
+    });
+    
+    return details.length > 0 ? details.join('<br><br>') : 'Standard security practices apply.';
+  }
+  
+  // Helper functions for formatting
+  function getSubCategoryIcon(subKey: string): string {
+    const icons: {[key: string]: string} = {
+      'retention': '📅', 'encryption': '🔒', 'geographic': '🌍',
+      'sharing': '🔄', 'training': '🎯', 'transparency': '📋',
+      'admin': '👥', 'audit': '📊', 'integration': '🔗',
+      'violations': '⚠️', 'score': '📈'
+    };
+    return icons[subKey] || '📌';
+  }
+  
+  function formatSubCategoryName(subKey: string): string {
+    const names: {[key: string]: string} = {
+      'retention': 'Data Retention', 'encryption': 'Encryption', 'geographic': 'Geographic Controls',
+      'sharing': 'Data Sharing', 'training': 'Training Usage', 'transparency': 'Policy Transparency',
+      'admin': 'Admin Controls', 'audit': 'Audit & Monitoring', 'integration': 'Integration',
+      'violations': 'Compliance Violations', 'score': 'Overall Assessment'
+    };
+    return names[subKey] || subKey.charAt(0).toUpperCase() + subKey.slice(1);
+  }
+  
+  // Map component scores to risk levels and create mapped data object
+  const mappedData = {
+    ...data,
+    data_storage_risk_level: getComponentRiskLevel(data.componentScores?.dataStorage || 0),
+    data_storage_details: getBreakdownDetails('Data Storage & Security'),
+    training_usage_risk_level: getComponentRiskLevel(data.componentScores?.trainingUsage || 0),
+    training_usage_details: getBreakdownDetails('Training Data Usage'),
+    access_controls_risk_level: getComponentRiskLevel(data.componentScores?.accessControls || 0),
+    access_controls_details: getBreakdownDetails('Access Controls'),
+    compliance_risk_level: getComponentRiskLevel(data.componentScores?.complianceRisk || 0),
+    compliance_details: getBreakdownDetails('Compliance Risk'),
+    vendor_transparency_risk_level: getComponentRiskLevel(data.componentScores?.vendorTransparency || 0),
+    vendor_transparency_details: getBreakdownDetails('Vendor Transparency')
+  };
+  
+  console.log('🎯 [HTML] Mapped data:', {
+    toolName: mappedData.toolName,
+    riskLevels: {
+      dataStorage: mappedData.data_storage_risk_level,
+      trainingUsage: mappedData.training_usage_risk_level,
+      accessControls: mappedData.access_controls_risk_level,
+      compliance: mappedData.compliance_risk_level,
+      vendorTransparency: mappedData.vendor_transparency_risk_level
+    }
+  });
+  
+  const riskColor = mappedData.riskLevel === 'LOW' ? '#10b981' : 
+                   mappedData.riskLevel === 'MODERATE' ? '#f59e0b' : 
+                   mappedData.riskLevel === 'HIGH' ? '#ef4444' : '#dc2626';
   
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1031,6 +1729,103 @@ function generatePremiumHTML(data: any) {
             color: #1f2937;
         }
 
+        /* === SECURITY RISK ANALYSIS === */
+        .risk-breakdown {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .categories-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card.low {
+            border-top-color: #10b981;
+        }
+
+        .category-card.medium {
+            border-top-color: #f59e0b;
+        }
+
+        .category-card.high {
+            border-top-color: #ef4444;
+        }
+
+        .category-card.critical {
+            border-top-color: #dc2626;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .category-score {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .category-score.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .category-score.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-score.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .category-score.critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .category-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .category-description strong {
+            color: #374151;
+        }
+
         /* === RECOMMENDATIONS === */
         .recommendations-section {
             padding: 2rem;
@@ -1198,7 +1993,7 @@ function generatePremiumHTML(data: any) {
                 <h1 class="report-title">AI SECURITY RISK ASSESSMENT</h1>
                 <p class="report-subtitle">Enterprise Security Analysis & Compliance Report</p>
                 <div class="tool-highlight">
-                    <div class="tool-name">${data.toolName}</div>
+                    <div class="tool-name">${mappedData.toolName}</div>
                     <div class="tool-subtitle">Risk Assessment Report</div>
                 </div>
                 <div class="report-meta">
@@ -1223,26 +2018,26 @@ function generatePremiumHTML(data: any) {
             
             <div class="summary-grid">
                 <div class="risk-score-display">
-                    <div class="risk-score-number">${data.finalScore}</div>
+                    <div class="risk-score-number">${mappedData.finalScore}</div>
                     <div class="risk-score-total">/100</div>
-                    <div class="risk-level-badge">${data.riskLevel} RISK</div>
-                    <div class="risk-description">${data.riskLevel === 'HIGH' ? 'Significant controls needed before use' : data.riskLevel === 'MEDIUM' ? 'Standard enterprise controls required' : 'Basic monitoring sufficient'}</div>
+                    <div class="risk-level-badge">${mappedData.riskLevel} RISK</div>
+                    <div class="risk-description">${mappedData.riskLevel === 'HIGH' ? 'Significant controls needed before use' : mappedData.riskLevel === 'MEDIUM' ? 'Standard enterprise controls required' : 'Basic monitoring sufficient'}</div>
                 </div>
                 
                 <div class="summary-insights">
                     <div class="insight-card">
                         <div class="insight-title">Security Status</div>
-                        <div class="insight-text">${data.riskLevel === 'HIGH' ? 'Tool poses significant security risks requiring immediate attention and enhanced controls.' : 'Tool meets security standards with appropriate controls for enterprise deployment.'}</div>
+                        <div class="insight-text">${mappedData.riskLevel === 'HIGH' ? 'Tool poses significant security risks requiring immediate attention and enhanced controls.' : 'Tool meets security standards with appropriate controls for enterprise deployment.'}</div>
                     </div>
                     
                     <div class="insight-card">
                         <div class="insight-title">Compliance Impact</div>
-                        <div class="insight-text">Standard compliance controls applicable with ${data.dataClassification} data classification requirements.</div>
+                        <div class="insight-text">Standard compliance controls applicable with ${mappedData.dataClassification} data classification requirements.</div>
                     </div>
                     
                     <div class="insight-card">
                         <div class="insight-title">Recommendation</div>
-                        <div class="insight-text">${data.riskLevel === 'HIGH' ? 'Immediate security review required before deployment.' : 'Standard deployment with ongoing monitoring recommended.'}</div>
+                        <div class="insight-text">${mappedData.riskLevel === 'HIGH' ? 'Immediate security review required before deployment.' : 'Standard deployment with ongoing monitoring recommended.'}</div>
                     </div>
                 </div>
             </div>
@@ -1252,10 +2047,10 @@ function generatePremiumHTML(data: any) {
                     ⚠️ Key Security Findings
                 </div>
                 <div class="findings-list">
-                    • Security assessment completed with ${data.riskLevel.toLowerCase()} risk classification<br>
-                    • Data classification: ${data.dataClassification} requires appropriate handling controls<br>
-                    • Use case: ${data.useCase} presents standard enterprise deployment considerations<br>
-                    • Final risk score of ${data.finalScore}/100 indicates ${data.riskLevel.toLowerCase()} priority for security controls
+                    • Security assessment completed with ${mappedData.riskLevel.toLowerCase()} risk classification<br>
+                    • Data classification: ${mappedData.dataClassification} requires appropriate handling controls<br>
+                    • Use case: ${mappedData.useCase} presents standard enterprise deployment considerations<br>
+                    • Final risk score of ${mappedData.finalScore}/100 indicates ${mappedData.riskLevel.toLowerCase()} priority for security controls
                 </div>
             </div>
         </div>
@@ -1264,21 +2059,21 @@ function generatePremiumHTML(data: any) {
         <div class="tool-info-section">
             <div class="tool-card">
                 <div class="tool-header">
-                    <div class="tool-icon">${data.toolName.substring(0, 2).toUpperCase()}</div>
+                    <div class="tool-icon">${mappedData.toolName.substring(0, 2).toUpperCase()}</div>
                     <div class="tool-details">
-                        <div class="tool-name">${data.toolName}</div>
-                        <div class="tool-category">${data.toolCategory || 'AI Platform'}</div>
+                        <div class="tool-name">${mappedData.toolName}</div>
+                        <div class="tool-category">${mappedData.toolCategory || 'AI Platform'}</div>
                     </div>
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Primary Use Case</span>
-                        <span class="info-value">${data.useCase}</span>
+                        <span class="info-value">${mappedData.useCase}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Data Classification</span>
-                        <span class="info-value">${data.dataClassification}</span>
+                        <span class="info-value">${mappedData.dataClassification}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Assessment Date</span>
@@ -1286,15 +2081,72 @@ function generatePremiumHTML(data: any) {
                     </div>
                     <div class="info-item">
                         <span class="info-label">Risk Category</span>
-                        <span class="info-value">${data.riskLevel}</span>
+                        <span class="info-value">${mappedData.riskLevel}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Base Score</span>
-                        <span class="info-value">${data.baseScore}</span>
+                        <span class="info-value">${mappedData.baseScore}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Final Score</span>
-                        <span class="info-value">${data.finalScore}</span>
+                        <span class="info-value">${mappedData.finalScore}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Risk Analysis -->
+        <div class="risk-breakdown">
+            <h2 class="section-title">🔍 Security Risk Analysis</h2>
+            
+            <div class="categories-grid">
+                <div class="category-card ${getRiskLevelClass(mappedData.data_storage_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Data Storage & Security</div>
+                        <div class="category-score ${getRiskLevelClass(mappedData.data_storage_risk_level || 'low')}">${(mappedData.data_storage_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${mappedData.data_storage_details || 'Standard data storage and security practices apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(mappedData.training_usage_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Training Data Usage</div>
+                        <div class="category-score ${getRiskLevelClass(mappedData.training_usage_risk_level || 'low')}">${(mappedData.training_usage_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${mappedData.training_usage_details || 'Standard training data usage policies apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(mappedData.access_controls_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Access Controls</div>
+                        <div class="category-score ${getRiskLevelClass(mappedData.access_controls_risk_level || 'low')}">${(mappedData.access_controls_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${mappedData.access_controls_details || 'Standard access control mechanisms apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(mappedData.compliance_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Compliance Risk</div>
+                        <div class="category-score ${getRiskLevelClass(mappedData.compliance_risk_level || 'low')}">${(mappedData.compliance_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${mappedData.compliance_details || 'Standard compliance requirements apply.'}
+                    </div>
+                </div>
+
+                <div class="category-card ${getRiskLevelClass(mappedData.vendor_transparency_risk_level || 'low')}">
+                    <div class="category-header">
+                        <div class="category-name">Vendor Transparency</div>
+                        <div class="category-score ${getRiskLevelClass(mappedData.vendor_transparency_risk_level || 'low')}">${(mappedData.vendor_transparency_risk_level || 'LOW').toUpperCase()}</div>
+                    </div>
+                    <div class="category-description">
+                        ${mappedData.vendor_transparency_details || 'Standard vendor transparency practices apply.'}
                     </div>
                 </div>
             </div>
@@ -1305,7 +2157,7 @@ function generatePremiumHTML(data: any) {
             <h2 class="section-title">🎯 Action Items & Recommendations</h2>
             
             <div class="recommendations-grid">
-                ${data.riskLevel === 'HIGH' ? `
+                ${mappedData.riskLevel === 'HIGH' ? `
                 <div class="recommendation-card priority-high">
                     <div class="recommendation-header">
                         <div class="recommendation-title">Immediate Security Review</div>
@@ -1318,13 +2170,13 @@ function generatePremiumHTML(data: any) {
                 </div>
                 ` : ''}
                 
-                <div class="recommendation-card priority-${data.riskLevel === 'HIGH' ? 'high' : 'medium'}">
+                <div class="recommendation-card priority-${mappedData.riskLevel === 'HIGH' ? 'high' : 'medium'}">
                     <div class="recommendation-header">
                         <div class="recommendation-title">Data Classification Controls</div>
-                        <div class="priority-badge priority-${data.riskLevel === 'HIGH' ? 'high' : 'medium'}">${data.riskLevel === 'HIGH' ? 'HIGH' : 'MEDIUM'}</div>
+                        <div class="priority-badge priority-${mappedData.riskLevel === 'HIGH' ? 'high' : 'medium'}">${mappedData.riskLevel === 'HIGH' ? 'HIGH' : 'MEDIUM'}</div>
                     </div>
                     <div class="recommendation-text">
-                        🔒 Implement appropriate controls for ${data.dataClassification} data classification level including access controls and monitoring.
+                        🔒 Implement appropriate controls for ${mappedData.dataClassification} data classification level including access controls and monitoring.
                         <br><br><strong>Timeline:</strong> 30 days | <strong>Owner:</strong> Data Protection Team
                     </div>
                 </div>
