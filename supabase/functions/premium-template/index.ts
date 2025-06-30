@@ -25,6 +25,8 @@ serve(async (req) => {
 
   try {
     // 1. Extract parameters from the request
+    const payload = await req.json();
+
     const {
       toolName,
       toolCategory = 'AI Platform',
@@ -34,12 +36,12 @@ serve(async (req) => {
       dataClassification,
       useCase,
       reportType, // 'free' or 'premium'
-    } = await req.json();
+    } = payload;
 
     console.log(`🚀 Received request for ${toolName} (${reportType} report)`);
 
     // 2. Validate essential parameters
-    if (!toolName || !finalScore || !riskLevel || !reportType) {
+    if (!toolName || finalScore === undefined || finalScore === null || !riskLevel || !reportType) {
       console.error('🚫 Missing required parameters');
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,

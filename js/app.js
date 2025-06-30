@@ -1497,8 +1497,8 @@ async function exportPremiumPDF() {
             throw new Error(`Server error: ${error.message}`);
         }
         
-        // The function returns a base64 encoded PDF
-        if (data.pdf) {
+        // The function returns a base64 encoded PDF or full HTML string
+        if (data && typeof data === 'object' && data.pdf) {
             const pdfBlob = b64toBlob(data.pdf, 'application/pdf');
             const pdfUrl = URL.createObjectURL(pdfBlob);
             
@@ -1512,8 +1512,17 @@ async function exportPremiumPDF() {
             URL.revokeObjectURL(pdfUrl);
             
             showMessage('✅ Enterprise PDF downloaded successfully', 'success');
+        } else if (data && typeof data === 'string') {
+            // Assume the server returned full HTML
+            const htmlBlob = new Blob([data], { type: 'text/html' });
+            const htmlUrl = URL.createObjectURL(htmlBlob);
+            
+            // Open in a new tab so the user can print / save as PDF
+            window.open(htmlUrl, '_blank');
+            
+            showMessage('✅ Enterprise report opened in a new tab. Use your browser\'s Print dialog to save as PDF.', 'success');
         } else {
-            throw new Error(data.error || 'Unknown error generating PDF');
+            throw new Error(data?.error || 'Unknown error generating report');
         }
         
     } catch (error) {
