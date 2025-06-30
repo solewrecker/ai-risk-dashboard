@@ -1380,17 +1380,42 @@ async function exportFreePDF() {
 
         // Inject risk breakdown
         const breakdownContainer = tempDiv.querySelector('#risk-breakdown-container');
-        const breakdownHtml = Object.entries(results.breakdown.scores).map(([category, score]) => `
-            <div class="item">
-                <span class="item-label">${results.breakdown.categoryNames[category] || category}:</span> ${score}/25
-            </div>
-        `).join('');
+        let breakdownHtml = '';
+        const breakdownData = results.breakdown;
+
+        if (breakdownData && breakdownData.scores) {
+            // Handle structure from database (has a 'scores' property)
+            breakdownHtml = Object.entries(breakdownData.scores).map(([category, score]) => `
+                <div class="item">
+                    <span class="item-label">${breakdownData.categoryNames[category] || category}:</span> ${score}/25
+                </div>
+            `).join('');
+        } else if (breakdownData) {
+            // Handle generic structure (e.g., { dataStorage: { score: 10, ... } })
+            const categoryNames = {
+                dataStorage: 'Data Storage & Security',
+                trainingUsage: 'Training Data Usage',
+                accessControls: 'Access Controls',
+                complianceRisk: 'Compliance Risk',
+                vendorTransparency: 'Vendor Transparency'
+            };
+            breakdownHtml = Object.entries(breakdownData).map(([category, data]) => {
+                const score = data.score || 0; // Generic breakdown items have a 'score' property
+                return `
+                    <div class="item">
+                        <span class="item-label">${categoryNames[category] || category}:</span> ${score}/25
+                    </div>
+                `;
+            }).join('');
+        }
         breakdownContainer.innerHTML = breakdownHtml;
 
         // Inject recommendations
         const recommendationsContainer = tempDiv.querySelector('#recommendations-container');
-        const recommendationsHtml = results.recommendations.slice(0, 3).map(rec => `<li>${rec}</li>`).join('');
-        recommendationsContainer.innerHTML = recommendationsHtml;
+        if (results.recommendations && Array.isArray(results.recommendations)) {
+            const recommendationsHtml = results.recommendations.slice(0, 3).map(rec => `<li>${rec}</li>`).join('');
+            recommendationsContainer.innerHTML = recommendationsHtml;
+        }
 
         // 4. Generate PDF from the populated HTML
         const { jsPDF } = window.jspdf;
