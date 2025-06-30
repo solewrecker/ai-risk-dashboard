@@ -9,9 +9,6 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Add html2canvas for capturing DOM as image -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <!-- Add jsPDF (simple backup) -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
     
@@ -3942,8 +3939,31 @@
                     // Use the actual template binding system
                     if (typeof window.TemplateBindingEngine !== 'undefined') {
                         const engine = new window.TemplateBindingEngine();
-                        // This now calls our new high-quality PDF export function
-                        await engine.exportPDFReport(assessmentData);
+                        const html = await engine.generateHTMLReport(assessmentData);
+                        
+                        // Create new window with report
+                        const printWindow = window.open('', '_blank', 'width=800,height=600');
+                        printWindow.document.write(html);
+                        printWindow.document.close();
+                        
+                        // Add print button to the report
+                        const printButton = printWindow.document.createElement('button');
+                        printButton.textContent = '🖨️ Print PDF';
+                        printButton.className = 'no-print';
+                        printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                        printButton.onclick = () => {
+                            printWindow.focus();
+                            printWindow.print();
+                        };
+                        printWindow.document.body.appendChild(printButton);
+                        
+                        // Auto-print after load
+                        printWindow.onload = () => {
+                            setTimeout(() => {
+                                printWindow.focus();
+                                printWindow.print();
+                            }, 500);
+                        };
                         
                         return; // Success, exit here
                     } else {
