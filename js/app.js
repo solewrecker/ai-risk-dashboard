@@ -508,45 +508,51 @@ async function generateAssessmentResults(formData) {
 
 async function getToolFromDatabase(formData) {
     const { toolName, toolVersion } = formData;
-    console.log(`🔍 [DB] Searching for: ${toolName}, Version: ${toolVersion}`);
+
+    // Capitalize version: 'enterprise' -> 'Enterprise', 'free' -> 'Free'
+    const versionName = toolVersion.charAt(0).toUpperCase() + toolVersion.slice(1);
+    const fullToolName = `${toolName} ${versionName}`;
+    
+    console.log(`[DB] Attempting to find exact match for: "${fullToolName}"`);
 
     try {
         let toolData = null;
-        let error = null;
-
-        // 1. Try for an exact match on the full name first
-        const exactMatchResponse = await supabase
+        
+        // 1. Try for an exact match on the constructed full name
+        const { data: exactData, error: exactError } = await supabase
             .from('ai_tools')
             .select('*')
-            .eq('name', toolName)
+            .eq('name', fullToolName)
             .limit(1)
             .single();
 
-        if (exactMatchResponse.data) {
-            console.log(`✅ [DB] Found exact match for "${toolName}"`);
-            toolData = exactMatchResponse.data;
+        if (exactData) {
+            console.log(`✅ [DB] Found exact match: "${exactData.name}"`);
+            toolData = exactData;
         } else {
-            // 2. If no exact match, fall back to a broader search on the base name
-            console.log(`... No exact match for "${toolName}", trying broader search.`);
-            const baseToolName = toolName.split(' ')[0];
-            const broadMatchResponse = await supabase
+            // 2. Fallback: If no exact match, try a more generic search on the base name
+            console.log(`[DB] No exact match. Falling back to search for base name: "${toolName}"`);
+            
+            const { data: broadData, error: broadError } = await supabase
                 .from('ai_tools')
                 .select('*')
-                .ilike('name', `%${baseToolName}%`)
-                .order('name', { ascending: true }) // Prefer shorter names if multiple match
+                .ilike('name', `%${toolName}%`)
+                // IMPORTANT: Exclude results that contain the *other* version name
+                .not('name', 'ilike', `%${versionName === 'Free' ? 'Enterprise' : 'Free'}%`)
+                .order('name', { ascending: true }) // Get the most relevant one first
                 .limit(1)
                 .single();
-            
-            if (broadMatchResponse.data) {
-                console.log(`✅ [DB] Found broad match: "${broadMatchResponse.data.name}"`);
-                toolData = broadMatchResponse.data;
-            } else {
-                error = broadMatchResponse.error;
+
+            if (broadData) {
+                console.log(`✅ [DB] Found broad match: "${broadData.name}"`);
+                toolData = broadData;
+            } else if (broadError) {
+                console.warn(`[DB] No tool found after fallback search for "${toolName}". Error:`, broadError.message);
             }
         }
 
-        if (error && !toolData) {
-            console.warn('[DB] No tool found in database after all attempts:', error.message);
+        if (!toolData) {
+            console.warn('[DB] Could not find any matching tool in database.');
             return null;
         }
         

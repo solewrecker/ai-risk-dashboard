@@ -61,14 +61,21 @@ serve(async (req) => {
         .limit(1)
         .single());
 
-    // If no exact match is found, try a broader search (e.g., "ChatGPT" from "ChatGPT Enterprise")
+    // If no exact match is found, try a broader search on the base name
     if (dbError || !dbData) {
         console.log(`... No exact match for "${toolName}", trying a broader search.`);
-        const baseToolName = toolName.split(' ')[0]; // Simple split to get the base name
+        const parts = toolName.split(' ');
+        const version = parts.pop()?.toLowerCase(); // 'enterprise' or 'free'
+        const baseToolName = parts.join(' ');
+        
+        const oppositeVersion = version === 'free' ? 'Enterprise' : 'Free';
+
         ({ data: dbData, error: dbError } = await supabase
             .from('ai_tools')
             .select('*')
             .ilike('name', `%${baseToolName}%`)
+            .not('name', 'ilike', `%${oppositeVersion}%`)
+            .order('name', { ascending: true })
             .limit(1)
             .single());
     }
