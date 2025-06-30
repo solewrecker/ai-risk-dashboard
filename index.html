@@ -1066,6 +1066,3367 @@
         // Global state (declared first to avoid initialization errors)
         let currentStep = 1;
         let currentAssessment = null;
+
+        // Check auth state on load
+        supabase.auth.onAuthStateChange((event, session) => {
+            currentUser = session?.user || null;
+            isAdmin = session?.user?.user_metadata?.role === 'admin';
+            updateUIForAuth();
+        });
+
+        // Initialize auth UI when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUIForAuth();
+        });
+
+        function updateUIForAuth() {
+            const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
+            const loginSection = document.getElementById('loginSection');
+            
+            if (saveButton) {
+                if (isAdmin) {
+                    saveButton.style.display = 'inline-flex';
+                    saveButton.innerHTML = '💾 Save to Database (Admin)';
+                } else {
+                    saveButton.style.display = 'none';
+                }
+            }
+            
+            if (loginSection) {
+                if (currentUser) {
+                    // User is logged in - show user info and account options
+                    const userTier = currentUser.user_metadata?.tier || 'free';
+                    loginSection.innerHTML = `
+                        <div style="text-align: center; margin-bottom: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 0.5rem; border: 1px solid #bbf7d0;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                                <span style="color: #166534;">✓ ${currentUser.email}</span>
+                                <span style="background: ${userTier === 'enterprise' ? '#fbbf24' : '#94a3b8'}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                                    ${userTier}
+                                </span>
+                                ${isAdmin ? '<span style="color: #dc2626; font-weight: 600; font-size: 0.75rem;">[ADMIN]</span>' : ''}
+                            </div>
+                            <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+                                ${userTier === 'free' ? '<button onclick="showUpgradeModal()" style="padding: 0.25rem 0.75rem; background: #fbbf24; color: #92400e; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">⭐ Upgrade</button>' : ''}
+                                <button onclick="showDashboard()" style="padding: 0.25rem 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">📊 Dashboard</button>
+                                <button onclick="signOut()" style="padding: 0.25rem 0.75rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 0.25rem; color: #991b1b; cursor: pointer; font-size: 0.75rem;">Sign Out</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // User not logged in - show auth options
+                    loginSection.innerHTML = `
+                        <div id="authContainer" style="text-align: center; margin-bottom: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 1px solid #dbeafe;">
+                            <div style="margin-bottom: 1rem;">
+                                <h3 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 1rem;">🔐 Sign in to save assessments & export reports</h3>
+                                <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Create an account to save your assessments and access professional exports</p>
+                            </div>
+                            
+                            <div id="authTabs" style="margin-bottom: 1rem;">
+                                <button id="signInTab" onclick="showAuthTab('signin')" style="padding: 0.5rem 1rem; margin-right: 0.25rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer; font-weight: 600;">Sign In</button>
+                                <button id="signUpTab" onclick="showAuthTab('signup')" style="padding: 0.5rem 1rem; margin-left: 0.25rem; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer;">Sign Up</button>
+                            </div>
+                            
+                            <div id="signInForm" style="display: block;">
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="email" id="signInEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <input type="password" id="signInPassword" placeholder="Password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <button onclick="signInUser()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Sign In</button>
+                            </div>
+                            
+                            <div id="signUpForm" style="display: none;">
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="email" id="signUpEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 0.75rem;">
+                                    <input type="password" id="signUpPassword" placeholder="Create password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <select id="signUpTier" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                        <option value="free">🆓 Free Tier - Basic exports</option>
+                                        <option value="enterprise">⭐ Enterprise - $49/month</option>
+                                    </select>
+                                </div>
+                                <button onclick="signUpUser()" style="padding: 0.75rem 1.5rem; background: #10b981; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Create Account</button>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b;">
+                                Continue as guest to try the assessment tool
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function signInAdmin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Check if user has admin role
+                if (data.user?.user_metadata?.role !== 'admin') {
+                    await supabase.auth.signOut();
+                    showMessage('Access denied: Admin privileges required', 'error');
+                    return;
+                }
+                
+                showMessage('Admin login successful', 'success');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Login failed: ' + error.message, 'error');
+            }
+        }
+
+        async function signOut() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                showMessage('Signed out successfully', 'success');
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showMessage('Sign out failed: ' + error.message, 'error');
+            }
+        }
+
+        // NEW: Enhanced auth functions for regular users
+
+        function showAuthTab(tab) {
+            const signInTab = document.getElementById('signInTab');
+            const signUpTab = document.getElementById('signUpTab');
+            const signInForm = document.getElementById('signInForm');
+            const signUpForm = document.getElementById('signUpForm');
+            
+            if (tab === 'signin') {
+                signInTab.style.background = '#3b82f6';
+                signInTab.style.color = 'white';
+                signUpTab.style.background = '#f8fafc';
+                signUpTab.style.color = '#64748b';
+                signInForm.style.display = 'block';
+                signUpForm.style.display = 'none';
+            } else {
+                signUpTab.style.background = '#3b82f6';
+                signUpTab.style.color = 'white';
+                signInTab.style.background = '#f8fafc';
+                signInTab.style.color = '#64748b';
+                signUpForm.style.display = 'block';
+                signInForm.style.display = 'none';
+            }
+        }
+
+        async function signInUser() {
+            const email = document.getElementById('signInEmail').value.trim();
+            const password = document.getElementById('signInPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                showMessage('✅ Signed in successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Sign in error:', error);
+                showMessage('Sign in failed: ' + error.message, 'error');
+            }
+        }
+
+        async function signUpUser() {
+            const email = document.getElementById('signUpEmail').value.trim();
+            const password = document.getElementById('signUpPassword').value;
+            const tier = document.getElementById('signUpTier').value;
+            
+            if (!email || !password) {
+                showMessage('Please enter email and password', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                // Sign up the user
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            tier: tier
+                        }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                if (data.user) {
+                    // Create user subscription record
+                    const { error: subError } = await supabase
+                        .from('user_subscriptions')
+                        .insert([
+                            {
+                                user_id: data.user.id,
+                                tier: tier
+                            }
+                        ]);
+                    
+                    if (subError) {
+                        console.warn('Failed to create subscription record:', subError);
+                        // Don't throw - user is still created successfully
+                    }
+                    
+                    if (data.user.email_confirmed_at) {
+                        showMessage('✅ Account created successfully!', 'success');
+                    } else {
+                        showMessage('📧 Account created! Please check your email to confirm your account.', 'success');
+                    }
+                } else {
+                    showMessage('Account created! Please check your email to confirm your account.', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Sign up error:', error);
+                showMessage('Sign up failed: ' + error.message, 'error');
+            }
+        }
+
+        function showUpgradeModal() {
+            const upgradeHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">⭐ Upgrade to Enterprise</h3>
+                        <p style="color: #64748b; margin-bottom: 2rem;">
+                            Get advanced features including server-generated PDFs, custom branding, assessment history, and priority support.
+                        </p>
+                        
+                        <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border-left: 3px solid #f59e0b;">
+                            <div style="font-weight: 600; color: #92400e; margin-bottom: 0.5rem;">🚧 Coming Soon</div>
+                            <div style="font-size: 0.875rem; color: #78350f;">
+                                Payment integration is being finalized. Contact us for early access pricing.
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="this.closest('div').closest('div').remove()" style="
+                                background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Maybe Later</button>
+                            <button onclick="contactSales()" style="
+                                background: #f59e0b; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Contact Sales</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', upgradeHTML);
+        }
+
+        function contactSales() {
+            // Remove modal
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            // For now, just show a message - later integrate with contact form or payment system
+            showMessage('📧 Please email sales@yourcompany.com for enterprise pricing', 'success');
+        }
+
+        function showDashboard() {
+            // For now, show a coming soon message - later we'll create dashboard.html
+            showMessage('📊 Dashboard feature coming soon! For now, continue using the assessment tool.', 'success');
+            
+            // TODO: Later redirect to dashboard.html
+            // window.location.href = 'dashboard.html';
+        }
+
+        // Data Classification and Use Case Multipliers are defined elsewhere
+
+        // Fallback database removed - using Supabase as primary data source for consistency
+
+        // Global state variables moved to top of script
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep === 1) {
+                if (!validateStep1()) return;
+                showStep(2);
+            } else if (currentStep === 2) {
+                if (!validateStep2()) return;
+                showStep(3);
+                startAssessment();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep === 2) {
+                showStep(1);
+            }
+        }
+
+        function showStep(step) {
+            // Hide all sections
+            document.querySelectorAll('.step-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            document.getElementById(`section${step}`).classList.add('active');
+            
+            // Update progress steps
+            document.querySelectorAll('.progress-step').forEach((stepEl, index) => {
+                stepEl.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    stepEl.classList.add('completed');
+                } else if (index + 1 === step) {
+                    stepEl.classList.add('active');
+                }
+            });
+            
+            currentStep = step;
+        }
+
+        // Validation
+        function validateStep1() {
+            const toolName = document.getElementById('toolName').value.trim();
+            if (!toolName) {
+                showMessage('Please enter a tool name', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep2() {
+            const dataClassification = document.querySelector('input[name="dataClassification"]:checked');
+            if (!dataClassification) {
+                showMessage('Please select a data classification', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        // Radio button selection styling
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'dataClassification') {
+                document.querySelectorAll('.classification-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                e.target.closest('.classification-option').classList.add('selected');
+            }
+        });
+
+        // Assessment process
+        async function startAssessment() {
+            const formData = {
+                toolName: document.getElementById('toolName').value.trim(),
+                toolVersion: document.getElementById('toolVersion').value,
+                toolCategory: document.getElementById('toolCategory').value,
+                toolUrl: document.getElementById('toolUrl').value.trim(),
+                useCase: document.getElementById('useCase').value,
+                additionalContext: document.getElementById('additionalContext').value.trim(),
+                dataClassification: document.querySelector('input[name="dataClassification"]:checked').value
+            };
+
+            // Note: All assessments are now free - paywall moved to export stage for better conversion
+
+            showStep(3);
+
+            try {
+                // Simulate analysis steps
+                await simulateAnalysisSteps();
+                
+                // Generate assessment results
+                const results = await generateAssessmentResults(formData);
+                currentAssessment = { formData, results };
+                
+                // Show results
+                displayResults(results);
+                showStep(4);
+                
+            } catch (error) {
+                console.error('Assessment error:', error);
+                showMessage('Assessment failed: ' + error.message, 'error');
+                showStep(2);
+            }
+        }
+
+        async function simulateAnalysisSteps() {
+            const steps = [
+                'Analyzing data storage policies...',
+                'Checking training data usage...',
+                'Evaluating access controls...',
+                'Assessing compliance requirements...',
+                'Reviewing vendor transparency...',
+                'Calculating risk score...',
+                'Generating recommendations...'
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                document.getElementById('analysisStatus').textContent = steps[i];
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+        }
+
+        async function generateAssessmentResults(formData) {
+            console.log('🚀 Starting assessment generation for:', formData.toolName);
+            
+            try {
+                // Try to get tool from database first
+                const baseScoreResult = await getToolFromDatabase(formData);
+                const baseScore = baseScoreResult.score;
+                const source = baseScoreResult.source;
+                
+                console.log('📊 Base score retrieved:', baseScore, 'from', source);
+                
+                const adjustedScore = applyMultipliers(baseScore, formData);
+                
+                // Debug logging
+                console.log('=== TARGETED MULTIPLIER DEBUG ===');
+                console.log('Tool:', formData.toolName, formData.toolVersion);
+                console.log('Base Score:', baseScore, 'Source:', source);
+                console.log('Data Classification:', formData.dataClassification, 'Multiplier:', DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification]);
+                console.log('Use Case:', formData.useCase, 'Multiplier:', USE_CASE_MULTIPLIERS[formData.useCase]);
+                
+                // Show which sections are affected
+                const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
+                const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
+                console.log('🎯 Sections affected by Data Classification multiplier:', 'Data Storage & Compliance Risk');
+                console.log('🎯 Sections affected by Use Case multiplier:', 'Compliance Risk & Access Controls');
+                console.log('📊 Final Score:', Math.min(100, Math.round(adjustedScore)));
+                console.log('==========================================');
+                
+                // Store tool data for breakdown generation
+                window.lastToolData = baseScoreResult;
+                
+                            const riskLevel = getRiskLevel(adjustedScore);
+            
+            console.log('📋 Generating breakdown...');
+            const breakdown = await generateBreakdown(formData);
+            console.log('✅ Breakdown complete');
+            console.log('🔍 Breakdown structure:', breakdown);
+                
+                const recommendations = generateRecommendations(adjustedScore, formData);
+                console.log('✅ Assessment complete');
+                
+                return {
+                    toolName: formData.toolName,
+                    baseScore: baseScore,
+                    finalScore: Math.min(100, Math.round(adjustedScore)),
+                    riskLevel: riskLevel,
+                    breakdown: breakdown,
+                    recommendations: recommendations,
+                    timestamp: new Date().toISOString(),
+                    source: source,
+                    enhancedInfo: window.currentEnhancedInfo || null
+                };
+            } catch (error) {
+                console.error('❌ Error in assessment generation:', error);
+                throw error; // Re-throw so the calling function can handle it
+            }
+        }
+
+        async function getToolFromDatabase(formData) {
+            // Try Supabase directly (fallback database removed for consistency)
+            console.log('🔍 Querying Supabase for tool data...');
+            try {
+                // Build search term based on tool name and version
+                const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
+                
+                console.log('Searching Supabase for:', searchTerms);
+                
+                // Try each search term until we find a match
+                for (const searchTerm of searchTerms) {
+                    console.log(`🔍 Trying Supabase search term: "${searchTerm}"`);
+                    
+                    // Search for exact version match first
+                    const { data, error } = await supabase
+                        .from('ai_tools')
+                        .select('name, total_score, detailed_assessment, breakdown, details, risk_level, compliance_score, data_storage_score, training_usage_score, access_controls_score, vendor_transparency_score')
+                        .ilike('name', `%${searchTerm}%`)
+                        .order('name', { ascending: true })
+                        .limit(5); // Get more results to find best version match
+                    
+                    if (error) {
+                        console.warn('Supabase query error (likely CORS):', error.message);
+                        continue;
+                    }
+                    
+                    if (data && data.length > 0) {
+                        console.log(`🔍 Found ${data.length} matches:`, data.map(t => `${t.name} (${t.total_score})`));
+                        
+                        // Find the best match for the requested version with enhanced priority
+                        let bestMatch = data[0]; // Default to first
+                        let exactMatch = null;
+                        let versionMatch = null;
+                        
+                        const requestedVersion = formData.toolVersion.toLowerCase();
+                        console.log(`🎯 Looking for ${requestedVersion} version among:`, data.map(t => t.name));
+                        
+                        for (const tool of data) {
+                            const toolNameLower = tool.name.toLowerCase();
+                            
+                            // PRIORITY 1: Exact version match (Claude.ai Enterprise)
+                            if (requestedVersion === 'enterprise' && toolNameLower.includes('enterprise')) {
+                                exactMatch = tool;
+                                console.log(`🎯 EXACT ENTERPRISE MATCH: ${tool.name} (score: ${tool.total_score})`);
+                                break; // Stop searching, we found the perfect match
+                            } else if (requestedVersion === 'free' && toolNameLower.includes('free')) {
+                                exactMatch = tool;
+                                console.log(`🎯 EXACT FREE MATCH: ${tool.name} (score: ${tool.total_score})`);
+                                break;
+                            }
+                            
+                            // PRIORITY 2: Version-aware match (avoid wrong versions)
+                            if (requestedVersion === 'enterprise' && !toolNameLower.includes('free')) {
+                                if (!versionMatch) versionMatch = tool;
+                            } else if (requestedVersion === 'free' && !toolNameLower.includes('enterprise')) {
+                                if (!versionMatch) versionMatch = tool;
+                            }
+                        }
+                        
+                        // Select best match in priority order
+                        bestMatch = exactMatch || versionMatch || bestMatch;
+                        
+                        console.log(`🎯 SELECTED MATCH: ${bestMatch.name} (score: ${bestMatch.total_score})`);
+                        console.log('Detailed assessment available:', !!bestMatch.detailed_assessment);
+                        
+                        return { 
+                            score: bestMatch.total_score, 
+                            source: 'database',
+                            toolData: bestMatch,
+                            hasDetailedAssessment: !!bestMatch.detailed_assessment
+                        };
+                    }
+                }
+                
+                console.log('Tool not found in Supabase, using heuristic scoring');
+                
+            } catch (error) {
+                console.warn('Supabase lookup failed (likely CORS):', error.message);
+            }
+            
+            // Fall back to heuristic
+            return { 
+                score: generateHeuristicScore(formData), 
+                source: 'heuristic' 
+            };
+        }
+
+        // checkFallbackDatabase function removed - using Supabase directly
+
+        function buildSearchTerms(toolName, toolVersion) {
+            const cleanToolName = toolName.trim();
+            const searchTerms = [];
+            
+            const versionSuffix = toolVersion === 'enterprise' ? 'Enterprise' : 'Free';
+            
+            // Check if tool name already includes the version suffix
+            const toolNameLower = cleanToolName.toLowerCase();
+            const suffixLower = versionSuffix.toLowerCase();
+            
+            // PRIORITY 1: Try exact matches with version first  
+            if (!toolNameLower.includes(suffixLower)) {
+                // For Claude specifically, try the exact database format first
+                if (cleanToolName.toLowerCase() === 'claude') {
+                    searchTerms.push(`Claude.ai ${versionSuffix}`); // Exact: "Claude.ai Enterprise"
+                    searchTerms.push(`${cleanToolName}.ai ${versionSuffix}`); // "Claude.ai Enterprise"  
+                    searchTerms.push(`${cleanToolName} ${versionSuffix}`);    // "Claude Enterprise"
+                } else {
+                    // Try common database naming patterns for other tools
+                    searchTerms.push(`${cleanToolName}.ai ${versionSuffix}`); // "ToolName.ai Enterprise"
+                    searchTerms.push(`${cleanToolName} ${versionSuffix}`);    // "ToolName Enterprise"
+                    
+                    // Tool-specific variations
+                    if (cleanToolName.toLowerCase() === 'chatgpt') {
+                        searchTerms.push(`ChatGPT ${versionSuffix}`);
+                    } else if (cleanToolName.toLowerCase().includes('copilot')) {
+                        searchTerms.push(`GitHub Copilot ${versionSuffix}`);
+                        searchTerms.push(`Microsoft Copilot ${versionSuffix}`);
+                    }
+                }
+            }
+            
+            // PRIORITY 2: Try exact name as entered (only if no version-specific matches)
+            searchTerms.push(cleanToolName);
+            
+            console.log(`🔍 Built search terms for "${toolName}" (${toolVersion}):`, searchTerms);
+            
+            return searchTerms;
+        }
+
+        function generateHeuristicScore(formData) {
+            // Fallback scoring for unknown tools
+            let score = 60; // Higher default for unknown tools (more conservative)
+            
+            const toolName = formData.toolName.toLowerCase();
+            
+            // Adjust based on version
+            if (formData.toolVersion === 'enterprise') {
+                score -= 15; // Enterprise typically safer
+            }
+            
+            // Category adjustments
+            if (formData.toolCategory === 'conversational-ai') {
+                score += 15; // Conversational AI tends to be higher risk
+            } else if (formData.toolCategory === 'code-assistant') {
+                score += 5;
+            } else if (formData.toolCategory === 'productivity') {
+                score += 10;
+            }
+            
+            return Math.min(100, Math.max(20, score)); // Keep between 20-100
+        }
+
+        function applyMultipliers(baseScore, formData) {
+            // Break down the base score into components proportionally
+            // Based on framework: Data Storage(25), Training(25), Access(20), Compliance(20), Vendor(10)
+            const scoreBreakdown = {
+                dataStorage: Math.round(baseScore * 0.25), // 25% of total
+                trainingUsage: Math.round(baseScore * 0.25), // 25% of total
+                accessControls: Math.round(baseScore * 0.20), // 20% of total
+                complianceRisk: Math.round(baseScore * 0.20), // 20% of total
+                vendorTransparency: Math.round(baseScore * 0.10) // 10% of total
+            };
+            
+            // Apply targeted data classification multipliers
+            const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
+            scoreBreakdown.dataStorage *= dataMultiplier; // Data storage most affected by data type
+            scoreBreakdown.complianceRisk *= dataMultiplier; // Compliance risk varies by data type
+            
+            // Apply targeted use case multipliers  
+            const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
+            scoreBreakdown.complianceRisk *= useCaseMultiplier; // Legal use cases need higher compliance
+            scoreBreakdown.accessControls *= useCaseMultiplier; // Sensitive use cases need better controls
+            
+            // Round the final component scores
+            scoreBreakdown.dataStorage = Math.round(scoreBreakdown.dataStorage);
+            scoreBreakdown.trainingUsage = Math.round(scoreBreakdown.trainingUsage);
+            scoreBreakdown.accessControls = Math.round(scoreBreakdown.accessControls);
+            scoreBreakdown.complianceRisk = Math.round(scoreBreakdown.complianceRisk);
+            scoreBreakdown.vendorTransparency = Math.round(scoreBreakdown.vendorTransparency);
+            
+            // Store breakdown for use in results display
+            window.currentScoreBreakdown = scoreBreakdown;
+            
+            // Recalculate total score from adjusted components
+            const adjustedScore = scoreBreakdown.dataStorage + 
+                                scoreBreakdown.trainingUsage + 
+                                scoreBreakdown.accessControls + 
+                                scoreBreakdown.complianceRisk + 
+                                scoreBreakdown.vendorTransparency;
+            
+            return adjustedScore;
+        }
+
+        function getRiskLevel(score) {
+            if (score >= 80) return 'critical';
+            if (score >= 60) return 'high';
+            if (score >= 35) return 'medium';
+            return 'low';
+        }
+
+        function getUseCaseLabel(useCase) {
+            const useCaseLabels = {
+                'legal-compliance': 'Legal/Compliance/Audit',
+                'finance-accounting': 'Finance/Accounting',
+                'hr-executive': 'HR/Executive Communications',
+                'customer-support': 'Customer Data/Support',
+                'development': 'Internal IT/Development',
+                'marketing': 'Marketing/Public Content',
+                'research': 'Research & Analysis',
+                'general': 'General Business Use'
+            };
+            return useCaseLabels[useCase] || useCase;
+        }
+
+        async function generateBreakdown(formData) {
+            console.log('🔍 Starting breakdown generation...');
+            
+            // Check if we have detailed assessment data from previous query
+            if (window.lastToolData && window.lastToolData.hasDetailedAssessment) {
+                console.log('✅ Using detailed assessment from cache');
+                return generateDetailedBreakdown(window.lastToolData.toolData, formData);
+            }
+            
+            // Try to get detailed breakdown from database with timeout
+            try {
+                console.log('🔍 Attempting database lookup for breakdown...');
+                const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
+                
+                // Add timeout to prevent hanging
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Database query timeout')), 5000)
+                );
+                
+                for (const searchTerm of searchTerms) {
+                    const queryPromise = supabase
+                        .from('ai_tools')
+                        .select('breakdown, details, detailed_assessment')
+                        .ilike('name', `%${searchTerm}%`)
+                        .limit(1);
+                    
+                    try {
+                        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+                        
+                        if (error) {
+                            console.warn('Supabase breakdown query error:', error.message);
+                            continue;
+                        }
+                        
+                        if (data && data.length > 0) {
+                            console.log('✅ Found breakdown data in database');
+                            console.log('📊 Raw database data:', data[0]);
+                            // Prefer detailed assessment if available
+                            if (data[0].detailed_assessment) {
+                                console.log('🎯 Using detailed assessment');
+                                return generateDetailedBreakdown(data[0], formData);
+                            }
+                            // Fall back to simple breakdown
+                            if (data[0].breakdown) {
+                                console.log('📋 Using simple breakdown:', data[0].breakdown);
+                                return convertDatabaseBreakdown(data[0].breakdown, formData);
+                            }
+                        }
+                    } catch (timeoutError) {
+                        console.warn('Database query timed out, using fallback');
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not fetch breakdown from database:', error);
+            }
+            
+            // Fallback to generic breakdown
+            console.log('📊 Using generic breakdown fallback');
+            return generateGenericBreakdown(formData);
+        }
+
+        function convertDatabaseBreakdown(breakdown, formData) {
+            // Convert database breakdown format to display format
+            if (!breakdown || !breakdown.scores) {
+                console.warn('Invalid breakdown structure:', breakdown);
+                return generateGenericBreakdown(formData);
+            }
+            
+            const scores = breakdown.scores;
+            const isEnterprise = formData.toolVersion === 'enterprise';
+            
+            return {
+                'Data Storage & Security': {
+                    score: `${scores.dataStorage || 0}/25`,
+                    description: isEnterprise ? 'Better data residency controls and encryption' : 'Limited visibility into data storage practices'
+                },
+                'Training Data Usage': {
+                    score: `${scores.trainingUsage || 0}/25`,
+                    description: isEnterprise ? 'Typically offers training opt-out options' : 'High risk - data may be used for model training'
+                },
+                'Access Controls': {
+                    score: `${scores.accessControls || 0}/20`,
+                    description: isEnterprise ? 'Enhanced admin controls and user management' : 'Limited enterprise admin controls available'
+                },
+                'Compliance Risk': {
+                    score: `${scores.complianceRisk || 0}/20`,
+                    description: isEnterprise ? 'Better compliance frameworks and certifications' : 'Potential regulatory compliance gaps'
+                },
+                'Vendor Transparency': {
+                    score: `${scores.vendorTransparency || 0}/10`,
+                    description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices'
+                }
+            };
+        }
+
+        function generateDetailedBreakdown(toolData, formData) {
+            // Generate Pro-level detailed breakdown from database assessment
+            const detailed = toolData.detailed_assessment;
+            
+            if (!detailed || !detailed.categories) {
+                // Fall back to simple breakdown if detailed data is malformed
+                return generateGenericBreakdown(formData);
+            }
+            
+            const breakdown = {};
+            const categoryMapping = {
+                'dataStorage': 'Data Storage & Security',
+                'trainingUsage': 'Training Data Usage', 
+                'accessControls': 'Access Controls',
+                'complianceRisk': 'Compliance Risk',
+                'vendorTransparency': 'Vendor Transparency'
+            };
+            
+            // Build detailed breakdown with justifications
+            Object.keys(categoryMapping).forEach(key => {
+                const category = detailed.categories[key];
+                const displayName = categoryMapping[key];
+                
+                if (category) {
+                    breakdown[displayName] = {
+                        score: `${category.total_score}/${category.max_score}`,
+                        description: category.description || 'Detailed assessment available',
+                        subcategories: category.subcategories || {},
+                        isDetailed: true // Flag for enhanced display
+                    };
+                } else {
+                    // Fallback for missing categories
+                    breakdown[displayName] = {
+                        score: 'N/A',
+                        description: 'Assessment data not available',
+                        isDetailed: false
+                    };
+                }
+            });
+            
+            // Store enhanced info for additional sections
+            window.currentEnhancedInfo = {
+                keyStrengths: detailed.keyStrengths || [],
+                areasForMonitoring: detailed.areasForMonitoring || [],
+                recommendations: detailed.recommendations || [],
+                executiveSummary: detailed.executiveSummary || null
+            };
+            
+            console.log('📋 Generated detailed breakdown for Pro user');
+            return breakdown;
+        }
+
+        function generateGenericBreakdown(formData) {
+            // Use the actual calculated component scores if available
+            if (window.currentScoreBreakdown) {
+                const breakdown = window.currentScoreBreakdown;
+                const isEnterprise = formData.toolVersion === 'enterprise';
+                
+                return {
+                    'Data Storage & Security': { 
+                        score: `${breakdown.dataStorage}/25`, 
+                        description: isEnterprise ? 'Better data residency controls and encryption' : 'Limited visibility into data storage practices' 
+                    },
+                    'Training Data Usage': { 
+                        score: `${breakdown.trainingUsage}/25`, 
+                        description: isEnterprise ? 'Typically offers training opt-out options' : 'High risk - data may be used for model training' 
+                    },
+                    'Access Controls': { 
+                        score: `${breakdown.accessControls}/20`, 
+                        description: isEnterprise ? 'Enhanced admin controls and user management' : 'Limited enterprise admin controls available' 
+                    },
+                    'Compliance Risk': { 
+                        score: `${breakdown.complianceRisk}/20`, 
+                        description: isEnterprise ? 'Better compliance frameworks and certifications' : 'Potential regulatory compliance gaps' 
+                    },
+                    'Vendor Transparency': { 
+                        score: `${breakdown.vendorTransparency}/10`, 
+                        description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices' 
+                    }
+                };
+            }
+            
+            // Fallback for when no breakdown is available
+            const isEnterprise = formData.toolVersion === 'enterprise';
+            return {
+                'Data Storage & Security': { 
+                    score: isEnterprise ? '12/25' : '18/25', 
+                    description: isEnterprise ? 'Better data residency controls and encryption' : 'Limited visibility into data storage practices' 
+                },
+                'Training Data Usage': { 
+                    score: isEnterprise ? '8/25' : '20/25', 
+                    description: isEnterprise ? 'Typically offers training opt-out options' : 'High risk - data may be used for model training' 
+                },
+                'Access Controls': { 
+                    score: isEnterprise ? '10/20' : '18/20', 
+                    description: isEnterprise ? 'Enhanced admin controls and user management' : 'Limited enterprise admin controls available' 
+                },
+                'Compliance Risk': { 
+                    score: isEnterprise ? '8/20' : '15/20', 
+                    description: isEnterprise ? 'Better compliance frameworks and certifications' : 'Potential regulatory compliance gaps' 
+                },
+                'Vendor Transparency': { 
+                    score: isEnterprise ? '2/10' : '5/10', 
+                    description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices' 
+                }
+            };
+        }
+
+        // OLD: Legacy enterprise assessment paywall (now deprecated)
+        async function showLegacyEnterprisePaywall() {
+            return new Promise((resolve) => {
+                const paywallHTML = `
+                    <div style="
+                        position: fixed; 
+                        top: 0; left: 0; 
+                        width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        z-index: 1000;
+                    ">
+                        <div style="
+                            background: white; 
+                            padding: 2rem; 
+                            border-radius: 1rem; 
+                            max-width: 500px; 
+                            text-align: center;
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        ">
+                            <h3 style="color: #1e293b; margin-bottom: 1rem;">🔒 Enterprise Assessment</h3>
+                            <p style="color: #64748b; margin-bottom: 2rem;">
+                                Enterprise assessments provide detailed category-by-category analysis using 
+                                objective security criteria with comprehensive justifications.
+                            </p>
+                            <div style="
+                                background: #f8fafc; 
+                                padding: 1rem; 
+                                border-radius: 0.5rem; 
+                                margin-bottom: 2rem;
+                                border-left: 4px solid #3b82f6;
+                            ">
+                                <p style="font-weight: 600; color: #1e293b;">📊 Pro Assessment Features</p>
+                                <p style="font-size: 0.875rem; color: #64748b;">
+                                    • <strong>Detailed Component Scoring:</strong> Individual scores for each security category with evidence<br>
+                                    • <strong>Objective Criteria Analysis:</strong> Measurable standards vs. subjective assessments<br>
+                                    • <strong>Compliance Justifications:</strong> Specific reasoning for each risk factor<br>
+                                    • <strong>Subcategory Breakdowns:</strong> Geographic, encryption, retention analysis<br>
+                                    • <strong>Audit-Ready Reports:</strong> Defensible documentation for enterprise decisions
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="paywallContinue" style="
+                                    background: #3b82f6; 
+                                    color: white; 
+                                    border: none; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Continue Free Assessment</button>
+                                <button id="paywallCancel" style="
+                                    background: #f8fafc; 
+                                    color: #475569; 
+                                    border: 1px solid #e2e8f0; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', paywallHTML);
+                
+                document.getElementById('paywallContinue').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    resolve(true);
+                };
+                
+                document.getElementById('paywallCancel').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    resolve(false);
+                };
+            });
+        }
+
+        function generateRecommendations(score, formData) {
+            const riskLevel = getRiskLevel(score);
+            const dataType = formData.dataClassification;
+            
+            let recommendations = [];
+            
+            if (riskLevel === 'critical') {
+                recommendations.push('🚫 IMMEDIATE ACTION REQUIRED: This tool should not be used with the selected data type');
+                recommendations.push('🔒 Consider enterprise alternatives with stronger security controls');
+            } else if (riskLevel === 'high') {
+                recommendations.push('⚠️ Significant security controls required before deployment');
+                recommendations.push('📋 Implement data loss prevention (DLP) policies');
+            }
+            
+            if (dataType === 'phi') {
+                recommendations.push('🏥 HIPAA compliance verification required');
+                recommendations.push('📄 Business Associate Agreement (BAA) must be signed');
+            } else if (dataType === 'financial') {
+                recommendations.push('💳 PCI-DSS compliance verification required');
+                recommendations.push('📊 SOX controls implementation needed');
+            }
+            
+            return recommendations;
+        }
+
+        function displayResults(results) {
+            const riskLevel = results.riskLevel;
+            const riskLabels = {
+                'critical': 'CRITICAL RISK',
+                'high': 'HIGH RISK',
+                'medium': 'MEDIUM RISK',
+                'low': 'LOW RISK'
+            };
+            
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required - critical security risks identified',
+                'high': 'Significant controls needed before use - high security risks',
+                'medium': 'Standard enterprise controls required - moderate security risks',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+
+            // Get ACTUAL tool data from currentAssessment to ensure accuracy
+            let actualToolName = currentAssessment.selectedTool?.name || results.toolName;
+            
+            // Add version info for proper display (ChatGPT Free, Claude Enterprise, etc.)
+            if (currentAssessment.formData.toolVersion && actualToolName) {
+                const versionLabels = {
+                    'free': 'Free',
+                    'enterprise': 'Enterprise'
+                };
+                const versionLabel = versionLabels[currentAssessment.formData.toolVersion];
+                if (versionLabel && !actualToolName.toLowerCase().includes(versionLabel.toLowerCase())) {
+                    actualToolName = `${actualToolName} ${versionLabel}`;
+                }
+            }
+            
+            const actualToolCategory = currentAssessment.selectedTool?.category || currentAssessment.formData.toolCategory;
+            
+            console.log('🎯 [RESULTS] Using actual tool data:', {
+                toolName: actualToolName,
+                category: actualToolCategory,
+                selectedTool: currentAssessment.selectedTool,
+                toolVersion: currentAssessment.formData.toolVersion
+            });
+
+            // Get data classification display names  
+            const dataClassificationLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Finance/Accounting',
+                'trade-secrets': 'Trade Secrets/IP',
+                'pii': 'Personal Information',
+                'public': 'Public Data'
+            };
+            
+            const dataClassificationLabel = dataClassificationLabels[currentAssessment.formData.dataClassification] || 'Unknown Data Type';
+            
+            // Get data classification color for badge
+            const dataClassificationColors = {
+                'phi': '#dc2626', // Red for PHI (highest risk)
+                'financial': '#ea580c', // Orange for Financial
+                'trade-secrets': '#ca8a04', // Yellow for Trade Secrets
+                'pii': '#3b82f6', // Blue for PII
+                'public': '#16a34a' // Green for Public (lowest risk)
+            };
+            
+            const dataClassificationColor = dataClassificationColors[currentAssessment.formData.dataClassification] || '#64748b';
+
+            // DEBUG: Check breakdown structure and calculate risk components properly
+            console.log('🔍 [BREAKDOWN DEBUG] Results breakdown:', results.breakdown);
+            console.log('🔍 [BREAKDOWN DEBUG] Window score breakdown:', window.currentScoreBreakdown);
+            
+            // Use actual calculated scores from currentScoreBreakdown for risk components
+            let totalComponents = 0;
+            let highRiskComponents = 0;
+            let complianceScore = 0;
+            
+            if (window.currentScoreBreakdown) {
+                const componentScores = window.currentScoreBreakdown;
+                totalComponents = Object.keys(componentScores).length;
+                highRiskComponents = Object.values(componentScores).filter(score => score > 8).length;
+                complianceScore = componentScores.complianceRisk || 0;
+                
+                console.log('🎯 [RISK COMPONENTS] Using actual scores:', {
+                    componentScores,
+                    totalComponents,
+                    highRiskComponents,
+                    complianceScore
+                });
+            } else {
+                // Fallback to results.breakdown if available
+                totalComponents = Object.keys(results.breakdown).length;
+                highRiskComponents = Object.values(results.breakdown).filter(comp => comp.score > 8).length;
+                
+                console.log('⚠️ [RISK COMPONENTS] Using fallback breakdown:', {
+                    totalComponents,
+                    highRiskComponents
+                });
+            }
+            
+            const resultsHTML = `
+                <div class="modern-results-container">
+                    <!-- Header Section -->
+                    <div class="results-header">
+                        <div class="tool-title-section">
+                            <h2 class="tool-name">${actualToolName}</h2>
+                            <div class="classification-badges">
+                                <span class="classification-badge" style="background: ${dataClassificationColor};">
+                                    🔒 ${dataClassificationLabel}
+                                </span>
+                                ${currentAssessment.formData.useCase ? `
+                                <span class="use-case-badge">
+                                    📋 ${getUseCaseLabel(currentAssessment.formData.useCase)}
+                                </span>
+                                ` : ''}
+                            </div>
+                            <p class="results-subtitle">Risk Assessment Results</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Score Card -->
+                    <div class="main-score-card risk-${riskLevel}">
+                        <div class="score-section">
+                            <div class="score-number">${results.finalScore}</div>
+                            <div class="score-label">${riskLabels[riskLevel]}</div>
+                        </div>
+                        <div class="score-description">
+                            <p>${riskDescriptions[riskLevel]}</p>
+                            ${results.source === 'database' ? 
+                                '<div class="data-source verified">✓ Verified Assessment Data</div>' : 
+                                '<div class="data-source estimated">⚠ Estimated Assessment</div>'
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Summary Insights -->
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-icon">📊</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Overall Security Score</div>
+                                <div class="insight-value">${results.finalScore}/100</div>
+                                <div class="insight-description">General security assessment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">✅</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Compliance Status</div>
+                                <div class="insight-value">${complianceScore < 10 ? '✓ Compliant' : '⚠ Needs Review'}</div>
+                                <div class="insight-description">Meets basic requirements</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">🎯</div>
+                            <div class="insight-content">
+                                <div class="insight-title">Risk Components</div>
+                                <div class="insight-value">${totalComponents - highRiskComponents}/${totalComponents} OK</div>
+                                <div class="insight-description">${highRiskComponents > 0 ? `${highRiskComponents} areas need attention` : 'All areas acceptable'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Recommendations -->
+                    ${results.recommendations.length > 0 ? `
+                        <div class="recommendations-section">
+                            <h3>📋 Key Recommendations</h3>
+                            <div class="recommendations-list">
+                                ${results.recommendations.slice(0, 3).map(rec => `
+                                    <div class="recommendation-item">
+                                        <div class="rec-bullet">•</div>
+                                        <div class="rec-text">${rec}</div>
+                                    </div>
+                                `).join('')}
+                                ${results.recommendations.length > 3 ? `
+                                    <div class="recommendation-item more-available">
+                                        <div class="rec-bullet">+</div>
+                                        <div class="rec-text">${results.recommendations.length - 3} more recommendations available in detailed export</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('resultsContent').innerHTML = resultsHTML;
+        }
+
+        function generateSubcategoryDisplay(subcategories) {
+            if (!subcategories || Object.keys(subcategories).length === 0) {
+                return '';
+            }
+            
+            const subcategoryHTML = Object.entries(subcategories).map(([subKey, subData]) => {
+                if (subData && subData.justification) {
+                    return `
+                        <div style="
+                            margin-top: 0.75rem; 
+                            padding: 0.5rem; 
+                            background: #f8fafc; 
+                            border-radius: 0.375rem; 
+                            border-left: 3px solid #3b82f6;
+                            font-size: 0.875rem;
+                        ">
+                            <div style="font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">
+                                ${subKey.charAt(0).toUpperCase() + subKey.slice(1)} (${subData.score} pts)
+                            </div>
+                            <div style="color: #64748b;">
+                                ${subData.justification}
+                            </div>
+                        </div>
+                    `;
+                }
+                return '';
+            }).join('');
+            
+            return subcategoryHTML;
+        }
+
+        function generateEnhancedSections(enhancedInfo) {
+            if (!enhancedInfo) return '';
+
+            let sectionsHTML = '';
+
+            // Key Strengths
+            if (enhancedInfo.keyStrengths && enhancedInfo.keyStrengths.length > 0) {
+                sectionsHTML += `
+                    <div style="
+                        margin-top: 2rem; 
+                        padding: 1.5rem; 
+                        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); 
+                        border-radius: 0.75rem; 
+                        border-left: 4px solid #10b981;
+                    ">
+                        <h4 style="color: #065f46; margin-bottom: 1rem; font-weight: 600;">✅ Key Strengths</h4>
+                        <ul style="margin: 0; padding-left: 1.25rem; color: #064e3b;">
+                            ${enhancedInfo.keyStrengths.map(strength => `<li style="margin-bottom: 0.5rem;">${strength}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Areas for Monitoring
+            if (enhancedInfo.areasForMonitoring && enhancedInfo.areasForMonitoring.length > 0) {
+                sectionsHTML += `
+                    <div style="
+                        margin-top: 1.5rem; 
+                        padding: 1.5rem; 
+                        background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); 
+                        border-radius: 0.75rem; 
+                        border-left: 4px solid #f59e0b;
+                    ">
+                        <h4 style="color: #92400e; margin-bottom: 1rem; font-weight: 600;">⚠️ Areas for Monitoring</h4>
+                        <ul style="margin: 0; padding-left: 1.25rem; color: #78350f;">
+                            ${enhancedInfo.areasForMonitoring.map(area => `<li style="margin-bottom: 0.5rem;">${area}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Implementation Recommendations
+            if (enhancedInfo.recommendations && enhancedInfo.recommendations.length > 0) {
+                sectionsHTML += `
+                    <div style="
+                        margin-top: 1.5rem; 
+                        padding: 1.5rem; 
+                        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+                        border-radius: 0.75rem; 
+                        border-left: 4px solid #3b82f6;
+                    ">
+                        <h4 style="color: #1e40af; margin-bottom: 1rem; font-weight: 600;">🎯 Implementation Recommendations</h4>
+                        <ul style="margin: 0; padding-left: 1.25rem; color: #1e3a8a;">
+                            ${enhancedInfo.recommendations.map(rec => `<li style="margin-bottom: 0.5rem;">${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Executive Summary
+            if (enhancedInfo.executiveSummary) {
+                sectionsHTML += `
+                    <div style="
+                        margin-top: 1.5rem; 
+                        padding: 1.5rem; 
+                        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+                        border-radius: 0.75rem; 
+                        border-left: 4px solid #64748b;
+                    ">
+                        <h4 style="color: #334155; margin-bottom: 1rem; font-weight: 600;">📋 Executive Summary</h4>
+                        <p style="margin: 0; color: #475569; line-height: 1.6;">${enhancedInfo.executiveSummary}</p>
+                    </div>
+                `;
+            }
+
+            return sectionsHTML;
+        }
+
+        // Utility functions
+        function showMessage(message, type = 'info') {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message message-${type}`;
+            messageEl.textContent = message;
+            
+            const container = document.querySelector('.form-content');
+            container.insertBefore(messageEl, container.firstChild);
+            
+            setTimeout(() => messageEl.remove(), 5000);
+        }
+
+        async function saveToDatabase() {
+            // Security check: Only admins can save to database
+            if (!isAdmin) {
+                showMessage('Access denied: Admin privileges required to save assessments', 'error');
+                return;
+            }
+
+            if (!currentAssessment) {
+                showMessage('No assessment to save', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('ai_tools')
+                    .insert([{
+                        name: currentAssessment.results.toolName,
+                        total_score: currentAssessment.results.finalScore,
+                        risk_level: currentAssessment.results.riskLevel.toUpperCase() + ' RISK',
+                        category: currentAssessment.formData.toolCategory || 'Other',
+                        breakdown: currentAssessment.results.breakdown,
+                        details: {
+                            formData: currentAssessment.formData,
+                            recommendations: currentAssessment.results.recommendations
+                        },
+                        assessed_by: `Admin: ${currentUser.email}`,
+                        notes: `Data Classification: ${currentAssessment.formData.dataClassification}`,
+                        created_at: new Date().toISOString()
+                    }]);
+
+                if (error) {
+                    console.error('Database error details:', error);
+                    throw error;
+                }
+                
+                showMessage('Assessment saved to database successfully!', 'success');
+            } catch (error) {
+                console.error('Save error:', error);
+                if (error.code === '42501') {
+                    showMessage('Database access denied: Please check admin permissions', 'error');
+                } else {
+                    showMessage('Failed to save to database: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // === EXPORT MENU FUNCTIONS ===
+        // Export menu visibility is tracked globally
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            const btn = document.getElementById('exportMainBtn');
+            exportMenuVisible = !exportMenuVisible;
+            
+            if (exportMenuVisible) {
+                // Smart positioning based on available space
+                positionDropdown(menu, btn);
+                menu.style.display = 'block';
+                
+                // Close menu when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeExportMenuOnClickOutside);
+                }, 10);
+            } else {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeExportMenuOnClickOutside);
+            }
+        }
+
+        function positionDropdown(menu, button) {
+            const buttonRect = button.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            const menuHeight = 240; // Approximate height of 4 options
+            
+            // Reset positioning
+            menu.style.position = 'absolute';
+            menu.style.top = 'auto';
+            menu.style.bottom = 'auto';
+            menu.style.left = '0';
+            menu.style.right = 'auto';
+            menu.style.transform = 'none';
+            
+            // Check if there's enough space below the button
+            const spaceBelow = viewportHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+            
+            if (spaceBelow >= menuHeight) {
+                // Position below button
+                menu.style.top = '100%';
+                menu.style.marginTop = '0.5rem';
+            } else if (spaceAbove >= menuHeight) {
+                // Position above button
+                menu.style.bottom = '100%';
+                menu.style.marginBottom = '0.5rem';
+            } else {
+                // Center in viewport if neither space is sufficient
+                menu.style.position = 'fixed';
+                menu.style.top = '50%';
+                menu.style.left = '50%';
+                menu.style.transform = 'translate(-50%, -50%)';
+                menu.style.zIndex = '99999';
+            }
+            
+            // Adjust horizontal position if needed
+            if (buttonRect.left + 220 > viewportWidth) {
+                menu.style.left = 'auto';
+                menu.style.right = '0';
+            }
+        }
+
+        function hideExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.style.display = 'none';
+            exportMenuVisible = false;
+            document.removeEventListener('click', closeExportMenuOnClickOutside);
+        }
+
+        function closeExportMenuOnClickOutside(event) {
+            const menu = document.getElementById('exportMenu');
+            const btn = document.getElementById('exportMainBtn');
+            
+            if (!menu.contains(event.target) && !btn.contains(event.target)) {
+                hideExportMenu();
+            }
+        }
+
+        // === EXPORT FUNCTIONS ===
+        
+        // NEW: Free Template Export (Print Current Results Page)
+        async function exportFreeTemplate() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                console.log('📄 [FREE EXPORT] Creating simple PDF from current results page');
+                
+                // Create a print-friendly version of the current results page
+                const currentResultsHTML = document.getElementById('resultsContent').innerHTML;
+                
+                // Get current form styles
+                const currentStyles = Array.from(document.styleSheets)
+                    .map(sheet => {
+                        try {
+                            return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
+                        } catch (e) {
+                            return '';
+                        }
+                    }).join('\n');
+
+                // Create a clean, print-ready HTML document
+                const printHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>AI Risk Assessment - ${currentAssessment.selectedTool?.name || currentAssessment.results.toolName}</title>
+                        <style>
+                            ${currentStyles}
+                            
+                            /* Print-specific styles */
+                            @media print {
+                                .no-print { display: none !important; }
+                                body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+                                .modern-results-container { max-width: none; margin: 0; }
+                            }
+                            
+                            /* Ensure good print layout */
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                line-height: 1.6;
+                                color: #333;
+                                margin: 2rem;
+                                background: white;
+                            }
+                            
+                            /* Add header */
+                            .print-header {
+                                text-align: center;
+                                margin-bottom: 2rem;
+                                padding-bottom: 1rem;
+                                border-bottom: 2px solid #e2e8f0;
+                            }
+                            
+                            .print-header h1 {
+                                color: #1e293b;
+                                margin: 0 0 0.5rem 0;
+                                font-size: 1.75rem;
+                            }
+                            
+                            .print-header p {
+                                color: #64748b;
+                                margin: 0;
+                                font-size: 0.9rem;
+                            }
+                            
+                            /* Add footer */
+                            .print-footer {
+                                margin-top: 3rem;
+                                padding-top: 1rem;
+                                border-top: 1px solid #e2e8f0;
+                                text-align: center;
+                                font-size: 0.8rem;
+                                color: #64748b;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="print-header">
+                            <h1>🔒 AI Tool Risk Assessment</h1>
+                            <p>Security Analysis Report • Generated ${new Date().toLocaleDateString('en-US', { 
+                                year: 'numeric', month: 'long', day: 'numeric' 
+                            })}</p>
+                        </div>
+                        
+                        ${currentResultsHTML}
+                        
+                        <div class="print-footer">
+                            <p>📄 Free Professional Report • For detailed analysis, upgrade to Enterprise</p>
+                            <p>Report ID: FREE-${Date.now()} • ${new Date().toLocaleString()}</p>
+                        </div>
+                        
+                        <!-- Print Controls -->
+                        <div class="no-print" style="
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            z-index: 1000;
+                            background: white;
+                            padding: 15px;
+                            border-radius: 10px;
+                            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                            border: 1px solid #ddd;
+                        ">
+                            <button onclick="window.print()" style="
+                                background: #3b82f6;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                margin-right: 10px;
+                                font-weight: 600;
+                                font-size: 14px;
+                            ">🖨️ Print/Save PDF</button>
+                            <button onclick="window.close()" style="
+                                background: #6b7280;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 14px;
+                            ">✕ Close</button>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                // Open in new window for printing
+                const printWindow = window.open('', '_blank', 'width=900,height=700');
+                printWindow.document.write(printHTML);
+                printWindow.document.close();
+                
+                // Auto-focus and show print dialog after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        // Don't auto-print, let user choose when to print
+                    }, 500);
+                };
+                
+                showMessage('📄 Free professional report ready for printing!', 'success');
+                
+            } catch (error) {
+                console.error('Free export error:', error);
+                showMessage('Free export failed: ' + error.message, 'error');
+            }
+        }
+
+        // NEW: Enterprise Export Access Control
+        async function handleEnterpriseExport() {
+            // Check if user is authenticated
+            if (!currentUser) {
+                showAuthRequiredModal('enterprise export');
+                return;
+            }
+            
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            
+            if (userTier === 'enterprise') {
+                // User has enterprise access - proceed directly
+                exportTemplated();
+                return;
+            }
+            
+            // Free user - show upgrade options
+            showEnterpriseExportPaywall();
+        }
+
+        function showAuthRequiredModal(featureName) {
+            const authModalHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">🔐 Sign In Required</h3>
+                        <p style="color: #64748b; margin-bottom: 2rem;">
+                            Please sign in or create an account to access ${featureName} features.
+                        </p>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="this.closest('div').closest('div').remove()" style="
+                                background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Cancel</button>
+                            <button onclick="scrollToAuth()" style="
+                                background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600;
+                            ">Sign In</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', authModalHTML);
+        }
+
+        function scrollToAuth() {
+            // Remove modal
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            // Scroll to auth section
+            const loginSection = document.getElementById('loginSection');
+            if (loginSection) {
+                loginSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Flash the auth section to draw attention
+                loginSection.style.transition = 'background-color 0.3s ease';
+                loginSection.style.backgroundColor = '#fef3c7';
+                setTimeout(() => {
+                    loginSection.style.backgroundColor = '';
+                }, 1000);
+            }
+        }
+
+        // NEW: Server-side Premium Export Functions
+        async function exportPremiumPDF() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            // Check authentication first
+            if (!currentUser) {
+                showAuthRequiredModal('premium PDF export');
+                return;
+            }
+
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            if (userTier !== 'enterprise') {
+                showEnterpriseExportPaywall();
+                return;
+            }
+
+            try {
+                showMessage('🚀 Generating premium PDF with Puppeteer...', 'info');
+                
+                // Get auth token
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Authentication required');
+                }
+                
+                console.log('🔑 DEBUG: Session check:', {
+                    hasSession: !!session,
+                    hasAccessToken: !!session?.access_token,
+                    tokenLength: session?.access_token?.length,
+                    userEmail: session?.user?.email,
+                    userTier: session?.user?.user_metadata?.tier
+                });
+                
+                const headers = {
+                    'authorization': `Bearer ${session.access_token}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
+                };
+                
+                console.log('🔑 DEBUG: Request headers:', {
+                    hasAuth: !!headers.authorization,
+                    hasApikey: !!headers.apikey,
+                    authPrefix: headers.authorization?.substring(0, 20) + '...',
+                    url: `${SUPABASE_URL}/functions/v1/premium-template`
+                });
+                
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        toolName: currentAssessment.results.toolName + 
+                            (currentAssessment.formData.toolVersion === 'enterprise' && 
+                            !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                        toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                        finalScore: currentAssessment.results.finalScore,
+                        riskLevel: currentAssessment.results.riskLevel,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        breakdown: currentAssessment.results.breakdown,
+                        formData: currentAssessment.formData,
+                        dataClassification: currentAssessment.formData.dataClassification,
+                        useCase: currentAssessment.formData.useCase,
+                        reportType: 'pdf'
+                    })
+                });
+
+                console.log('🔑 DEBUG: Response received:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('🔑 DEBUG: Error response body:', errorText);
+                    
+                    try {
+                        const error = JSON.parse(errorText);
+                        throw new Error(error.error || 'Server-side PDF generation failed');
+                    } catch (jsonError) {
+                        throw new Error(`Server error (${response.status}): ${errorText}`);
+                    }
+                }
+
+                // Get HTML content and open in new window for client-side PDF generation
+                const htmlContent = await response.text();
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+
+                showMessage('✅ Premium PDF generator opened in new window!', 'success');
+
+            } catch (error) {
+                console.error('Premium PDF error:', error);
+                showMessage('Premium PDF failed: ' + error.message, 'error');
+            }
+        }
+
+        async function exportPremiumHTML() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            // Check authentication first
+            if (!currentUser) {
+                showAuthRequiredModal('premium HTML export');
+                return;
+            }
+
+            // Check user tier
+            const userTier = currentUser.user_metadata?.tier || 'free';
+            if (userTier !== 'enterprise') {
+                showEnterpriseExportPaywall();
+                return;
+            }
+
+            try {
+                showMessage('🚀 Generating premium HTML report...', 'info');
+                
+                // Get auth token
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session?.access_token) {
+                    throw new Error('Authentication required');
+                }
+                
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
+                    method: 'POST',
+                    headers: {
+                        'authorization': `Bearer ${session.access_token}`,
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        toolName: currentAssessment.results.toolName + 
+                            (currentAssessment.formData.toolVersion === 'enterprise' && 
+                            !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                        toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                        finalScore: currentAssessment.results.finalScore,
+                        riskLevel: currentAssessment.results.riskLevel,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        breakdown: currentAssessment.results.breakdown,
+                        formData: currentAssessment.formData,
+                        dataClassification: currentAssessment.formData.dataClassification,
+                        useCase: currentAssessment.formData.useCase,
+                        reportType: 'html'
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Server-side HTML generation failed');
+                }
+
+                // Download the HTML file
+                const htmlContent = await response.text();
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentAssessment.results.toolName}-premium-assessment.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showMessage('✅ Premium HTML report generated successfully!', 'success');
+
+            } catch (error) {
+                console.error('Premium HTML error:', error);
+                showMessage('Premium HTML failed: ' + error.message, 'error');
+            }
+        }
+
+        // Enterprise Export Paywall (for free users)
+        async function showEnterpriseExportPaywall() {
+            return new Promise((resolve) => {
+                const paywallHTML = `
+                    <div style="
+                        position: fixed; 
+                        top: 0; left: 0; 
+                        width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        z-index: 1000;
+                    ">
+                        <div style="
+                            background: white; 
+                            padding: 2rem; 
+                            border-radius: 1rem; 
+                            max-width: 600px; 
+                            text-align: center;
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        ">
+                            <h3 style="color: #1e293b; margin-bottom: 1rem;">🌟 Enterprise PDF Export</h3>
+                            <p style="color: #64748b; margin-bottom: 2rem;">
+                                Get detailed, audit-ready reports with enterprise-grade analysis and compliance documentation.
+                            </p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #10b981;">
+                                    <h4 style="color: #059669; margin-bottom: 0.5rem;">✅ Free Version</h4>
+                                    <ul style="text-align: left; color: #64748b; font-size: 0.875rem; margin: 0; padding-left: 1rem;">
+                                        <li>Risk score & level</li>
+                                        <li>Category breakdown</li>
+                                        <li>Basic recommendations</li>
+                                        <li>Professional formatting</li>
+                                    </ul>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #f59e0b;">
+                                    <h4 style="color: #92400e; margin-bottom: 0.5rem;">🌟 Enterprise Version</h4>
+                                    <ul style="text-align: left; color: #92400e; font-size: 0.875rem; margin: 0; padding-left: 1rem;">
+                                        <li><strong>Detailed justifications</strong></li>
+                                        <li><strong>Compliance mapping</strong></li>
+                                        <li><strong>Sub-category analysis</strong></li>
+                                        <li><strong>Executive summary</strong></li>
+                                        <li><strong>Azure AD integration</strong></li>
+                                        <li><strong>Audit-ready format</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div style="
+                                background: #eff6ff; 
+                                padding: 1rem; 
+                                border-radius: 0.5rem; 
+                                margin-bottom: 2rem;
+                                border-left: 4px solid #3b82f6;
+                            ">
+                                <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">💼 Perfect for Enterprise Teams</p>
+                                <p style="font-size: 0.875rem; color: #1e3a8a; margin: 0;">
+                                    Detailed reports that security teams can present to executives and auditors with confidence.
+                                    Each assessment includes specific evidence and compliance justifications.
+                                </p>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="paywallUpgrade" style="
+                                    background: linear-gradient(135deg, #f59e0b, #d97706); 
+                                    color: white; 
+                                    border: none; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+                                ">🌟 Get Enterprise Export - $49/month</button>
+                                <button id="paywallFree" style="
+                                    background: #f8fafc; 
+                                    color: #475569; 
+                                    border: 1px solid #e2e8f0; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Use Free Version</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', paywallHTML);
+                
+                document.getElementById('paywallUpgrade').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    // TODO: Integrate with payment system
+                    showMessage('🚧 Payment integration coming soon! For now, contact sales@yourcompany.com', 'warning');
+                    resolve(false);
+                };
+                
+                document.getElementById('paywallFree').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    exportFreeTemplate(); // Export free version instead
+                    resolve(false);
+                };
+            });
+        }
+        
+        // Option 1: Template-based PDF (Recommended) - Updated to use new system
+        async function exportTemplated() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                // Check if template system is available
+                if (!templateManager) {
+                    console.warn('Template system not loaded, falling back to legacy method');
+                    const exporter = new EnhancedPDFExporter();
+                    await exporter.exportTemplatedPDF(currentAssessment);
+                    showMessage('📄 Generated using fallback template system', 'warning');
+                    return;
+                }
+
+                // Convert assessment data for new template system
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                
+                // Embed assessment data for template access
+                window.EMBEDDED_TOOL_INFO = {
+                    ...currentAssessment.formData,
+                    ...templateData,
+                    isFreeVersion: false,
+                    enterpriseFeatures: true,
+                    // Include final calculated scores
+                    finalScore: currentAssessment.results.finalScore,
+                    baseScore: currentAssessment.results.baseScore,
+                    componentScores: window.currentScoreBreakdown,
+                    hasCalculatedScores: true
+                };
+                
+                // Generate report using new template system (default: enterprise-report)
+                const html = templateManager.generateReport(templateData, 'enterprise-report');
+                
+                // Create new window with report
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                // Add print button and controls
+                addPrintControls(printWindow);
+                
+                // Auto-print after load
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage('🌟 Professional PDF report generated with new template system!', 'success');
+            } catch (error) {
+                console.error('Template PDF generation error:', error);
+                showMessage('Main template failed, trying fallback...', 'warning');
+                
+                // Fallback to legacy system only if main fails
+                try {
+                    const exporter = new EnhancedPDFExporter();
+                    await exporter.exportTemplatedPDF(currentAssessment);
+                    showMessage('📄 Generated using fallback template system', 'warning');
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    showMessage('All PDF generation methods failed', 'error');
+                }
+            }
+        }
+
+        // Generate complete standalone HTML with all data baked in (Option D + E)
+        async function generateStandaloneHTML(assessment) {
+            try {
+                // Load the template file
+                const templateResponse = await fetch('./templates/export-template.html');
+                if (!templateResponse.ok) {
+                    throw new Error('Failed to load export template');
+                }
+                let templateHTML = await templateResponse.text();
+                
+                // Extract assessment data
+                const toolData = {
+                    name: assessment.results.toolName,
+                    category: assessment.formData.toolCategory || 'AI Platform',
+                    total_score: assessment.results.finalScore, // Use calculated score
+                    risk_level: assessment.results.riskLevel.toLowerCase(),
+                    // Use calculated component scores
+                    data_storage_score: window.currentScoreBreakdown?.dataStorage || 0,
+                    training_usage_score: window.currentScoreBreakdown?.trainingUsage || 0,
+                    access_controls_score: window.currentScoreBreakdown?.accessControls || 0,
+                    compliance_score: window.currentScoreBreakdown?.complianceRisk || 0,
+                    vendor_transparency_score: window.currentScoreBreakdown?.vendorTransparency || 0,
+                    breakdown: assessment.results.breakdown || {}
+                };
+                
+                console.log('🏗️ [STANDALONE HTML] Using pre-calculated data:', toolData);
+                
+                // Replace the JavaScript section with pre-populated data and essential functions
+                const standaloneScript = `
+                <script>
+                    // Pre-calculated assessment data (no database queries needed)
+                    const PRECALCULATED_TOOL_DATA = ${JSON.stringify(toolData, null, 8)};
+                    
+                    console.log('✅ [STANDALONE] Using pre-calculated assessment data:', PRECALCULATED_TOOL_DATA);
+                    
+                    // Essential helper functions (copied from template)
+                    function calculateRiskLevel(score, maxScore = 25) {
+                        if (!score || score === 0) return 'LOW';
+                        const percentage = (score / maxScore) * 100;
+                        if (percentage >= 80) return 'HIGH';
+                        if (percentage >= 60) return 'MEDIUM';
+                        return 'LOW';
+                    }
+                    
+                    function getRiskLevelClass(riskLevel) {
+                        switch(riskLevel.toLowerCase()) {
+                            case 'high': return 'high';
+                            case 'medium': return 'medium';
+                            case 'low': return 'low';
+                            default: return 'low';
+                        }
+                    }
+                    
+                    function getRiskLevelFromScore(score) {
+                        if (score >= 80) return 'CRITICAL';
+                        if (score >= 60) return 'HIGH';
+                        if (score >= 35) return 'MEDIUM';
+                        return 'LOW';
+                    }
+                    
+                    function generateToolIcon(toolName) {
+                        if (toolName.toLowerCase().includes('chatgpt')) return 'GPT';
+                        if (toolName.toLowerCase().includes('claude')) return 'CLD';
+                        if (toolName.toLowerCase().includes('copilot')) return 'CP';
+                        if (toolName.toLowerCase().includes('gemini')) return 'GEM';
+                        return 'AI';
+                    }
+                    
+                    function extractVendor(toolName) {
+                        if (toolName.toLowerCase().includes('chatgpt')) return 'OpenAI';
+                        if (toolName.toLowerCase().includes('claude')) return 'Anthropic';
+                        if (toolName.toLowerCase().includes('copilot')) return 'Microsoft/GitHub';
+                        if (toolName.toLowerCase().includes('gemini')) return 'Google';
+                        return 'Unknown Vendor';
+                    }
+                    
+                    function getRiskDescription(riskLevel, score) {
+                        switch(riskLevel) {
+                            case 'CRITICAL':
+                                return 'Immediate blocking required - critical security risks identified';
+                            case 'HIGH':
+                                return 'Significant controls needed before use - high security risks';
+                            case 'MEDIUM':
+                                return 'Standard enterprise controls required - moderate security risks';
+                            case 'LOW':
+                            default:
+                                return 'Basic monitoring sufficient - acceptable risk level';
+                        }
+                    }
+                    
+                    function generateSecurityStatus(toolData, riskLevel) {
+                        if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                            return 'Tool poses significant security risks requiring immediate attention and enhanced controls before deployment.';
+                        } else if (riskLevel === 'MEDIUM') {
+                            return 'Tool meets basic security standards with some areas requiring attention for enterprise deployment.';
+                        } else {
+                            return 'Tool demonstrates acceptable security posture with standard enterprise controls and monitoring.';
+                        }
+                    }
+                    
+                    function generateComplianceImpact(toolData) {
+                        const complianceScore = toolData.compliance_score || 0;
+                        if (complianceScore > 15) {
+                            return 'Significant compliance gaps identified. HIPAA, PCI-DSS, and SOX verification required before handling regulated data.';
+                        } else if (complianceScore > 8) {
+                            return 'PCI-DSS and SOX compliance verification needed due to financial data classification and regulatory requirements.';
+                        } else {
+                            return 'Standard compliance controls applicable. Regular compliance monitoring and documentation recommended.';
+                        }
+                    }
+                    
+                    function generateMainRecommendation(toolData, riskLevel) {
+                        if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
+                            return 'Immediate security review and remediation required before deployment authorization.';
+                        } else if (riskLevel === 'MEDIUM') {
+                            return 'Implement enhanced monitoring and compliance controls before full deployment.';
+                        } else {
+                            return 'Standard deployment procedures with ongoing monitoring and periodic risk assessments.';
+                        }
+                    }
+                    
+                    function generateKeyFindings(toolData) {
+                        const findings = [];
+                        
+                        // Try to use the dedicated notes field from database
+                        if (toolData.notes && toolData.notes.trim().length > 0) {
+                            const noteFindings = toolData.notes
+                                .split(/[;|\\n|•]/)
+                                .map(note => note.trim())
+                                .filter(note => note.length > 10)
+                                .slice(0, 5);
+                                
+                            if (noteFindings.length > 0) {
+                                return '• ' + noteFindings.join('<br>• ');
+                            }
+                        }
+                        
+                        // Fallback: Extract critical findings from breakdown data
+                        if (toolData.breakdown && toolData.breakdown.subScores) {
+                            const subScores = toolData.breakdown.subScores;
+                            
+                            Object.keys(subScores).forEach(categoryKey => {
+                                const category = subScores[categoryKey];
+                                
+                                Object.keys(category).forEach(subKey => {
+                                    const item = category[subKey];
+                                    if (item && item.note) {
+                                        const note = item.note.toLowerCase();
+                                        
+                                        if (note.includes('critical gap') || note.includes('critical:') || 
+                                            note.includes('hipaa') || note.includes('not compliant') ||
+                                            note.includes('indefinite retention') || note.includes('no enterprise') ||
+                                            note.includes('major compliance barriers') || note.includes('high gdpr risk') ||
+                                            note.includes('no audit trail') || note.includes('basic oauth only') ||
+                                            note.includes('unclear server locations') || note.includes('lacks enterprise-grade')) {
+                                            
+                                            findings.push(item.note);
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                        
+                        // If no critical findings found, add general findings based on scores
+                        if (findings.length === 0) {
+                            if (toolData.total_score < 35) {
+                                findings.push('Acceptable security controls with standard enterprise monitoring requirements');
+                                findings.push('Regular assessment and compliance review recommended');
+                            } else {
+                                findings.push('Enhanced security controls and compliance verification required');
+                                findings.push('Detailed risk mitigation plan needed before deployment');
+                            }
+                        }
+                        
+                        const limitedFindings = findings.slice(0, 5);
+                        return '• ' + limitedFindings.join('<br>• ');
+                    }
+                    
+                    // Core category descriptions for display
+                    const categoryDescriptions = {
+                        dataStorage: { name: "Data Storage & Privacy" },
+                        trainingUsage: { name: "Training & Content Usage" },
+                        accessControls: { name: "Access Controls & Authentication" },
+                        complianceRisk: { name: "Compliance & Regulatory Risk" },
+                        vendorTransparency: { name: "Vendor Transparency & Trust" }
+                    };
+                    
+                    function generateDescription(categoryKey, score, breakdownData) {
+                        // Generate a basic description based on score
+                        if (score > 8) {
+                            return \`High risk identified (Score: \${score}). Enhanced controls required.\`;
+                        } else if (score > 5) {
+                            return \`Medium risk level (Score: \${score}). Standard monitoring recommended.\`;
+                        } else {
+                            return \`Low risk level (Score: \${score}). Basic controls sufficient.\`;
+                        }
+                    }
+                    
+                    // Generate security categories HTML based on your data structure
+                    function generateSecurityCategories(toolData) {
+                        const categoriesGrid = document.getElementById('securityCategoriesGrid');
+                        
+                        if (!categoriesGrid) {
+                            console.error('Categories grid not found');
+                            return;
+                        }
+
+                        // Extract scores from your data structure
+                        const scores = {
+                            dataStorage: toolData.data_storage_score || 0,
+                            trainingUsage: toolData.training_usage_score || 0,
+                            accessControls: toolData.access_controls_score || 0,
+                            complianceRisk: toolData.compliance_score || 0,
+                            vendorTransparency: toolData.vendor_transparency_score || 0
+                        };
+
+                        // Parse breakdown data
+                        let breakdownData = null;
+                        try {
+                            if (toolData.breakdown && typeof toolData.breakdown === 'string') {
+                                breakdownData = JSON.parse(toolData.breakdown);
+                            } else if (toolData.breakdown && typeof toolData.breakdown === 'object') {
+                                breakdownData = toolData.breakdown;
+                            }
+                        } catch (e) {
+                            console.warn('Could not parse breakdown data:', e);
+                        }
+
+                        console.log('Scores extracted:', scores);
+
+                        // Generate HTML for each category
+                        let categoriesHTML = '';
+                        
+                        Object.keys(scores).forEach(categoryKey => {
+                            const score = scores[categoryKey];
+                            const riskLevel = calculateRiskLevel(score);
+                            const riskClass = getRiskLevelClass(riskLevel);
+                            const categoryInfo = categoryDescriptions[categoryKey];
+                            const description = generateDescription(categoryKey, score, breakdownData);
+
+                            categoriesHTML += \`
+                                <div class="category-card \${riskClass}">
+                                    <div class="category-header">
+                                        <div class="category-name">\${categoryInfo.name}</div>
+                                        <div class="category-score \${riskClass}">\${riskLevel}</div>
+                                    </div>
+                                    <div class="category-description">
+                                        \${description}
+                                    </div>
+                                </div>
+                            \`;
+                        });
+
+                        // Update the grid
+                        categoriesGrid.innerHTML = categoriesHTML;
+                        
+                        console.log('Security categories generated successfully');
+                    }
+
+                    // Populate Executive Summary section
+                    function populateExecutiveSummary(toolData) {
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        // Update risk score display
+                        const riskScoreEl = document.getElementById('riskScore');
+                        const riskLevelEl = document.getElementById('riskLevel');
+                        const riskDescEl = document.getElementById('riskDescription');
+                        
+                        if (riskScoreEl) riskScoreEl.textContent = totalScore;
+                        if (riskLevelEl) riskLevelEl.textContent = \`\${riskLevel} RISK\`;
+                        if (riskDescEl) riskDescEl.textContent = getRiskDescription(riskLevel, totalScore);
+                        
+                        // Apply risk level styling to the card
+                        const riskCard = document.getElementById('riskScoreCard');
+                        if (riskCard) {
+                            riskCard.classList.remove('risk-low', 'risk-medium', 'risk-high', 'risk-critical');
+                            riskCard.classList.add(\`risk-\${riskLevel.toLowerCase()}\`);
+                        }
+                        
+                        // Generate content
+                        const securityStatus = generateSecurityStatus(toolData, riskLevel);
+                        const complianceImpact = generateComplianceImpact(toolData);
+                        const mainRecommendation = generateMainRecommendation(toolData, riskLevel);
+                        const keyFindings = generateKeyFindings(toolData);
+                        
+                        const statusEl = document.getElementById('securityStatusText');
+                        const complianceEl = document.getElementById('complianceImpactText');
+                        const recommendationEl = document.getElementById('mainRecommendationText');
+                        const findingsEl = document.getElementById('keyFindings');
+                        
+                        if (statusEl) statusEl.textContent = securityStatus;
+                        if (complianceEl) complianceEl.textContent = complianceImpact;
+                        if (recommendationEl) recommendationEl.textContent = mainRecommendation;
+                        if (findingsEl) findingsEl.innerHTML = keyFindings;
+                        
+                        console.log('Executive summary populated successfully');
+                    }
+
+                    // Populate Tool Information section
+                    function populateToolInformation(toolData) {
+                        const currentDate = new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                        });
+                        
+                        // Generate assessment ID
+                        const assessmentId = \`ASS-\${Date.now()}\`;
+                        
+                        // Update all elements safely
+                        const elements = {
+                            'headerToolName': toolData.name || 'Unknown Tool',
+                            'headerAssessmentId': assessmentId,
+                            'headerGeneratedDate': currentDate,
+                            'footerAssessmentId': assessmentId,
+                            'footerGeneratedDate': currentDate,
+                            'toolName': toolData.name || 'Unknown Tool',
+                            'toolCategory': toolData.category || 'AI Platform',
+                            'primaryUseCase': 'Enterprise Productivity',
+                            'dataClassification': 'Confidential',
+                            'assessmentDate': currentDate,
+                            'riskCategory': toolData.category || 'AI Platform',
+                            'vendor': extractVendor(toolData.name),
+                            'licenseType': toolData.name.includes('Enterprise') ? 'Enterprise License' : 'Standard License'
+                        };
+                        
+                        // Next review date (3 months from now)
+                        const nextReview = new Date();
+                        nextReview.setMonth(nextReview.getMonth() + 3);
+                        elements['nextReviewDate'] = nextReview.toLocaleDateString('en-US', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                        });
+                        
+                        // Update all elements
+                        Object.keys(elements).forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.textContent = elements[id];
+                            }
+                        });
+                        
+                        // Tool icon
+                        const toolIconEl = document.getElementById('toolIcon');
+                        if (toolIconEl) {
+                            toolIconEl.textContent = generateToolIcon(toolData.name);
+                        }
+                        
+                        console.log('Tool information populated successfully');
+                    }
+
+                    // Update risk matrix display
+                    function updateRiskMatrix(toolData) {
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        const matrixDescEl = document.getElementById('matrixDescription');
+                        if (matrixDescEl) {
+                            matrixDescEl.textContent = \`★ Current Risk Level: Score \${totalScore} falls in \${riskLevel} category\`;
+                        }
+                        
+                        const matrixCell = document.getElementById('currentRiskMatrixCell');
+                        if (matrixCell) {
+                            matrixCell.className = \`matrix-\${riskLevel.toLowerCase()}\`;
+                            matrixCell.innerHTML = \`\${riskLevel.toLowerCase().charAt(0).toUpperCase() + riskLevel.toLowerCase().slice(1)} ★\`;
+                        }
+                        
+                        console.log('Risk matrix updated successfully');
+                    }
+
+                    // Generate Azure permissions (placeholder)
+                    function generateAzurePermissions(toolData) {
+                        const permissionsHTML = \`
+                            <div style="text-align: center; padding: 2rem; color: #64748b;">
+                                <div style="margin-bottom: 1rem;">🔐 Azure AD Integration Assessment</div>
+                                <div style="font-size: 0.9rem;">
+                                    This section will be populated with Azure AD permissions analysis<br>
+                                    when integration is configured. Contact IT Security for setup.
+                                </div>
+                            </div>
+                        \`;
+                        
+                        const azureEl = document.getElementById('azurePermissions');
+                        if (azureEl) {
+                            azureEl.innerHTML = permissionsHTML;
+                        }
+                        console.log('Azure permissions section updated');
+                    }
+
+                    // Generate recommendations based on tool data
+                    function generateRecommendations(toolData) {
+                        const recommendations = [];
+                        const totalScore = toolData.total_score || 0;
+                        const riskLevel = getRiskLevelFromScore(totalScore);
+                        
+                        // Generate recommendations based on scores and risk levels
+                        if (toolData.compliance_score > 10) {
+                            recommendations.push({
+                                title: 'PCI-DSS Compliance Verification',
+                                priority: 'HIGH',
+                                icon: '💳',
+                                description: 'Conduct comprehensive PCI-DSS compliance audit to ensure financial data handling meets regulatory requirements.',
+                                timeline: '30 days',
+                                owner: 'Security Team'
+                            });
+                        }
+                        
+                        if (toolData.compliance_score > 8) {
+                            recommendations.push({
+                                title: 'SOX Controls Implementation',
+                                priority: 'HIGH',
+                                icon: '📊',
+                                description: 'Implement Sarbanes-Oxley controls for financial reporting data processed through the AI tool.',
+                                timeline: '45 days',
+                                owner: 'Compliance Team'
+                            });
+                        }
+                        
+                        if (toolData.data_storage_score > 8) {
+                            recommendations.push({
+                                title: 'Enhanced Data Loss Prevention (DLP)',
+                                priority: 'MEDIUM',
+                                icon: '🛡️',
+                                description: 'Configure advanced DLP policies to monitor and prevent sensitive data from being inadvertently shared.',
+                                timeline: '60 days',
+                                owner: 'IT Security'
+                            });
+                        }
+                        
+                        if (riskLevel === 'HIGH' || riskLevel === 'MEDIUM') {
+                            recommendations.push({
+                                title: 'AI Governance Committee',
+                                priority: 'MEDIUM',
+                                icon: '👥',
+                                description: 'Create a cross-functional AI governance committee to oversee AI tool usage and establish policies.',
+                                timeline: '90 days',
+                                owner: 'Executive Team'
+                            });
+                        }
+                        
+                        recommendations.push({
+                            title: 'Usage Analytics Dashboard',
+                            priority: 'LOW',
+                            icon: '📈',
+                            description: 'Deploy comprehensive usage analytics to track AI tool utilization patterns.',
+                            timeline: '120 days',
+                            owner: 'IT Operations'
+                        });
+                        
+                        // Generate HTML for recommendations
+                        const recommendationsHTML = recommendations.map(rec => \`
+                            <div class="recommendation-card priority-\${rec.priority.toLowerCase()}">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">\${rec.title}</div>
+                                    <div class="priority-badge priority-\${rec.priority.toLowerCase()}">\${rec.priority}</div>
+                                </div>
+                                <div class="recommendation-text">
+                                    \${rec.icon} \${rec.description}
+                                    <br><br><strong>Timeline:</strong> \${rec.timeline} | <strong>Owner:</strong> \${rec.owner}
+                                </div>
+                            </div>
+                        \`).join('');
+                        
+                        const recommendationsEl = document.getElementById('recommendationsGrid');
+                        if (recommendationsEl) {
+                            recommendationsEl.innerHTML = recommendationsHTML;
+                        }
+                        console.log('Recommendations generated successfully');
+                    }
+                    
+                    // Load security assessment data - use pre-calculated data only
+                    async function loadSecurityAssessment() {
+                        try {
+                            console.log('🎯 [STANDALONE] Loading pre-calculated assessment data');
+                            
+                            // Use the pre-calculated data directly
+                            const toolData = PRECALCULATED_TOOL_DATA;
+                            
+                            // Generate all dynamic content using pre-calculated scores
+                            generateSecurityCategories(toolData);
+                            populateExecutiveSummary(toolData);
+                            populateToolInformation(toolData);
+                            updateRiskMatrix(toolData);
+                            generateAzurePermissions(toolData);
+                            generateRecommendations(toolData);
+                            
+                        } catch (error) {
+                            console.error('Error loading security assessment:', error);
+                            console.error('Failed to load pre-calculated assessment data');
+                        }
+                    }
+                    
+                    // Initialize when page loads
+                    document.addEventListener('DOMContentLoaded', function() {
+                        console.log('📋 [STANDALONE] DOM loaded, using pre-calculated data');
+                        loadSecurityAssessment();
+                    });
+                `;
+                
+                // Replace the existing script section with our standalone script
+                const scriptStartPattern = /<script>\s*\/\/\s*Initialize Supabase/;
+                const scriptEndPattern = /<\/script>\s*<\/body>/;
+                
+                const scriptStart = templateHTML.search(scriptStartPattern);
+                const scriptEnd = templateHTML.search(scriptEndPattern);
+                
+                if (scriptStart !== -1 && scriptEnd !== -1) {
+                    // Replace the entire script section
+                    templateHTML = templateHTML.substring(0, scriptStart) + 
+                                 standaloneScript + 
+                                 '\n                ' + templateHTML.substring(scriptEnd);
+                } else {
+                    // Fallback: inject before closing body tag
+                    templateHTML = templateHTML.replace('</body>', standaloneScript + '\n    </body>');
+                }
+                
+                // Remove Supabase dependency
+                templateHTML = templateHTML.replace(
+                    /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2"><\/script>/,
+                    '<!-- Supabase removed - using pre-calculated data -->'
+                );
+                
+                console.log('✅ [STANDALONE HTML] Generated complete standalone HTML file');
+                return templateHTML;
+                
+            } catch (error) {
+                console.error('Error generating standalone HTML:', error);
+                throw error;
+            }
+        }
+
+        // Convert assessment data to new template format
+        function convertAssessmentForTemplate(assessment) {
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+            
+            const dataLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Financial/Payment Data',
+                'trade-secrets': 'Trade Secrets/Intellectual Property',
+                'pii': 'Personally Identifiable Information',
+                'public': 'Public/Marketing Data'
+            };
+            
+            const toolName = assessment.results.toolName + 
+                (assessment.formData.toolVersion === 'enterprise' && 
+                 !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            return {
+                toolName: toolName,
+                category: assessment.formData.toolCategory || 'Not specified',
+                useCase: getUseCaseLabel(assessment.formData.useCase) || 'Not specified',
+                dataClassification: dataLabels[assessment.formData.dataClassification] || 'Unknown',
+                riskScore: assessment.results.finalScore,
+                riskLevel: assessment.results.riskLevel.toUpperCase(),
+                riskDescription: riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.',
+                categories: Object.entries(assessment.results.breakdown).map(([name, data]) => ({
+                    name: name,
+                    score: data.score,
+                    description: data.description
+                })),
+                recommendations: assessment.results.recommendations || [],
+                primaryRecommendation: assessment.results.recommendations?.[0] || 'Follow security best practices'
+            };
+        }
+
+        // Add print controls to the generated report window
+        function addPrintControls(printWindow) {
+            const controlsHTML = `
+                <div id="printControls" class="no-print" style="
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 1000;
+                    background: white;
+                    padding: 10px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    border: 1px solid #ddd;
+                ">
+                    <button onclick="window.print()" style="
+                        background: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        margin-right: 8px;
+                        font-weight: 600;
+                    ">🖨️ Print PDF</button>
+                    <button onclick="window.close()" style="
+                        background: #6b7280;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">✕ Close</button>
+                </div>
+            `;
+            
+            printWindow.document.body.insertAdjacentHTML('beforeend', controlsHTML);
+        }
+
+        // Add template selection function (for future use)
+        function showTemplateSelector() {
+            if (!templateManager) {
+                showMessage('Template system not available', 'error');
+                return;
+            }
+
+            const templates = templateManager.list();
+            const selectorHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
+                        <h3 style="margin-bottom: 1rem;">Select PDF Template</h3>
+                        <div style="margin-bottom: 2rem;">
+                            ${templates.map(template => `
+                                <button onclick="exportWithTemplate('${template}')" style="
+                                    display: block;
+                                    width: 100%;
+                                    margin: 0.5rem 0;
+                                    padding: 1rem;
+                                    background: #f8fafc;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 0.5rem;
+                                    cursor: pointer;
+                                    text-align: left;
+                                ">
+                                    <strong>${template.replace('-', ' ').toUpperCase()}</strong><br>
+                                    <small style="color: #64748b;">Professional ${template} format</small>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="this.closest('div').parentElement.remove()" style="
+                            background: #6b7280;
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 0.5rem;
+                            cursor: pointer;
+                        ">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', selectorHTML);
+        }
+
+        // Export with specific template
+        function exportWithTemplate(templateName) {
+            // Close selector
+            document.querySelector('[style*="position: fixed"]')?.remove();
+            
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                const templateData = convertAssessmentForTemplate(currentAssessment);
+                const html = templateManager.generateReport(templateData, templateName);
+                
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                addPrintControls(printWindow);
+                
+                printWindow.onload = () => {
+                    setTimeout(() => {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+                };
+                
+                showMessage(`📄 Generated ${templateName.replace('-', ' ')} template successfully!`, 'success');
+            } catch (error) {
+                console.error('Template export error:', error);
+                showMessage('Failed to export with selected template: ' + error.message, 'error');
+            }
+        }
+
+        // Option 2: HTML Export (Generate complete standalone HTML with data baked in)
+        async function exportHTML() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            try {
+                console.log('📤 [HTML EXPORT] Generating standalone HTML with pre-calculated data');
+                
+                // Generate complete standalone HTML file
+                const completeHTML = await generateStandaloneHTML(currentAssessment);
+                
+                // Create blob and open as new window
+                const blob = new Blob([completeHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                // Open in new window
+                const htmlWindow = window.open(url, '_blank', 'width=1200,height=800');
+                
+                // Add print button after load
+                htmlWindow.onload = () => {
+                    setTimeout(() => {
+                        const printButton = htmlWindow.document.createElement('button');
+                        printButton.textContent = '🖨️ Print PDF';
+                        printButton.className = 'no-print';
+                        printButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+                        printButton.onclick = () => {
+                            htmlWindow.focus();
+                            htmlWindow.print();
+                        };
+                        htmlWindow.document.body.appendChild(printButton);
+                    }, 500);
+                };
+                
+                // Clean up URL after a delay
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+                
+                showMessage('🌐 Standalone HTML report generated successfully!', 'success');
+            } catch (error) {
+                console.error('HTML export error:', error);
+                showMessage('Failed to export HTML: ' + error.message, 'error');
+            }
+        }
+
+        // Option 3: Original jsPDF (Keep existing)
+        async function exportAssessment() {
+            if (!currentAssessment) {
+                showMessage('No assessment to export', 'error');
+                return;
+            }
+
+            // Check if jsPDF is loaded, with retry logic (correct property: window.jspdf)
+            if (!window.jsPDFLoaded || typeof window.jspdf === 'undefined') {
+                showMessage('PDF library is loading... Please wait.', 'warning');
+                
+                // Wait up to 5 seconds for library to load
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (attempts < maxAttempts && (!window.jsPDFLoaded || typeof window.jspdf === 'undefined')) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                if (!window.jsPDFLoaded || typeof window.jspdf === 'undefined') {
+                    showMessage('PDF library failed to load. Falling back to JSON export.', 'warning');
+                    exportAssessmentJSON();
+                    return;
+                }
+            }
+
+            try {
+                generatePDFReportOriginal(currentAssessment);
+                showMessage('PDF report generated successfully!', 'success');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showMessage('Failed to generate PDF: ' + error.message + '. Exporting JSON instead.', 'error');
+                
+                // Fallback to JSON export
+                exportAssessmentJSON();
+            }
+        }
+
+        function exportAssessmentJSON() {
+            if (!currentAssessment) return;
+
+            const exportData = {
+                exportDate: new Date().toISOString(),
+                assessment: currentAssessment.results,
+                formData: currentAssessment.formData,
+                framework: {
+                    version: "2.0",
+                    description: "AI Tool Risk Assessment Framework with Data Classification"
+                }
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ai-assessment-${currentAssessment.results.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // === LEGACY HTML TEMPLATE (Simplified - Now using separate template system) ===
+        class AIRiskReportGenerator {
+            constructor() {
+                console.warn('AIRiskReportGenerator is deprecated. Use TemplateBindingEngine instead.');
+                // Minimal template for fallback compatibility
+                this.template = '<html><head><title>Legacy Report</title></head><body><h1>Please use new template system</h1></body></html>';
+            }
+
+            generateReport(data) {
+                console.warn('Using deprecated generateReport. Please use TemplateBindingEngine instead.');
+                return this.template;
+            }
+        }
+
+        // === ENHANCED PDF EXPORT OPTIONS ===
+        class EnhancedPDFExporter {
+            
+            // Option 1: HTML Template + Print (Best for production)
+            async exportTemplatedPDF(assessmentData) {
+                try {
+                    // Use the actual template binding system
+                    if (typeof window.TemplateBindingEngine !== 'undefined') {
+                        const engine = new window.TemplateBindingEngine();
+                        // This now calls our new high-quality PDF export function
+                        await engine.exportPDFReport(assessmentData);
+                        
+                        return; // Success, exit here
+                    } else {
+                        throw new Error('Template system not loaded');
+                    }
+                } catch (error) {
+                    console.error('Template PDF failed:', error);
+                    console.log('Available systems:', {
+                        TemplateBindingEngine: typeof window.TemplateBindingEngine,
+                        templateManager: typeof window.templateManager,
+                        jsPDF: typeof window.jspdf
+                    });
+                    // Fallback to jsPDF
+                    return this.exportJsPDF(assessmentData);
+                }
+            }
+            
+            // Option 2: jsPDF Enhanced (Current working version)
+            exportJsPDF(assessmentData) {
+                return generatePDFReportOriginal(assessmentData); // Use existing function
+            }
+            
+            // Option 3: Save as HTML file
+            exportHTML(assessmentData) {
+                const generator = new AIRiskReportGenerator();
+                const reportData = this.convertAssessmentData(assessmentData);
+                const html = generator.generateReport(reportData);
+                
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ai-risk-assessment-' + reportData.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-' + new Date().toISOString().split('T')[0] + '.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            convertAssessmentData(assessment) {
+                const riskDescriptions = {
+                    'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                    'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                    'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                    'low': 'Basic monitoring sufficient. Tool meets security standards.'
+                };
+                
+                const dataLabels = {
+                    'phi': 'Protected Health Information (PHI)',
+                    'financial': 'Financial/Payment Data',
+                    'trade-secrets': 'Trade Secrets/Intellectual Property',
+                    'pii': 'Personally Identifiable Information',
+                    'public': 'Public/Marketing Data'
+                };
+                
+                const toolName = assessment.results.toolName + 
+                    (assessment.formData.toolVersion === 'enterprise' && 
+                     !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+                
+                return {
+                    toolName: toolName,
+                    category: assessment.formData.toolCategory,
+                    useCase: getUseCaseLabel(assessment.formData.useCase),
+                    dataClassification: dataLabels[assessment.formData.dataClassification] || 'Unknown',
+                    riskScore: assessment.results.finalScore,
+                    riskLevel: assessment.results.riskLevel,
+                    riskDescription: riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.',
+                    categories: Object.entries(assessment.results.breakdown).map(([name, data]) => ({
+                        name: name,
+                        score: data.score,
+                        description: data.description
+                    })),
+                    recommendations: assessment.results.recommendations || []
+                };
+            }
+        }
+
+        function generatePDFReportOriginal(assessment) {
+            console.log('🔧 Starting PDF generation...', assessment);
+            
+            // Check if jsPDF is available (correct property: window.jspdf)
+            if (typeof window.jspdf === 'undefined') {
+                throw new Error('jsPDF library not loaded. Please refresh the page and try again.');
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let yPosition = 20;
+            
+            console.log('✅ jsPDF initialized');
+            
+            // === HEADER WITH BRANDING ===
+            // Background header
+            doc.setFillColor(59, 130, 246); // Blue background
+            doc.rect(0, 0, 210, 45, 'F');
+            
+            // Company logo area
+            doc.setFillColor(255, 255, 255, 0.1);
+            doc.rect(15, 8, 35, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI RISK', 17, 16);
+            doc.text('FRAMEWORK', 17, 22);
+            
+            // Main title
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI TOOL SECURITY RISK ASSESSMENT', 105, 18, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Enterprise Security Analysis Report', 105, 28, { align: 'center' });
+            
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            doc.setFontSize(10);
+            doc.text(`Generated: ${currentDate}`, 105, 38, { align: 'center' });
+            
+            // Reset text color and position
+            doc.setTextColor(0, 0, 0);
+            yPosition = 55;
+            
+            // === TOOL INFORMATION BOX ===
+            // Background box
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 45, 'FD');
+            
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('TOOL INFORMATION', 20, yPosition + 10);
+            yPosition += 20;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            
+            const toolName = assessment.results.toolName + 
+                (assessment.formData.toolVersion === 'enterprise' && 
+                 !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text(`Tool Name: ${toolName}`, 20, yPosition);
+            yPosition += 7;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            
+            if (assessment.formData.toolCategory) {
+                doc.text(`Category: ${assessment.formData.toolCategory}`, 20, yPosition);
+                yPosition += 7;
+            }
+            
+            if (assessment.formData.useCase) {
+                doc.text(`Use Case: ${getUseCaseLabel(assessment.formData.useCase)}`, 20, yPosition);
+                yPosition += 7;
+            }
+            
+            // Data Classification with colored badge
+            const dataLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Financial/Payment Data',
+                'trade-secrets': 'Trade Secrets/Intellectual Property',
+                'pii': 'Personally Identifiable Information',
+                'public': 'Public/Marketing Data'
+            };
+            
+            const dataType = dataLabels[assessment.formData.dataClassification] || 'Unknown';
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(220, 38, 38);
+            doc.text(`Data Classification: ${dataType}`, 20, yPosition);
+            
+            doc.setTextColor(0, 0, 0);
+            yPosition += 20;
+            
+            // === RISK SCORE PANEL ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('RISK ASSESSMENT RESULTS', 20, yPosition);
+            yPosition += 15;
+            
+            // Risk color mapping
+            const riskColors = {
+                'critical': [220, 38, 38],
+                'high': [234, 88, 12],
+                'medium': [202, 138, 4],
+                'low': [22, 163, 74]
+            };
+            
+            const riskBgColors = {
+                'critical': [254, 242, 242],
+                'high': [255, 247, 237],
+                'medium': [254, 252, 232],
+                'low': [240, 253, 244]
+            };
+            
+            const riskLabels = {
+                'critical': 'CRITICAL RISK',
+                'high': 'HIGH RISK',
+                'medium': 'MEDIUM RISK',
+                'low': 'LOW RISK'
+            };
+            
+            const riskColor = riskColors[assessment.results.riskLevel] || [0, 0, 0];
+            const riskBgColor = riskBgColors[assessment.results.riskLevel] || [248, 250, 252];
+            const riskLabel = riskLabels[assessment.results.riskLevel] || 'UNKNOWN RISK';
+            
+            // Risk score background box
+            doc.setFillColor(...riskBgColor);
+            doc.setDrawColor(...riskColor);
+            doc.setLineWidth(2);
+            doc.rect(15, yPosition, 180, 35, 'FD');
+            doc.setLineWidth(0.5);
+            
+            // Large risk score number
+            doc.setTextColor(...riskColor);
+            doc.setFontSize(32);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${assessment.results.finalScore}`, 25, yPosition + 20);
+            
+            // Risk score label
+            doc.setFontSize(20);
+            doc.text('RISK SCORE', 25, yPosition + 30);
+            
+            // Risk level label on the right
+            doc.setFontSize(18);
+            doc.text(riskLabel, 120, yPosition + 20);
+            
+            yPosition += 45;
+            
+            // Risk description box
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+            
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 15, 'FD');
+            doc.text(riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.', 20, yPosition + 8);
+            yPosition += 25;
+            
+            // === BREAKDOWN TABLE ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('SECURITY CATEGORY BREAKDOWN', 20, yPosition);
+            yPosition += 15;
+            
+            // Table header
+            doc.setFillColor(59, 130, 246);
+            doc.rect(15, yPosition, 180, 12, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CATEGORY', 20, yPosition + 8);
+            doc.text('SCORE', 120, yPosition + 8);
+            doc.text('ASSESSMENT', 140, yPosition + 8);
+            yPosition += 12;
+            
+            // Table rows
+            const categories = Object.entries(assessment.results.breakdown);
+            categories.forEach(([category, data], index) => {
+                if (yPosition > 240) {
+                    doc.addPage();
+                    yPosition = 20;
+                    
+                    // Redraw header on new page
+                    doc.setFillColor(59, 130, 246);
+                    doc.rect(15, yPosition, 180, 12, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CATEGORY', 20, yPosition + 8);
+                    doc.text('SCORE', 120, yPosition + 8);
+                    doc.text('ASSESSMENT', 140, yPosition + 8);
+                    yPosition += 12;
+                }
+                
+                // Alternating row colors
+                const rowColor = index % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+                doc.setFillColor(...rowColor);
+                doc.rect(15, yPosition, 180, 20, 'F');
+                
+                // Row border
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(15, yPosition, 180, 20);
+                
+                // Category name
+                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text(category, 18, yPosition + 8);
+                
+                // Score with color coding
+                const scoreNum = parseInt(data.score.split('/')[0]);
+                const maxScore = parseInt(data.score.split('/')[1]);
+                const scorePercent = scoreNum / maxScore;
+                
+                let scoreColor = [22, 163, 74]; // Green (good)
+                if (scorePercent > 0.7) scoreColor = [220, 38, 38]; // Red (bad)
+                else if (scorePercent > 0.4) scoreColor = [234, 88, 12]; // Orange (medium)
+                
+                doc.setTextColor(...scoreColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(data.score, 122, yPosition + 8);
+                
+                // Description
+                doc.setTextColor(75, 85, 99);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                const description = data.description.length > 45 ? 
+                    data.description.substring(0, 45) + '...' : data.description;
+                
+                // Word wrap for description
+                const lines = doc.splitTextToSize(description, 50);
+                let lineY = yPosition + 6;
+                lines.slice(0, 2).forEach(line => {
+                    doc.text(line, 142, lineY);
+                    lineY += 5;
+                });
+                
+                yPosition += 20;
+            });
+            
+            yPosition += 10;
+            
+            // === RECOMMENDATIONS ===
+            if (assessment.results.recommendations && assessment.results.recommendations.length > 0) {
+                if (yPosition > 200) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                // Recommendations header
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(30, 41, 59);
+                doc.text('RECOMMENDATIONS', 20, yPosition);
+                yPosition += 15;
+                
+                // Recommendations box
+                const recHeight = Math.min(assessment.results.recommendations.length * 12 + 10, 60);
+                doc.setFillColor(255, 251, 235);
+                doc.setDrawColor(251, 191, 36);
+                doc.rect(15, yPosition, 180, recHeight, 'FD');
+                
+                yPosition += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(146, 64, 14);
+                
+                assessment.results.recommendations.forEach((rec, index) => {
+                    if (yPosition > 270) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    // Bullet point with icon
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${index + 1}.`, 20, yPosition);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    const recLines = doc.splitTextToSize(rec, 160);
+                    recLines.slice(0, 2).forEach((line, lineIndex) => {
+                        doc.text(line, 30, yPosition + (lineIndex * 4));
+                    });
+                    yPosition += Math.min(recLines.length * 4, 8) + 4;
+                });
+                
+                yPosition += 10;
+            }
+            
+            // === PROFESSIONAL FOOTER ===
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                
+                // Footer background
+                doc.setFillColor(248, 250, 252);
+                doc.rect(0, 275, 210, 22, 'F');
+                
+                // Footer line
+                doc.setDrawColor(59, 130, 246);
+                doc.setLineWidth(1);
+                doc.line(15, 278, 195, 278);
+                doc.setLineWidth(0.5);
+                
+                // Footer text
+                doc.setFontSize(8);
+                doc.setTextColor(75, 85, 99);
+                doc.setFont('helvetica', 'normal');
+                doc.text('AI Tool Risk Assessment Framework v2.0', 20, 285);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(220, 38, 38);
+                doc.text('CONFIDENTIAL - Internal Use Only', 105, 285, { align: 'center' });
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(75, 85, 99);
+                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
+                
+                // Assessment ID
+                doc.setFontSize(7);
+                doc.setTextColor(156, 163, 175);
+                doc.text(`Assessment ID: ${Date.now()}`, 105, 292, { align: 'center' });
+            }
+            
+            // === SAVE PDF ===
+            const fileName = `ai-risk-assessment-${toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            
+            console.log('💾 Saving PDF as:', fileName);
+            doc.save(fileName);
+            console.log('✅ PDF generation complete!');
+        }
+
+        function startNewAssessment() {
+            document.getElementById('assessmentForm').reset();
+            document.querySelectorAll('.classification-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            currentAssessment = null;
+            showStep(1);
+        }
+
+        // Template manager is defined globally
+
+        // Initialize template system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize template manager with error handling
+            try {
+                if (typeof PDFTemplateManager !== 'undefined') {
+                    templateManager = new PDFTemplateManager();
+                    console.log('✅ PDF Template System loaded');
+                    console.log('Available templates:', templateManager.list());
+                } else {
+                    console.warn('⚠️ PDF Template System not available - using legacy system');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing PDF Template System:', error);
+                templateManager = null;
+            }
+            
+            showStep(1);
+            updateUIForAuth(); // Initialize auth UI
+            
+            // Check PDF library loading after page loads
+            setTimeout(() => {
+                if (window.jsPDFLoaded && typeof window.jspdf !== 'undefined') {
+                    console.log('✅ PDF export functionality ready');
+                    console.log('jsPDF available at:', window.jspdf);
+                } else {
+                    console.warn('⚠️ PDF library still loading... Export will retry automatically');
+                    console.log('window.jspdf:', typeof window.jspdf);
+                }
+            }, 3000);
+        });
+
+        async function exportFreePDF() {
+            try {
+                // Show loading state
+                const exportButton = document.querySelector('button[onclick="exportFreePDF(); hideExportMenu();"]');
+                const originalText = exportButton.innerHTML;
+                exportButton.innerHTML = '⏳ Generating PDF...';
+                
+                // Get the assessment container
+                const element = document.getElementById('assessmentContainer');
+                
+                // Use html2canvas to capture the content
+                const canvas = await html2canvas(element, {
+                    scale: 2, // Higher quality
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                // Convert to PDF using jsPDF
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Calculate dimensions to fit the page
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                
+                // Add image to PDF
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                // If content spans multiple pages, add new pages
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                while (heightLeft >= pageHeight) {
+                    position = heightLeft - pageHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Download the PDF
+                pdf.save('AI_Risk_Assessment.pdf');
+                
+                // Restore button text
+                exportButton.innerHTML = originalText;
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('There was an error generating the PDF. Please try again.');
+                
+                // Restore button text on error
+                const exportButton = document.querySelector('button[onclick="exportFreePDF(); hideExportMenu();"]');
+                if (exportButton) {
+                    exportButton.innerHTML = originalText;
+                }
+            }
+        }
         
         // Configuration
         const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
