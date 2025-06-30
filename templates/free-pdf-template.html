@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Tool Risk Assessment Report</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { font-size: 24px; margin: 0; }
+        h2 { font-size: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px; }
+        .section { margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .item { background: #f9f9f9; padding: 10px; border-radius: 5px; }
+        .item-label { font-weight: bold; }
+        .score { text-align: center; margin-bottom: 20px; }
+        .score-number { font-size: 48px; font-weight: bold; }
+        .score-label { font-size: 18px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Tool Risk Assessment Report</h1>
+    </div>
+    
+    <div class="score">
+        <div class="score-number">{{finalScore}}</div>
+        <div class="score-label">{{riskLevel}} RISK</div>
+    </div>
+    
+    <h2>Tool Information</h2>
+    <div class="section grid">
+        <div class="item"><span class="item-label">Tool Name:</span> {{toolName}}</div>
+        <div class="item"><span class="item-label">Version:</span> {{toolVersion}}</div>
+        <div class="item"><span class="item-label">Category:</span> {{toolCategory}}</div>
+        <div class="item"><span class="item-label">Use Case:</span> {{useCase}}</div>
+    </div>
+    
+    <h2>Data Classification</h2>
+    <div class="section">
+        <div class="item"><span class="item-label">Data Type:</span> {{dataClassification}}</div>
+    </div>
+    
+    <h2>Risk Breakdown</h2>
+    <div class="section grid" id="risk-breakdown-container">
+        <!-- Risk breakdown will be inserted here by JavaScript -->
+    </div>
+    
+    <h2>Key Recommendations</h2>
+    <div class="section">
+        <ul id="recommendations-container">
+            <!-- Recommendations will be inserted here by JavaScript -->
+        </ul>
+    </div>
+</body>
+</html> 

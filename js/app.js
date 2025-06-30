@@ -1350,59 +1350,66 @@ async function exportFreePDF() {
         return;
     }
 
-    console.log('🚀 Starting free PDF export...');
-    
     try {
-        // Generate a simplified printable template
-        const printableContent = generatePrintableHTML(currentAssessment);
-        
-        // Create a hidden container for rendering
-        const renderContainer = document.createElement('div');
-        renderContainer.style.position = 'absolute';
-        renderContainer.style.left = '-9999px';
-        renderContainer.style.top = '0';
-        renderContainer.style.width = '800px';
-        renderContainer.innerHTML = printableContent;
-        document.body.appendChild(renderContainer);
-        
-        // Use html2canvas to capture the content
-        const canvas = await html2canvas(renderContainer, {
-            scale: 2, // Improve resolution
-            useCORS: true, // For images if any
-            logging: true
-        });
-        
-        // Clean up the render container
-        document.body.removeChild(renderContainer);
-        
-        // Use jsPDF to create the PDF
-        const { jsPDF } = window.jspdf;
-        if (!jsPDF) {
-            throw new Error('jsPDF library not loaded');
+        // 1. Fetch the free PDF template
+        const response = await fetch('./templates/free-pdf-template.html');
+        if (!response.ok) {
+            throw new Error('Could not load the free PDF template.');
         }
+        let templateHtml = await response.text();
+
+        // 2. Prepare data and replace placeholders
+        const { formData, results } = currentAssessment;
+        const replacements = {
+            '{{finalScore}}': results.finalScore,
+            '{{riskLevel}}': results.riskLevel.toUpperCase(),
+            '{{toolName}}': formData.toolName,
+            '{{toolVersion}}': formData.toolVersion,
+            '{{toolCategory}}': formData.toolCategory || 'N/A',
+            '{{useCase}}': formData.useCase || 'N/A',
+            '{{dataClassification}}': formData.dataClassification,
+        };
+
+        for (const [key, value] of Object.entries(replacements)) {
+            templateHtml = templateHtml.replace(new RegExp(key, 'g'), value);
+        }
+
+        // 3. Create a temporary element to inject complex HTML (breakdown and recommendations)
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = templateHtml;
+
+        // Inject risk breakdown
+        const breakdownContainer = tempDiv.querySelector('#risk-breakdown-container');
+        const breakdownHtml = Object.entries(results.breakdown.scores).map(([category, score]) => `
+            <div class="item">
+                <span class="item-label">${results.breakdown.categoryNames[category] || category}:</span> ${score}/25
+            </div>
+        `).join('');
+        breakdownContainer.innerHTML = breakdownHtml;
+
+        // Inject recommendations
+        const recommendationsContainer = tempDiv.querySelector('#recommendations-container');
+        const recommendationsHtml = results.recommendations.slice(0, 3).map(rec => `<li>${rec}</li>`).join('');
+        recommendationsContainer.innerHTML = recommendationsHtml;
+
+        // 4. Generate PDF from the populated HTML
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
         
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'px',
-            format: 'a4'
+        await pdf.html(tempDiv, {
+            callback: function (doc) {
+                doc.save(`Free-Risk-Assessment-${formData.toolName.replace(/\s/g, '-')}.pdf`);
+                showMessage('✅ Free PDF downloaded successfully', 'success');
+            },
+            x: 10,
+            y: 10,
+            width: 190,
+            windowWidth: 800 
         });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgData = canvas.toDataURL('image/png');
-        
-        // Add image to PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        
-        // Download PDF
-        const fileName = `AI-Risk-Assessment-${currentAssessment.formData.toolName.replace(/\s/g, '-')}-Free.pdf`;
-        pdf.save(fileName);
-        
-        showMessage('✅ Free PDF downloaded successfully', 'success');
-        
+
     } catch (error) {
         console.error('❌ Free PDF export failed:', error);
-        showMessage('Failed to generate free PDF: ' + error.message, 'error');
+        showMessage(`Failed to generate PDF: ${error.message}`, 'error');
     }
 }
 
@@ -1502,71 +1509,6 @@ function b64toBlob(b64Data, contentType='', sliceSize=512) {
     }
 
     return new Blob(byteArrays, {type: contentType});
-}
-
-// Generates a simplified, printable HTML for the free PDF export
-function generatePrintableHTML(assessment) {
-    const { formData, results } = assessment;
-    
-    // Basic styles for the printable version
-    const styles = `
-        <style>
-            body { font-family: sans-serif; padding: 20px; color: #333; }
-            .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-            h1 { font-size: 24px; margin: 0; }
-            h2 { font-size: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px; }
-            .section { margin-bottom: 20px; }
-            .section-title { font-weight: bold; font-size: 16px; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-            .item { background: #f9f9f9; padding: 10px; border-radius: 5px; }
-            .item-label { font-weight: bold; }
-            .score { text-align: center; margin-bottom: 20px; }
-            .score-number { font-size: 48px; font-weight: bold; }
-            .score-label { font-size: 18px; }
-        </style>
-    `;
-    
-    // HTML content
-    return `
-        ${styles}
-        <div class="header">
-            <h1>AI Tool Risk Assessment Report</h1>
-        </div>
-        
-        <div class="score">
-            <div class="score-number">${results.finalScore}</div>
-            <div class="score-label">${results.riskLevel.toUpperCase()} RISK</div>
-        </div>
-        
-        <h2>Tool Information</h2>
-        <div class="section grid">
-            <div class="item"><span class="item-label">Tool Name:</span> ${formData.toolName}</div>
-            <div class="item"><span class="item-label">Version:</span> ${formData.toolVersion}</div>
-            <div class="item"><span class="item-label">Category:</span> ${formData.toolCategory || 'N/A'}</div>
-            <div class="item"><span class="item-label">Use Case:</span> ${formData.useCase || 'N/A'}</div>
-        </div>
-        
-        <h2>Data Classification</h2>
-        <div class="section">
-            <div class="item"><span class="item-label">Data Type:</span> ${formData.dataClassification}</div>
-        </div>
-        
-        <h2>Risk Breakdown</h2>
-        <div class="section grid">
-            ${Object.entries(results.breakdown).map(([category, data]) => `
-                <div class="item">
-                    <span class="item-label">${category}:</span> ${data.score}
-                </div>
-            `).join('')}
-        </div>
-        
-        <h2>Key Recommendations</h2>
-        <div class="section">
-            <ul>
-                ${results.recommendations.slice(0, 3).map(rec => `<li>${rec}</li>`).join('')}
-            </ul>
-        </div>
-    `;
 }
 
 // Premium HTML export
