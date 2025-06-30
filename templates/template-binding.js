@@ -212,10 +212,17 @@ class TemplateBindingEngine {
         const recommendations = this.generateSmartRecommendations(assessmentData);
         
         return recommendations.map(rec => `
-            <li class="recommendation-item priority-${rec.priority}">
-                <div class="recommendation-title">${rec.title}</div>
+            <li class="priority-${rec.priority}">
+                <div class="priority-indicator"></div>
+                <div class="recommendation-title">
+                    ${rec.title}
+                    <span class="priority-badge">${rec.priority} Priority</span>
+                </div>
                 <div class="recommendation-text">${rec.description}</div>
-                ${rec.timeline ? `<div class="recommendation-meta">Timeline: ${rec.timeline} | Owner: ${rec.owner}</div>` : ''}
+                <div class="recommendation-meta">
+                    <span>Timeline: ${rec.timeline}</span>
+                    <span>Owner: ${rec.owner}</span>
+                </div>
             </li>
         `).join('');
     }
