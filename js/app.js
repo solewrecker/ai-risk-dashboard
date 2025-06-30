@@ -458,151 +458,105 @@ async function simulateAnalysisSteps() {
 }
 
 async function generateAssessmentResults(formData) {
-    console.log('🚀 Starting assessment generation for:', formData.toolName);
-    
-    try {
-        // Try to get tool from database first
-        const baseScoreResult = await getToolFromDatabase(formData);
-        const baseScore = baseScoreResult.score;
-        const source = baseScoreResult.source;
-        
-        console.log('📊 Base score retrieved:', baseScore, 'from', source);
-        
-        const adjustedScore = applyMultipliers(baseScore, formData);
-        
-        // Debug logging
-        console.log('=== TARGETED MULTIPLIER DEBUG ===');
-        console.log('Tool:', formData.toolName, formData.toolVersion);
-        console.log('Base Score:', baseScore, 'Source:', source);
-        console.log('Data Classification:', formData.dataClassification, 'Multiplier:', DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification]);
-        console.log('Use Case:', formData.useCase, 'Multiplier:', USE_CASE_MULTIPLIERS[formData.useCase]);
-        
-        // Show which sections are affected
-        const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
-        const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
-        console.log('🎯 Sections affected by Data Classification multiplier:', 'Data Storage & Compliance Risk');
-        console.log('🎯 Sections affected by Use Case multiplier:', 'Compliance Risk & Access Controls');
-        console.log('📊 Final Score:', Math.min(100, Math.round(adjustedScore)));
-        console.log('==========================================');
-        
-        // Store tool data for breakdown generation
-        window.lastToolData = baseScoreResult;
-        
-        const riskLevel = getRiskLevel(adjustedScore);
-    
-    console.log('📋 Generating breakdown...');
-    const breakdown = await generateBreakdown(formData);
-    console.log('✅ Breakdown complete');
-    console.log('🔍 Breakdown structure:', breakdown);
-        
-        const recommendations = generateRecommendations(adjustedScore, formData);
-        console.log('✅ Assessment complete');
-        
-        return {
-            toolName: formData.toolName,
-            baseScore: baseScore,
-            finalScore: Math.min(100, Math.round(adjustedScore)),
-            riskLevel: riskLevel,
-            breakdown: breakdown,
-            recommendations: recommendations,
-            timestamp: new Date().toISOString(),
-            source: source,
-            enhancedInfo: window.currentEnhancedInfo || null
-        };
-    } catch (error) {
-        console.error('❌ Error in assessment generation:', error);
-        throw error; // Re-throw so the calling function can handle it
-    }
-}
+    console.log('📊 Generating assessment results for:', formData.toolName);
 
-async function getToolFromDatabase(formData) {
-    // Try Supabase directly (fallback database removed for consistency)
-    console.log('🔍 Querying Supabase for tool data...');
-    try {
-        // Build search term based on tool name and version
-        const searchTerms = buildSearchTerms(formData.toolName, formData.toolVersion);
+    // Fetch the tool data from the database first
+    const toolData = await getToolFromDatabase(formData);
+
+    let baseScore, breakdown, recommendations, finalScore;
+
+    if (toolData && toolData.total_score !== undefined) {
+        console.log('🎯 [RESULTS] Using actual tool data:', { 
+            toolName: toolData.name, 
+            category: toolData.category, 
+            selectedTool: toolData.selected_tool_version,
+            toolVersion: formData.toolVersion
+        });
         
-        console.log('Searching Supabase for:', searchTerms);
+        // IMPORTANT: The backend is the source of truth. Recalculate score on client-side
+        // to match what the PDF export will do.
+        const componentScores = applyClientSideMultipliers(toolData, formData);
+        finalScore = Object.values(componentScores).reduce((sum, score) => sum + score, 0);
         
-        // Try each search term until we find a match
-        for (const searchTerm of searchTerms) {
-            console.log(`🔍 Trying Supabase search term: "${searchTerm}"`);
-            
-            // Search for exact version match first
-            const { data, error } = await supabase
-                .from('ai_tools')
-                .select('name, total_score, detailed_assessment, breakdown, details, risk_level, compliance_score, data_storage_score, training_usage_score, access_controls_score, vendor_transparency_score')
-                .ilike('name', `%${searchTerm}%`)
-                .order('name', { ascending: true })
-                .limit(5); // Get more results to find best version match
-            
-            if (error) {
-                console.warn('Supabase query error (likely CORS):', error.message);
-                continue;
-            }
-            
-            if (data && data.length > 0) {
-                console.log(`🔍 Found ${data.length} matches:`, data.map(t => `${t.name} (${t.total_score})`));
-                
-                // Find the best match for the requested version with enhanced priority
-                let bestMatch = data[0]; // Default to first
-                let exactMatch = null;
-                let versionMatch = null;
-                
-                const requestedVersion = formData.toolVersion.toLowerCase();
-                console.log(`🎯 Looking for ${requestedVersion} version among:`, data.map(t => t.name));
-                
-                for (const tool of data) {
-                    const toolNameLower = tool.name.toLowerCase();
-                    
-                    // PRIORITY 1: Exact version match (Claude.ai Enterprise)
-                    if (requestedVersion === 'enterprise' && toolNameLower.includes('enterprise')) {
-                        exactMatch = tool;
-                        console.log(`🎯 EXACT ENTERPRISE MATCH: ${tool.name} (score: ${tool.total_score})`);
-                        break; // Stop searching, we found the perfect match
-                    } else if (requestedVersion === 'free' && toolNameLower.includes('free')) {
-                        exactMatch = tool;
-                        console.log(`🎯 EXACT FREE MATCH: ${tool.name} (score: ${tool.total_score})`);
-                        break;
-                    }
-                    
-                    // PRIORITY 2: Version-aware match (avoid wrong versions)
-                    if (requestedVersion === 'enterprise' && !toolNameLower.includes('free')) {
-                        if (!versionMatch) versionMatch = tool;
-                    } else if (requestedVersion === 'free' && !toolNameLower.includes('enterprise')) {
-                        if (!versionMatch) versionMatch = tool;
-                    }
-                }
-                
-                // Select best match in priority order
-                bestMatch = exactMatch || versionMatch || bestMatch;
-                
-                console.log(`🎯 SELECTED MATCH: ${bestMatch.name} (score: ${bestMatch.total_score})`);
-                console.log('Detailed assessment available:', !!bestMatch.detailed_assessment);
-                
-                return { 
-                    score: bestMatch.total_score, 
-                    source: 'database',
-                    toolData: bestMatch,
-                    hasDetailedAssessment: !!bestMatch.detailed_assessment
-                };
-            }
-        }
+        baseScore = toolData.total_score;
+        breakdown = await generateBreakdown(formData, toolData);
+        recommendations = generateRecommendations(finalScore, formData, toolData);
         
-        console.log('Tool not found in Supabase, using heuristic scoring');
+        // Update formData with the name from DB to ensure consistency
+        formData.toolName = toolData.name;
         
-    } catch (error) {
-        console.warn('Supabase lookup failed (likely CORS):', error.message);
+    } else {
+        console.log('⚠️ [RESULTS] No specific tool data found, generating heuristic assessment');
+        baseScore = generateHeuristicScore(formData);
+        finalScore = applyMultipliers(baseScore, formData);
+        breakdown = await generateBreakdown(formData);
+        recommendations = generateRecommendations(finalScore, formData);
     }
-    
-    // Fall back to heuristic
-    return { 
-        score: generateHeuristicScore(formData), 
-        source: 'heuristic' 
+
+    return {
+        toolName: formData.toolName,
+        baseScore: baseScore,
+        finalScore: finalScore,
+        riskLevel: getRiskLevel(finalScore),
+        breakdown: breakdown,
+        recommendations: recommendations,
+        timestamp: new Date().toISOString(),
+        source: 'database',
+        enhancedInfo: window.currentEnhancedInfo || null
     };
 }
 
-// checkFallbackDatabase function removed - using Supabase directly
+async function getToolFromDatabase(formData) {
+    const { toolName, toolVersion } = formData;
+    console.log(`🔍 [DB] Searching for: ${toolName}, Version: ${toolVersion}`);
+
+    try {
+        let toolData = null;
+        let error = null;
+
+        // 1. Try for an exact match on the full name first
+        const exactMatchResponse = await supabase
+            .from('ai_tools')
+            .select('*')
+            .eq('name', toolName)
+            .limit(1)
+            .single();
+
+        if (exactMatchResponse.data) {
+            console.log(`✅ [DB] Found exact match for "${toolName}"`);
+            toolData = exactMatchResponse.data;
+        } else {
+            // 2. If no exact match, fall back to a broader search on the base name
+            console.log(`... No exact match for "${toolName}", trying broader search.`);
+            const baseToolName = toolName.split(' ')[0];
+            const broadMatchResponse = await supabase
+                .from('ai_tools')
+                .select('*')
+                .ilike('name', `%${baseToolName}%`)
+                .order('name', { ascending: true }) // Prefer shorter names if multiple match
+                .limit(1)
+                .single();
+            
+            if (broadMatchResponse.data) {
+                console.log(`✅ [DB] Found broad match: "${broadMatchResponse.data.name}"`);
+                toolData = broadMatchResponse.data;
+            } else {
+                error = broadMatchResponse.error;
+            }
+        }
+
+        if (error && !toolData) {
+            console.warn('[DB] No tool found in database after all attempts:', error.message);
+            return null;
+        }
+        
+        return toolData;
+
+    } catch (err) {
+        console.error('❌ [DB] Critical error during database fetch:', err.message);
+        return null;
+    }
+}
 
 function buildSearchTerms(toolName, toolVersion) {
     const cleanToolName = toolName.trim();
@@ -668,51 +622,42 @@ function generateHeuristicScore(formData) {
 }
 
 function applyMultipliers(baseScore, formData) {
-    // Break down the base score into components proportionally
-    // Based on framework: Data Storage(25), Training(25), Access(20), Compliance(20), Vendor(10)
-    const scoreBreakdown = {
-        dataStorage: Math.round(baseScore * 0.25), // 25% of total
-        trainingUsage: Math.round(baseScore * 0.25), // 25% of total
-        accessControls: Math.round(baseScore * 0.20), // 20% of total
-        complianceRisk: Math.round(baseScore * 0.20), // 20% of total
-        vendorTransparency: Math.round(baseScore * 0.10) // 10% of total
-    };
-    
-    // Apply targeted data classification multipliers
-    const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
-    scoreBreakdown.dataStorage *= dataMultiplier; // Data storage most affected by data type
-    scoreBreakdown.complianceRisk *= dataMultiplier; // Compliance risk varies by data type
-    
-    // Apply targeted use case multipliers  
-    const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
-    scoreBreakdown.complianceRisk *= useCaseMultiplier; // Legal use cases need higher compliance
-    scoreBreakdown.accessControls *= useCaseMultiplier; // Sensitive use cases need better controls
-    
-    // Round the final component scores
-    scoreBreakdown.dataStorage = Math.round(scoreBreakdown.dataStorage);
-    scoreBreakdown.trainingUsage = Math.round(scoreBreakdown.trainingUsage);
-    scoreBreakdown.accessControls = Math.round(scoreBreakdown.accessControls);
-    scoreBreakdown.complianceRisk = Math.round(scoreBreakdown.complianceRisk);
-    scoreBreakdown.vendorTransparency = Math.round(scoreBreakdown.vendorTransparency);
-    
-    // Store breakdown for use in results display
-    window.currentScoreBreakdown = scoreBreakdown;
-    
-    // Recalculate total score from adjusted components
-    const adjustedScore = scoreBreakdown.dataStorage + 
-                        scoreBreakdown.trainingUsage + 
-                        scoreBreakdown.accessControls + 
-                        scoreBreakdown.complianceRisk + 
-                        scoreBreakdown.vendorTransparency;
-    
-    return adjustedScore;
+    let finalScore = baseScore;
+    const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1;
+    const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1;
+    finalScore *= dataMultiplier;
+    finalScore *= useCaseMultiplier;
+    return Math.round(finalScore);
+}
+
+// Client-side equivalent of the backend multiplier logic
+function applyClientSideMultipliers(dbData, formData) {
+  if (!dbData) return { dataStorage: 0, trainingUsage: 0, accessControls: 0, complianceRisk: 0, vendorTransparency: 0 };
+  
+  const baseScores = {
+    dataStorage: dbData.data_storage_score || 0,
+    trainingUsage: dbData.training_usage_score || 0,
+    accessControls: dbData.access_controls_score || 0,
+    complianceRisk: dbData.compliance_score || 0,
+    vendorTransparency: dbData.vendor_transparency_score || 0
+  };
+  
+  const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1.0;
+  baseScores.dataStorage = Math.round(baseScores.dataStorage * dataMultiplier);
+  baseScores.complianceRisk = Math.round(baseScores.complianceRisk * dataMultiplier);
+  
+  const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1.0;
+  baseScores.complianceRisk = Math.round(baseScores.complianceRisk * useCaseMultiplier);
+  baseScores.accessControls = Math.round(baseScores.accessControls * useCaseMultiplier);
+  
+  return baseScores;
 }
 
 function getRiskLevel(score) {
-    if (score >= 80) return 'critical';
-    if (score >= 60) return 'high';
-    if (score >= 35) return 'medium';
-    return 'low';
+    if (score >= 75) return 'Critical';
+    if (score >= 60) return 'High';
+    if (score >= 35) return 'Medium';
+    return 'Low';
 }
 
 function getUseCaseLabel(useCase) {
