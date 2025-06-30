@@ -1,7 +1,12 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { chromium } from "npm:playwright@1.44.1";
+import { chromium } from "npm:playwright-core";
+import sparticuzChromium from "npm:@sparticuz/chromium@123.0.1";
 import { corsHeaders } from "../premium-template/cors.ts"; // Re-use cors headers
 import { generatePremiumHTML } from "../premium-template/templates.ts"; // Re-use html template
+
+// Set headless and no-sandbox flags for serverless environments
+sparticuzChromium.setHeadlessMode = true;
+sparticuzChromium.setNoSandboxMode = true;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -30,8 +35,13 @@ serve(async (req) => {
 
     const html = generatePremiumHTML(templateData);
 
-    // Launch headless Chrome
-    const browser = await chromium.launch({ headless: true });
+    // Launch headless Chrome using the bundled executable
+    const browser = await chromium.launch({
+      executablePath: await sparticuzChromium.executablePath(),
+      args: sparticuzChromium.args,
+      headless: true,
+    });
+
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 
     // Feed the HTML string directly to the page
