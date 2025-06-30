@@ -49,14 +49,29 @@ serve(async (req) => {
       });
     }
 
-    // 3. Fetch tool-specific data from the database
+    // 3. Fetch tool-specific data from the database with improved logic
     console.log(`🔍 Fetching data for tool: ${toolName}`);
-    const { data: dbData, error: dbError } = await supabase
+    let dbData, dbError;
+
+    // First, try to find an exact match for the full tool name
+    ({ data: dbData, error: dbError } = await supabase
         .from('ai_tools')
         .select('*')
-      .ilike('name', `%${toolName}%`)
-      .limit(1)
-      .single();
+        .eq('name', toolName) // Exact match
+        .limit(1)
+        .single());
+
+    // If no exact match is found, try a broader search (e.g., "ChatGPT" from "ChatGPT Enterprise")
+    if (dbError || !dbData) {
+        console.log(`... No exact match for "${toolName}", trying a broader search.`);
+        const baseToolName = toolName.split(' ')[0]; // Simple split to get the base name
+        ({ data: dbData, error: dbError } = await supabase
+            .from('ai_tools')
+            .select('*')
+            .ilike('name', `%${baseToolName}%`)
+            .limit(1)
+            .single());
+    }
 
     if (dbError) {
       console.error('Database query error:', dbError.message);
