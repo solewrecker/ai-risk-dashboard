@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { chromium } from "npm:playwright@1.44.1";
-import { corsHeaders } from "./cors.ts";
-import { generatePremiumHTML } from "./templates.ts";
+import { corsHeaders } from "../premium-template/cors.ts"; // Re-use cors headers
+import { generatePremiumHTML } from "../premium-template/templates.ts"; // Re-use html template
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

@@ -2807,7 +2807,7 @@
                     useCase: currentAssessment.formData.useCase
                 };
 
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template/pdf`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-pdf`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${session.access_token}`,
