@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Risk Assessment Report</title>
-
-    <!-- Add html2canvas and jsPDF for high-quality export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
     <style>
         /* === DYNAMIC VARIABLES === */
         :root {
@@ -730,26 +725,11 @@
             .risk-matrix-section {
                 page-break-before: always;
             }
-
-            .print-button-container {
-                display: none;
-            }
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="print-button-container">
-        <button id="exportButton" class="print-trigger">
-            <span class="print-icon">📄</span>
-            <span id="exportButtonText" class="print-text">Export Report</span>
-        </button>
-    </div>
-
-    <div class="report-container" id="reportContainer">
+    <div class="report-container">
         <!-- Header -->
         <div class="header">
             <div class="header-content">
@@ -1794,71 +1774,6 @@
             
             loadSecurityAssessment();
         });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const exportButton = document.getElementById('exportButton');
-            const exportButtonText = document.getElementById('exportButtonText');
-            
-            // Default to 'free' mode if not specified
-            const exportMode = window.exportMode || 'free'; 
-
-            if (exportMode === 'premium') {
-                exportButtonText.innerHTML = 'Download PDF';
-                exportButton.addEventListener('click', downloadPremiumPDF);
-            } else {
-                exportButtonText.innerHTML = 'Print / Save PDF';
-                exportButton.addEventListener('click', () => window.print());
-            }
-        });
-
-        async function downloadPremiumPDF() {
-            const { jsPDF } = window.jspdf;
-            const reportContainer = document.getElementById('reportContainer');
-            const exportButton = document.getElementById('exportButton');
-
-            // Show loading state
-            exportButton.disabled = true;
-            exportButton.innerHTML = '<span class="print-text">Processing...</span>';
-
-            try {
-                // Use html2canvas to capture the report container
-                const canvas = await html2canvas(reportContainer, {
-                    scale: 2, // Higher scale for better quality
-                    useCORS: true,
-                    logging: true,
-                    width: reportContainer.scrollWidth,
-                    height: reportContainer.scrollHeight,
-                    windowWidth: reportContainer.scrollWidth,
-                    windowHeight: reportContainer.scrollHeight
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                
-                // Calculate PDF dimensions
-                const pdfWidth = 210; // A4 width in mm
-                const imgWidth = canvas.width;
-                const imgHeight = canvas.height;
-                const ratio = imgWidth / pdfWidth;
-                const pdfHeight = imgHeight / ratio;
-
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save('AI-Risk-Assessment-Report.pdf');
-
-            } catch (error) {
-                console.error('Failed to generate premium PDF:', error);
-                alert('There was an error generating the PDF. Please try again.');
-            } finally {
-                // Restore button
-                exportButton.disabled = false;
-                exportButton.innerHTML = '<span class="print-icon">📄</span><span id="exportButtonText" class="print-text">Download PDF</span>';
-            }
-        }
     </script>
 </body>
 </html>

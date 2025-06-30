@@ -953,7 +953,7 @@
                                     max-height: 300px;
                                     overflow-y: auto;
                                 ">
-                                    <button type="button" class="export-option" onclick="openReport('free'); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="exportFreeTemplate(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -967,7 +967,7 @@
                                         📄 <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="openReport('premium'); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="exportPremiumPDF(); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -980,6 +980,19 @@
                                     ">
                                         🌟 <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
                                         <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
+                                    </button>
+                                    <button type="button" class="export-option" onclick="exportAssessment(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                    ">
+                                        📄 <strong>PDF Report (jsPDF)</strong><br>
+                                        <small style="color: #64748b;">Manual layout</small>
                                     </button>
                                     <button type="button" class="export-option" onclick="exportPremiumHTML(); hideExportMenu();" style="
                                         display: block;
@@ -994,7 +1007,18 @@
                                         🌐 <strong>HTML Report</strong><br>
                                         <small style="color: #64748b;">Viewable in browser</small>
                                     </button>
-                                
+                                    <button type="button" class="export-option" onclick="exportAssessmentJSON(); hideExportMenu();" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                    ">
+                                        📊 <strong>JSON Data</strong><br>
+                                        <small style="color: #64748b;">Raw assessment data</small>
+                                    </button>
                                 </div>
                             </div>
                             <button type="button" class="btn btn-secondary" onclick="saveToDatabase()">
@@ -1983,6 +2007,87 @@
                     description: isEnterprise ? 'Better documentation and support channels' : 'Limited transparency on data practices' 
                 }
             };
+        }
+
+        // OLD: Legacy enterprise assessment paywall (now deprecated)
+        async function showLegacyEnterprisePaywall() {
+            return new Promise((resolve) => {
+                const paywallHTML = `
+                    <div style="
+                        position: fixed; 
+                        top: 0; left: 0; 
+                        width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        z-index: 1000;
+                    ">
+                        <div style="
+                            background: white; 
+                            padding: 2rem; 
+                            border-radius: 1rem; 
+                            max-width: 500px; 
+                            text-align: center;
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        ">
+                            <h3 style="color: #1e293b; margin-bottom: 1rem;">🔒 Enterprise Assessment</h3>
+                            <p style="color: #64748b; margin-bottom: 2rem;">
+                                Enterprise assessments provide detailed category-by-category analysis using 
+                                objective security criteria with comprehensive justifications.
+                            </p>
+                            <div style="
+                                background: #f8fafc; 
+                                padding: 1rem; 
+                                border-radius: 0.5rem; 
+                                margin-bottom: 2rem;
+                                border-left: 4px solid #3b82f6;
+                            ">
+                                <p style="font-weight: 600; color: #1e293b;">📊 Pro Assessment Features</p>
+                                <p style="font-size: 0.875rem; color: #64748b;">
+                                    • <strong>Detailed Component Scoring:</strong> Individual scores for each security category with evidence<br>
+                                    • <strong>Objective Criteria Analysis:</strong> Measurable standards vs. subjective assessments<br>
+                                    • <strong>Compliance Justifications:</strong> Specific reasoning for each risk factor<br>
+                                    • <strong>Subcategory Breakdowns:</strong> Geographic, encryption, retention analysis<br>
+                                    • <strong>Audit-Ready Reports:</strong> Defensible documentation for enterprise decisions
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="paywallContinue" style="
+                                    background: #3b82f6; 
+                                    color: white; 
+                                    border: none; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Continue Free Assessment</button>
+                                <button id="paywallCancel" style="
+                                    background: #f8fafc; 
+                                    color: #475569; 
+                                    border: 1px solid #e2e8f0; 
+                                    padding: 0.75rem 1.5rem; 
+                                    border-radius: 0.5rem; 
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                ">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', paywallHTML);
+                
+                document.getElementById('paywallContinue').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    resolve(true);
+                };
+                
+                document.getElementById('paywallCancel').onclick = () => {
+                    document.body.removeChild(document.body.lastChild);
+                    resolve(false);
+                };
+            });
         }
 
         function generateRecommendations(score, formData) {
@@ -3814,6 +3919,20 @@
             URL.revokeObjectURL(url);
         }
 
+        // === LEGACY HTML TEMPLATE (Simplified - Now using separate template system) ===
+        class AIRiskReportGenerator {
+            constructor() {
+                console.warn('AIRiskReportGenerator is deprecated. Use TemplateBindingEngine instead.');
+                // Minimal template for fallback compatibility
+                this.template = '<html><head><title>Legacy Report</title></head><body><h1>Please use new template system</h1></body></html>';
+            }
+
+            generateReport(data) {
+                console.warn('Using deprecated generateReport. Please use TemplateBindingEngine instead.');
+                return this.template;
+            }
+        }
+
         // === ENHANCED PDF EXPORT OPTIONS ===
         class EnhancedPDFExporter {
             
@@ -3837,9 +3956,421 @@
                         templateManager: typeof window.templateManager,
                         jsPDF: typeof window.jspdf
                     });
-                    alert('Could not generate PDF report. Please ensure you are logged in and try again. If the issue persists, contact support.');
+                    // Fallback to jsPDF
+                    return this.exportJsPDF(assessmentData);
                 }
             }
+            
+            // Option 2: jsPDF Enhanced (Current working version)
+            exportJsPDF(assessmentData) {
+                return generatePDFReportOriginal(assessmentData); // Use existing function
+            }
+            
+            // Option 3: Save as HTML file
+            exportHTML(assessmentData) {
+                const generator = new AIRiskReportGenerator();
+                const reportData = this.convertAssessmentData(assessmentData);
+                const html = generator.generateReport(reportData);
+                
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ai-risk-assessment-' + reportData.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-' + new Date().toISOString().split('T')[0] + '.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            convertAssessmentData(assessment) {
+                const riskDescriptions = {
+                    'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                    'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                    'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                    'low': 'Basic monitoring sufficient. Tool meets security standards.'
+                };
+                
+                const dataLabels = {
+                    'phi': 'Protected Health Information (PHI)',
+                    'financial': 'Financial/Payment Data',
+                    'trade-secrets': 'Trade Secrets/Intellectual Property',
+                    'pii': 'Personally Identifiable Information',
+                    'public': 'Public/Marketing Data'
+                };
+                
+                const toolName = assessment.results.toolName + 
+                    (assessment.formData.toolVersion === 'enterprise' && 
+                     !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+                
+                return {
+                    toolName: toolName,
+                    category: assessment.formData.toolCategory,
+                    useCase: getUseCaseLabel(assessment.formData.useCase),
+                    dataClassification: dataLabels[assessment.formData.dataClassification] || 'Unknown',
+                    riskScore: assessment.results.finalScore,
+                    riskLevel: assessment.results.riskLevel,
+                    riskDescription: riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.',
+                    categories: Object.entries(assessment.results.breakdown).map(([name, data]) => ({
+                        name: name,
+                        score: data.score,
+                        description: data.description
+                    })),
+                    recommendations: assessment.results.recommendations || []
+                };
+            }
+        }
+
+        function generatePDFReportOriginal(assessment) {
+            console.log('🔧 Starting PDF generation...', assessment);
+            
+            // Check if jsPDF is available (correct property: window.jspdf)
+            if (typeof window.jspdf === 'undefined') {
+                throw new Error('jsPDF library not loaded. Please refresh the page and try again.');
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let yPosition = 20;
+            
+            console.log('✅ jsPDF initialized');
+            
+            // === HEADER WITH BRANDING ===
+            // Background header
+            doc.setFillColor(59, 130, 246); // Blue background
+            doc.rect(0, 0, 210, 45, 'F');
+            
+            // Company logo area
+            doc.setFillColor(255, 255, 255, 0.1);
+            doc.rect(15, 8, 35, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI RISK', 17, 16);
+            doc.text('FRAMEWORK', 17, 22);
+            
+            // Main title
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AI TOOL SECURITY RISK ASSESSMENT', 105, 18, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Enterprise Security Analysis Report', 105, 28, { align: 'center' });
+            
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            doc.setFontSize(10);
+            doc.text(`Generated: ${currentDate}`, 105, 38, { align: 'center' });
+            
+            // Reset text color and position
+            doc.setTextColor(0, 0, 0);
+            yPosition = 55;
+            
+            // === TOOL INFORMATION BOX ===
+            // Background box
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 45, 'FD');
+            
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('TOOL INFORMATION', 20, yPosition + 10);
+            yPosition += 20;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            
+            const toolName = assessment.results.toolName + 
+                (assessment.formData.toolVersion === 'enterprise' && 
+                 !assessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : '');
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text(`Tool Name: ${toolName}`, 20, yPosition);
+            yPosition += 7;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            
+            if (assessment.formData.toolCategory) {
+                doc.text(`Category: ${assessment.formData.toolCategory}`, 20, yPosition);
+                yPosition += 7;
+            }
+            
+            if (assessment.formData.useCase) {
+                doc.text(`Use Case: ${getUseCaseLabel(assessment.formData.useCase)}`, 20, yPosition);
+                yPosition += 7;
+            }
+            
+            // Data Classification with colored badge
+            const dataLabels = {
+                'phi': 'Protected Health Information (PHI)',
+                'financial': 'Financial/Payment Data',
+                'trade-secrets': 'Trade Secrets/Intellectual Property',
+                'pii': 'Personally Identifiable Information',
+                'public': 'Public/Marketing Data'
+            };
+            
+            const dataType = dataLabels[assessment.formData.dataClassification] || 'Unknown';
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(220, 38, 38);
+            doc.text(`Data Classification: ${dataType}`, 20, yPosition);
+            
+            doc.setTextColor(0, 0, 0);
+            yPosition += 20;
+            
+            // === RISK SCORE PANEL ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('RISK ASSESSMENT RESULTS', 20, yPosition);
+            yPosition += 15;
+            
+            // Risk color mapping
+            const riskColors = {
+                'critical': [220, 38, 38],
+                'high': [234, 88, 12],
+                'medium': [202, 138, 4],
+                'low': [22, 163, 74]
+            };
+            
+            const riskBgColors = {
+                'critical': [254, 242, 242],
+                'high': [255, 247, 237],
+                'medium': [254, 252, 232],
+                'low': [240, 253, 244]
+            };
+            
+            const riskLabels = {
+                'critical': 'CRITICAL RISK',
+                'high': 'HIGH RISK',
+                'medium': 'MEDIUM RISK',
+                'low': 'LOW RISK'
+            };
+            
+            const riskColor = riskColors[assessment.results.riskLevel] || [0, 0, 0];
+            const riskBgColor = riskBgColors[assessment.results.riskLevel] || [248, 250, 252];
+            const riskLabel = riskLabels[assessment.results.riskLevel] || 'UNKNOWN RISK';
+            
+            // Risk score background box
+            doc.setFillColor(...riskBgColor);
+            doc.setDrawColor(...riskColor);
+            doc.setLineWidth(2);
+            doc.rect(15, yPosition, 180, 35, 'FD');
+            doc.setLineWidth(0.5);
+            
+            // Large risk score number
+            doc.setTextColor(...riskColor);
+            doc.setFontSize(32);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${assessment.results.finalScore}`, 25, yPosition + 20);
+            
+            // Risk score label
+            doc.setFontSize(20);
+            doc.text('RISK SCORE', 25, yPosition + 30);
+            
+            // Risk level label on the right
+            doc.setFontSize(18);
+            doc.text(riskLabel, 120, yPosition + 20);
+            
+            yPosition += 45;
+            
+            // Risk description box
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const riskDescriptions = {
+                'critical': 'Immediate blocking required. This tool poses severe security risks.',
+                'high': 'Significant controls needed before use. Enhanced monitoring required.',
+                'medium': 'Standard enterprise controls required. Regular audit recommended.',
+                'low': 'Basic monitoring sufficient. Tool meets security standards.'
+            };
+            
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(15, yPosition, 180, 15, 'FD');
+            doc.text(riskDescriptions[assessment.results.riskLevel] || 'Risk assessment complete.', 20, yPosition + 8);
+            yPosition += 25;
+            
+            // === BREAKDOWN TABLE ===
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('SECURITY CATEGORY BREAKDOWN', 20, yPosition);
+            yPosition += 15;
+            
+            // Table header
+            doc.setFillColor(59, 130, 246);
+            doc.rect(15, yPosition, 180, 12, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CATEGORY', 20, yPosition + 8);
+            doc.text('SCORE', 120, yPosition + 8);
+            doc.text('ASSESSMENT', 140, yPosition + 8);
+            yPosition += 12;
+            
+            // Table rows
+            const categories = Object.entries(assessment.results.breakdown);
+            categories.forEach(([category, data], index) => {
+                if (yPosition > 240) {
+                    doc.addPage();
+                    yPosition = 20;
+                    
+                    // Redraw header on new page
+                    doc.setFillColor(59, 130, 246);
+                    doc.rect(15, yPosition, 180, 12, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CATEGORY', 20, yPosition + 8);
+                    doc.text('SCORE', 120, yPosition + 8);
+                    doc.text('ASSESSMENT', 140, yPosition + 8);
+                    yPosition += 12;
+                }
+                
+                // Alternating row colors
+                const rowColor = index % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+                doc.setFillColor(...rowColor);
+                doc.rect(15, yPosition, 180, 20, 'F');
+                
+                // Row border
+                doc.setDrawColor(226, 232, 240);
+                doc.rect(15, yPosition, 180, 20);
+                
+                // Category name
+                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.text(category, 18, yPosition + 8);
+                
+                // Score with color coding
+                const scoreNum = parseInt(data.score.split('/')[0]);
+                const maxScore = parseInt(data.score.split('/')[1]);
+                const scorePercent = scoreNum / maxScore;
+                
+                let scoreColor = [22, 163, 74]; // Green (good)
+                if (scorePercent > 0.7) scoreColor = [220, 38, 38]; // Red (bad)
+                else if (scorePercent > 0.4) scoreColor = [234, 88, 12]; // Orange (medium)
+                
+                doc.setTextColor(...scoreColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(data.score, 122, yPosition + 8);
+                
+                // Description
+                doc.setTextColor(75, 85, 99);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                const description = data.description.length > 45 ? 
+                    data.description.substring(0, 45) + '...' : data.description;
+                
+                // Word wrap for description
+                const lines = doc.splitTextToSize(description, 50);
+                let lineY = yPosition + 6;
+                lines.slice(0, 2).forEach(line => {
+                    doc.text(line, 142, lineY);
+                    lineY += 5;
+                });
+                
+                yPosition += 20;
+            });
+            
+            yPosition += 10;
+            
+            // === RECOMMENDATIONS ===
+            if (assessment.results.recommendations && assessment.results.recommendations.length > 0) {
+                if (yPosition > 200) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                // Recommendations header
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(30, 41, 59);
+                doc.text('RECOMMENDATIONS', 20, yPosition);
+                yPosition += 15;
+                
+                // Recommendations box
+                const recHeight = Math.min(assessment.results.recommendations.length * 12 + 10, 60);
+                doc.setFillColor(255, 251, 235);
+                doc.setDrawColor(251, 191, 36);
+                doc.rect(15, yPosition, 180, recHeight, 'FD');
+                
+                yPosition += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(146, 64, 14);
+                
+                assessment.results.recommendations.forEach((rec, index) => {
+                    if (yPosition > 270) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    // Bullet point with icon
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${index + 1}.`, 20, yPosition);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    const recLines = doc.splitTextToSize(rec, 160);
+                    recLines.slice(0, 2).forEach((line, lineIndex) => {
+                        doc.text(line, 30, yPosition + (lineIndex * 4));
+                    });
+                    yPosition += Math.min(recLines.length * 4, 8) + 4;
+                });
+                
+                yPosition += 10;
+            }
+            
+            // === PROFESSIONAL FOOTER ===
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                
+                // Footer background
+                doc.setFillColor(248, 250, 252);
+                doc.rect(0, 275, 210, 22, 'F');
+                
+                // Footer line
+                doc.setDrawColor(59, 130, 246);
+                doc.setLineWidth(1);
+                doc.line(15, 278, 195, 278);
+                doc.setLineWidth(0.5);
+                
+                // Footer text
+                doc.setFontSize(8);
+                doc.setTextColor(75, 85, 99);
+                doc.setFont('helvetica', 'normal');
+                doc.text('AI Tool Risk Assessment Framework v2.0', 20, 285);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(220, 38, 38);
+                doc.text('CONFIDENTIAL - Internal Use Only', 105, 285, { align: 'center' });
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(75, 85, 99);
+                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
+                
+                // Assessment ID
+                doc.setFontSize(7);
+                doc.setTextColor(156, 163, 175);
+                doc.text(`Assessment ID: ${Date.now()}`, 105, 292, { align: 'center' });
+            }
+            
+            // === SAVE PDF ===
+            const fileName = `ai-risk-assessment-${toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            
+            console.log('💾 Saving PDF as:', fileName);
+            doc.save(fileName);
+            console.log('✅ PDF generation complete!');
         }
 
         function startNewAssessment() {
@@ -3884,86 +4415,6 @@
                 }
             }, 3000);
         });
-
-        // This class is now a lightweight wrapper
-        class EnhancedPDFExporter {
-            async exportTemplatedPDF(assessmentData) {
-                try {
-                    if (typeof window.TemplateBindingEngine !== 'undefined') {
-                        const engine = new window.TemplateBindingEngine();
-                        // This now calls our new high-quality PDF export function
-                        await engine.exportPDFReport(assessmentData);
-                    } else {
-                        throw new Error('Template system not loaded');
-                    }
-                } catch (error) {
-                    console.error('PDF export failed:', error);
-                    alert('Could not generate PDF report. Please ensure all required scripts are loaded and try again.');
-                }
-            }
-        }
-
-        /**
-         * NEW: Opens the report in a new window and triggers the browser's print dialog.
-         * This is for the "Free" PDF export option.
-         */
-        async function exportPrintablePDF() {
-            if (!currentAssessment) {
-                showMessage('No assessment result to export.', 'error');
-                return;
-            }
-
-            try {
-                const engine = new window.TemplateBindingEngine();
-                const html = await engine.exportHTMLReport(currentAssessment);
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.focus();
-                setTimeout(() => {
-                    printWindow.print();
-                }, 500); // Timeout helps ensure content is rendered
-            } catch (error) {
-                console.error('Printable PDF export failed:', error);
-                alert('Could not generate printable report. Please try again.');
-            }
-        }
-
-        /**
-         * Opens the report in a new window, passing the export mode.
-         * @param {'free' | 'premium'} mode - The export mode to use.
-         */
-        async function openReport(mode) {
-            if (!currentAssessment) {
-                showMessage('No assessment result to export.', 'error');
-                return;
-            }
-
-            try {
-                const engine = new window.TemplateBindingEngine();
-                let html = await engine.exportHTMLReport(currentAssessment);
-
-                // Inject the exportMode variable into the new page
-                const scriptToInject = `<script>window.exportMode = '${mode}';</script>`;
-                html = html.replace('</head>', scriptToInject + '</head>');
-
-                const reportWindow = window.open('', '_blank');
-                reportWindow.document.write(html);
-                reportWindow.document.close();
-                reportWindow.focus();
-            } catch (error) {
-                console.error('Failed to open report:', error);
-                alert('Could not generate the report. Please try again.');
-            }
-        }
-
-        function hideExportMenuOnClickOutside(event) {
-            const menu = document.getElementById('exportMenu');
-            const button = document.getElementById('exportMainBtn');
-            if (!menu.contains(event.target) && !button.contains(event.target)) {
-                hideExportMenu();
-            }
-        }
     </script>
 </body>
 </html>
