@@ -73,9 +73,15 @@ class TemplateBindingEngine {
         }
 
         try {
-            const response = await fetch(templatePath);
+            // Handle relative paths
+            const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const absolutePath = templatePath.startsWith('./') ? 
+                basePath + '/' + templatePath.substring(2) : 
+                templatePath;
+
+            const response = await fetch(absolutePath);
             if (!response.ok) {
-                throw new Error(`Failed to load template: ${response.status}`);
+                throw new Error(`Failed to load template: ${response.status} - ${absolutePath}`);
             }
             const template = await response.text();
             this.templateCache.set(templatePath, template);
