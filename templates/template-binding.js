@@ -507,25 +507,111 @@ class TemplateBindingEngine {
     async exportHTMLReport(assessmentData, templatePath = './templates/export-template.html') {
         try {
             const html = await this.generateHTMLReport(assessmentData, templatePath);
-            
-            // Create and download file
-            const blob = new Blob([html], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            
-            const fileName = `ai-risk-assessment-${assessmentData.results.toolName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.html`;
-            
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            return { success: true, fileName };
+            return html;
         } catch (error) {
-            console.error('HTML export error:', error);
+            console.error('HTML export failed:', error);
             throw error;
+        }
+    }
+
+    /**
+     * NEW: Export report as a PDF using html2canvas and jsPDF
+     */
+    async exportPDFReport(assessmentData, templatePath = './templates/export-template.html') {
+        console.log('Starting PDF export process...');
+        
+        // 1. Show a loading indicator
+        const loadingEl = document.createElement('div');
+        loadingEl.id = 'pdf-loading-indicator';
+        loadingEl.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9998; display: flex; justify-content: center; align-items: center; color: white; font-family: sans-serif; flex-direction: column;">
+                <p style="font-size: 1.5rem; margin-bottom: 1rem;">Generating High-Quality PDF Report...</p>
+                <p style="font-size: 1rem;">This may take a moment. Please wait.</p>
+            </div>
+        `;
+        document.body.appendChild(loadingEl);
+
+        try {
+            // 2. Generate the full HTML for the report
+            const reportHtml = await this.generateHTMLReport(assessmentData, templatePath);
+            
+            // 3. Create a temporary, off-screen container to render the HTML
+            const container = document.createElement('div');
+            container.id = 'pdf-render-container';
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            // Use a fixed width for consistent output
+            container.style.width = '1200px'; 
+            container.innerHTML = reportHtml;
+            document.body.appendChild(container);
+
+            // Give images a moment to load
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 4. Use html2canvas to capture the rendered container
+            console.log('Capturing HTML with html2canvas...');
+            const canvas = await html2canvas(container, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true, // Important for external images/fonts
+                logging: true,
+                onclone: (clonedDoc) => {
+                    // This is a great place to make final tweaks before rendering
+                    // For example, ensuring the print button isn't shown
+                    const printButton = clonedDoc.querySelector('.print-button');
+                    if(printButton) printButton.style.display = 'none';
+                }
+            });
+            console.log('Canvas created successfully.');
+
+            // 5. Use jsPDF to create a PDF from the canvas
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            
+            // A4 page size: 210mm wide, 297mm tall
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const canvasAspectRatio = canvasWidth / canvasHeight;
+            
+            // Calculate height that maintains aspect ratio
+            const imgHeight = pdfWidth / canvasAspectRatio;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+
+            // Add new pages if content overflows
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+            
+            console.log('PDF object created. Triggering download.');
+            // 6. Save the PDF
+            pdf.save(`AI-Tool-Risk-Assessment-${assessmentData.formData.toolName.replace(/\s/g, '-')}.pdf`);
+
+        } catch (error) {
+            console.error('PDF generation failed:', error);
+            alert('Could not generate the PDF. Please check the console for errors.');
+        } finally {
+            // 7. Clean up the temporary elements
+            const tempContainer = document.getElementById('pdf-render-container');
+            if (tempContainer) {
+                tempContainer.remove();
+            }
+            loadingEl.remove();
+            console.log('Cleanup complete.');
         }
     }
 }
