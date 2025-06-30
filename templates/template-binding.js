@@ -211,17 +211,22 @@ class TemplateBindingEngine {
     generateRecommendations(assessmentData) {
         const recommendations = this.generateSmartRecommendations(assessmentData);
         
+        const priorityIcons = {
+            high: 'fa-exclamation-circle',
+            medium: 'fa-exclamation-triangle',
+            low: 'fa-info-circle'
+        };
+        
         return recommendations.map(rec => `
             <li class="priority-${rec.priority}">
-                <div class="priority-indicator"></div>
                 <div class="recommendation-title">
+                    <i class="fas ${priorityIcons[rec.priority]}"></i>
                     ${rec.title}
-                    <span class="priority-badge">${rec.priority} Priority</span>
                 </div>
                 <div class="recommendation-text">${rec.description}</div>
                 <div class="recommendation-meta">
-                    <span>Timeline: ${rec.timeline}</span>
-                    <span>Owner: ${rec.owner}</span>
+                    <span><i class="fas fa-clock"></i> Timeline: ${rec.timeline}</span>
+                    <span><i class="fas fa-user"></i> Owner: ${rec.owner}</span>
                 </div>
             </li>
         `).join('');
