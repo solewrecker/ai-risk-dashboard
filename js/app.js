@@ -1395,12 +1395,21 @@ async function exportPremiumPDF() {
             return;
         }
 
+        // Prepare the required parameters
+        const payload = {
+            toolName: currentAssessment.formData.toolName,
+            toolCategory: currentAssessment.formData.toolCategory,
+            finalScore: currentAssessment.results.finalScore,
+            riskLevel: currentAssessment.results.riskLevel,
+            baseScore: currentAssessment.results.baseScore,
+            dataClassification: currentAssessment.formData.dataClassification,
+            useCase: currentAssessment.formData.useCase,
+            reportType: 'pdf'
+        };
+
         // Call Supabase function endpoint for premium template
         const { data: templateResponse, error } = await supabase.functions.invoke('premium-template', {
-            body: {
-                assessmentData: currentAssessment,
-                reportType: 'pdf'
-            }
+            body: payload
         });
 
         if (error) throw error;
@@ -1437,12 +1446,21 @@ async function exportPremiumHTML() {
             return;
         }
 
+        // Prepare the required parameters
+        const payload = {
+            toolName: currentAssessment.formData.toolName,
+            toolCategory: currentAssessment.formData.toolCategory,
+            finalScore: currentAssessment.results.finalScore,
+            riskLevel: currentAssessment.results.riskLevel,
+            baseScore: currentAssessment.results.baseScore,
+            dataClassification: currentAssessment.formData.dataClassification,
+            useCase: currentAssessment.formData.useCase,
+            reportType: 'html'
+        };
+
         // Call Supabase function endpoint for premium template
         const { data: templateResponse, error } = await supabase.functions.invoke('premium-template', {
-            body: {
-                assessmentData: currentAssessment,
-                reportType: 'html'
-            }
+            body: payload
         });
 
         if (error) throw error;
