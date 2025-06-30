@@ -9,8 +9,26 @@ serve(async (req) => {
   }
 
   try {
-    const payload = await req.json(); // expects same body as current HTML endpoint
-    const html = generatePremiumHTML(payload);
+    const payload = await req.json();
+
+    // Reconstruct the data structure expected by the templates
+    const templateData = {
+        ...payload,
+        dbData: {
+            ...payload.breakdown, // Assumes 'breakdown' contains db fields
+            category: payload.toolCategory,
+            primary_use_case: payload.useCase,
+            data_classification: payload.dataClassification,
+            vendor: payload.vendor, // Assuming vendor is in payload
+        },
+        executiveSummary: payload.executiveSummary || { // Add fallback
+            securityStatus: "Analysis based on provided data.",
+            complianceImpact: "Compliance impact derived from component scores.",
+            mainRecommendation: "Review detailed recommendations below."
+        }
+    };
+
+    const html = generatePremiumHTML(templateData);
 
     // Launch headless Chrome
     const browser = await chromium.launch({ headless: true });
