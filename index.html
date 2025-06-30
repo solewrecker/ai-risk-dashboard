@@ -2785,61 +2785,85 @@
             }
 
             try {
-                showMessage('🚀 Generating high-fidelity PDF... This may take a moment.', 'info');
+                showMessage('🚀 Generating premium PDF with Puppeteer...', 'info');
                 
+                // Get auth token
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session?.access_token) {
                     throw new Error('Authentication required');
                 }
                 
-                const payload = {
-                    toolName: currentAssessment.results.toolName + 
-                        (currentAssessment.formData.toolVersion === 'enterprise' && 
-                        !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
-                    toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
-                    finalScore: currentAssessment.results.finalScore,
-                    riskLevel: currentAssessment.results.riskLevel,
-                    baseScore: currentAssessment.results.baseScore,
-                    componentScores: window.currentScoreBreakdown,
-                    breakdown: currentAssessment.results.breakdown,
-                    formData: currentAssessment.formData,
-                    dataClassification: currentAssessment.formData.dataClassification,
-                    useCase: currentAssessment.formData.useCase
+                console.log('🔑 DEBUG: Session check:', {
+                    hasSession: !!session,
+                    hasAccessToken: !!session?.access_token,
+                    tokenLength: session?.access_token?.length,
+                    userEmail: session?.user?.email,
+                    userTier: session?.user?.user_metadata?.tier
+                });
+                
+                const headers = {
+                    'authorization': `Bearer ${session.access_token}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
                 };
-
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-pdf`, {
+                
+                console.log('🔑 DEBUG: Request headers:', {
+                    hasAuth: !!headers.authorization,
+                    hasApikey: !!headers.apikey,
+                    authPrefix: headers.authorization?.substring(0, 20) + '...',
+                    url: `${SUPABASE_URL}/functions/v1/premium-template`
+                });
+                
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/premium-template`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${session.access_token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
+                    headers: headers,
+                    body: JSON.stringify({
+                        toolName: currentAssessment.results.toolName + 
+                            (currentAssessment.formData.toolVersion === 'enterprise' && 
+                            !currentAssessment.results.toolName.toLowerCase().includes('enterprise') ? ' Enterprise' : ''),
+                        toolCategory: currentAssessment.formData.toolCategory || 'AI Platform',
+                        finalScore: currentAssessment.results.finalScore,
+                        riskLevel: currentAssessment.results.riskLevel,
+                        baseScore: currentAssessment.results.baseScore,
+                        componentScores: window.currentScoreBreakdown,
+                        breakdown: currentAssessment.results.breakdown,
+                        formData: currentAssessment.formData,
+                        dataClassification: currentAssessment.formData.dataClassification,
+                        useCase: currentAssessment.formData.useCase,
+                        reportType: 'pdf'
+                    })
+                });
+
+                console.log('🔑 DEBUG: Response received:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    headers: Object.fromEntries(response.headers.entries())
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('PDF Generation Error:', errorText);
-                    throw new Error(`PDF generation failed: ${response.statusText}`);
+                    console.error('🔑 DEBUG: Error response body:', errorText);
+                    
+                    try {
+                        const error = JSON.parse(errorText);
+                        throw new Error(error.error || 'Server-side PDF generation failed');
+                    } catch (jsonError) {
+                        throw new Error(`Server error (${response.status}): ${errorText}`);
+                    }
                 }
 
-                // Create a blob from the PDF stream
-                const blob = await response.blob();
-                
-                // Create a link to download it
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `AI-Risk-Assessment-${payload.toolName.replace(/ /g, '-')}.pdf`;
-                
-                // Append to the DOM, click, and then remove
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showMessage('✅ PDF downloaded successfully!', 'success');
-                
+                // Get HTML content and open in new window for client-side PDF generation
+                const htmlContent = await response.text();
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+
+                showMessage('✅ Premium PDF generator opened in new window!', 'success');
+
             } catch (error) {
-                console.error('❌ Error exporting PDF:', error);
-                showMessage(`PDF Export Failed: ${error.message}`, 'error');
+                console.error('Premium PDF error:', error);
+                showMessage('Premium PDF failed: ' + error.message, 'error');
             }
         }
 
