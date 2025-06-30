@@ -369,6 +369,168 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Print Dialog Overlay */
+        .print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .print-dialog {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        
+        .print-dialog h3 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .print-dialog h3 i {
+            color: #3b82f6;
+        }
+        
+        .print-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+        }
+        
+        .print-steps li {
+            margin-bottom: 16px;
+            padding-left: 32px;
+            position: relative;
+            color: #475569;
+            line-height: 1.6;
+        }
+        
+        .print-steps li::before {
+            content: counter(step);
+            counter-increment: step;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        
+        .print-dialog img {
+            width: 100%;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            margin: 16px 0;
+        }
+        
+        .print-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .print-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .print-btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .print-btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .print-btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .print-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        /* Print Button */
+        .save-button {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .save-button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            .save-button, .print-overlay {
+                display: none !important;
+            }
+            
+            body {
+                padding: 0;
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                border: none;
+            }
+            
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            
+            html, body {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
     </style>
 </head>
 <body>
@@ -461,6 +623,28 @@
                 <div class="disclaimer">
                     <i class="fas fa-copyright"></i> {{year}} Enterprise Security Framework • Generated on {{date}} • AI-Enhanced Security Assessment
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <button class="save-button" onclick="showPrintDialog()">
+        <i class="fas fa-file-pdf"></i> Save as PDF
+    </button>
+    
+    <!-- Print Dialog Overlay -->
+    <div class="print-overlay" id="printOverlay">
+        <div class="print-dialog">
+            <h3><i class="fas fa-print"></i> Save Assessment as PDF</h3>
+            <ol class="print-steps">
+                <li>Click the <strong>Print</strong> button below to open your browser's print dialog</li>
+                <li>Set <strong>Destination</strong> to "Save as PDF"</li>
+                <li>Enable <strong>"Background graphics"</strong> in More Settings to preserve the design</li>
+                <li>Click <strong>Save</strong> to download your assessment</li>
+            </ol>
+            <div class="print-buttons">
+                <button class="print-btn print-btn-secondary" onclick="closePrintDialog()">Cancel</button>
+                <button class="print-btn print-btn-primary" onclick="printReport()">Print</button>
             </div>
         </div>
     </div>
@@ -564,6 +748,27 @@
                     value
                 );
             });
+        });
+        
+        // Print Dialog Functions
+        function showPrintDialog() {
+            document.getElementById('printOverlay').style.display = 'flex';
+        }
+        
+        function closePrintDialog() {
+            document.getElementById('printOverlay').style.display = 'none';
+        }
+        
+        function printReport() {
+            closePrintDialog();
+            window.print();
+        }
+        
+        // Close print dialog when clicking outside
+        document.getElementById('printOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePrintDialog();
+            }
         });
     </script>
 </body>
