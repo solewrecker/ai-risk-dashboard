@@ -660,10 +660,10 @@ function applyClientSideMultipliers(dbData, formData) {
 }
 
 function getRiskLevel(score) {
-    if (score >= 75) return 'Critical';
-    if (score >= 60) return 'High';
-    if (score >= 35) return 'Medium';
-    return 'Low';
+    if (score >= 75) return 'critical';
+    if (score >= 60) return 'high';
+    if (score >= 35) return 'medium';
+    return 'low';
 }
 
 function getUseCaseLabel(useCase) {
