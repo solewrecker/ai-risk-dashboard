@@ -1395,21 +1395,20 @@ async function exportPremiumPDF() {
             return;
         }
 
-        // Create a new window/tab with the premium template
-        const templateWindow = window.open('templates/export-template.html', '_blank');
-        
-        // Wait for the template to load
-        templateWindow.onload = function() {
-            // Pass the assessment data to the template
-            templateWindow.assessmentData = currentAssessment;
-            
-            // Initialize the template with the data
-            templateWindow.document.addEventListener('DOMContentLoaded', function() {
-                if (templateWindow.initializeTemplate) {
-                    templateWindow.initializeTemplate(currentAssessment);
-                }
-            });
-        };
+        // Call Supabase function endpoint for premium template
+        const { data: templateResponse, error } = await supabase.functions.invoke('premium-template', {
+            body: {
+                assessmentData: currentAssessment,
+                reportType: 'pdf'
+            }
+        });
+
+        if (error) throw error;
+
+        // Create a new window/tab with the premium template HTML
+        const templateWindow = window.open('', '_blank');
+        templateWindow.document.write(templateResponse);
+        templateWindow.document.close();
         
         showMessage('Premium template loaded - follow the print instructions to save as PDF', 'success');
     } catch (error) {
@@ -1438,21 +1437,20 @@ async function exportPremiumHTML() {
             return;
         }
 
-        // Create a new window/tab with the premium template
-        const templateWindow = window.open('templates/export-template.html', '_blank');
-        
-        // Wait for the template to load
-        templateWindow.onload = function() {
-            // Pass the assessment data to the template
-            templateWindow.assessmentData = currentAssessment;
-            
-            // Initialize the template with the data
-            templateWindow.document.addEventListener('DOMContentLoaded', function() {
-                if (templateWindow.initializeTemplate) {
-                    templateWindow.initializeTemplate(currentAssessment);
-                }
-            });
-        };
+        // Call Supabase function endpoint for premium template
+        const { data: templateResponse, error } = await supabase.functions.invoke('premium-template', {
+            body: {
+                assessmentData: currentAssessment,
+                reportType: 'html'
+            }
+        });
+
+        if (error) throw error;
+
+        // Create a new window/tab with the premium template HTML
+        const templateWindow = window.open('', '_blank');
+        templateWindow.document.write(templateResponse);
+        templateWindow.document.close();
         
         showMessage('HTML report opened in new tab', 'success');
     } catch (error) {
