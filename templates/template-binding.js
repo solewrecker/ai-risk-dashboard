@@ -212,16 +212,11 @@ class TemplateBindingEngine {
         const recommendations = this.generateSmartRecommendations(assessmentData);
         
         return recommendations.map(rec => `
-            <div class="recommendation-card priority-${rec.priority}">
-                <div class="recommendation-header">
-                    <div class="recommendation-title">${rec.title}</div>
-                    <div class="priority-badge priority-${rec.priority}">${rec.priority.toUpperCase()}</div>
-                </div>
-                <div class="recommendation-text">
-                    ${rec.description}
-                    ${rec.timeline ? `<br><br><strong>Timeline:</strong> ${rec.timeline} | <strong>Owner:</strong> ${rec.owner}` : ''}
-                </div>
-            </div>
+            <li class="recommendation-item priority-${rec.priority}">
+                <div class="recommendation-title">${rec.title}</div>
+                <div class="recommendation-text">${rec.description}</div>
+                ${rec.timeline ? `<div class="recommendation-meta">Timeline: ${rec.timeline} | Owner: ${rec.owner}</div>` : ''}
+            </li>
         `).join('');
     }
 
@@ -233,60 +228,55 @@ class TemplateBindingEngine {
         const { formData, results } = assessmentData;
         
         // High-priority recommendations based on data classification
+        if (formData.dataClassification === 'phi') {
+            recommendations.push({
+                title: 'IMMEDIATE ACTION REQUIRED',
+                priority: 'high',
+                description: 'This tool should not be used with PHI data until HIPAA compliance verification is completed.',
+                timeline: '30 days',
+                owner: 'Compliance Team'
+            });
+        }
+
         if (formData.dataClassification === 'financial') {
             recommendations.push({
-                title: 'PCI-DSS Compliance Verification',
+                title: 'PCI-DSS Compliance Required',
                 priority: 'high',
-                description: '💳 Conduct comprehensive PCI-DSS compliance audit to ensure financial data handling meets regulatory requirements. Verify data encryption, access logging, and secure transmission protocols.',
+                description: 'Verify PCI-DSS compliance before processing any financial data.',
                 timeline: '30 days',
                 owner: 'Security Team'
             });
+        }
 
+        // Add security recommendations based on risk score
+        if (results.finalScore > 100) {
             recommendations.push({
-                title: 'SOX Controls Implementation',
+                title: 'Enhanced Security Controls Required',
                 priority: 'high',
-                description: '📊 Implement Sarbanes-Oxley controls for financial reporting data processed through the AI tool. Establish audit trails, data integrity checks, and access accountability measures.',
+                description: 'Consider enterprise alternatives with stronger security controls.',
                 timeline: '45 days',
-                owner: 'Compliance Team'
-            });
-        }
-
-        if (formData.dataClassification === 'phi') {
-            recommendations.push({
-                title: 'HIPAA Compliance Review',
-                priority: 'high',
-                description: '🏥 Conduct HIPAA compliance assessment to ensure protected health information handling meets regulatory standards.',
-                timeline: '30 days',
-                owner: 'Compliance Team'
-            });
-        }
-
-        // Medium-priority recommendations based on risk score
-        if (results.finalScore > 40) {
-            recommendations.push({
-                title: 'Enhanced Data Loss Prevention (DLP)',
-                priority: 'medium',
-                description: '🛡️ Configure advanced DLP policies to monitor and prevent sensitive data from being inadvertently shared through AI interactions.',
-                timeline: '60 days',
                 owner: 'IT Security'
             });
         }
 
-        // Standard recommendations
-        recommendations.push({
-            title: 'AI Governance Committee',
-            priority: 'medium',
-            description: '👥 Create a cross-functional AI governance committee to oversee AI tool usage, establish usage policies, and conduct regular risk assessments.',
-            timeline: '90 days',
-            owner: 'Executive Team'
-        });
+        // Add compliance recommendations
+        if (results.finalScore > 75) {
+            recommendations.push({
+                title: 'Compliance Verification Required',
+                priority: 'medium',
+                description: 'Complete compliance verification before deployment.',
+                timeline: '60 days',
+                owner: 'Compliance Team'
+            });
+        }
 
+        // Add standard recommendations
         recommendations.push({
-            title: 'Usage Analytics Dashboard',
-            priority: 'low',
-            description: '📈 Deploy comprehensive usage analytics to track AI tool utilization patterns, identify potential security anomalies, and generate compliance reports.',
-            timeline: '120 days',
-            owner: 'IT Operations'
+            title: 'Regular Security Review',
+            priority: 'medium',
+            description: 'Schedule periodic security assessments and updates.',
+            timeline: '90 days',
+            owner: 'Security Team'
         });
 
         return recommendations.slice(0, 5); // Limit to top 5 recommendations

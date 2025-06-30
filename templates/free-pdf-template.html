@@ -116,21 +116,42 @@
         
         .recommendations li {
             background: #fff;
-            padding: 16px 20px;
+            padding: 20px;
             border-radius: 8px;
-            border: 1px solid #edf2f7;
-            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
             color: #4a5568;
-            position: relative;
-            padding-left: 40px;
         }
         
-        .recommendations li::before {
-            content: "⚠️";
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+        .recommendation-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation-text {
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+        
+        .recommendation-meta {
+            font-size: 14px;
+            color: #718096;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .priority-high .recommendation-title {
+            color: #c53030;
+        }
+        
+        .priority-medium .recommendation-title {
+            color: #c05621;
+        }
+        
+        .priority-low .recommendation-title {
+            color: #2c7a7b;
         }
         
         .legal-section {
