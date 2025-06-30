@@ -953,7 +953,7 @@
                                     max-height: 300px;
                                     overflow-y: auto;
                                 ">
-                                    <button type="button" class="export-option" onclick="exportPremiumPDF(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="openReport('free'); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -967,7 +967,7 @@
                                         📄 <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="exportPremiumPDF(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" onclick="openReport('premium'); hideExportMenu();" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -3884,6 +3884,86 @@
                 }
             }, 3000);
         });
+
+        // This class is now a lightweight wrapper
+        class EnhancedPDFExporter {
+            async exportTemplatedPDF(assessmentData) {
+                try {
+                    if (typeof window.TemplateBindingEngine !== 'undefined') {
+                        const engine = new window.TemplateBindingEngine();
+                        // This now calls our new high-quality PDF export function
+                        await engine.exportPDFReport(assessmentData);
+                    } else {
+                        throw new Error('Template system not loaded');
+                    }
+                } catch (error) {
+                    console.error('PDF export failed:', error);
+                    alert('Could not generate PDF report. Please ensure all required scripts are loaded and try again.');
+                }
+            }
+        }
+
+        /**
+         * NEW: Opens the report in a new window and triggers the browser's print dialog.
+         * This is for the "Free" PDF export option.
+         */
+        async function exportPrintablePDF() {
+            if (!currentAssessment) {
+                showMessage('No assessment result to export.', 'error');
+                return;
+            }
+
+            try {
+                const engine = new window.TemplateBindingEngine();
+                const html = await engine.exportHTMLReport(currentAssessment);
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500); // Timeout helps ensure content is rendered
+            } catch (error) {
+                console.error('Printable PDF export failed:', error);
+                alert('Could not generate printable report. Please try again.');
+            }
+        }
+
+        /**
+         * Opens the report in a new window, passing the export mode.
+         * @param {'free' | 'premium'} mode - The export mode to use.
+         */
+        async function openReport(mode) {
+            if (!currentAssessment) {
+                showMessage('No assessment result to export.', 'error');
+                return;
+            }
+
+            try {
+                const engine = new window.TemplateBindingEngine();
+                let html = await engine.exportHTMLReport(currentAssessment);
+
+                // Inject the exportMode variable into the new page
+                const scriptToInject = `<script>window.exportMode = '${mode}';</script>`;
+                html = html.replace('</head>', scriptToInject + '</head>');
+
+                const reportWindow = window.open('', '_blank');
+                reportWindow.document.write(html);
+                reportWindow.document.close();
+                reportWindow.focus();
+            } catch (error) {
+                console.error('Failed to open report:', error);
+                alert('Could not generate the report. Please try again.');
+            }
+        }
+
+        function hideExportMenuOnClickOutside(event) {
+            const menu = document.getElementById('exportMenu');
+            const button = document.getElementById('exportMainBtn');
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                hideExportMenu();
+            }
+        }
     </script>
 </body>
 </html>
