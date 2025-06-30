@@ -1577,10 +1577,12 @@ async function exportPremiumHTML() {
     }
 
     try {
-        // Use the new template binding system
-        if (window.TemplateBinding) {
-            const binding = new window.TemplateBinding('./templates/export-template.html');
-            const fullHTML = await binding.bind(currentAssessment);
+        // Use the template binding engine
+        if (window.TemplateBindingEngine) {
+            const binding = new window.TemplateBindingEngine();
+            // Get the absolute path to the template
+            const templatePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/templates/export-template.html';
+            const fullHTML = await binding.exportHTMLReport(currentAssessment, templatePath);
             
             const blob = new Blob([fullHTML], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
