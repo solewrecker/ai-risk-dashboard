@@ -329,7 +329,9 @@ const USE_CASE_MULTIPLIERS = {
     'hr-executive': 1.15,
     'customer-support': 1.1,
     'development': 0.95,
-    'marketing': 0.9
+    'marketing': 0.9,
+    'research': 1.0,
+    'general': 1.0
 };
 
 // Fallback database removed - using Supabase as primary data source for consistency
@@ -473,12 +475,14 @@ async function generateAssessmentResults(formData) {
             toolVersion: formData.toolVersion
         });
         
-        // IMPORTANT: The backend is the source of truth. Recalculate score on client-side
-        // to match what the PDF export will do.
-        const componentScores = applyClientSideMultipliers(toolData, formData);
-        finalScore = Object.values(componentScores).reduce((sum, score) => sum + score, 0);
-        
+        // Calculate base score from components
         baseScore = toolData.total_score;
+        
+        // Apply multipliers to the total score
+        const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[formData.dataClassification] || 1;
+        const useCaseMultiplier = USE_CASE_MULTIPLIERS[formData.useCase] || 1;
+        finalScore = Math.round(baseScore * dataMultiplier * useCaseMultiplier);
+        
         breakdown = await generateBreakdown(formData, toolData);
         recommendations = generateRecommendations(finalScore, formData, toolData);
         
