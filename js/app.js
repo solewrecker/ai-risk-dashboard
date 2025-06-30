@@ -1474,11 +1474,23 @@ async function exportPremiumPDF() {
     showMessage('🚀 Generating your Enterprise PDF report...', 'success');
     
     try {
+        const { formData, results } = currentAssessment;
+        const payload = {
+            reportType: 'pdf', // Specify the report type
+            toolName: formData.toolName,
+            toolCategory: formData.toolCategory,
+            finalScore: results.finalScore,
+            riskLevel: results.riskLevel,
+            baseScore: results.baseScore,
+            dataClassification: formData.dataClassification,
+            useCase: formData.useCase,
+            // Pass other relevant data if needed by the template
+            breakdown: results.breakdown,
+            recommendations: results.recommendations,
+        };
+
         const { data, error } = await supabase.functions.invoke('premium-template', {
-            body: { 
-                assessment: currentAssessment,
-                tier: 'enterprise'
-            },
+            body: payload,
         });
 
         if (error) {
