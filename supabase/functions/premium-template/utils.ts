@@ -1,5 +1,7 @@
 // supabase/functions/generate-premium-pdf/utils.ts
 
+import { theme } from './styles/theme.ts';
+
 // Multiplier constants
 export const DATA_CLASSIFICATION_MULTIPLIERS = {
   'phi': 1.4,
@@ -22,23 +24,23 @@ export const USE_CASE_MULTIPLIERS = {
 
 // Helper function to get CSS class for risk levels
 export function getRiskLevelClass(riskLevel: string): string {
-  const level = (riskLevel || 'unknown').toLowerCase();
-  switch(level) {
-    case 'high': return 'high';
-    case 'medium': return 'medium';
-    case 'low': return 'low';
-    case 'critical': return 'critical';
-    case 'unknown': return 'unknown';
-    default: return 'unknown';
-  }
+  const level = riskLevel.toUpperCase();
+  if (level.includes('CRITICAL')) return 'critical';
+  if (level.includes('HIGH')) return 'high';
+  if (level.includes('MEDIUM') || level.includes('MODERATE')) return 'medium';
+  if (level.includes('LOW')) return 'low';
+  return 'unknown';
 }
 
 // Helper function to extract risk level from component scores
-export function getComponentRiskLevel(score: number | null | undefined): string {
-  if (score === null || score === undefined) return 'UNKNOWN';
-  if (score >= 8) return 'HIGH';
-  if (score >= 5) return 'MEDIUM';
-  return 'LOW';
+export function getComponentRiskLevel(score: number, maxScore = 25): string {
+  if (score === null || score === undefined || maxScore === 0) return 'LOW';
+  
+  const percentage = (score / maxScore) * 100;
+  
+  if (percentage >= 80) return 'HIGH';      // 80%+ of max score is High
+  if (percentage >= 50) return 'MEDIUM';    // 50-79% is Medium
+  return 'LOW';                             // < 50% is Low
 }
 
 // Helper function to format database details with proper paragraph breaks
@@ -158,4 +160,72 @@ export function extractCriticalFindings(dbData: any, finalScore: number): string
   }
   
   return findings.slice(0, 4);
+}
+
+export function generateExecutiveSummary(score: number, dataClassification: string) {
+  const summary = {
+    securityStatus: '',
+    complianceImpact: '',
+    recommendation: ''
+  };
+
+  // Determine Security Status
+  if (score >= 80) {
+    summary.securityStatus = 'Tool poses significant security risks requiring immediate attention and enhanced controls before deployment.';
+  } else if (score >= 60) {
+    summary.securityStatus = 'Tool requires significant security improvements and enhanced controls for enterprise deployment.';
+  } else if (score >= 35) {
+    summary.securityStatus = 'Tool meets basic security standards but requires standard enterprise controls and monitoring.';
+  } else {
+    summary.securityStatus = 'Tool demonstrates an acceptable security posture for deployment with standard monitoring.';
+  }
+
+  // Determine Compliance Impact
+  switch (dataClassification) {
+    case 'phi':
+      summary.complianceImpact = 'Significant compliance barriers exist. Use with PHI requires a signed BAA and thorough HIPAA compliance verification.';
+      break;
+    case 'financial':
+      summary.complianceImpact = 'PCI-DSS and SOX compliance verification needed due to financial data classification and regulatory requirements.';
+      break;
+    case 'trade-secrets':
+      summary.complianceImpact = 'High risk for intellectual property. Strict data handling and DLP controls are mandatory.';
+      break;
+    case 'pii':
+      summary.complianceImpact = 'GDPR/CCPA compliance must be verified. Data residency and processing agreements are required.';
+      break;
+    case 'public':
+    default:
+      summary.complianceImpact = 'Public data processing has minimal compliance impact, but should follow security best practices.';
+      break;
+  }
+
+  // Determine Recommendation
+  if (score >= 80) {
+    summary.recommendation = 'Not recommended for enterprise use. Immediate blocking and risk mitigation is advised.';
+  } else if (score >= 60) {
+    summary.recommendation = 'Not recommended for enterprise use without significant security improvements and additional controls.';
+  } else if (score >= 35) {
+    summary.recommendation = 'Conditional approval recommended, pending implementation of standard security controls and monitoring.';
+  } else {
+    summary.recommendation = 'Recommended for deployment with standard monitoring and periodic review.';
+  }
+
+  return summary;
+}
+
+export function getRiskLevelFromScore(score: number): string {
+  if (score >= 8) return 'HIGH';
+  if (score >= 5) return 'MEDIUM';
+  if (score >= 2) return 'LOW';
+  return 'N/A';
+}
+
+export function getRiskColor(riskLevel: string): string {
+  const level = riskLevel.toUpperCase();
+  if (level.includes('CRITICAL')) return theme.colors.riskCritical;
+  if (level.includes('HIGH')) return theme.colors.riskHigh;
+  if (level.includes('MEDIUM') || level.includes('MODERATE')) return theme.colors.riskModerate;
+  if (level.includes('LOW')) return theme.colors.riskLow;
+  return theme.colors.secondaryText; // Default color
 } 

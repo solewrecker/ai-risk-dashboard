@@ -1,8 +1,8 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.42.0';
 import { corsHeaders } from './cors.ts';
-import { generateFreePdfHTML, generatePremiumHTML } from './templates.ts';
-import { applyMultipliersToComponents } from './utils.ts';
+import { generatePremiumHTML } from './templates.ts';
+import { applyMultipliersToComponents, generateExecutiveSummary } from './utils.ts';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -67,6 +67,7 @@ serve(async (req) => {
     // 4. Calculate final score using multipliers
     const componentScores = applyMultipliersToComponents(dbData, { dataClassification, useCase });
     const calculatedFinalScore = Object.values(componentScores).reduce((sum, score) => sum + score, 0);
+    const executiveSummary = generateExecutiveSummary(calculatedFinalScore, dataClassification);
 
     console.log(`🧮 Calculated final score: ${calculatedFinalScore}`);
 
@@ -80,6 +81,10 @@ serve(async (req) => {
       dataClassification,
       useCase,
       databaseContent: dbData, // Pass the entire DB record
+      executiveSummary: executiveSummary, // Pass the dynamic summary
+      componentScores: componentScores, // Pass the component scores
+      dbData: dbData, // Pass the raw dbData for recommendations
+      recommendations: dbData?.recommendations // Pass for dynamic generation
     };
 
     // 6. Generate HTML based on the report type

@@ -1,3 +1,5 @@
+// This file is deprecated. The logic has been moved to /templates/recommendations.ts
+
 export function generateRecommendationsHTML(data: any) {
   // --- Primary: Use pre-defined recommendations from the database if they exist ---
   if (data.dbData?.recommendations && Array.isArray(data.dbData.recommendations) && data.dbData.recommendations.length > 0) {
