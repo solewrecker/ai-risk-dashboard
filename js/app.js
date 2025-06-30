@@ -1368,6 +1368,12 @@ async function exportFreePDF() {
             '{{toolCategory}}': formData.toolCategory || 'N/A',
             '{{useCase}}': formData.useCase || 'N/A',
             '{{dataClassification}}': formData.dataClassification,
+            '{{date}}': new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }),
+            '{{year}}': new Date().getFullYear()
         };
 
         for (const [key, value] of Object.entries(replacements)) {
