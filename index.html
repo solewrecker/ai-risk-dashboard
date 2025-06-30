@@ -9,11 +9,8 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Add html2canvas for capturing DOM as image -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Add jsPDF (simple backup) -->
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Add PDF Template System (conditional loading) -->
     <script>
@@ -42,41 +39,6 @@
             console.warn('Template binding system failed to load');
         };
         document.head.appendChild(bindingScript);
-    </script>
-    
-    <!-- Add jsPDF for PDF Export with fallback -->
-    <script>
-        // Global flag to track jsPDF loading
-        window.jsPDFLoaded = false;
-        
-        // Try primary CDN
-        function loadJsPDF() {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
-            script.onload = () => {
-                console.log('✅ jsPDF loaded from jsdelivr');
-                console.log('Available at window.jspdf:', typeof window.jspdf);
-                window.jsPDFLoaded = true;
-            };
-            script.onerror = () => {
-                console.warn('❌ jsdelivr failed, trying unpkg...');
-                // Fallback to unpkg
-                const fallbackScript = document.createElement('script');
-                fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
-                fallbackScript.onload = () => {
-                    console.log('✅ jsPDF loaded from unpkg');
-                    console.log('Available at window.jspdf:', typeof window.jspdf);
-                    window.jsPDFLoaded = true;
-                };
-                fallbackScript.onerror = () => {
-                    console.error('❌ All CDNs failed');
-                    window.jsPDFLoaded = false;
-                };
-                document.head.appendChild(fallbackScript);
-            };
-            document.head.appendChild(script);
-        }
-        loadJsPDF();
     </script>
     
     <link rel="stylesheet" href="css/style.css">
@@ -279,7 +241,7 @@
                         <div class="btn-group">
                             <div style="position: relative; display: inline-block;">
                                 <button type="button" class="btn btn-secondary" onclick="toggleExportMenu()" id="exportMainBtn">
-                                    📄 Export Options ▼
+                                    <i class="fas fa-file-export"></i> Export Options
                                 </button>
                                 <div id="exportMenu" style="
                                     display: none;
@@ -307,7 +269,7 @@
                                         border-bottom: 1px solid #e2e8f0;
                                         background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
                                     ">
-                                        📄 <strong>Free Professional PDF</strong><br>
+                                        <i class="fas fa-file-pdf"></i> <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
 
@@ -322,7 +284,7 @@
                                         border-bottom: 1px solid #e2e8f0;
                                         background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
                                     ">
-                                        🌟 <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
+                                        <i class="fas fa-star"></i> <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
                                         <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
                                     </button>
 
@@ -336,7 +298,7 @@
                                         cursor: pointer;
                                         border-bottom: 1px solid #e2e8f0;
                                     ">
-                                        🌐 <strong>HTML Report</strong><br>
+                                        <i class="fas fa-globe"></i> <strong>HTML Report</strong><br>
                                         <small style="color: #64748b;">Viewable in browser</small>
                                     </button>
                                     <button type="button" class="export-option" onclick="exportAssessmentJSON(); hideExportMenu();" style="
@@ -348,20 +310,18 @@
                                         text-align: left;
                                         cursor: pointer;
                                     ">
-                                        📊 <strong>JSON Data</strong><br>
+                                        <i class="fas fa-code"></i> <strong>JSON Data</strong><br>
                                         <small style="color: #64748b;">Raw assessment data</small>
                                     </button>
                                 </div>
                             </div>
                             <button type="button" class="btn btn-secondary" onclick="saveToDatabase()">
-                                💾 Save to Database
+                                <i class="fas fa-save"></i> Save to Database
                             </button>
                             <button type="button" class="btn btn-primary" onclick="startNewAssessment()">
-                                🔄 New Assessment
+                                <i class="fas fa-redo"></i> New Assessment
                             </button>
                         </div>
-                        
-                        
                     </div>
                 </form>
             </div>
@@ -371,5 +331,5 @@
     <!-- Load template binding before app.js -->
     <script src="templates/template-binding.js"></script>
     <script src="js/app.js"></script>
-                    </body>
-                    </html>
+</body>
+</html>

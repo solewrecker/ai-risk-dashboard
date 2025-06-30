@@ -1345,259 +1345,152 @@ function hideExportMenu() {
 
 // Free PDF export using client-side rendering (html2canvas)
 async function exportFreePDF() {
-    if (!currentAssessment) {
-        showMessage('No assessment to export', 'error');
-        return;
-    }
-
     try {
-        // 1. Fetch the free PDF template
-        const response = await fetch('./templates/free-pdf-template.html');
-        if (!response.ok) {
-            throw new Error('Could not load the free PDF template.');
-        }
-        let templateHtml = await response.text();
-
-        // 2. Prepare data and replace placeholders
-        const { formData, results } = currentAssessment;
-        const replacements = {
-            '{{finalScore}}': results.finalScore,
-            '{{riskLevel}}': results.riskLevel.toUpperCase(),
-            '{{toolName}}': formData.toolName,
-            '{{toolVersion}}': formData.toolVersion,
-            '{{toolCategory}}': formData.toolCategory || 'N/A',
-            '{{useCase}}': formData.useCase || 'N/A',
-            '{{dataClassification}}': formData.dataClassification,
-            '{{date}}': new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            '{{year}}': new Date().getFullYear()
-        };
-
-        for (const [key, value] of Object.entries(replacements)) {
-            templateHtml = templateHtml.replace(new RegExp(key, 'g'), value);
+        // Get current assessment data
+        if (!currentAssessment) {
+            showMessage('No assessment data available', 'error');
+            return;
         }
 
-        // 3. Create a temporary element to inject complex HTML (breakdown and recommendations)
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = templateHtml;
-
-        // Inject risk breakdown
-        const breakdownContainer = tempDiv.querySelector('#risk-breakdown-container');
-        let breakdownHtml = '';
-        const breakdownData = results.breakdown;
-
-        if (breakdownData && breakdownData.scores) {
-            // Handle structure from database (has a 'scores' property)
-            breakdownHtml = Object.entries(breakdownData.scores).map(([category, score]) => `
-                <div class="item">
-                    <span class="item-label">${breakdownData.categoryNames[category] || category}:</span> ${score}/25
-                </div>
-            `).join('');
-        } else if (breakdownData) {
-            // Handle generic structure (e.g., { dataStorage: { score: 10, ... } })
-            const categoryNames = {
-                dataStorage: 'Data Storage & Security',
-                trainingUsage: 'Training Data Usage',
-                accessControls: 'Access Controls',
-                complianceRisk: 'Compliance Risk',
-                vendorTransparency: 'Vendor Transparency'
-            };
-            breakdownHtml = Object.entries(breakdownData).map(([category, data]) => {
-                const score = data.score || 0; // Generic breakdown items have a 'score' property
-                return `
-                    <div class="item">
-                        <span class="item-label">${categoryNames[category] || category}:</span> ${score}/25
-                    </div>
-                `;
-            }).join('');
-        }
-        breakdownContainer.innerHTML = breakdownHtml;
-
-        // Inject recommendations
-        const recommendationsContainer = tempDiv.querySelector('#recommendations-container');
-        if (results.recommendations && Array.isArray(results.recommendations)) {
-            const recommendationsHtml = results.recommendations.slice(0, 3).map(rec => `<li>${rec}</li>`).join('');
-            recommendationsContainer.innerHTML = recommendationsHtml;
-        }
-
-        // 4. Generate PDF from the populated HTML
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        // Create a new window/tab with the free template
+        const templateWindow = window.open('templates/free-pdf-template.html', '_blank');
         
-        await pdf.html(tempDiv, {
-            callback: function (doc) {
-                doc.save(`Free-Risk-Assessment-${formData.toolName.replace(/\s/g, '-')}.pdf`);
-                showMessage('✅ Free PDF downloaded successfully', 'success');
-            },
-            x: 10,
-            y: 10,
-            width: 190,
-            windowWidth: 800 
-        });
-
+        // Wait for the template to load
+        templateWindow.onload = function() {
+            // Pass the assessment data to the template
+            templateWindow.assessmentData = currentAssessment;
+            
+            // Initialize the template with the data
+            templateWindow.document.addEventListener('DOMContentLoaded', function() {
+                if (templateWindow.initializeTemplate) {
+                    templateWindow.initializeTemplate(currentAssessment);
+                }
+            });
+        };
+        
+        showMessage('Template loaded - follow the print instructions to save as PDF', 'success');
     } catch (error) {
-        console.error('❌ Free PDF export failed:', error);
-        showMessage(`Failed to generate PDF: ${error.message}`, 'error');
+        console.error('Export error:', error);
+        showMessage('Export failed: ' + error.message, 'error');
     }
 }
 
 // Premium PDF export (server-side generation)
 async function exportPremiumPDF() {
-    if (!currentAssessment) {
-        showMessage('No assessment to export', 'error');
-        return;
-    }
-
-    // Check user authentication
     if (!currentUser) {
-        showMessage('Please sign in to access premium exports', 'warning');
-        showAuthTab('signin');
+        showMessage('Please sign in to access premium exports', 'error');
         return;
     }
     
     const userTier = currentUser.user_metadata?.tier;
     if (userTier !== 'enterprise' && !isAdmin) {
-        showUpgradeModal();
+        showLegacyEnterprisePaywall();
         return;
     }
-
-    showMessage('🚀 Generating your Enterprise PDF report...', 'success');
     
     try {
-        const { formData, results } = currentAssessment;
-        const payload = {
-            reportType: 'pdf', // Specify the report type
-            toolName: formData.toolName,
-            toolCategory: formData.toolCategory,
-            finalScore: results.finalScore,
-            riskLevel: results.riskLevel,
-            baseScore: results.baseScore,
-            dataClassification: formData.dataClassification,
-            useCase: formData.useCase,
-            // Pass other relevant data if needed by the template
-            breakdown: results.breakdown,
-            recommendations: results.recommendations,
+        // Get current assessment data
+        if (!currentAssessment) {
+            showMessage('No assessment data available', 'error');
+            return;
+        }
+
+        // Create a new window/tab with the premium template
+        const templateWindow = window.open('templates/export-template.html', '_blank');
+        
+        // Wait for the template to load
+        templateWindow.onload = function() {
+            // Pass the assessment data to the template
+            templateWindow.assessmentData = currentAssessment;
+            
+            // Initialize the template with the data
+            templateWindow.document.addEventListener('DOMContentLoaded', function() {
+                if (templateWindow.initializeTemplate) {
+                    templateWindow.initializeTemplate(currentAssessment);
+                }
+            });
         };
-
-        const { data, error } = await supabase.functions.invoke('premium-template', {
-            body: payload,
-        });
-
-        if (error) {
-            throw new Error(`Server error: ${error.message}`);
-        }
         
-        // The function returns a base64 encoded PDF or full HTML string
-        if (data && typeof data === 'object' && data.pdf) {
-            const pdfBlob = b64toBlob(data.pdf, 'application/pdf');
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            
-            // Trigger download
-            const a = document.createElement('a');
-            a.href = pdfUrl;
-            a.download = `AI-Risk-Assessment-${currentAssessment.formData.toolName.replace(/\s/g, '-')}-Enterprise.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(pdfUrl);
-            
-            showMessage('✅ Enterprise PDF downloaded successfully', 'success');
-        } else if (data && typeof data === 'string') {
-            // Assume the server returned full HTML
-            const htmlBlob = new Blob([data], { type: 'text/html' });
-            const htmlUrl = URL.createObjectURL(htmlBlob);
-            
-            // Open in a new tab so the user can print / save as PDF
-            window.open(htmlUrl, '_blank');
-            
-            showMessage('✅ Enterprise report opened in a new tab. Use your browser\'s Print dialog to save as PDF.', 'success');
-        } else {
-            throw new Error(data?.error || 'Unknown error generating report');
-        }
-        
+        showMessage('Premium template loaded - follow the print instructions to save as PDF', 'success');
     } catch (error) {
-        console.error('❌ Enterprise PDF export failed:', error);
-        showMessage('Failed to generate Enterprise PDF: ' + error.message, 'error');
+        console.error('Export error:', error);
+        showMessage('Export failed: ' + error.message, 'error');
     }
-}
-
-// Helper to convert base64 to Blob
-function b64toBlob(b64Data, contentType='', sliceSize=512) {
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        const slice = byteCharacters.slice(offset, offset + sliceSize);
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
-    }
-
-    return new Blob(byteArrays, {type: contentType});
 }
 
 // Premium HTML export
 async function exportPremiumHTML() {
-    if (!currentAssessment) {
-        showMessage('No assessment to export', 'error');
+    if (!currentUser) {
+        showMessage('Please sign in to access premium exports', 'error');
         return;
     }
-
+    
+    const userTier = currentUser.user_metadata?.tier;
+    if (userTier !== 'enterprise' && !isAdmin) {
+        showLegacyEnterprisePaywall();
+        return;
+    }
+    
     try {
-        // Use the template binding engine
-        if (window.TemplateBindingEngine) {
-            const binding = new window.TemplateBindingEngine();
-            // Get the absolute path to the template
-            const templatePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/templates/export-template.html';
-            const fullHTML = await binding.exportHTMLReport(currentAssessment, templatePath);
-            
-            const blob = new Blob([fullHTML], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `AI-Risk-Assessment-${currentAssessment.formData.toolName.replace(/\s/g, '-')}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showMessage('✅ HTML report downloaded successfully', 'success');
-        } else {
-            throw new Error('Template binding system not loaded');
+        // Get current assessment data
+        if (!currentAssessment) {
+            showMessage('No assessment data available', 'error');
+            return;
         }
+
+        // Create a new window/tab with the premium template
+        const templateWindow = window.open('templates/export-template.html', '_blank');
+        
+        // Wait for the template to load
+        templateWindow.onload = function() {
+            // Pass the assessment data to the template
+            templateWindow.assessmentData = currentAssessment;
+            
+            // Initialize the template with the data
+            templateWindow.document.addEventListener('DOMContentLoaded', function() {
+                if (templateWindow.initializeTemplate) {
+                    templateWindow.initializeTemplate(currentAssessment);
+                }
+            });
+        };
+        
+        showMessage('HTML report opened in new tab', 'success');
     } catch (error) {
-        console.error('❌ HTML export failed:', error);
-        showMessage('Failed to generate HTML report: ' + error.message, 'error');
+        console.error('Export error:', error);
+        showMessage('Export failed: ' + error.message, 'error');
     }
 }
 
-// JSON data export
 function exportAssessmentJSON() {
-    if (!currentAssessment) {
-        showMessage('No assessment to export', 'error');
-        return;
+    try {
+        if (!currentAssessment) {
+            showMessage('No assessment data available', 'error');
+            return;
+        }
+        
+        // Create a Blob with the JSON data
+        const jsonString = JSON.stringify(currentAssessment, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ai-risk-assessment-${Date.now()}.json`;
+        
+        // Trigger download
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showMessage('JSON data downloaded', 'success');
+    } catch (error) {
+        console.error('Export error:', error);
+        showMessage('Export failed: ' + error.message, 'error');
     }
-    
-    const jsonString = JSON.stringify(currentAssessment, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `AI-Risk-Assessment-${currentAssessment.formData.toolName.replace(/\s/g, '-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showMessage('✅ JSON data downloaded successfully', 'success');
 }
 
 // Utility: Save assessment to Supabase
