@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
+    <title>Assessment Details</title>
+
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Assessment Details</h1>
+            <p>A detailed view of your risk assessment.</p>
+            <div class="header-buttons">
+                <a href="dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="form-card" id="detailContent">
+            <div id="loading-state" style="text-align: center; padding: 40px;">
+                <div class="spinner"></div>
+                <p>Loading assessment details...</p>
+            </div>
+            <div id="resultsContent" style="display: none;">
+                <!-- Full assessment results will be rendered here by js/assessment-detail.js -->
+            </div>
+            <div id="error-state" style="display: none; text-align: center; padding: 40px; color: red;">
+                <h3>Error</h3>
+                <p id="errorMessage">Could not load assessment details.</p>
+                 <a href="dashboard.html" class="btn btn-primary" style="margin-top: 20px;">Return to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/assessment-detail.js"></script>
+</body>
+</html> 
