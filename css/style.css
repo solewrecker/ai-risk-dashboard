@@ -689,4 +689,69 @@ body {
         min-width: 280px !important;
         max-width: 90vw !important;
     }
+}
+
+/* Header Buttons */
+.header-buttons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Assessment List Styles */
+.list-header {
+    display: flex;
+    font-weight: 600;
+    color: #475569;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+}
+.list-item:hover {
+    background-color: #f8fafc;
+}
+.list-item:last-child {
+    border-bottom: none;
+}
+.list-col-tool { flex: 3; display: flex; align-items: center; gap: 1rem; font-weight: 500; }
+.list-col-score { flex: 1; text-align: center; }
+.list-col-level { flex: 1; display: flex; align-items: center; gap: 0.5rem; }
+.list-col-date { flex: 1.5; color: #64748b; }
+.list-col-actions { flex: 1; text-align: right; }
+.list-item-icon { color: #3b82f6; }
+.score-badge {
+    color: white;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+.level-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+.btn-icon:hover {
+    color: #1e293b;
+    background-color: #e2e8f0;
 } 
