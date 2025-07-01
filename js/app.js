@@ -173,13 +173,90 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Update signInUser function
+// Security Constants
+const MAX_EMAIL_LENGTH = 254; // RFC 5321
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 128;
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+// Track failed login attempts
+const failedAttempts = new Map();
+const lockoutTimes = new Map();
+
+// Input sanitization
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input.trim()
+        .replace(/[<>]/g, '') // Basic XSS prevention
+        .slice(0, MAX_EMAIL_LENGTH); // Prevent overflow
+}
+
+// Password strength check
+function checkPasswordStrength(password) {
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        return { valid: false, message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long` };
+    }
+    if (password.length > MAX_PASSWORD_LENGTH) {
+        return { valid: false, message: 'Password is too long' };
+    }
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+        return { 
+            valid: false, 
+            message: 'Password must contain uppercase, lowercase, numbers, and special characters' 
+        };
+    }
+    
+    return { valid: true };
+}
+
+// Rate limiting check
+function checkRateLimit(email) {
+    const now = Date.now();
+    const lockoutTime = lockoutTimes.get(email);
+    
+    if (lockoutTime && now < lockoutTime) {
+        const remainingTime = Math.ceil((lockoutTime - now) / 1000 / 60);
+        return {
+            allowed: false,
+            message: `Too many attempts. Please try again in ${remainingTime} minutes`
+        };
+    }
+    
+    const attempts = failedAttempts.get(email) || 0;
+    if (attempts >= MAX_FAILED_ATTEMPTS) {
+        lockoutTimes.set(email, now + LOCKOUT_TIME);
+        failedAttempts.delete(email);
+        return {
+            allowed: false,
+            message: 'Too many failed attempts. Please try again in 15 minutes'
+        };
+    }
+    
+    return { allowed: true };
+}
+
+// Update signInUser function with security measures
 async function signInUser() {
-    const email = document.getElementById('signInEmail').value.trim();
+    const email = sanitizeInput(document.getElementById('signInEmail').value);
     const password = document.getElementById('signInPassword').value;
     
+    // Input validation
     if (!email || !password) {
         showMessage('Please enter email and password', 'error');
+        return;
+    }
+    
+    // Check rate limiting
+    const rateLimit = checkRateLimit(email);
+    if (!rateLimit.allowed) {
+        showMessage(rateLimit.message, 'error');
         return;
     }
     
@@ -189,7 +266,16 @@ async function signInUser() {
             password: password
         });
         
-        if (error) throw error;
+        if (error) {
+            // Track failed attempt
+            const attempts = (failedAttempts.get(email) || 0) + 1;
+            failedAttempts.set(email, attempts);
+            throw error;
+        }
+        
+        // Clear failed attempts on success
+        failedAttempts.delete(email);
+        lockoutTimes.delete(email);
         
         showMessage('Signed in successfully', 'success');
         closeAuthModal();
@@ -200,14 +286,22 @@ async function signInUser() {
     }
 }
 
-// Update signUpUser function
+// Update signUpUser function with security measures
 async function signUpUser() {
-    const email = document.getElementById('signUpEmail').value.trim();
+    const email = sanitizeInput(document.getElementById('signUpEmail').value);
     const password = document.getElementById('signUpPassword').value;
     const tier = document.getElementById('signUpTier').value;
     
+    // Input validation
     if (!email || !password) {
         showMessage('Please enter email and password', 'error');
+        return;
+    }
+    
+    // Check password strength
+    const passwordCheck = checkPasswordStrength(password);
+    if (!passwordCheck.valid) {
+        showMessage(passwordCheck.message, 'error');
         return;
     }
     
@@ -307,13 +401,40 @@ const USE_CASE_MULTIPLIERS = {
 
 // Step navigation
 function nextStep() {
+    const currentStep = getCurrentStep();
+    
+    // Validate form data before proceeding
     if (currentStep === 1) {
-        if (!validateStep1()) return;
-        showStep(2);
-    } else if (currentStep === 2) {
-        if (!validateStep2()) return;
-        showStep(3);
-        startAssessment();
+        const formData = {
+            toolName: document.getElementById('toolName').value,
+            toolUrl: document.getElementById('toolUrl').value,
+            toolCategory: document.getElementById('toolCategory').value,
+            useCase: document.getElementById('useCase').value,
+            additionalContext: document.getElementById('additionalContext').value
+        };
+        
+        const validation = validateFormData(formData);
+        if (!validation.valid) {
+            showMessage(validation.message, 'error');
+            return;
+        }
+    }
+    else if (currentStep === 2) {
+        const dataClassification = document.querySelector('input[name="dataClassification"]:checked')?.value;
+        if (!dataClassification) {
+            showMessage('Please select a data classification', 'error');
+            return;
+        }
+    }
+    
+    // Proceed with step change if validation passes
+    document.querySelector(`#step${currentStep}`).classList.remove('active');
+    document.querySelector(`#section${currentStep}`).classList.remove('active');
+    document.querySelector(`#step${currentStep + 1}`).classList.add('active');
+    document.querySelector(`#section${currentStep + 1}`).classList.add('active');
+    
+    if (currentStep === 2) {
+        startAnalysis();
     }
 }
 
@@ -1478,35 +1599,35 @@ function exportAssessmentJSON() {
 
 // Utility: Save assessment to Supabase
 async function saveToDatabase() {
-    if (!currentAssessment) {
-        showMessage('No assessment to save', 'error');
+    if (!currentUser) {
+        showMessage('Please sign in to save assessments', 'error');
         return;
     }
+
+    const formData = collectFormData();
+    const validation = validateFormData(formData);
     
-    if (!currentUser || !isAdmin) {
-        showMessage('You must be an admin to save assessments', 'error');
+    if (!validation.valid) {
+        showMessage(validation.message, 'error');
         return;
     }
 
     try {
         const { data, error } = await supabase
             .from('assessments')
-            .insert([
-                { 
-                    user_id: currentUser.id,
-                    tool_name: currentAssessment.results.toolName,
-                    assessment_data: currentAssessment,
-                    risk_score: currentAssessment.results.finalScore,
-                    risk_level: currentAssessment.results.riskLevel
-                }
-            ]);
-        
+            .insert([{
+                user_id: currentUser.id,
+                tool_name: validation.sanitizedData.toolName,
+                assessment_data: validation.sanitizedData,
+                risk_score: currentResults.finalScore,
+                risk_level: currentResults.riskLevel
+            }]);
+
         if (error) throw error;
-        
-        showMessage('✅ Assessment saved successfully!', 'success');
-        
+        showMessage('Assessment saved successfully', 'success');
+
     } catch (error) {
-        console.error('Save to database error:', error);
+        console.error('Error saving assessment:', error);
         showMessage('Failed to save assessment: ' + error.message, 'error');
     }
 }
@@ -1565,3 +1686,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Form validation constants
+const MAX_TOOL_NAME_LENGTH = 100;
+const MAX_URL_LENGTH = 2048; // Common browser limit
+const MAX_CONTEXT_LENGTH = 5000;
+
+// Validate assessment form data
+function validateFormData(formData) {
+    // Tool name validation
+    if (!formData.toolName || typeof formData.toolName !== 'string') {
+        return { valid: false, message: 'Tool name is required' };
+    }
+    if (formData.toolName.length > MAX_TOOL_NAME_LENGTH) {
+        return { valid: false, message: `Tool name must be less than ${MAX_TOOL_NAME_LENGTH} characters` };
+    }
+    formData.toolName = sanitizeInput(formData.toolName);
+
+    // URL validation
+    if (formData.toolUrl) {
+        try {
+            const url = new URL(formData.toolUrl);
+            if (formData.toolUrl.length > MAX_URL_LENGTH) {
+                return { valid: false, message: 'URL is too long' };
+            }
+            if (!['http:', 'https:'].includes(url.protocol)) {
+                return { valid: false, message: 'Invalid URL protocol' };
+            }
+        } catch (e) {
+            return { valid: false, message: 'Invalid URL format' };
+        }
+    }
+
+    // Additional context validation
+    if (formData.additionalContext) {
+        if (formData.additionalContext.length > MAX_CONTEXT_LENGTH) {
+            return { valid: false, message: 'Additional context is too long' };
+        }
+        formData.additionalContext = sanitizeInput(formData.additionalContext);
+    }
+
+    // Data classification validation
+    if (!formData.dataClassification) {
+        return { valid: false, message: 'Please select a data classification' };
+    }
+
+    // Category validation
+    if (formData.toolCategory && !['conversational-ai', 'code-assistant', 'content-generation', 
+        'data-analysis', 'productivity', 'design-creative', 'translation', 'other'].includes(formData.toolCategory)) {
+        return { valid: false, message: 'Invalid tool category' };
+    }
+
+    // Use case validation
+    if (formData.useCase && !['legal-compliance', 'finance-accounting', 'hr-executive', 
+        'customer-support', 'development', 'marketing', 'research', 'general'].includes(formData.useCase)) {
+        return { valid: false, message: 'Invalid use case' };
+    }
+
+    return { valid: true, sanitizedData: formData };
+}
