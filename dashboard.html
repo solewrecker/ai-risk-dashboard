@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
+    <title>Risk Assessment Dashboard</title>
+
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>AI Tool Risk Dashboard</h1>
+            <p>View and manage your past assessments</p>
+            <a href="index.html" class="btn btn-secondary" style="position: absolute; top: 20px; right: 20px;">
+                <i class="fas fa-plus"></i> New Assessment
+            </a>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection">
+            <!-- Login UI will be populated by JavaScript -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="form-card" id="dashboardContent" style="display: none;">
+            <div class="form-header">
+                <h2>Assessment History</h2>
+                <p>A log of all risk assessments performed.</p>
+            </div>
+            
+            <div class="form-content">
+                <div id="assessment-list-container">
+                    <div class="list-header">
+                        <div class="list-col-tool">Tool</div>
+                        <div class="list-col-score">Score</div>
+                        <div class="list-col-level">Risk Level</div>
+                        <div class="list-col-date">Date</div>
+                        <div class="list-col-actions">Actions</div>
+                    </div>
+                    <div id="assessment-list">
+                        <!-- Assessment items will be populated here -->
+                    </div>
+                    <div id="loading-state" style="text-align: center; padding: 40px;">
+                        <div class="spinner"></div>
+                        <p>Loading assessment history...</p>
+                    </div>
+                    <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
+                        <h3>No assessments found</h3>
+                        <p>You haven't performed any assessments yet.</p>
+                        <a href="index.html" class="btn btn-primary" style="margin-top: 20px;">Start Your First Assessment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

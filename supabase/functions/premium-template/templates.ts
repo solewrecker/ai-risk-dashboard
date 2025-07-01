@@ -1,5 +1,4 @@
-import { getLayoutStyles } from './styles/layout.ts';
-import { getComponentStyles } from './styles/components.ts';
+import { getLayoutStyles, getComponentStyles } from './styles/index.ts';
 import { generateHeaderHTML } from './templates/header.ts';
 import { generateSummaryHTML } from './templates/summary.ts';
 import { generateCategoriesHTML } from './templates/categories.ts';
