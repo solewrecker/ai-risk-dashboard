@@ -4,23 +4,18 @@ let currentAssessment = null;
 
 // Configuration
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU2MzM5NDAsImV4cCI6MjAzMTIwOTk0MH0.2p6U6C-Gv9Dk_vga5tqE2w7T4xDRl_u62i2oV_i9v7g';
+let supabase;
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-        persistSession: true,
-        storageKey: 'ai-assessment-auth',
-        storage: window.localStorage,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-    },
-    realtime: {
-        params: {
-            eventsPerSecond: 2
-        }
+function initializeSupabase() {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client initialized.');
+    } else {
+        console.error('Supabase client not found. Make sure the Supabase script is loaded.');
     }
-});
+}
 
 // Authentication state  
 let currentUser = null;
@@ -40,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Security constants
-const MAX_LOGIN_ATTEMPTS = 5;
+const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 const MAX_EMAIL_LENGTH = 254;
