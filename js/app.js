@@ -136,31 +136,44 @@ async function signOut() {
     }
 }
 
-// NEW: Enhanced auth functions for regular users
-
-function showAuthTab(tab) {
-    const signInTab = document.getElementById('signInTab');
-    const signUpTab = document.getElementById('signUpTab');
-    const signInForm = document.getElementById('signInForm');
-    const signUpForm = document.getElementById('signUpForm');
-    
-    if (tab === 'signin') {
-        signInTab.style.background = '#3b82f6';
-        signInTab.style.color = 'white';
-        signUpTab.style.background = '#f8fafc';
-        signUpTab.style.color = '#64748b';
-        signInForm.style.display = 'block';
-        signUpForm.style.display = 'none';
-    } else {
-        signUpTab.style.background = '#3b82f6';
-        signUpTab.style.color = 'white';
-        signInTab.style.background = '#f8fafc';
-        signInTab.style.color = '#64748b';
-        signUpForm.style.display = 'block';
-        signInForm.style.display = 'none';
-    }
+// Auth Modal Functions
+function showAuthModal(tab = 'signin') {
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'flex';
+    switchAuthTab(tab);
 }
 
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+    // Update tabs
+    document.getElementById('signInTab').classList.toggle('active', tab === 'signin');
+    document.getElementById('signUpTab').classList.toggle('active', tab === 'signup');
+    
+    // Update forms
+    document.getElementById('signInForm').classList.toggle('active', tab === 'signin');
+    document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
+}
+
+// Update the showAuthTab function to use the new modal
+function showAuthTab(tab) {
+    showAuthModal(tab);
+}
+
+// Click outside modal to close
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('authModal');
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeAuthModal();
+        }
+    });
+});
+
+// Update signInUser function
 async function signInUser() {
     const email = document.getElementById('signInEmail').value.trim();
     const password = document.getElementById('signInPassword').value;
@@ -178,7 +191,8 @@ async function signInUser() {
         
         if (error) throw error;
         
-        showMessage('✅ Signed in successfully!', 'success');
+        showMessage('Signed in successfully', 'success');
+        closeAuthModal();
         
     } catch (error) {
         console.error('Sign in error:', error);
@@ -186,6 +200,7 @@ async function signInUser() {
     }
 }
 
+// Update signUpUser function
 async function signUpUser() {
     const email = document.getElementById('signUpEmail').value.trim();
     const password = document.getElementById('signUpPassword').value;
@@ -196,13 +211,7 @@ async function signUpUser() {
         return;
     }
     
-    if (password.length < 6) {
-        showMessage('Password must be at least 6 characters', 'error');
-        return;
-    }
-    
     try {
-        // Sign up the user
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -215,30 +224,8 @@ async function signUpUser() {
         
         if (error) throw error;
         
-        if (data.user) {
-            // Create user subscription record
-            const { error: subError } = await supabase
-                .from('user_subscriptions')
-                .insert([
-                    {
-                        user_id: data.user.id,
-                        tier: tier
-                    }
-                ]);
-            
-            if (subError) {
-                console.warn('Failed to create subscription record:', subError);
-                // Don't throw - user is still created successfully
-            }
-            
-            if (data.user.email_confirmed_at) {
-                showMessage('✅ Account created successfully!', 'success');
-            } else {
-                showMessage('📧 Account created! Please check your email to confirm your account.', 'success');
-            }
-        } else {
-            showMessage('Account created! Please check your email to confirm your account.', 'success');
-        }
+        showMessage('Account created successfully! Please check your email to verify your account.', 'success');
+        closeAuthModal();
         
     } catch (error) {
         console.error('Sign up error:', error);
