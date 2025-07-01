@@ -38,7 +38,7 @@ function updateUIForAuth() {
     if (saveButton) {
         if (isAdmin) {
             saveButton.style.display = 'inline-flex';
-            saveButton.innerHTML = '💾 Save to Database (Admin)';
+            saveButton.innerHTML = '<i class="fas fa-save"></i> Save to Database (Admin)';
         } else {
             saveButton.style.display = 'none';
         }
@@ -49,64 +49,44 @@ function updateUIForAuth() {
             // User is logged in - show user info and account options
             const userTier = currentUser.user_metadata?.tier || 'free';
             loginSection.innerHTML = `
-                <div style="text-align: center; margin-bottom: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 0.5rem; border: 1px solid #bbf7d0;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                        <span style="color: #166534;">✓ ${currentUser.email}</span>
-                        <span style="background: ${userTier === 'enterprise' ? '#fbbf24' : '#94a3b8'}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
-                            ${userTier}
-                        </span>
-                        ${isAdmin ? '<span style="color: #dc2626; font-weight: 600; font-size: 0.75rem;">[ADMIN]</span>' : ''}
-                    </div>
-                    <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                        ${userTier === 'free' ? '<button onclick="showUpgradeModal()" style="padding: 0.25rem 0.75rem; background: #fbbf24; color: #92400e; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">⭐ Upgrade</button>' : ''}
-                        <button onclick="showDashboard()" style="padding: 0.25rem 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">📊 Dashboard</button>
-                        <button onclick="signOut()" style="padding: 0.25rem 0.75rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 0.25rem; color: #991b1b; cursor: pointer; font-size: 0.75rem;">Sign Out</button>
-                    </div>
+                <div class="login-user">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${currentUser.email}</span>
+                </div>
+                
+                <div class="login-badges">
+                    ${userTier === 'enterprise' ? 
+                        '<span class="badge badge-enterprise">ENTERPRISE</span>' : ''}
+                    ${isAdmin ? 
+                        '<span class="badge badge-admin">ADMIN</span>' : ''}
+                </div>
+                
+                <div class="login-actions">
+                    ${userTier === 'free' ? 
+                        '<button onclick="showUpgradeModal()" class="btn btn-secondary">⭐ Upgrade</button>' : ''}
+                    <a href="dashboard.html" class="btn btn-secondary">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <button onclick="signOut()" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                    </button>
                 </div>
             `;
         } else {
             // User not logged in - show auth options
             loginSection.innerHTML = `
-                <div id="authContainer" style="text-align: center; margin-bottom: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 1px solid #dbeafe;">
-                    <div style="margin-bottom: 1rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 1rem;">🔐 Sign in to save assessments & export reports</h3>
-                        <p style="margin: 0; color: #64748b; font-size: 0.875rem;">Create an account to save your assessments and access professional exports</p>
-                    </div>
-                    
-                    <div id="authTabs" style="margin-bottom: 1rem;">
-                        <button id="signInTab" onclick="showAuthTab('signin')" style="padding: 0.5rem 1rem; margin-right: 0.25rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer; font-weight: 600;">Sign In</button>
-                        <button id="signUpTab" onclick="showAuthTab('signup')" style="padding: 0.5rem 1rem; margin-left: 0.25rem; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer;">Sign Up</button>
-                    </div>
-                    
-                    <div id="signInForm" style="display: block;">
-                        <div style="margin-bottom: 0.75rem;">
-                            <input type="email" id="signInEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <input type="password" id="signInPassword" placeholder="Password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
-                        </div>
-                        <button onclick="signInUser()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Sign In</button>
-                    </div>
-                    
-                    <div id="signUpForm" style="display: none;">
-                        <div style="margin-bottom: 0.75rem;">
-                            <input type="email" id="signUpEmail" placeholder="Email address" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
-                        </div>
-                        <div style="margin-bottom: 0.75rem;">
-                            <input type="password" id="signUpPassword" placeholder="Create password" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <select id="signUpTier" style="width: 100%; max-width: 280px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
-                                <option value="free">🆓 Free Tier - Basic exports</option>
-                                <option value="enterprise">⭐ Enterprise - $49/month</option>
-                            </select>
-                        </div>
-                        <button onclick="signUpUser()" style="padding: 0.75rem 1.5rem; background: #10b981; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">Create Account</button>
-                    </div>
-                    
-                    <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b;">
-                        Continue as guest to try the assessment tool
-                    </div>
+                <div class="login-user">
+                    <i class="fas fa-lock"></i>
+                    <span>Sign in to save assessments & export reports</span>
+                </div>
+                
+                <div class="login-actions">
+                    <button onclick="showAuthTab('signin')" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <button onclick="showAuthTab('signup')" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
                 </div>
             `;
         }
