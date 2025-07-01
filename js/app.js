@@ -6,12 +6,19 @@ let currentAssessment = null;
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
 
-// Initialize Supabase with CORS options
+// Initialize Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
         persistSession: true,
         storageKey: 'ai-assessment-auth',
-        storage: window.localStorage
+        storage: window.localStorage,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    },
+    realtime: {
+        params: {
+            eventsPerSecond: 2
+        }
     }
 });
 
@@ -174,11 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Security Constants
-const MAX_EMAIL_LENGTH = 254; // RFC 5321
-const MIN_PASSWORD_LENGTH = 8;
-const MAX_PASSWORD_LENGTH = 128;
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+const AUTH_TOKEN_EXPIRY = 3600; // 1 hour in seconds
+const REAUTH_TOKEN_EXPIRY = 300; // 5 minutes in seconds
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 900; // 15 minutes in seconds
 
 // Track failed login attempts
 const failedAttempts = new Map();
