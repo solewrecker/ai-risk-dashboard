@@ -183,15 +183,15 @@ otp_expiry = 1800  # 30 minutes
 # Email template configuration
 [auth.email.template.confirm_signup]
 subject = "Confirm Your AI Risk Assessment Account"
-content_path = "./templates/confirm-signup.html"
+content_path = "supabase/templates/confirm-signup.html"
 
 [auth.email.template.reset_password]
 subject = "Reset Your AI Risk Assessment Password"
-content_path = "./templates/reset-password.html"
+content_path = "supabase/templates/reset-password.html"
 
 [auth.email.template.confirm_email_change]
 subject = "Confirm Your Email Change"
-content_path = "./templates/confirm-email-change.html"
+content_path = "supabase/templates/confirm-email-change.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

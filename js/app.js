@@ -38,6 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForAuth();
 });
 
+// Security constants
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const MAX_EMAIL_LENGTH = 254;
+const MIN_PASSWORD_LENGTH = 12;
+
+let loginAttempts = 0;
+let lockoutTimer = null;
+
 function updateUIForAuth() {
     const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
     const loginSection = document.getElementById('loginSection');
@@ -179,16 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-// Security Constants
-const AUTH_TOKEN_EXPIRY = 3600; // 1 hour in seconds
-const REAUTH_TOKEN_EXPIRY = 300; // 5 minutes in seconds
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 900; // 15 minutes in seconds
-
-// Track failed login attempts
-const failedAttempts = new Map();
-const lockoutTimes = new Map();
 
 // Input sanitization
 function sanitizeInput(input) {
