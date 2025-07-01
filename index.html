@@ -61,6 +61,62 @@
             <!-- Login UI will be populated by JavaScript -->
         </div>
 
+        <!-- Auth Modal -->
+        <div id="authModal" class="auth-modal-overlay">
+            <div class="auth-modal">
+                <div class="auth-modal-header">
+                    <h3><i class="fas fa-lock"></i> Account Access</h3>
+                </div>
+                <div class="auth-modal-content">
+                    <div class="auth-tabs">
+                        <div id="signInTab" class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div>
+                        <div id="signUpTab" class="auth-tab" onclick="switchAuthTab('signup')">Create Account</div>
+                    </div>
+                    
+                    <div id="signInForm" class="auth-form active">
+                        <div class="auth-input-group">
+                            <label for="signInEmail">Email Address</label>
+                            <input type="email" id="signInEmail" class="auth-input" placeholder="Enter your email">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signInPassword">Password</label>
+                            <input type="password" id="signInPassword" class="auth-input" placeholder="Enter your password">
+                        </div>
+                        <button onclick="signInUser()" class="auth-button">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                    </div>
+                    
+                    <div id="signUpForm" class="auth-form">
+                        <div class="auth-input-group">
+                            <label for="signUpEmail">Email Address</label>
+                            <input type="email" id="signUpEmail" class="auth-input" placeholder="Enter your email">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signUpPassword">Password</label>
+                            <input type="password" id="signUpPassword" class="auth-input" placeholder="Create a password">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signUpTier">Account Type</label>
+                            <select id="signUpTier" class="auth-select">
+                                <option value="free">🆓 Free Tier - Basic exports</option>
+                                <option value="enterprise">⭐ Enterprise - $49/month</option>
+                            </select>
+                        </div>
+                        <button onclick="signUpUser()" class="auth-button">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <button onclick="closeAuthModal()" class="btn btn-secondary">
+                            Continue as Guest
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Progress Indicator -->
         <div class="progress-container">
             <div class="progress-steps">

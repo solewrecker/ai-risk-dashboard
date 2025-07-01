@@ -816,4 +816,138 @@ body {
 .btn-icon:hover {
     color: #1e293b;
     background-color: #e2e8f0;
+}
+
+/* Auth Modal Styles */
+.auth-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-modal {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    overflow: hidden;
+}
+
+.auth-modal-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.auth-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.auth-modal-content {
+    padding: 1.5rem;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+}
+
+.auth-tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.auth-input-group {
+    margin-bottom: 1rem;
+}
+
+.auth-input-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.auth-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    background: #3b82f6;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.auth-button:hover {
+    background: #2563eb;
+}
+
+.auth-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
 } 
