@@ -4,7 +4,7 @@ let currentAssessment = null;
 
 // Configuration
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU2MzM5NDAsImV4cCI6MjAzMTIwOTk0MH0.2p6U6C-Gv9Dk_vga5tqE2w7T4xDRl_u62i2oV_i9v7g';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
 let supabase;
 
 // Security constants
