@@ -35,6 +35,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 // Initialize auth UI when page loads
 document.addEventListener('DOMContentLoaded', () => {
+    initializeSupabase();
     updateUIForAuth();
 });
 
@@ -45,8 +46,9 @@ const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 const MAX_EMAIL_LENGTH = 254;
 const MIN_PASSWORD_LENGTH = 12;
 
-let loginAttempts = 0;
-let lockoutTimer = null;
+// Track login attempts and lockouts
+const failedAttempts = new Map();
+const lockoutTimes = new Map();
 
 function updateUIForAuth() {
     const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
