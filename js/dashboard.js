@@ -135,9 +135,8 @@ function getRiskColor(riskLevel) {
 }
 
 function viewDetails(assessmentId) {
-    // For now, just log it. We can build a details view later.
-    console.log('Viewing details for assessment:', assessmentId);
-    alert('Detail view is not implemented yet. You can see the ID in the console.');
+    // Navigate to a new detail page with the assessment ID in the URL
+    window.location.href = `assessment-detail.html?id=${assessmentId}`;
 }
 
 async function deleteAssessment(assessmentId) {
