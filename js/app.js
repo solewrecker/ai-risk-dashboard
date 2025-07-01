@@ -7,43 +7,57 @@ const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU2MzM5NDAsImV4cCI6MjAzMTIwOTk0MH0.2p6U6C-Gv9Dk_vga5tqE2w7T4xDRl_u62i2oV_i9v7g';
 let supabase;
 
-// Initialize Supabase client
+// Security constants
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
+const TOKEN_EXPIRY_MS = 60 * 60 * 1000;
+const MAX_EMAIL_LENGTH = 254;
+const MIN_PASSWORD_LENGTH = 12;
+const MAX_PASSWORD_LENGTH = 128; 
+const LOCKOUT_TIME = 15 * 60 * 1000;
+
+// Authentication state
+let currentUser = null;
+let isAdmin = false;
+
+// Track login attempts and lockouts
+const failedAttempts = new Map();
+const lockoutTimes = new Map();
+
+// Initialize the application once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeSupabase();
+    setupEventListeners();
+});
+
+// Main initialization function
 function initializeSupabase() {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('Supabase client initialized.');
+        
+        // Now that supabase is initialized, set up the auth listener
+        supabase.auth.onAuthStateChange((event, session) => {
+            currentUser = session?.user || null;
+            isAdmin = session?.user?.user_metadata?.role === 'admin';
+            updateUIForAuth();
+        });
     } else {
         console.error('Supabase client not found. Make sure the Supabase script is loaded.');
     }
 }
 
-// Authentication state  
-let currentUser = null;
-let isAdmin = false;
-
-// Check auth state on load
-supabase.auth.onAuthStateChange((event, session) => {
-    currentUser = session?.user || null;
-    isAdmin = session?.user?.user_metadata?.role === 'admin';
-    updateUIForAuth();
-});
-
-// Initialize auth UI when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    initializeSupabase();
-    updateUIForAuth();
-});
-
-// Security constants
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
-const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
-const MAX_EMAIL_LENGTH = 254;
-const MIN_PASSWORD_LENGTH = 12;
-
-// Track login attempts and lockouts
-const failedAttempts = new Map();
-const lockoutTimes = new Map();
+// Setup all other event listeners
+function setupEventListeners() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeAuthModal();
+            }
+        });
+    }
+}
 
 function updateUIForAuth() {
     const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
@@ -177,16 +191,6 @@ function showAuthTab(tab) {
     showAuthModal(tab);
 }
 
-// Click outside modal to close
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('authModal');
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeAuthModal();
-        }
-    });
-});
-
 // Input sanitization
 function sanitizeInput(input) {
     if (typeof input !== 'string') return '';
@@ -238,7 +242,7 @@ function checkRateLimit(email) {
         failedAttempts.delete(email);
         return {
             allowed: false,
-            message: 'Too many failed attempts. Please try again in 15 minutes'
+            message: `Too many failed attempts. Please try again in 15 minutes`
         };
     }
     
