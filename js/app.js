@@ -408,40 +408,25 @@ const USE_CASE_MULTIPLIERS = {
 
 // Step navigation
 function nextStep() {
-    const currentStep = getCurrentStep();
+    let isValid = false;
     
-    // Validate form data before proceeding
+    // Validate current step before proceeding
     if (currentStep === 1) {
-        const formData = {
-            toolName: document.getElementById('toolName').value,
-            toolUrl: document.getElementById('toolUrl').value,
-            toolCategory: document.getElementById('toolCategory').value,
-            useCase: document.getElementById('useCase').value,
-            additionalContext: document.getElementById('additionalContext').value
-        };
-        
-        const validation = validateFormData(formData);
-        if (!validation.valid) {
-            showMessage(validation.message, 'error');
-            return;
-        }
-    }
-    else if (currentStep === 2) {
-        const dataClassification = document.querySelector('input[name="dataClassification"]:checked')?.value;
-        if (!dataClassification) {
-            showMessage('Please select a data classification', 'error');
-            return;
-        }
+        isValid = validateStep1();
+    } else if (currentStep === 2) {
+        isValid = validateStep2();
+    } else {
+        // No validation for other steps
+        isValid = true;
     }
     
-    // Proceed with step change if validation passes
-    document.querySelector(`#step${currentStep}`).classList.remove('active');
-    document.querySelector(`#section${currentStep}`).classList.remove('active');
-    document.querySelector(`#step${currentStep + 1}`).classList.add('active');
-    document.querySelector(`#section${currentStep + 1}`).classList.add('active');
-    
-    if (currentStep === 2) {
-        startAnalysis();
+    if (isValid) {
+        currentStep++;
+        if (currentStep === 3) {
+            startAssessment();
+        } else {
+            showStep(currentStep);
+        }
     }
 }
 
