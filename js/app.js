@@ -1527,8 +1527,10 @@ async function saveToDatabase() {
             .insert([
                 { 
                     user_id: currentUser.id,
-                    tool_name: currentAssessment.formData.toolName,
-                    assessment_data: currentAssessment
+                    tool_name: currentAssessment.results.toolName,
+                    assessment_data: currentAssessment,
+                    risk_score: currentAssessment.results.finalScore,
+                    risk_level: currentAssessment.results.riskLevel
                 }
             ]);
         
