@@ -1,44 +1,59 @@
 // js/dashboard.js
 
-// Supabase Connection (replace with your details)
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+document.addEventListener('DOMContentLoaded', () => {
+    // IMPORTANT: Replace with your actual Supabase project URL and Anon Key
+    const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
 
-const loginSection = document.getElementById('loginSection');
-const dashboardContent = document.getElementById('dashboardContent');
-const assessmentList = document.getElementById('assessment-list');
-const loadingState = document.getElementById('loading-state');
-const emptyState = document.getElementById('empty-state');
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // Check user session
-    const { data: { session }, error } = await supabase.auth.getSession();
-
-    if (session) {
-        console.log('User is logged in:', session.user.email);
-        loginSection.style.display = 'none';
-        dashboardContent.style.display = 'block';
-        loadAssessments(session.user.id);
-    } else {
-        console.log('User is not logged in.');
-        renderLoginUI();
+    if (SUPABASE_URL.includes("YOUR_SUPABASE_URL")) {
+        alert('Please configure SUPABASE_URL and SUPABASE_ANON_KEY in js/dashboard.js');
+        return;
     }
 
-    // Handle auth state changes
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const loginSection = document.getElementById('loginSection');
+    const dashboardContent = document.getElementById('dashboardContent');
+    
+    // Handle auth state changes to update the UI
+    supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session) {
             loginSection.style.display = 'none';
             dashboardContent.style.display = 'block';
-            loadAssessments(session.user.id);
+            
+            // Check for admin role and show import button
+            const isAdmin = session.user?.user_metadata?.role === 'admin';
+            const importContainer = document.getElementById('importContainer');
+            if (importContainer) {
+                importContainer.style.display = isAdmin ? 'block' : 'none';
+            }
+            
+            loadAssessments(supabase);
         } else {
-            renderLoginUI();
+            renderLoginUI(loginSection, supabase);
             dashboardContent.style.display = 'none';
+        }
+    });
+
+    // Initial check in case the user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+            loginSection.style.display = 'none';
+            dashboardContent.style.display = 'block';
+
+            const isAdmin = session.user?.user_metadata?.role === 'admin';
+            const importContainer = document.getElementById('importContainer');
+            if (importContainer) {
+                importContainer.style.display = isAdmin ? 'block' : 'none';
+            }
+            
+            loadAssessments(supabase);
+        } else {
+            renderLoginUI(loginSection, supabase);
         }
     });
 });
 
-function renderLoginUI() {
+function renderLoginUI(loginSection, supabase) {
     loginSection.style.display = 'block';
     loginSection.innerHTML = `
         <div class="form-card">
@@ -52,33 +67,31 @@ function renderLoginUI() {
             </div>
         </div>
     `;
-    document.getElementById('login-button').addEventListener('click', signInWithGitHub);
+    document.getElementById('login-button').addEventListener('click', () => signInWithGitHub(supabase));
 }
 
-async function signInWithGitHub() {
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-    });
-    if (error) {
-        console.error('Error logging in:', error.message);
-    }
+async function signInWithGitHub(supabase) {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'github' });
+    if (error) console.error('Error logging in:', error.message);
 }
 
-async function loadAssessments(userId) {
+async function loadAssessments(supabase) {
+    const loadingState = document.getElementById('loading-state');
+    const emptyState = document.getElementById('empty-state');
+    const assessmentList = document.getElementById('assessment-list');
+
     loadingState.style.display = 'block';
     emptyState.style.display = 'none';
     assessmentList.innerHTML = '';
 
     try {
+        // Fetch from the correct 'ai_tools' table
         const { data, error } = await supabase
-            .from('assessments')
+            .from('ai_tools')
             .select('*')
-            .eq('user_id', userId)
             .order('created_at', { ascending: false });
 
-        if (error) {
-            throw error;
-        }
+        if (error) throw error;
 
         if (data.length === 0) {
             emptyState.style.display = 'block';
@@ -93,72 +106,125 @@ async function loadAssessments(userId) {
     }
 }
 
-function renderAssessmentItem(assessment) {
-    const results = assessment.results || {};
-    const formData = assessment.form_data || {};
-    const riskLevel = results.riskLevel || 'Unknown';
-    const riskColor = getRiskColor(riskLevel.toLowerCase());
+function renderAssessmentItem(tool) {
+    const assessmentList = document.getElementById('assessment-list');
+    const riskLevel = tool.risk_level || 'Unknown';
+    const riskColor = getRiskColor(riskLevel);
 
     const item = document.createElement('div');
     item.className = 'list-item';
     item.innerHTML = `
         <div class="list-col-tool">
-            <i class="fas fa-tools list-item-icon"></i>
-            ${results.toolName || 'N/A'}
+            <i class="fas fa-robot list-item-icon"></i>
+            ${tool.name || 'N/A'}
         </div>
         <div class="list-col-score">
-            <span class="score-badge" style="background-color: ${riskColor};">${results.finalScore || 'N/A'}</span>
+            <span class="score-badge" style="background-color: ${riskColor};">${tool.total_score || 'N/A'}</span>
         </div>
         <div class="list-col-level">
             <span class="level-indicator" style="background-color: ${riskColor};"></span>
             ${riskLevel}
         </div>
         <div class="list-col-date">
-            ${new Date(assessment.created_at).toLocaleDateString()}
+            ${new Date(tool.created_at).toLocaleDateString()}
         </div>
         <div class="list-col-actions">
-            <button class="btn-icon" title="View Details" onclick="viewDetails('${assessment.id}')"><i class="fas fa-eye"></i></button>
-            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')"><i class="fas fa-trash"></i></button>
+            <button class="btn-icon" title="View Details" onclick="alert('Detail view not implemented yet.')"><i class="fas fa-eye"></i></button>
+            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${tool.id}')"><i class="fas fa-trash"></i></button>
         </div>
     `;
     assessmentList.appendChild(item);
 }
 
 function getRiskColor(riskLevel) {
-    switch(riskLevel) {
-        case 'low': return '#16a34a';
-        case 'medium': return '#f59e0b';
-        case 'high': return '#ef4444';
-        case 'critical': return '#dc2626';
-        default: return '#64748b';
-    }
+    if (!riskLevel) return '#64748b';
+    const level = riskLevel.toUpperCase();
+    if (level.includes('CRITICAL')) return '#dc2626';
+    if (level.includes('HIGH')) return '#ef4444';
+    if (level.includes('MEDIUM')) return '#f59e0b';
+    if (level.includes('LOW')) return '#16a34a';
+    return '#64748b';
 }
 
-function viewDetails(assessmentId) {
-    // Navigate to a new detail page with the assessment ID in the URL
-    window.location.href = `assessment-detail.html?id=${assessmentId}`;
-}
-
-async function deleteAssessment(assessmentId) {
+async function deleteAssessment(toolId) {
     if (confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
         try {
-            const { error } = await supabase
-                .from('assessments')
-                .delete()
-                .eq('id', assessmentId);
+            const SUPABASE_URL = "YOUR_SUPABASE_URL";
+            const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            if (error) {
-                throw error;
-            }
+            const { error } = await supabase
+                .from('ai_tools')
+                .delete()
+                .eq('id', toolId);
+
+            if (error) throw error;
             
-            // Refresh the list
-            const { data: { session } } = await supabase.auth.getSession();
-            if(session) loadAssessments(session.user.id);
+            loadAssessments(supabase); // Refresh the list
 
         } catch (error) {
             console.error('Error deleting assessment:', error.message);
             alert('Failed to delete the assessment.');
         }
+    }
+}
+
+// --- Import Modal Functions ---
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            // The new function expects the raw tool data, not a { tools: [...] } wrapper
+            window.importData = JSON.parse(e.target.result);
+            document.getElementById('fileName').textContent = `File: ${file.name}`;
+            document.getElementById('importOptions').style.display = 'block';
+        } catch (error) {
+            alert('❌ Invalid JSON file. Please select a valid assessment file.');
+            console.error("JSON Parsing Error:", error);
+        }
+    };
+    reader.readAsText(file);
+}
+
+async function processImport() {
+    if (!window.importData) {
+        alert('❌ No valid data to import. Please select a file first.');
+        return;
+    }
+
+    const importButton = document.querySelector('#importModal button');
+    importButton.disabled = true;
+    importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+
+    try {
+        const SUPABASE_URL = "YOUR_SUPABASE_URL";
+        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            alert('You must be logged in to import data.');
+            throw new Error('User not authenticated.');
+        }
+
+        const { data, error } = await supabase.functions.invoke('upload-assessment', {
+            body: { toolData: window.importData } // Pass the tool data directly
+        });
+
+        if (error) throw error;
+        
+        alert(`✅ Success: ${data.message}`);
+        document.getElementById('importModal').style.display = 'none';
+        loadAssessments(supabase); // Refresh the grid
+
+    } catch (error) {
+        console.error('Import Error:', error);
+        alert(`❌ Import Failed: ${error.message || 'Unknown error'}`);
+    } finally {
+        importButton.disabled = false;
+        importButton.innerHTML = 'Start Import';
     }
 }
 
