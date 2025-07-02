@@ -1,18 +1,20 @@
 // js/dashboard.js
 
 let isAdmin = false; // Use a global variable for the admin state
+let supabaseClient = null; // Global Supabase client instance
+
+// IMPORTANT: Replace with your actual Supabase project URL and Anon Key
+const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // IMPORTANT: Replace with your actual Supabase project URL and Anon Key
-    const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
-
     if (SUPABASE_URL.includes("YOUR_SUPABASE_URL")) {
         alert('Please configure SUPABASE_URL and SUPABASE_ANON_KEY in js/dashboard.js');
         return;
     }
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Create a single global Supabase client instance
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     // --- Add Event Listeners for the Modal ---
     const importBtn = document.getElementById('importBtn');
@@ -32,18 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // Handle auth state changes to update the UI
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-        handleAuthChange(session, supabase);
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+        handleAuthChange(session);
     });
 
     // Initial check in case the user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        handleAuthChange(session, supabase);
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        handleAuthChange(session);
     });
 });
 
 // A single, central function to handle UI changes based on auth state
-function handleAuthChange(session, supabase) {
+function handleAuthChange(session) {
     const loginSection = document.getElementById('loginSection');
     const dashboardContent = document.getElementById('dashboardContent');
 
@@ -55,10 +57,10 @@ function handleAuthChange(session, supabase) {
         dashboardContent.style.display = 'block';
         
         updateDashboardUI();
-        loadAssessments(supabase);
+        loadAssessments();
     } else {
         isAdmin = false; // Reset admin state on logout
-        renderLoginUI(loginSection, supabase);
+        renderLoginUI(loginSection);
         dashboardContent.style.display = 'none';
         updateDashboardUI();
     }
@@ -72,7 +74,7 @@ function updateDashboardUI() {
     }
 }
 
-function renderLoginUI(loginSection, supabase) {
+function renderLoginUI(loginSection) {
     loginSection.style.display = 'block';
     loginSection.innerHTML = `
         <div class="form-card">
@@ -86,15 +88,15 @@ function renderLoginUI(loginSection, supabase) {
             </div>
         </div>
     `;
-    document.getElementById('login-button').addEventListener('click', () => signInWithGitHub(supabase));
+    document.getElementById('login-button').addEventListener('click', () => signInWithGitHub());
 }
 
-async function signInWithGitHub(supabase) {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'github' });
+async function signInWithGitHub() {
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'github' });
     if (error) console.error('Error logging in:', error.message);
 }
 
-async function loadAssessments(supabase) {
+async function loadAssessments() {
     const loadingState = document.getElementById('loading-state');
     const emptyState = document.getElementById('empty-state');
     const assessmentList = document.getElementById('assessment-list');
@@ -105,7 +107,7 @@ async function loadAssessments(supabase) {
 
     try {
         // Fetch from the correct 'ai_tools' table
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('ai_tools')
             .select('*')
             .order('created_at', { ascending: false });
@@ -168,18 +170,14 @@ function getRiskColor(riskLevel) {
 async function deleteAssessment(toolId) {
     if (confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
         try {
-            const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
-            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('ai_tools')
                 .delete()
                 .eq('id', toolId);
 
             if (error) throw error;
             
-            loadAssessments(supabase); // Refresh the list
+            loadAssessments(); // Refresh the list
 
         } catch (error) {
             console.error('Error deleting assessment:', error.message);
@@ -218,17 +216,13 @@ async function processImport() {
     importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
 
     try {
-        const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
             alert('You must be logged in to import data.');
             throw new Error('User not authenticated.');
         }
 
-        const { data, error } = await supabase.functions.invoke('upload-assessment', {
+        const { data, error } = await supabaseClient.functions.invoke('upload-assessment', {
             body: { toolData: window.importData } // Pass the tool data directly
         });
 
@@ -236,7 +230,7 @@ async function processImport() {
         
         alert(`✅ Success: ${data.message}`);
         document.getElementById('importModal').style.display = 'none';
-        loadAssessments(supabase); // Refresh the grid
+        loadAssessments(); // Refresh the grid
 
     } catch (error) {
         console.error('Import Error:', error);
