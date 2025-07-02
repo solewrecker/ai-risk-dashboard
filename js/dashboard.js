@@ -57,20 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (riskFilter) riskFilter.addEventListener('change', applyFilters);
     if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
     if (sortSelect) sortSelect.addEventListener('change', applyFilters);
-    if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        riskFilter.value = 'all';
-        categoryFilter.value = 'all';
-        sortSelect.value = 'date_desc';
+    
+    const resetAllFilters = () => {
+        if(searchInput) searchInput.value = '';
+        if(riskFilter) riskFilter.value = 'all';
+        if(categoryFilter) categoryFilter.value = 'all';
+        if(sortSelect) sortSelect.value = 'date_desc';
         applyFilters();
-    });
-    if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        riskFilter.value = 'all';
-        categoryFilter.value = 'all';
-        sortSelect.value = 'date_desc';
-        applyFilters();
-    });
+    };
+
+    if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', resetAllFilters);
+    if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetAllFilters);
 });
 
 // A single, central function to handle UI changes based on auth state
@@ -143,7 +140,7 @@ async function loadAssessments() {
         if (error) throw error;
 
         allAssessments = data || [];
-        applyFilters(); // Render based on current filter state
+        applyFilters(); // Initial render
     } catch (error) {
         console.error('Error loading assessments:', error.message);
         assessmentList.innerHTML = `<p style="color: red; text-align: center;">Error: Could not load assessments.</p>`;
@@ -325,7 +322,7 @@ const addStylesReminder = `
     background-color: #e2e8f0;
 }
 `;
-console.log("Reminder: Add the following styles to css/style.css:\n" + addStylesReminder);
+// console.log("Reminder: Add the following styles to css/style.css:\n" + addStylesReminder);
 
 function applyFilters() {
     if (!allAssessments) return;
@@ -336,9 +333,9 @@ function applyFilters() {
     const sortValue = document.getElementById('sortSelect')?.value || 'date_desc';
 
     filteredAssessments = allAssessments.filter(tool => {
-        const matchesSearch = tool.name?.toLowerCase().includes(searchTerm);
+        const matchesSearch = !searchTerm || tool.name?.toLowerCase().includes(searchTerm);
         const matchesRisk = riskValue === 'all' || (tool.risk_level || '').toLowerCase().includes(riskValue);
-        const matchesCategory = categoryValue === 'all' || (tool.category || '').toLowerCase().includes(categoryValue.toLowerCase());
+        const matchesCategory = categoryValue === 'all' || (tool.category || '').toLowerCase() === categoryValue.toLowerCase();
         return matchesSearch && matchesRisk && matchesCategory;
     });
 
@@ -375,16 +372,21 @@ function renderAssessmentList() {
 
     assessmentList.innerHTML = '';
 
+    const isFiltered = (document.getElementById('searchInput')?.value || '') !== '' ||
+                       (document.getElementById('riskFilter')?.value || 'all') !== 'all' ||
+                       (document.getElementById('categoryFilter')?.value || 'all') !== 'all';
+
     if (filteredAssessments.length === 0) {
         emptyState.style.display = 'block';
-        resultsCount.textContent = '0 tools';
-        clearFiltersBtn.style.display = 'none';
-        return;
+        resultsCount.textContent = '0 tools found';
+    } else {
+        emptyState.style.display = 'none';
+        resultsCount.textContent = `Showing ${filteredAssessments.length} of ${allAssessments.length} tools`;
     }
 
-    emptyState.style.display = 'none';
-    resultsCount.textContent = `${filteredAssessments.length} tool${filteredAssessments.length !== 1 ? 's' : ''}`;
-    clearFiltersBtn.style.display = 'block';
+    if(clearFiltersBtn) {
+        clearFiltersBtn.style.display = isFiltered ? 'block' : 'none';
+    }
 
     filteredAssessments.forEach(renderAssessmentItem);
 } 

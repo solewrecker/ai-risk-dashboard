@@ -45,17 +45,17 @@
             <div class="dashboard-controls">
                 <div class="search-container">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+                    <input type="text" id="searchInput" placeholder="Search by tool name..." class="search-input">
                 </div>
                 <div class="filter-container">
-                    <select id="riskFilter" class="filter-select">
+                    <select id="riskFilter" class="filter-select" aria-label="Filter by risk">
                         <option value="all">All Risk Levels</option>
-                        <option value="low">Low Risk</option>
-                        <option value="medium">Medium Risk</option>
-                        <option value="high">High Risk</option>
-                        <option value="critical">Critical Risk</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
                     </select>
-                    <select id="categoryFilter" class="filter-select">
+                    <select id="categoryFilter" class="filter-select" aria-label="Filter by category">
                         <option value="all">All Categories</option>
                         <option value="General">General</option>
                         <option value="Communication">Communication</option>
@@ -65,24 +65,24 @@
                     </select>
                 </div>
                 <div class="sort-container">
-                    <select id="sortSelect" class="filter-select">
-                        <option value="date_desc">Newest First</option>
-                        <option value="date_asc">Oldest First</option>
-                        <option value="score_desc">Highest Risk</option>
-                        <option value="score_asc">Lowest Risk</option>
-                        <option value="name_asc">Name A-Z</option>
-                        <option value="name_desc">Name Z-A</option>
+                    <select id="sortSelect" class="filter-select" aria-label="Sort by">
+                        <option value="date_desc">Sort: Newest</option>
+                        <option value="date_asc">Sort: Oldest</option>
+                        <option value="score_desc">Sort: Highest Risk</option>
+                        <option value="score_asc">Sort: Lowest Risk</option>
+                        <option value="name_asc">Sort: Name A-Z</option>
+                        <option value="name_desc">Sort: Name Z-A</option>
                     </select>
                 </div>
             </div>
             
-            <!-- Results Summary -->
-            <div class="results-summary">
-                <span id="resultsCount">Loading...</span>
-                <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
-            </div>
-            
             <div class="form-content">
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    <span id="resultsCount">Loading...</span>
+                    <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
+                </div>
+                
                 <div id="assessment-list-container">
                     <div class="list-header">
                         <div class="list-col-tool">Tool</div>
@@ -100,8 +100,8 @@
                     </div>
                     <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
                         <h3>No tools found</h3>
-                        <p>No tools match your current filters.</p>
-                        <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Reset Filters</button>
+                        <p>No tools match your current filters. Try adjusting your search.</p>
+                        <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Clear All Filters</button>
                     </div>
                 </div>
             </div>
@@ -114,10 +114,12 @@
             <span class="close">&times;</span>
             <h2>Import Assessment from JSON</h2>
             <p>Select a valid JSON assessment file to upload it to the database.</p>
-            <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)">
-            <p id="fileName" style="margin-top: 15px; font-style: italic;"></p>
+            <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)" class="form-input">
+            <p id="fileName" style="margin-top: 15px; font-style: italic; color: #64748b;"></p>
             <div id="importOptions" style="display:none; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="processImport()">Start Import</button>
+                <button class="btn btn-primary" onclick="processImport()">
+                    <i class="fas fa-check"></i> Start Import
+                </button>
             </div>
         </div>
     </div>
