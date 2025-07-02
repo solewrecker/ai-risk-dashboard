@@ -156,6 +156,12 @@ function renderAssessmentItem(tool) {
 
     const item = document.createElement('div');
     item.className = 'list-item';
+
+    let actionsHtml = `<button class="btn-icon" title="View Details" onclick="alert('Detail view not implemented yet.')"><i class="fas fa-eye"></i></button>`;
+    if (isAdmin) {
+        actionsHtml += ` <button class="btn-icon" title="Delete" onclick="deleteAssessment('${tool.id}')"><i class="fas fa-trash"></i></button>`;
+    }
+
     item.innerHTML = `
         <div class="list-col-tool">
             <i class="fas fa-robot list-item-icon"></i>
@@ -172,8 +178,7 @@ function renderAssessmentItem(tool) {
             ${new Date(tool.created_at).toLocaleDateString()}
         </div>
         <div class="list-col-actions">
-            <button class="btn-icon" title="View Details" onclick="alert('Detail view not implemented yet.')"><i class="fas fa-eye"></i></button>
-            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${tool.id}')"><i class="fas fa-trash"></i></button>
+            ${actionsHtml}
         </div>
     `;
     assessmentList.appendChild(item);

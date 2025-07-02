@@ -68,7 +68,16 @@ ALTER TABLE public.assessments
 -- Add indexes for performance
 CREATE INDEX IF NOT EXISTS idx_assessments_user_id ON public.assessments(user_id);
 CREATE INDEX IF NOT EXISTS idx_assessments_created_at ON public.assessments(created_at);
+
+-- Add indexes for ai_tools table performance
 CREATE INDEX IF NOT EXISTS idx_ai_tools_category ON public.ai_tools(category);
+CREATE INDEX IF NOT EXISTS idx_ai_tools_risk_level ON public.ai_tools(risk_level);
+CREATE INDEX IF NOT EXISTS idx_ai_tools_total_score ON public.ai_tools(total_score);
+CREATE INDEX IF NOT EXISTS idx_ai_tools_created_at ON public.ai_tools(created_at);
+
+-- For speeding up name searches with LIKE/ILIKE
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX IF NOT EXISTS idx_ai_tools_name_trgm ON public.ai_tools USING gin (name gin_trgm_ops);
 
 -- Comments
 COMMENT ON POLICY "Allow admin full access" ON public.ai_tools IS 'Admins have full CRUD access to AI tools';
