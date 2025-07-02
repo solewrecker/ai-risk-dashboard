@@ -19,10 +19,14 @@
         <!-- Header -->
         <div class="header">
             <h1>AI Tool Risk Dashboard</h1>
-            <p>View and manage your past assessments</p>
-            <a href="index.html" class="btn btn-secondary" style="position: absolute; top: 20px; right: 20px;">
-                <i class="fas fa-plus"></i> New Assessment
-            </a>
+            <div class="header-actions">
+                <div id="importContainer" style="display: none;">
+                    <button id="importBtn" class="btn btn-primary"><i class="fas fa-upload"></i> Import Assessment</button>
+                </div>
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> New Assessment
+                </a>
+            </div>
         </div>
 
         <!-- Login Section -->
@@ -59,6 +63,20 @@
                         <a href="index.html" class="btn btn-primary" style="margin-top: 20px;">Start Your First Assessment</a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Import Assessment from JSON</h2>
+            <p>Select a valid JSON assessment file to upload it to the database.</p>
+            <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)">
+            <p id="fileName" style="margin-top: 15px; font-style: italic;"></p>
+            <div id="importOptions" style="display:none; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="processImport()">Start Import</button>
             </div>
         </div>
     </div>
