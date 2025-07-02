@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
-    <title>Risk Assessment Dashboard</title>
+    <title>AI Risk Pro Dashboard</title>
 
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,98 +14,349 @@
     
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>AI Tool Risk Dashboard</h1>
-            <div class="header-actions">
-                <div id="importContainer" style="display: none;">
-                    <button id="importBtn" class="btn btn-primary"><i class="fas fa-upload"></i> Import Assessment</button>
-                </div>
-                <a href="index.html" class="btn btn-secondary">
-                    <i class="fas fa-plus"></i> New Assessment
+<body data-theme="default">
+    <div class="app-container">
+        <!-- Premium Navigation Header -->
+        <nav class="premium-nav">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span class="brand-text">AI Risk Pro</span>
+                <span class="tier-badge" id="tierBadge">FREE</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="#compare" class="nav-item pro-feature" data-section="compare">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Compare Tools</span>
+                    <i class="fas fa-lock pro-lock"></i>
+                </a>
+                
+                <a href="#team" class="nav-item pro-feature" data-section="team">
+                    <i class="fas fa-users"></i>
+                    <span>Team</span>
+                    <i class="fas fa-lock pro-lock"></i>
+                </a>
+                
+                <a href="#themes" class="nav-item" data-section="themes">
+                    <i class="fas fa-palette"></i>
+                    <span>Themes</span>
+                    <span class="unlock-count" id="themeCount">1/5</span>
+                </a>
+                
+                <a href="#templates" class="nav-item pro-feature" data-section="templates">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Templates</span>
+                    <i class="fas fa-lock pro-lock"></i>
+                </a>
+                
+                <a href="#achievements" class="nav-item" data-section="achievements">
+                    <i class="fas fa-trophy"></i>
+                    <span>Achievements</span>
+                    <span class="achievement-count" id="achievementCount">1/8</span>
                 </a>
             </div>
-        </div>
-
-        <!-- Login Section -->
-        <div id="loginSection">
-            <!-- Login UI will be populated by JavaScript -->
-        </div>
-
-        <!-- Main Content -->
-        <div class="form-card" id="dashboardContent" style="display: none;">
-            <div class="form-header">
-                <h2>AI Tool Risk Database</h2>
-                <p>Browse and manage the AI tool risk assessment database.</p>
-            </div>
             
-            <!-- Dashboard Controls -->
-            <div class="dashboard-controls">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search by tool name..." class="search-input">
+            <div class="nav-user">
+                <div class="upgrade-prompt" id="upgradePrompt">
+                    <button class="btn-upgrade">
+                        <i class="fas fa-crown"></i>
+                        Upgrade to Pro
+                    </button>
                 </div>
-                <div class="filter-container">
-                    <select id="riskFilter" class="filter-select" aria-label="Filter by risk">
-                        <option value="all">All Risk Levels</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
-                    </select>
-                    <select id="categoryFilter" class="filter-select" aria-label="Filter by category">
-                        <option value="all">All Categories</option>
-                        <option value="General">General</option>
-                        <option value="Communication">Communication</option>
-                        <option value="Development">Development</option>
-                        <option value="Note-taking">Note-taking</option>
-                        <option value="Writing">Writing</option>
-                    </select>
-                </div>
-                <div class="sort-container">
-                    <select id="sortSelect" class="filter-select" aria-label="Sort by">
-                        <option value="date_desc">Sort: Newest</option>
-                        <option value="date_asc">Sort: Oldest</option>
-                        <option value="score_desc">Sort: Highest Risk</option>
-                        <option value="score_asc">Sort: Lowest Risk</option>
-                        <option value="name_asc">Sort: Name A-Z</option>
-                        <option value="name_desc">Sort: Name Z-A</option>
-                    </select>
+                <div class="user-menu" id="userMenu">
+                    <!-- Will be populated by JS -->
                 </div>
             </div>
-            
-            <div class="form-content">
-                <!-- Results Summary -->
-                <div class="results-summary">
-                    <span id="resultsCount">Loading...</span>
-                    <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <!-- Progress Overview (Always Visible) -->
+                <div class="progress-overview">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h3>Your Progress</h3>
+                            <span class="progress-tier" id="progressTier">Free Tier</span>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="assessmentCount">12</span>
+                                <span class="stat-label">Assessments</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="themeUnlocked">2</span>
+                                <span class="stat-label">Themes Unlocked</span>
+                            </div>
+                            <div class="stat-item pro-feature">
+                                <span class="stat-number">0</span>
+                                <span class="stat-label">Team Members</span>
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Achievement Progress -->
+                    <div class="next-achievement">
+                        <h4>🎯 Next Achievement</h4>
+                        <div class="achievement-progress">
+                            <div class="achievement-info">
+                                <span class="achievement-name">Matrix Theme</span>
+                                <span class="achievement-desc">Complete 10 assessments</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                                <span class="progress-text">7/10</span>
+                            </div>
+                        </div>
+                        <button class="btn-skip-progress pro-only">
+                            <i class="fas fa-forward"></i>
+                            Skip with Pro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Assessment List (Current functionality) -->
+                <div class="assessment-dashboard">
+                    <div class="dashboard-header">
+                        <h2>AI Tool Risk Database</h2>
+                        <div class="dashboard-actions">
+                            <div id="importContainer" class="admin-only" style="display: none;">
+                                <button id="importBtn" class="btn btn-secondary">
+                                    <i class="fas fa-upload"></i> Import Assessment
+                                </button>
+                            </div>
+                            <a href="index.html" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Assessment
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Controls -->
+                    <div class="dashboard-controls">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search by tool name..." class="search-input">
+                        </div>
+                        <div class="filter-container">
+                            <select id="riskFilter" class="filter-select" aria-label="Filter by risk">
+                                <option value="all">All Risk Levels</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            <select id="categoryFilter" class="filter-select" aria-label="Filter by category">
+                                <option value="all">All Categories</option>
+                                <option value="General">General</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Development">Development</option>
+                                <option value="Note-taking">Note-taking</option>
+                                <option value="Writing">Writing</option>
+                            </select>
+                        </div>
+                        <div class="sort-container">
+                            <select id="sortSelect" class="filter-select" aria-label="Sort by">
+                                <option value="date_desc">Sort: Newest</option>
+                                <option value="date_asc">Sort: Oldest</option>
+                                <option value="score_desc">Sort: Highest Risk</option>
+                                <option value="score_asc">Sort: Lowest Risk</option>
+                                <option value="name_asc">Sort: Name A-Z</option>
+                                <option value="name_desc">Sort: Name Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-content">
+                        <!-- Results Summary -->
+                        <div class="results-summary">
+                            <span id="resultsCount">Loading...</span>
+                            <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
+                        </div>
+                        
+                        <div id="assessment-list-container">
+                            <div class="list-header">
+                                <div class="list-col-tool">Tool</div>
+                                <div class="list-col-score">Score</div>
+                                <div class="list-col-level">Risk Level</div>
+                                <div class="list-col-date">Date</div>
+                                <div class="list-col-actions">Actions</div>
+                            </div>
+                            <div id="assessment-list">
+                                <!-- Assessment items will be populated here -->
+                            </div>
+                            <div id="loading-state" style="text-align: center; padding: 40px;">
+                                <div class="spinner"></div>
+                                <p>Loading AI tool database...</p>
+                            </div>
+                            <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
+                                <h3>No tools found</h3>
+                                <p>No tools match your current filters. Try adjusting your search.</p>
+                                <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Clear All Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compare Tools Section (Pro Feature) -->
+            <section id="compare-section" class="content-section pro-feature">
+                <div class="pro-feature-overlay">
+                    <div class="pro-feature-content">
+                        <i class="fas fa-crown pro-crown"></i>
+                        <h3>Compare Tools</h3>
+                        <p>Side-by-side risk analysis and bulk comparison features</p>
+                        <button class="btn-upgrade-feature">
+                            <i class="fas fa-unlock"></i>
+                            Upgrade to Pro
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Section (Pro Feature) -->
+            <section id="team-section" class="content-section pro-feature">
+                <div class="pro-feature-overlay">
+                    <div class="pro-feature-content">
+                        <i class="fas fa-crown pro-crown"></i>
+                        <h3>Team Collaboration</h3>
+                        <p>Invite team members and collaborate on risk assessments</p>
+                        <button class="btn-upgrade-feature">
+                            <i class="fas fa-unlock"></i>
+                            Upgrade to Pro
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Themes Section (Gamified) -->
+            <section id="themes-section" class="content-section">
+                <div class="themes-header">
+                    <h2>Theme Gallery</h2>
+                    <p>Unlock new themes by completing assessments</p>
                 </div>
                 
-                <div id="assessment-list-container">
-                    <div class="list-header">
-                        <div class="list-col-tool">Tool</div>
-                        <div class="list-col-score">Score</div>
-                        <div class="list-col-level">Risk Level</div>
-                        <div class="list-col-date">Date</div>
-                        <div class="list-col-actions">Actions</div>
+                <div class="theme-gallery">
+                    <div class="theme-card unlocked active" data-theme="default">
+                        <div class="theme-preview default-preview"></div>
+                        <h4>Default</h4>
+                        <span class="theme-status unlocked">✅ Active</span>
                     </div>
-                    <div id="assessment-list">
-                        <!-- Assessment items will be populated here -->
+                    
+                    <div class="theme-card locked" data-theme="darkCoder">
+                        <div class="theme-preview dark-coder-preview blurred"></div>
+                        <h4>Dark Coder</h4>
+                        <span class="theme-status locked">🔒 Complete 1 assessment</span>
+                        <div class="theme-progress">
+                            <div class="progress-bar mini">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="progress-text">Ready to unlock!</span>
+                        </div>
                     </div>
-                    <div id="loading-state" style="text-align: center; padding: 40px;">
-                        <div class="spinner"></div>
-                        <p>Loading AI tool database...</p>
+                    
+                    <div class="theme-card locked" data-theme="matrix">
+                        <div class="theme-preview matrix-preview blurred"></div>
+                        <h4>Matrix</h4>
+                        <span class="theme-status locked">🔒 Complete 10 assessments</span>
+                        <div class="theme-progress">
+                            <div class="progress-bar mini">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                            <span class="progress-text">7/10 assessments</span>
+                        </div>
                     </div>
-                    <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
-                        <h3>No tools found</h3>
-                        <p>No tools match your current filters. Try adjusting your search.</p>
-                        <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Clear All Filters</button>
+                    
+                    <div class="theme-card locked" data-theme="cyberpunk">
+                        <div class="theme-preview cyberpunk-preview blurred"></div>
+                        <h4>Cyberpunk</h4>
+                        <span class="theme-status locked">🔒 Complete 50 assessments</span>
+                        <div class="theme-progress">
+                            <div class="progress-bar mini">
+                                <div class="progress-fill" style="width: 14%"></div>
+                            </div>
+                            <span class="progress-text">7/50 assessments</span>
+                        </div>
+                    </div>
+                    
+                    <div class="theme-card pro-exclusive locked" data-theme="corporate">
+                        <div class="theme-preview corporate-preview blurred"></div>
+                        <h4>Corporate Pro</h4>
+                        <span class="theme-status pro-only">👑 Pro Exclusive</span>
+                        <button class="btn-unlock-pro">Upgrade to Unlock</button>
                     </div>
                 </div>
+            </section>
+
+            <!-- Templates Section (Pro Feature) -->
+            <section id="templates-section" class="content-section pro-feature">
+                <div class="pro-feature-overlay">
+                    <div class="pro-feature-content">
+                        <i class="fas fa-crown pro-crown"></i>
+                        <h3>Custom Templates</h3>
+                        <p>Industry-specific templates and custom evaluation rubrics</p>
+                        <button class="btn-upgrade-feature">
+                            <i class="fas fa-unlock"></i>
+                            Upgrade to Pro
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Achievements Section -->
+            <section id="achievements-section" class="content-section">
+                <div class="achievements-header">
+                    <h2>Achievements</h2>
+                    <p>Track your progress and unlock rewards</p>
+                </div>
+                
+                <div class="achievements-grid">
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">🎯</div>
+                        <h4>First Assessment</h4>
+                        <p>Complete your first risk assessment</p>
+                        <span class="achievement-date">Unlocked 2 days ago</span>
+                    </div>
+                    
+                    <div class="achievement-card in-progress">
+                        <div class="achievement-icon">🔍</div>
+                        <h4>Risk Detective</h4>
+                        <p>Complete 10 risk assessments</p>
+                        <div class="achievement-progress">
+                            <div class="progress-bar mini">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                            <span class="progress-text">7/10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card locked">
+                        <div class="achievement-icon">⚡</div>
+                        <h4>Power User</h4>
+                        <p>Complete 50 risk assessments</p>
+                        <span class="achievement-requirement">43 more to go</span>
+                    </div>
+                    
+                    <div class="achievement-card pro-exclusive locked">
+                        <div class="achievement-icon">👥</div>
+                        <h4>Team Player</h4>
+                        <p>Invite your first team member</p>
+                        <span class="achievement-requirement">👑 Pro Feature</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Login Section -->
+            <div id="loginSection" style="display: none;">
+                <!-- Login UI will be populated by JavaScript -->
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Import Modal -->
