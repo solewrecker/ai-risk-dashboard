@@ -14,6 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // --- Add Event Listeners for the Modal ---
+    const importBtn = document.getElementById('importBtn');
+    const importModal = document.getElementById('importModal');
+    const closeBtn = document.querySelector('.modal .close'); // Be more specific
+
+    if(importBtn) {
+        importBtn.onclick = () => { if(isAdmin) importModal.style.display = 'block'; };
+    }
+    if(closeBtn) {
+        closeBtn.onclick = () => { importModal.style.display = 'none'; };
+    }
+    window.onclick = (event) => {
+        if (event.target == importModal) {
+            importModal.style.display = 'none';
+        }
+    };
+    
     // Handle auth state changes to update the UI
     supabase.auth.onAuthStateChange(async (_event, session) => {
         handleAuthChange(session, supabase);
@@ -34,8 +51,6 @@ function handleAuthChange(session, supabase) {
         // Update global admin state
         isAdmin = session.user?.user_metadata?.role === 'admin';
         
-        console.log("DEBUG: Auth state changed. User is now admin?", isAdmin);
-
         loginSection.style.display = 'none';
         dashboardContent.style.display = 'block';
         
@@ -53,7 +68,6 @@ function handleAuthChange(session, supabase) {
 function updateDashboardUI() {
     const importContainer = document.getElementById('importContainer');
     if (importContainer) {
-        console.log("DEBUG: Updating UI. Should show import button?", isAdmin);
         importContainer.style.display = isAdmin ? 'block' : 'none';
     }
 }
