@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
 
-    if (SUPABASE_URL.includes("YOUR_SUPABASE_URL")) {
+    if (SUPABASE_URL.includes("https://lgybmsziqjdmmxdiyils.supabase.co")) {
         alert('Please configure SUPABASE_URL and SUPABASE_ANON_KEY in js/dashboard.js');
         return;
     }
