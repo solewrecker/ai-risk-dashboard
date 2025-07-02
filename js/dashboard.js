@@ -1,5 +1,7 @@
 // js/dashboard.js
 
+let isAdmin = false; // Use a global variable for the admin state
+
 document.addEventListener('DOMContentLoaded', () => {
     // IMPORTANT: Replace with your actual Supabase project URL and Anon Key
     const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
@@ -11,47 +13,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const loginSection = document.getElementById('loginSection');
-    const dashboardContent = document.getElementById('dashboardContent');
     
     // Handle auth state changes to update the UI
     supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session) {
-            loginSection.style.display = 'none';
-            dashboardContent.style.display = 'block';
-            
-            // Check for admin role and show import button
-            const isAdmin = session.user?.user_metadata?.role === 'admin';
-            const importContainer = document.getElementById('importContainer');
-            if (importContainer) {
-                importContainer.style.display = isAdmin ? 'block' : 'none';
-            }
-            
-            loadAssessments(supabase);
-        } else {
-            renderLoginUI(loginSection, supabase);
-            dashboardContent.style.display = 'none';
-        }
+        handleAuthChange(session, supabase);
     });
 
     // Initial check in case the user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-            loginSection.style.display = 'none';
-            dashboardContent.style.display = 'block';
-
-            const isAdmin = session.user?.user_metadata?.role === 'admin';
-            const importContainer = document.getElementById('importContainer');
-            if (importContainer) {
-                importContainer.style.display = isAdmin ? 'block' : 'none';
-            }
-            
-            loadAssessments(supabase);
-        } else {
-            renderLoginUI(loginSection, supabase);
-        }
+        handleAuthChange(session, supabase);
     });
 });
+
+// A single, central function to handle UI changes based on auth state
+function handleAuthChange(session, supabase) {
+    const loginSection = document.getElementById('loginSection');
+    const dashboardContent = document.getElementById('dashboardContent');
+
+    if (session) {
+        // Update global admin state
+        isAdmin = session.user?.user_metadata?.role === 'admin';
+        
+        console.log("DEBUG: Auth state changed. User is now admin?", isAdmin);
+
+        loginSection.style.display = 'none';
+        dashboardContent.style.display = 'block';
+        
+        updateDashboardUI();
+        loadAssessments(supabase);
+    } else {
+        isAdmin = false; // Reset admin state on logout
+        renderLoginUI(loginSection, supabase);
+        dashboardContent.style.display = 'none';
+        updateDashboardUI();
+    }
+}
+
+// This function specifically updates UI elements based on the global 'isAdmin' state
+function updateDashboardUI() {
+    const importContainer = document.getElementById('importContainer');
+    if (importContainer) {
+        console.log("DEBUG: Updating UI. Should show import button?", isAdmin);
+        importContainer.style.display = isAdmin ? 'block' : 'none';
+    }
+}
 
 function renderLoginUI(loginSection, supabase) {
     loginSection.style.display = 'block';
