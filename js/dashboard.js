@@ -168,8 +168,8 @@ function getRiskColor(riskLevel) {
 async function deleteAssessment(toolId) {
     if (confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
         try {
-            const SUPABASE_URL = "YOUR_SUPABASE_URL";
-            const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+            const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             const { error } = await supabase
@@ -218,8 +218,8 @@ async function processImport() {
     importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
 
     try {
-        const SUPABASE_URL = "YOUR_SUPABASE_URL";
-        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+        const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const { data: { session } } = await supabase.auth.getSession();
