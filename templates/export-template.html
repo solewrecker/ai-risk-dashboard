@@ -1671,18 +1671,21 @@
         function generateKeyFindings(toolData) {
             const findings = [];
             
-            // First, try to use the dedicated notes field from database
-            if (toolData.notes && toolData.notes.trim().length > 0) {
-                // Split notes by common separators and add each as a finding
-                const noteFindings = toolData.notes
-                    .split(/[;|\n|•]/) // Split on semicolon, newline, or bullet points
-                    .map(note => note.trim())
-                    .filter(note => note.length > 10) // Filter out very short notes
-                    .slice(0, 5); // Limit to 5 findings
-                    
-                if (noteFindings.length > 0) {
-                    return '• ' + noteFindings.join('<br>• ');
-                }
+            // First, try to use the dedicated summary field from database
+            if (toolData.summary_and_recommendation && toolData.summary_and_recommendation.trim().length > 0) {
+                // Split summary by common separators and add each as a finding
+                const summaryFindings = toolData.summary_and_recommendation
+                    .split(/[.।•\n-]/)
+                    .map(s => s.trim())
+                    .filter(note => note.length > 10); // Filter out very short notes
+                findings.push(...summaryFindings.map(finding => ({
+                    title: "Key Finding",
+                    description: finding,
+                    priority: 'HIGH',
+                    icon: '⚠️',
+                    timeline: 'Immediate',
+                    owner: 'Security Team'
+                })));
             }
             
             // Fallback: Extract critical findings from breakdown data (NO TRUNCATION)

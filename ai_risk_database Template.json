@@ -1,0 +1,210 @@
+{
+  "name": "",
+  "vendor": "",
+  "license_type": "",
+  "total_score": 0,
+  "risk_level": "LOW RISK | MEDIUM RISK | HIGH RISK | CRITICAL RISK",
+  "data_storage_score": 0,
+  "training_usage_score": 0,
+  "access_controls_score": 0,
+  "compliance_score": 0,
+  "vendor_transparency_score": 0,
+  "summary_and_recommendation": "A summary of key risks and a final recommendation (e.g., Approve for general use, Block, Requires review).",
+  "confidence": 0.0,
+  "primary_use_case": "",
+  "data_classification": "",
+  "category": "",
+  "assessed_by": "AI Security Council",
+  
+  "breakdown": {
+    "scores": {
+      "dataStorage": 0,
+      "trainingUsage": 0,
+      "accessControls": 0,
+      "complianceRisk": 0,
+      "vendorTransparency": 0
+    },
+    "subScores": {
+      "dataStorage": {
+        "geographic": {
+          "score": 0,
+          "note": "Reasoning based on the tool's data residency policies."
+        },
+        "encryption": {
+          "score": 0,
+          "note": "Reasoning based on documented encryption at-rest and in-transit."
+        },
+        "retention": {
+          "score": 0,
+          "note": "Reasoning based on the tool's data retention and deletion policies."
+        }
+      },
+      "trainingUsage": {
+        "training": {
+          "score": 0,
+          "note": "Reasoning on whether customer data is used for training and if an opt-out exists."
+        },
+        "sharing": {
+          "score": 0,
+          "note": "Reasoning based on policies about sharing data with third parties."
+        }
+      },
+      "accessControls": {
+        "admin": {
+          "score": 0,
+          "note": "Reasoning based on the availability of enterprise admin dashboards, roles, etc."
+        },
+        "audit": {
+          "score": 0,
+          "note": "Reasoning based on the availability of audit logs and user activity tracking."
+        },
+        "integration": {
+          "score": 0,
+          "note": "Reasoning based on support for SSO, SCIM, and other enterprise integrations."
+        }
+      },
+      "complianceRisk": {
+        "violations": {
+          "score": 0,
+          "note": "Reasoning based on published certifications (SOC 2, ISO 27001, HIPAA) and compliance documentation."
+        },
+        "transparency": {
+          "score": 0,
+          "note": "Reasoning based on the clarity of data flow diagrams, subprocesses, etc."
+        }
+      },
+      "vendorTransparency": {
+        "score": {
+          "score": 0,
+          "note": "Reasoning based on the quality and availability of security whitepapers, privacy policies, and support responsiveness."
+        }
+      }
+    },
+    "compliance": {
+      "pci": "non-compliant",
+      "sox": "non-compliant",
+      "gdpr": "non-compliant",
+      "hipaa": "non-compliant"
+    }
+  },
+  
+  "details": {
+    "dataStorage": "Geographic: [geographic_justification] | Encryption: [encryption_justification] | Retention: [retention_justification]",
+    "trainingUsage": "Training: [training_justification] | Sharing: [sharing_justification]",
+    "accessControls": "Admin: [admin_justification] | Audit: [audit_justification] | Integration: [integration_justification]",
+    "complianceRisk": "Violations: [violations_justification] | Transparency: [transparency_justification]",
+    "vendorTransparency": "[vendor_transparency_justification]"
+  },
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "example.permission.read",
+      "example.permission.write"
+    ],
+    "recommended_restrictions": [
+      "Block network access",
+      "Require MFA"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Example recommendation",
+      "description": "Detailed explanation of the recommendation",
+      "priority": "high",
+      "category": "security"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://example.com/privacy-policy",
+      "title": "Privacy Policy",
+      "last_updated": "2023-06-15"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "",
+    "final_risk_score": 0,
+    "final_risk_category": "LOW RISK | MEDIUM RISK | HIGH RISK | CRITICAL RISK",
+    "summary_and_recommendation": "A summary of key risks and a final recommendation (e.g., Approve for general use, Block, Requires review).",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 0,
+        "criteria": {
+          "geographic_control": {
+            "score": 0,
+            "justification": "Reasoning based on the tool's data residency policies."
+          },
+          "encryption_standards": {
+            "score": 0,
+            "justification": "Reasoning based on documented encryption at-rest and in-transit."
+          },
+          "data_retention": {
+            "score": 0,
+            "justification": "Reasoning based on the tool's data retention and deletion policies."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "Reasoning on whether customer data is used for training and if an opt-out exists."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "Reasoning based on policies about sharing data with third parties."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 0,
+        "criteria": {
+          "admin_management": {
+            "score": 0,
+            "justification": "Reasoning based on the availability of enterprise admin dashboards, roles, etc."
+          },
+          "audit_capabilities": {
+            "score": 0,
+            "justification": "Reasoning based on the availability of audit logs and user activity tracking."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "Reasoning based on support for SSO, SCIM, and other enterprise integrations."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 0,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "Reasoning based on published certifications (SOC 2, ISO 27001, HIPAA) and compliance documentation."
+          },
+          "data_processing_transparency": {
+            "score": 0,
+            "justification": "Reasoning based on the clarity of data flow diagrams, subprocesses, etc."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 0,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 0,
+            "justification": "Reasoning based on the quality and availability of security whitepapers, privacy policies, and support responsiveness."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "e.g., Marketing/Public Content",
+      "data_classification": "e.g., Public/Marketing Data",
+      "base_score": 0,
+      "final_score_with_multiplier": 0
+    }
+  }
+}
