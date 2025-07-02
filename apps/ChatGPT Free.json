@@ -1,0 +1,233 @@
+{
+  "name": "ChatGPT Free",
+  "vendor": "OpenAI",
+  "license_type": "Free tier",
+  "total_score": 72,
+  "risk_level": "HIGH RISK",
+  "data_storage_score": 21,
+  "training_usage_score": 20,
+  "access_controls_score": 20,
+  "compliance_score": 6,
+  "vendor_transparency_score": 4,
+  "summary_and_recommendation": "ChatGPT Free presents significant enterprise risks due to indefinite data retention, default training use, and lack of enterprise controls. While training opt-out is available, data is still retained indefinitely. No admin controls, audit logs, or SSO integration available for free tier. Recommend blocking for business use or upgrading to enterprise tier for better controls.",
+  "confidence": 0.9,
+  "primary_use_case": "General AI assistance and content generation",
+  "data_classification": "Varies - can include sensitive business data",
+  "category": "Generative AI",
+  "assessed_by": "AI Security Council",
+  
+  "breakdown": {
+    "scores": {
+      "dataStorage": 21,
+      "trainingUsage": 20,
+      "accessControls": 20,
+      "complianceRisk": 6,
+      "vendorTransparency": 4
+    },
+    "subScores": {
+      "dataStorage": {
+        "geographic": {
+          "score": 3,
+          "note": "Data stored in known secure regions (US) with some contractual protections, but exact locations not specified for free tier."
+        },
+        "encryption": {
+          "score": 4,
+          "note": "Standard encryption in transit and at rest documented, but not customer-controlled encryption and limited encryption specifications published."
+        },
+        "retention": {
+          "score": 10,
+          "note": "Indefinite data retention by default unless user manually deletes conversations. Recent court order requires indefinite retention of all data including deleted content."
+        }
+      },
+      "trainingUsage": {
+        "training": {
+          "score": 15,
+          "note": "Data used for training by default, but opt-out available through settings or privacy portal. However, training opt-out still retains data indefinitely."
+        },
+        "sharing": {
+          "score": 3,
+          "note": "Limited sharing with clear disclosure in privacy policy, primarily for safety and compliance purposes."
+        }
+      }
+    },
+    "accessControls": {
+      "admin": {
+        "score": 8,
+        "note": "Free tier provides no organizational visibility or centralized management - individual accounts only."
+      },
+      "audit": {
+        "score": 7,
+        "note": "No audit capabilities available for free tier users - no activity logs or usage tracking accessible to administrators."
+      },
+      "integration": {
+        "score": 5,
+        "note": "Username/password authentication only - no SSO, SCIM provisioning, or enterprise identity management integration available."
+      }
+    },
+    "complianceRisk": {
+      "violations": {
+        "score": 3,
+        "note": "Basic compliance certifications present and privacy policy generally compliant with major regulations, though lacks specialized enterprise compliance features."
+      },
+      "transparency": {
+        "score": 2,
+        "note": "General data processing described with retention periods stated, though some third-party relationships and exact processing locations could be clearer."
+      }
+    },
+    "vendorTransparency": {
+      "score": {
+        "score": 4,
+        "note": "Clear privacy policy with basic security documentation available. Support available but can be slower for free tier users. Regular transparency reports not consistently published."
+      }
+    }
+  },
+  "compliance": {
+    "pci": "non-compliant",
+    "sox": "compliant",
+    "gdpr": "compliant", 
+    "hipaa": "non-compliant"
+  },
+  
+  "details": {
+    "dataStorage": "Geographic: US-based with some international infrastructure but good contractual protections | Encryption: Standard TLS and AES encryption documented but not customer-controlled | Retention: Indefinite retention by default, user can delete but recent court order may override deletions",
+    "trainingUsage": "Training: Used by default for model training but opt-out available through settings or privacy portal | Sharing: Limited third-party sharing primarily for safety/compliance with clear disclosure",
+    "accessControls": "Admin: No organizational controls for free tier - individual accounts only | Audit: No audit logs or activity tracking available | Integration: Basic username/password only, no enterprise identity integration",
+    "complianceRisk": "Violations: Basic certifications present, generally compliant privacy policy | Transparency: Good general documentation though some processing details could be clearer",
+    "vendorTransparency": "Clear privacy policy and basic security documentation available, support responsive but prioritizes paid users"
+  },
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "Not applicable - web-based service"
+    ],
+    "recommended_restrictions": [
+      "Block at network level for business use",
+      "Require business justification for access",
+      "Monitor for sensitive data uploads",
+      "Mandate training opt-out if used"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Block free tier for business use",
+      "description": "Free tier lacks necessary enterprise controls and retains data indefinitely. Consider blocking at network level for business users.",
+      "priority": "high",
+      "category": "security"
+    },
+    {
+      "title": "Upgrade to enterprise tier if needed",
+      "description": "ChatGPT Enterprise provides better data controls, admin oversight, and compliance features necessary for business use.",
+      "priority": "medium", 
+      "category": "governance"
+    },
+    {
+      "title": "Mandatory training opt-out",
+      "description": "If free tier must be used, require all users to opt out of model training through privacy settings immediately.",
+      "priority": "high",
+      "category": "privacy"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://openai.com/policies/privacy-policy/",
+      "title": "OpenAI Privacy Policy",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://help.openai.com/en/articles/7730893-data-controls-faq",
+      "title": "Data Controls FAQ",
+      "last_updated": "2024-11-15"
+    },
+    {
+      "url": "https://openai.com/enterprise-privacy/",
+      "title": "Enterprise Privacy at OpenAI", 
+      "last_updated": "2024-10-30"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "ChatGPT Free",
+    "final_risk_score": 72,
+    "final_risk_category": "HIGH RISK",
+    "summary_and_recommendation": "ChatGPT Free presents significant enterprise risks due to indefinite data retention, default training use, and lack of enterprise controls. While training opt-out is available, data is still retained indefinitely. No admin controls, audit logs, or SSO integration available for free tier. Recommend blocking for business use or upgrading to enterprise tier for better controls.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 21,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "Data stored in known secure regions (US) with some contractual protections, but exact locations not specified for free tier."
+          },
+          "encryption_standards": {
+            "score": 4,
+            "justification": "Standard encryption in transit and at rest documented, but not customer-controlled encryption and limited encryption specifications published."
+          },
+          "data_retention": {
+            "score": 10,
+            "justification": "Indefinite data retention by default unless user manually deletes conversations. Recent court order requires indefinite retention of all data including deleted content."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 20,
+        "criteria": {
+          "model_training": {
+            "score": 15,
+            "justification": "Data used for training by default, but opt-out available through settings or privacy portal. However, training opt-out still retains data indefinitely."
+          },
+          "data_sharing": {
+            "score": 3,
+            "justification": "Limited sharing with clear disclosure in privacy policy, primarily for safety and compliance purposes."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 20,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "Free tier provides no organizational visibility or centralized management - individual accounts only."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "No audit capabilities available for free tier users - no activity logs or usage tracking accessible to administrators."
+          },
+          "integration": {
+            "score": 5,
+            "justification": "Username/password authentication only - no SSO, SCIM provisioning, or enterprise identity management integration available."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 6,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 3,
+            "justification": "Basic compliance certifications present and privacy policy generally compliant with major regulations, though lacks specialized enterprise compliance features."
+          },
+          "data_processing_transparency": {
+            "score": 2,
+            "justification": "General data processing described with retention periods stated, though some third-party relationships and exact processing locations could be clearer."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 4,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 4,
+            "justification": "Clear privacy policy with basic security documentation available. Support available but can be slower for free tier users. Regular transparency reports not consistently published."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "General AI assistance",
+      "data_classification": "Varies - can include sensitive business data",
+      "base_score": 72,
+      "final_score_with_multiplier": 72
+    }
+  }
+}
