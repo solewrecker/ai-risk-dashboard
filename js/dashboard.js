@@ -2,6 +2,8 @@
 
 let isAdmin = false; // Use a global variable for the admin state
 let supabaseClient = null; // Global Supabase client instance
+let allAssessments = []; // Store all assessments for filtering
+let filteredAssessments = []; // Store currently filtered assessments
 
 // IMPORTANT: Replace with your actual Supabase project URL and Anon Key
 const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
@@ -41,6 +43,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial check in case the user is already logged in
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         handleAuthChange(session);
+    });
+
+    // --- Dashboard filter controls ---
+    const searchInput = document.getElementById('searchInput');
+    const riskFilter = document.getElementById('riskFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortSelect = document.getElementById('sortSelect');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (riskFilter) riskFilter.addEventListener('change', applyFilters);
+    if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+    if (sortSelect) sortSelect.addEventListener('change', applyFilters);
+    if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        riskFilter.value = 'all';
+        categoryFilter.value = 'all';
+        sortSelect.value = 'date_desc';
+        applyFilters();
+    });
+    if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        riskFilter.value = 'all';
+        categoryFilter.value = 'all';
+        sortSelect.value = 'date_desc';
+        applyFilters();
     });
 });
 
@@ -106,7 +135,6 @@ async function loadAssessments() {
     assessmentList.innerHTML = '';
 
     try {
-        // Fetch from the correct 'ai_tools' table
         const { data, error } = await supabaseClient
             .from('ai_tools')
             .select('*')
@@ -114,11 +142,8 @@ async function loadAssessments() {
 
         if (error) throw error;
 
-        if (data.length === 0) {
-            emptyState.style.display = 'block';
-        } else {
-            data.forEach(renderAssessmentItem);
-        }
+        allAssessments = data || [];
+        applyFilters(); // Render based on current filter state
     } catch (error) {
         console.error('Error loading assessments:', error.message);
         assessmentList.innerHTML = `<p style="color: red; text-align: center;">Error: Could not load assessments.</p>`;
@@ -300,4 +325,66 @@ const addStylesReminder = `
     background-color: #e2e8f0;
 }
 `;
-console.log("Reminder: Add the following styles to css/style.css:\n" + addStylesReminder); 
+console.log("Reminder: Add the following styles to css/style.css:\n" + addStylesReminder);
+
+function applyFilters() {
+    if (!allAssessments) return;
+
+    const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const riskValue = document.getElementById('riskFilter')?.value || 'all';
+    const categoryValue = document.getElementById('categoryFilter')?.value || 'all';
+    const sortValue = document.getElementById('sortSelect')?.value || 'date_desc';
+
+    filteredAssessments = allAssessments.filter(tool => {
+        const matchesSearch = tool.name?.toLowerCase().includes(searchTerm);
+        const matchesRisk = riskValue === 'all' || (tool.risk_level || '').toLowerCase().includes(riskValue);
+        const matchesCategory = categoryValue === 'all' || (tool.category || '').toLowerCase().includes(categoryValue.toLowerCase());
+        return matchesSearch && matchesRisk && matchesCategory;
+    });
+
+    // Sort
+    switch (sortValue) {
+        case 'date_asc':
+            filteredAssessments.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+            break;
+        case 'date_desc':
+            filteredAssessments.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+            break;
+        case 'score_asc':
+            filteredAssessments.sort((a,b) => (a.total_score || 0) - (b.total_score || 0));
+            break;
+        case 'score_desc':
+            filteredAssessments.sort((a,b) => (b.total_score || 0) - (a.total_score || 0));
+            break;
+        case 'name_asc':
+            filteredAssessments.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+            break;
+        case 'name_desc':
+            filteredAssessments.sort((a,b) => (b.name || '').localeCompare(a.name || ''));
+            break;
+    }
+
+    renderAssessmentList();
+}
+
+function renderAssessmentList() {
+    const assessmentList = document.getElementById('assessment-list');
+    const emptyState = document.getElementById('empty-state');
+    const resultsCount = document.getElementById('resultsCount');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+
+    assessmentList.innerHTML = '';
+
+    if (filteredAssessments.length === 0) {
+        emptyState.style.display = 'block';
+        resultsCount.textContent = '0 tools';
+        clearFiltersBtn.style.display = 'none';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    resultsCount.textContent = `${filteredAssessments.length} tool${filteredAssessments.length !== 1 ? 's' : ''}`;
+    clearFiltersBtn.style.display = 'block';
+
+    filteredAssessments.forEach(renderAssessmentItem);
+} 

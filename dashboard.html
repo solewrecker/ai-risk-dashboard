@@ -37,8 +37,49 @@
         <!-- Main Content -->
         <div class="form-card" id="dashboardContent" style="display: none;">
             <div class="form-header">
-                <h2>Assessment History</h2>
-                <p>A log of all risk assessments performed.</p>
+                <h2>AI Tool Risk Database</h2>
+                <p>Browse and manage the AI tool risk assessment database.</p>
+            </div>
+            
+            <!-- Dashboard Controls -->
+            <div class="dashboard-controls">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+                </div>
+                <div class="filter-container">
+                    <select id="riskFilter" class="filter-select">
+                        <option value="all">All Risk Levels</option>
+                        <option value="low">Low Risk</option>
+                        <option value="medium">Medium Risk</option>
+                        <option value="high">High Risk</option>
+                        <option value="critical">Critical Risk</option>
+                    </select>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="General">General</option>
+                        <option value="Communication">Communication</option>
+                        <option value="Development">Development</option>
+                        <option value="Note-taking">Note-taking</option>
+                        <option value="Writing">Writing</option>
+                    </select>
+                </div>
+                <div class="sort-container">
+                    <select id="sortSelect" class="filter-select">
+                        <option value="date_desc">Newest First</option>
+                        <option value="date_asc">Oldest First</option>
+                        <option value="score_desc">Highest Risk</option>
+                        <option value="score_asc">Lowest Risk</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <span id="resultsCount">Loading...</span>
+                <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
             </div>
             
             <div class="form-content">
@@ -55,12 +96,12 @@
                     </div>
                     <div id="loading-state" style="text-align: center; padding: 40px;">
                         <div class="spinner"></div>
-                        <p>Loading assessment history...</p>
+                        <p>Loading AI tool database...</p>
                     </div>
                     <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
-                        <h3>No assessments found</h3>
-                        <p>You haven't performed any assessments yet.</p>
-                        <a href="index.html" class="btn btn-primary" style="margin-top: 20px;">Start Your First Assessment</a>
+                        <h3>No tools found</h3>
+                        <p>No tools match your current filters.</p>
+                        <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Reset Filters</button>
                     </div>
                 </div>
             </div>
