@@ -10,45 +10,59 @@ export async function getToolFromDatabase(formData) {
     }
 
     const toolName = formData.toolName.trim();
-    const toolVersion = formData.toolVersion; // 'free' or 'enterprise'
+    const toolVersion = formData.toolVersion.trim();
     console.log(`Searching DB for: ${toolName} (Version: ${toolVersion})`);
 
     try {
-        const { data, error } = await supabase
+        // --- Attempt 1: Exact Phrase Match (e.g., "ChatGPT Free") ---
+        const exactPhrase = `${toolName} ${toolVersion}`;
+        console.log(`Attempt 1: Exact match for "${exactPhrase}"`);
+        let { data, error } = await supabase
+            .from('ai_tools')
+            .select('*')
+            .eq('name', exactPhrase)
+            .limit(1);
+
+        if (data && data.length > 0) {
+            console.log('Success (Attempt 1): Found exact phrase match.', data[0]);
+            return applyClientSideMultipliers(data[0], formData);
+        }
+
+        // --- Attempt 2: Keyword Match (name contains both toolName and toolVersion) ---
+        console.log(`Attempt 2: Keyword match for "${toolName}" and "${toolVersion}"`);
+        ({ data, error } = await supabase
             .from('ai_tools')
             .select('*')
             .ilike('name', `%${toolName}%`)
             .ilike('name', `%${toolVersion}%`)
-            .limit(1);
-
-        if (error) {
-            console.error('Error fetching tool:', error);
-            return null;
-        }
+            .limit(1));
 
         if (data && data.length > 0) {
-            console.log('Found specific match:', data[0]);
+            console.log('Success (Attempt 2): Found keyword match.', data[0]);
             return applyClientSideMultipliers(data[0], formData);
         }
 
-        // Fallback to a broader search
-        const { data: genericData, error: genericError } = await supabase
+        // --- Attempt 3: Base Name Match (name contains only the toolName) ---
+        console.log(`Attempt 3: Base name match for "${toolName}"`);
+        ({ data, error } = await supabase
             .from('ai_tools')
             .select('*')
             .ilike('name', `%${toolName}%`)
-            .limit(1);
-
-        if (genericError) {
-            console.error('Error on fallback search:', genericError);
-            return null;
+            // Sort by creation date to get the most recent one if multiple exist
+            .order('created_at', { ascending: false }) 
+            .limit(1));
+            
+        if (data && data.length > 0) {
+            console.log('Success (Attempt 3): Found base name match.', data[0]);
+            return applyClientSideMultipliers(data[0], formData);
         }
         
-        if (genericData && genericData.length > 0) {
-            console.log('Found generic match:', genericData[0]);
-            return applyClientSideMultipliers(genericData[0], formData);
+        if (error) {
+            console.error('Database query failed after all attempts:', error);
+            return null;
         }
 
-        console.log('No assessment found in database.');
+        console.log('No assessment found in database after all attempts.');
         return null;
 
     } catch (err) {
