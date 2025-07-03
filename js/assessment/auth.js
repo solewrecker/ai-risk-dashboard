@@ -11,31 +11,18 @@ let currentUser = null;
 let isAdmin = false;
 
 // --- Public Functions ---
-export function initAuth(onAuthStateChangeCallback) {
+export function initializeSupabase(onAuthStateChange) {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('Supabase client initialized.');
         
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth state changed:', event);
             currentUser = session?.user || null;
             isAdmin = session?.user?.user_metadata?.role === 'admin';
-            if (onAuthStateChangeCallback) {
-                onAuthStateChangeCallback(); // Callback to update UI
-            }
-        });
-
-        // Set up auth modal event listeners
-        setupAuthModalListeners();
-        
-        // Return a promise that resolves with the initial user state
-        return supabase.auth.getSession().then(({ data: { session } }) => {
-            currentUser = session?.user || null;
-            isAdmin = session?.user?.user_metadata?.role === 'admin';
+            onAuthStateChange(); // Callback to update UI
         });
     } else {
         console.error('Supabase client not found.');
-        return Promise.resolve();
     }
 }
 
@@ -124,36 +111,4 @@ export function switchAuthTab(tab) {
     document.getElementById('signUpTab').classList.toggle('active', tab === 'signup');
     document.getElementById('signInForm').classList.toggle('active', tab === 'signin');
     document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
-}
-
-function setupAuthModalListeners() {
-    // Sign in button
-    const signInBtn = document.getElementById('signInBtn');
-    if (signInBtn) {
-        signInBtn.addEventListener('click', signInUser);
-    }
-    
-    // Sign up button
-    const signUpBtn = document.getElementById('signUpBtn');
-    if (signUpBtn) {
-        signUpBtn.addEventListener('click', signUpUser);
-    }
-    
-    // Close modal button
-    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
-    if (closeAuthModalBtn) {
-        closeAuthModalBtn.addEventListener('click', closeAuthModal);
-    }
-    
-    // Tab switching
-    const signInTab = document.getElementById('signInTab');
-    const signUpTab = document.getElementById('signUpTab');
-    
-    if (signInTab) {
-        signInTab.addEventListener('click', () => switchAuthTab('signin'));
-    }
-    
-    if (signUpTab) {
-        signUpTab.addEventListener('click', () => switchAuthTab('signup'));
-    }
 } 

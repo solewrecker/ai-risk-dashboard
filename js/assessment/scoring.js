@@ -103,37 +103,4 @@ export function generateRecommendations(score, formData) {
     }
     
     return recommendations;
-}
-
-export function calculateScore(formData) {
-    const baseScore = generateHeuristicScore(formData);
-    const finalScore = applyMultipliers(baseScore, formData);
-    const riskLevel = getRiskLevel(finalScore);
-    const recommendations = generateRecommendations(finalScore, formData);
-    
-    // Create a simplified breakdown for heuristic results
-    const detailedAssessment = {
-        assessment_details: {
-            "Data Storage & Security": { category_score: 50, justification: "Heuristically assigned score." },
-            "Access Controls": { category_score: 50, justification: "Heuristically assigned score." },
-            "Training Data Usage": { category_score: 50, justification: "Heuristically assigned score." },
-            "Compliance & Legal Risk": { category_score: 50, justification: "Heuristically assigned score." },
-            "Vendor Transparency": { category_score: 50, justification: "Heuristically assigned score." }
-        }
-    };
-    
-    // Mimic the structure expected by the results display function
-    return {
-        finalScore: finalScore,
-        riskLevel: riskLevel,
-        recommendations: recommendations,
-        detailedAssessment: detailedAssessment,
-        categoryScores: { // Legacy structure, can be phased out
-            data_storage_and_security: 50,
-            access_controls: 50,
-            training_data_usage: 50,
-            compliance_and_legal_risk: 50,
-            vendor_transparency: 50
-        }
-    };
 } 
