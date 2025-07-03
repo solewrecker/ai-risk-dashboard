@@ -1988,139 +1988,198 @@ body {
 /* Disabled state improvements */
 .nav-btn:disabled {
     background-color: transparent !important;
-    filter: grayscale(0.3);
+    filter: grayscale(100%);
 }
 
-.nav-btn:disabled [data-lucide="crown"] {
-    opacity: 0.7;
+/* Ensure proper crown icon positioning */
+.nav-btn [data-lucide="crown"] {
+    flex-shrink: 0;
 }
 
-/* Focus states for accessibility */
-.nav-btn:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
+/* Detailed Breakdown Styling */
+.breakdown-categories {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1rem;
 }
 
-.nav-btn:focus:not(:focus-visible) {
-    outline: none;
+.breakdown-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease;
 }
 
-/* Stats Cards */
-.bg-gray-800 {
-    background-color: #1f2937;
-    border: 1px solid #374151;
+.breakdown-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Progress Bar */
-.bg-blue-500 {
-    background-color: #3b82f6;
+.breakdown-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-/* Recent Assessments List */
-#recentAssessmentsList .assessment-item {
+.breakdown-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
     display: flex;
     align-items: center;
+}
+
+.breakdown-title::before {
+    content: "📋";
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.breakdown-content {
+    padding: 1.25rem;
+}
+
+.breakdown-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.breakdown-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.breakdown-item-header {
+    display: flex;
     justify-content: space-between;
-    padding: 1rem;
-    background-color: #374151;
-    border-radius: 0.5rem;
-    transition: background-color 0.15s ease;
-}
-
-#recentAssessmentsList .assessment-item:hover {
-    background-color: #4b5563;
-}
-
-.risk-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.risk-high { color: #f87171; background-color: rgba(220, 38, 38, 0.2); }
-.risk-medium { color: #facc15; background-color: rgba(245, 158, 11, 0.2); }
-.risk-low { color: #4ade80; background-color: rgba(22, 163, 74, 0.2); }
-
-/* Achievement Cards */
-.achievement-card {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #4b5563;
-    background-color: #374151;
-}
-
-.achievement-card.unlocked {
-    border-color: rgba(34, 197, 94, 0.3);
-    background: linear-gradient(135deg, rgba(240, 253, 244, 0.1), rgba(220, 252, 231, 0.1));
-}
-
-.achievement-card.in-progress {
-    border-color: rgba(59, 130, 246, 0.3);
-    background: linear-gradient(135deg, rgba(239, 246, 255, 0.1), rgba(219, 234, 254, 0.1));
-}
-
-/* Progress bars for achievements */
-.achievement-progress-bar {
-    width: 100%;
-    height: 0.5rem;
-    background-color: #4b5563;
-    border-radius: 0.25rem;
-    overflow: hidden;
+    align-items: flex-start;
     margin-bottom: 0.5rem;
 }
 
-.achievement-progress-fill {
-    height: 100%;
-    background-color: #3b82f6;
-    transition: width 0.3s ease;
+.breakdown-item-title {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.95rem;
+    flex: 1;
+    margin-right: 1rem;
 }
 
-/* Quick Actions Grid */
-.quick-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background-color: #374151;
-    border: none;
-    border-radius: 0.5rem;
+.breakdown-score {
+    background: #3b82f6;
     color: white;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-    text-align: left;
-    width: 100%;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    flex-shrink: 0;
 }
 
-.quick-action-btn:hover {
-    background-color: #4b5563;
+.breakdown-item-note {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding-left: 0.5rem;
+    border-left: 3px solid #e5e7eb;
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
 }
 
-/* Responsive design */
-@media (min-width: 768px) {
-    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* Fallback styling for unknown breakdown structures */
+.breakdown-fallback {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
-@media (min-width: 1024px) {
-    .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .lg\:col-span-2 { grid-column: span 2 / span 2; }
+.breakdown-fallback pre {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    margin: 0.5rem 0 0 0;
 }
 
-/* Tab switching functionality */
-.tab-content {
-    display: none;
+.no-breakdown {
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
 }
 
-.tab-content.active {
-    display: block;
+/* Enhanced Recommendations Styling */
+.recommendations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-/* Banner close functionality */
-.banner-close {
-    cursor: pointer;
-    font-size: 1.25rem;
-    line-height: 1;
-    padding: 0.25rem;
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: #fefefe;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.recommendation-item:hover {
+    background: #f8fafc;
+}
+
+.recommendation-item:last-child {
+    margin-bottom: 0;
+}
+
+.rec-bullet {
+    color: #3b82f6;
+    font-weight: bold;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.rec-text {
+    flex: 1;
+    line-height: 1.5;
+    color: #374151;
+}
+
+/* Responsive design for breakdown cards */
+@media (max-width: 768px) {
+    .breakdown-categories {
+        gap: 1rem;
+    }
+    
+    .breakdown-header {
+        padding: 0.875rem 1rem;
+    }
+    
+    .breakdown-content {
+        padding: 1rem;
+    }
+    
+    .breakdown-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .breakdown-item-title {
+        margin-right: 0;
+    }
 } 
