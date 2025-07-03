@@ -3,7 +3,15 @@
 // Orchestrates all modules and handles the main application state.
 
 import { initAuth, getCurrentUser, signOut } from './auth.js';
-import { initUI, navigateToStep, showError, showSuccess } from './ui.js';
+import { 
+    initUI, 
+    navigateToStep, 
+    showError, 
+    showSuccess,
+    setupEventListeners as setupUIEventListeners,
+    showAuthModal,
+    closeAuthModal
+} from './ui.js';
 import { calculateScore } from './scoring.js';
 import { fetchToolFromDatabase, saveAssessment } from './api.js';
 import { displayResults } from './results.js';
@@ -18,6 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         await initAuth();
         initUI();
         setupEventListeners();
+        setupUIEventListeners({
+            signOut,
+            showAuthModal,
+            closeAuthModal
+        });
         checkForSharedAssessment();
     } catch (error) {
         console.error('Error initializing app:', error);
