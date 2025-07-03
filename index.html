@@ -64,8 +64,8 @@
                 </div>
                 <div class="auth-modal-content">
                     <div class="auth-tabs">
-                        <div id="signInTab" class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div>
-                        <div id="signUpTab" class="auth-tab" onclick="switchAuthTab('signup')">Create Account</div>
+                        <div id="signInTab" class="auth-tab active">Sign In</div>
+                        <div id="signUpTab" class="auth-tab">Create Account</div>
                     </div>
                     
                     <div id="signInForm" class="auth-form active">
@@ -77,7 +77,7 @@
                             <label for="signInPassword">Password</label>
                             <input type="password" id="signInPassword" class="auth-input" placeholder="Enter your password">
                         </div>
-                        <button onclick="signInUser()" class="auth-button">
+                        <button id="signInBtn" class="auth-button">
                             <i class="fas fa-sign-in-alt"></i> Sign In
                         </button>
                     </div>
@@ -98,13 +98,13 @@
                                 <option value="enterprise">⭐ Enterprise - $49/month</option>
                             </select>
                         </div>
-                        <button onclick="signUpUser()" class="auth-button">
+                        <button id="signUpBtn" class="auth-button">
                             <i class="fas fa-user-plus"></i> Create Account
                         </button>
                     </div>
                     
                     <div class="auth-footer">
-                        <button onclick="closeAuthModal()" class="btn btn-secondary">
+                        <button id="closeAuthModalBtn" class="btn btn-secondary">
                             Continue as Guest
                         </button>
                     </div>
@@ -209,7 +209,7 @@
                         </div>
                         
                         <div class="btn-group">
-                            <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            <button type="button" class="btn btn-primary" id="nextStepBtn1">
                                 Next: Data Classification →
                             </button>
                         </div>
@@ -270,10 +270,10 @@
                         </div>
                         
                         <div class="btn-group">
-                            <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <button type="button" class="btn btn-secondary" id="prevStepBtn2">
                                 ← Back
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            <button type="button" class="btn btn-primary" id="nextStepBtn2">
                                 Start Assessment →
                             </button>
                         </div>
@@ -332,7 +332,7 @@
                         
                         <div class="btn-group">
                             <div style="position: relative; display: inline-block;">
-                                <button type="button" class="btn btn-secondary" onclick="toggleExportMenu()" id="exportMainBtn">
+                                <button type="button" class="btn btn-secondary" id="exportMainBtn">
                                     <i class="fas fa-file-export"></i> Export Options
                                 </button>
                                 <div id="exportMenu" style="
@@ -350,7 +350,7 @@
                                     max-height: 300px;
                                     overflow-y: auto;
                                 ">
-                                    <button type="button" class="export-option" onclick="exportFreePDF(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" id="exportFreePdfBtn" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -365,7 +365,7 @@
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
 
-                                    <button type="button" class="export-option" onclick="exportPremiumPDF(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" id="exportPremiumPdfBtn" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -380,7 +380,7 @@
                                         <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
                                     </button>
 
-                                    <button type="button" class="export-option" onclick="exportPremiumHTML(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" id="exportHtmlBtn" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -393,7 +393,7 @@
                                         <i class="fas fa-globe"></i> <strong>HTML Report</strong><br>
                                         <small style="color: #64748b;">Viewable in browser</small>
                                     </button>
-                                    <button type="button" class="export-option" onclick="exportAssessmentJSON(); hideExportMenu();" style="
+                                    <button type="button" class="export-option" id="exportJsonBtn" style="
                                         display: block;
                                         width: 100%;
                                         padding: 0.75rem 1rem;
@@ -407,10 +407,10 @@
                                     </button>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-secondary" onclick="saveToDatabase()">
+                            <button type="button" class="btn btn-secondary" id="saveToDbBtn">
                                 <i class="fas fa-save"></i> Save to Database
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="startNewAssessment()">
+                            <button type="button" class="btn btn-primary" id="newAssessmentBtn">
                                 <i class="fas fa-redo"></i> New Assessment
                             </button>
                             <a href="dashboard.html" class="btn btn-secondary">
@@ -424,6 +424,6 @@
     </div>
 
     <!-- Load template binding before app.js -->
-    <script src="js/app.js"></script>
+    <script type="module" src="js/assessment/main.js"></script>
 </body>
 </html>
