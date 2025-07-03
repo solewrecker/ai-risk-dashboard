@@ -1784,8 +1784,7 @@ body {
     pointer-events: none;
 }
 
-.admin-only.tier-free,
-.admin-only.tier-pro {
+.admin-only {
     display: none !important;
 }
 
