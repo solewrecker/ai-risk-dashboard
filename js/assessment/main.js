@@ -25,7 +25,8 @@ async function startAssessment() {
             riskLevel: toolData.risk_level,
             source: 'database',
             breakdown: toolData.breakdown,
-            recommendations: toolData.recommendations
+            recommendations: toolData.recommendations,
+            detailedAssessment: toolData.detailed_assessment
         };
     } else {
         // Generate heuristic score
