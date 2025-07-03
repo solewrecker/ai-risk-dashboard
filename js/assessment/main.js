@@ -91,7 +91,7 @@ function simulateAnalysisSteps(callback) {
     let index = 0;
     const interval = setInterval(() => {
         if (index < steps.length) {
-            document.getElementById('analysisProgress').textContent = steps[index];
+            document.getElementById('analysisStatus').textContent = steps[index];
             index++;
         } else {
             clearInterval(interval);
