@@ -163,6 +163,11 @@ export function setupEventListeners(callbacks) {
     });
 }
 
+export function initUI() {
+    showStep(1);
+    updateUIForAuth();
+}
+
 // Aliases and helper exports to match main.js expectations
 export function navigateToStep(step) {
     showStep(step);
