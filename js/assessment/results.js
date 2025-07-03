@@ -149,17 +149,18 @@ function renderDetailedBreakdown(breakdownData) {
 
 // Helper functions for formatting
 function formatCategoryName(category) {
+    // Replace underscores with spaces and title-case each word
     return category
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, str => str.toUpperCase())
-        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, char => char.toUpperCase())
         .trim();
 }
 
 function formatItemName(item) {
+    // Similar humanization for item names
     return item
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, str => str.toUpperCase())
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, char => char.toUpperCase())
         .trim();
 }
 
