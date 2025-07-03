@@ -161,25 +161,4 @@ export function setupEventListeners(callbacks) {
             e.target.closest('.classification-option').classList.add('selected');
         }
     });
-}
-
-export function initUI() {
-    showStep(1);
-    updateUIForAuth();
-}
-
-// Aliases and helper exports to match main.js expectations
-export function navigateToStep(step) {
-    showStep(step);
-}
-
-export function showError(message) {
-    showMessage(message, 'error');
-}
-
-export function showSuccess(message) {
-    showMessage(message, 'success');
-}
-
-// Re-export authentication modal controls
-export { showAuthModal, closeAuthModal } from './auth.js'; 
+} 

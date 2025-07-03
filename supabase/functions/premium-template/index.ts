@@ -58,7 +58,7 @@ serve(async (req) => {
         .from('ai_tools')
         .select('*')
         .eq('name', toolName) // Exact match
-        .limit(1)
+      .limit(1)
         .single());
 
     // If no exact match is found, try a broader search on the base name

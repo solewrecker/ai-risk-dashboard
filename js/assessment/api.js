@@ -3,7 +3,7 @@
 import { supabase } from './auth.js';
 import { applyClientSideMultipliers } from './scoring.js';
 
-export async function fetchToolFromDatabase(formData) {
+export async function getToolFromDatabase(formData) {
     if (!supabase) {
         console.warn('Supabase client not available for DB check.');
         return null;
@@ -66,7 +66,7 @@ export async function fetchToolFromDatabase(formData) {
         return null;
 
     } catch (err) {
-        console.error('Critical error in fetchToolFromDatabase:', err);
+        console.error('Critical error in getToolFromDatabase:', err);
         return null;
     }
 }
@@ -112,7 +112,4 @@ export async function saveToDatabase(assessment) {
         console.error('Error saving to database:', error);
         return { error };
     }
-}
-
-// Alias for compatibility with main.js
-export { saveToDatabase as saveAssessment }; 
+} 
