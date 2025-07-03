@@ -13,7 +13,7 @@ export function displayResults(results) {
         return;
     }
 
-    const { formData, finalScore, riskLevel, source, recommendations, breakdown } = results;
+    const { formData, finalScore, riskLevel, source, recommendations, breakdown, detailedAssessment } = results;
     const toolName = formData.toolName || 'Unknown Tool';
 
     document.getElementById('toolNameResults').textContent = toolName;
@@ -31,7 +31,10 @@ export function displayResults(results) {
 
     renderInsights(breakdown);
     renderRecommendations(recommendations, finalScore, formData);
-    renderDetailedBreakdown(breakdown, formData);
+
+    // Prioritize the complete 'detailedAssessment' object, but fall back to 'breakdown.subScores'
+    const breakdownData = detailedAssessment || (breakdown ? breakdown.subScores : null);
+    renderDetailedBreakdown(breakdownData);
 
     const exportMenu = document.getElementById('exportMenu');
     if (exportMenu) {
@@ -92,10 +95,10 @@ function renderRecommendations(recommendations, finalScore, formData) {
     `).join('');
 }
 
-function renderDetailedBreakdown(breakdown, formData) {
+function renderDetailedBreakdown(breakdownData) {
     const detailedBreakdownContainer = document.getElementById('detailedBreakdown');
     
-    if (!breakdown) {
+    if (!breakdownData || Object.keys(breakdownData).length === 0) {
         detailedBreakdownContainer.innerHTML = `
             <h3>Detailed Breakdown</h3>
             <p class="no-breakdown">No detailed breakdown available for this assessment.</p>
@@ -104,69 +107,41 @@ function renderDetailedBreakdown(breakdown, formData) {
     }
     
     let html = '<h3>Detailed Breakdown</h3>';
-    
-    // Handle different breakdown structures
-    if (breakdown.subScores && typeof breakdown.subScores === 'object') {
-        // Structure: { category: { subcategory: { score, note } } }
-        html += '<div class="breakdown-categories">';
-        for (const [category, subScores] of Object.entries(breakdown.subScores)) {
-            html += `
-                <div class="breakdown-card">
-                    <div class="breakdown-header">
-                        <h4 class="breakdown-title">${formatCategoryName(category)}</h4>
-                    </div>
-                    <div class="breakdown-content">
-            `;
-            
-            if (typeof subScores === 'object' && subScores !== null) {
-                for (const [key, value] of Object.entries(subScores)) {
-                    if (typeof value === 'object' && value !== null) {
-                        html += `
-                            <div class="breakdown-item">
-                                <div class="breakdown-item-header">
-                                    <span class="breakdown-item-title">${formatItemName(key)}</span>
-                                    <span class="breakdown-score">${value.score || 'N/A'}</span>
-                                </div>
-                                <div class="breakdown-item-note">${value.note || value.description || 'No details available'}</div>
+    html += '<div class="breakdown-categories">';
+
+    for (const [category, subScores] of Object.entries(breakdownData)) {
+        if (!subScores) continue; // Skip null/undefined categories
+
+        html += `
+            <div class="breakdown-card">
+                <div class="breakdown-header">
+                    <h4 class="breakdown-title">${formatCategoryName(category)}</h4>
+                </div>
+                <div class="breakdown-content">
+        `;
+        
+        if (typeof subScores === 'object' && subScores !== null) {
+            for (const [key, value] of Object.entries(subScores)) {
+                if (typeof value === 'object' && value !== null) {
+                    html += `
+                        <div class="breakdown-item">
+                            <div class="breakdown-item-header">
+                                <span class="breakdown-item-title">${formatItemName(key)}</span>
+                                <span class="breakdown-score">${value.score ?? 'N/A'}</span>
                             </div>
-                        `;
-                    }
+                            <div class="breakdown-item-note">${value.note || value.description || 'No details available'}</div>
+                        </div>
+                    `;
                 }
             }
-            
-            html += `
-                    </div>
-                </div>
-            `;
         }
-        html += '</div>';
-    } else if (breakdown.details && typeof breakdown.details === 'object') {
-        // Alternative structure: handle details object
-        html += '<div class="breakdown-categories">';
-        for (const [key, value] of Object.entries(breakdown.details)) {
-            html += `
-                <div class="breakdown-card">
-                    <div class="breakdown-header">
-                        <h4 class="breakdown-title">${formatCategoryName(key)}</h4>
-                    </div>
-                    <div class="breakdown-content">
-                        <div class="breakdown-item">
-                            <div class="breakdown-item-note">${typeof value === 'object' ? JSON.stringify(value, null, 2) : value}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        html += '</div>';
-    } else {
-        // Fallback: display whatever we have
+        
         html += `
-            <div class="breakdown-fallback">
-                <p>Assessment data structure:</p>
-                <pre>${JSON.stringify(breakdown, null, 2)}</pre>
+                </div>
             </div>
         `;
     }
+    html += '</div>';
     
     detailedBreakdownContainer.innerHTML = html;
 }
