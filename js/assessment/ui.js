@@ -179,4 +179,7 @@ export function showError(message) {
 
 export function showSuccess(message) {
     showMessage(message, 'success');
-} 
+}
+
+// Re-export authentication modal controls
+export { showAuthModal, closeAuthModal } from './auth.js'; 
