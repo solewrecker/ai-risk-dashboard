@@ -590,60 +590,64 @@ async function generateAssessmentResults(formData) {
     };
 }
 
+// New function to fetch assessment from the database using the new schema
 async function getToolFromDatabase(formData) {
-    const { toolName, toolVersion } = formData;
+    if (!supabase) {
+        console.warn('Supabase client not available for DB check.');
+        return null;
+    }
 
-    // Capitalize version: 'enterprise' -> 'Enterprise', 'free' -> 'Free'
-    const versionName = toolVersion.charAt(0).toUpperCase() + toolVersion.slice(1);
-    const fullToolName = `${toolName} ${versionName}`;
-    
-    console.log(`[DB] Attempting to find exact match for: "${fullToolName}"`);
+    const toolName = formData.toolName.trim();
+    const toolVersion = formData.toolVersion; // 'free' or 'enterprise'
+
+    console.log(`Searching database for: ${toolName} (Version: ${toolVersion})`);
 
     try {
-        let toolData = null;
-        
-        // 1. Try for an exact match on the constructed full name
-        const { data: exactData, error: exactError } = await supabase
+        // Construct a query that is more specific
+        // It looks for a name match AND tries to find a version in the name string itself.
+        const { data, error } = await supabase
             .from('ai_tools')
             .select('*')
-            .eq('name', fullToolName)
-            .limit(1)
-            .single();
+            .ilike('name', `%${toolName}%`) // Case-insensitive search
+            .ilike('name', `%${toolVersion}%`) // Check if version is in the name
+            .limit(1);
 
-        if (exactData) {
-            console.log(`✅ [DB] Found exact match: "${exactData.name}"`);
-            toolData = exactData;
+        if (error) {
+            console.error('Error fetching tool from database:', error);
+            return null;
+        }
+
+        if (data && data.length > 0) {
+            console.log('Found matching assessment in database:', data[0]);
+            // Apply client-side multipliers to the database score
+            const finalResults = applyClientSideMultipliers(data[0], formData);
+            return finalResults;
         } else {
-            // 2. Fallback: If no exact match, try a more generic search on the base name
-            console.log(`[DB] No exact match. Falling back to search for base name: "${toolName}"`);
-            
-            const { data: broadData, error: broadError } = await supabase
+            console.log('No specific match found. Will perform a broader search.');
+            // Fallback to a broader search if no version-specific one is found
+            const { data: genericData, error: genericError } = await supabase
                 .from('ai_tools')
                 .select('*')
                 .ilike('name', `%${toolName}%`)
-                // IMPORTANT: Exclude results that contain the *other* version name
-                .not('name', 'ilike', `%${versionName === 'Free' ? 'Enterprise' : 'Free'}%`)
-                .order('name', { ascending: true }) // Get the most relevant one first
-                .limit(1)
-                .single();
+                .limit(1);
 
-            if (broadData) {
-                console.log(`✅ [DB] Found broad match: "${broadData.name}"`);
-                toolData = broadData;
-            } else if (broadError) {
-                console.warn(`[DB] No tool found after fallback search for "${toolName}". Error:`, broadError.message);
+            if (genericError) {
+                console.error('Error during fallback search:', genericError);
+                return null;
+            }
+
+            if (genericData && genericData.length > 0) {
+                console.log('Found generic assessment:', genericData[0]);
+                const finalResults = applyClientSideMultipliers(genericData[0], formData);
+                return finalResults;
             }
         }
 
-        if (!toolData) {
-            console.warn('[DB] Could not find any matching tool in database.');
-            return null;
-        }
-        
-        return toolData;
+        console.log('No assessment found in database for this tool.');
+        return null;
 
     } catch (err) {
-        console.error('❌ [DB] Critical error during database fetch:', err.message);
+        console.error('A critical error occurred in getToolFromDatabase:', err);
         return null;
     }
 }
@@ -1075,341 +1079,98 @@ function generateRecommendations(score, formData) {
 }
 
 function displayResults(results) {
+    const resultsCard = document.getElementById('resultsCard');
+    if (!resultsCard) return;
+
+    // --- Main Score and Title ---
+    const toolName = results.formData.toolName || results.name || 'Unknown Tool';
+    const finalScore = results.finalScore;
     const riskLevel = results.riskLevel;
-    const riskLabels = {
-        'critical': 'CRITICAL RISK',
-        'high': 'HIGH RISK',
-        'medium': 'MEDIUM RISK',
-        'low': 'LOW RISK'
-    };
-    
-    const riskDescriptions = {
-        'critical': 'Immediate blocking required - critical security risks identified',
-        'high': 'Significant controls needed before use - high security risks',
-        'medium': 'Standard enterprise controls required - moderate security risks',
-        'low': 'Basic monitoring sufficient. Tool meets security standards.'
-    };
 
-    // Get ACTUAL tool data from currentAssessment to ensure accuracy
-    let actualToolName = currentAssessment.selectedTool?.name || results.toolName;
-    
-    // Add version info for proper display (ChatGPT Free, Claude Enterprise, etc.)
-    if (currentAssessment.formData.toolVersion && actualToolName) {
-        const versionLabels = {
-            'free': 'Free',
-            'enterprise': 'Enterprise'
-        };
-        const versionLabel = versionLabels[currentAssessment.formData.toolVersion];
-        if (versionLabel && !actualToolName.toLowerCase().includes(versionLabel.toLowerCase())) {
-            actualToolName = `${actualToolName} ${versionLabel}`;
-        }
-    }
-    
-    const actualToolCategory = currentAssessment.selectedTool?.category || currentAssessment.formData.toolCategory;
-    
-    console.log('🎯 [RESULTS] Using actual tool data:', {
-        toolName: actualToolName,
-        category: actualToolCategory,
-        selectedTool: currentAssessment.selectedTool,
-        toolVersion: currentAssessment.formData.toolVersion
-    });
+    document.getElementById('toolNameResults').textContent = toolName;
+    document.getElementById('mainScore').textContent = finalScore;
+    document.getElementById('riskLevel').textContent = riskLevel;
 
-    // Get data classification display names  
-    const dataClassificationLabels = {
-        'phi': 'Protected Health Information (PHI)',
-        'financial': 'Finance/Accounting',
-        'trade-secrets': 'Trade Secrets/IP',
-        'pii': 'Personal Information',
-        'public': 'Public Data'
-    };
-    
-    const dataClassificationLabel = dataClassificationLabels[currentAssessment.formData.dataClassification] || 'Unknown Data Type';
-    
-    // Get data classification color for badge
-    const dataClassificationColors = {
-        'phi': '#dc2626', // Red for PHI (highest risk)
-        'financial': '#ea580c', // Orange for Financial
-        'trade-secrets': '#ca8a04', // Yellow for Trade Secrets
-        'pii': '#3b82f6', // Blue for PII
-        'public': '#16a34a' // Green for Public (lowest risk)
-    };
-    
-    const dataClassificationColor = dataClassificationColors[currentAssessment.formData.dataClassification] || '#64748b';
+    const riskClass = `risk-${riskLevel.toLowerCase()}`;
+    const scoreCard = document.querySelector('.main-score-card');
+    scoreCard.className = `main-score-card ${riskClass}`;
 
-    // DEBUG: Check breakdown structure and calculate risk components properly
-    console.log('🔍 [BREAKDOWN DEBUG] Results breakdown:', results.breakdown);
-    console.log('🔍 [BREAKDOWN DEBUG] Window score breakdown:', window.currentScoreBreakdown);
-    
-    // Use actual calculated scores from currentScoreBreakdown for risk components
-    let totalComponents = 0;
-    let highRiskComponents = 0;
-    let complianceScore = 0;
-    
-    if (window.currentScoreBreakdown) {
-        const componentScores = window.currentScoreBreakdown;
-        totalComponents = Object.keys(componentScores).length;
-        highRiskComponents = Object.values(componentScores).filter(score => score > 8).length;
-        complianceScore = componentScores.complianceRisk || 0;
-        
-        console.log('🎯 [RISK COMPONENTS] Using actual scores:', {
-            componentScores,
-            totalComponents,
-            highRiskComponents,
-            complianceScore
-        });
+    // --- Score Description ---
+    const scoreDescription = getScoreDescription(finalScore, riskLevel, toolName);
+    document.getElementById('scoreDescription').innerHTML = scoreDescription;
+
+    // --- Data Source Indicator ---
+    const dataSourceEl = document.getElementById('dataSource');
+    if (results.source === 'database') {
+        dataSourceEl.textContent = 'Based on Verified Assessment';
+        dataSourceEl.className = 'data-source verified';
     } else {
-        // Fallback to results.breakdown if available
-        totalComponents = Object.keys(results.breakdown).length;
-        highRiskComponents = Object.values(results.breakdown).filter(comp => comp.score > 8).length;
-        
-        console.log('⚠️ [RISK COMPONENTS] Using fallback breakdown:', {
-            totalComponents,
-            highRiskComponents
-        });
+        dataSourceEl.textContent = 'Based on Heuristic Analysis';
+        dataSourceEl.className = 'data-source estimated';
     }
-    
-    const resultsHTML = `
-        <div class="modern-results-container">
-            <!-- Header Section -->
-            <div class="results-header">
-                <div class="tool-title-section">
-                    <h2 class="tool-name">${actualToolName}</h2>
-                    <div class="classification-badges">
-                        <span class="classification-badge" style="background: ${dataClassificationColor};">
-                            🔒 ${dataClassificationLabel}
-                        </span>
-                        ${currentAssessment.formData.useCase ? `
-                        <span class="use-case-badge">
-                            📋 ${getUseCaseLabel(currentAssessment.formData.useCase)}
-                        </span>
-                        ` : ''}
-                    </div>
-                    <p class="results-subtitle">Risk Assessment Results</p>
+
+    // --- Insights Grid (Category Scores) ---
+    const insightsGrid = document.getElementById('insightsGrid');
+    const breakdown = results.breakdown || {};
+    const scores = breakdown.scores || {};
+
+    const insights = [
+        { id: 'dataStorageScore', title: 'Data Storage & Security', score: scores.dataStorage, icon: 'database' },
+        { id: 'trainingUsageScore', title: 'Training Data Usage', score: scores.trainingUsage, icon: 'robot' },
+        { id: 'accessControlsScore', title: 'Access Controls', score: scores.accessControls, icon: 'key' },
+        { id: 'complianceScore', title: 'Compliance & Legal', score: scores.complianceRisk, icon: 'gavel' },
+        { id: 'vendorTransparencyScore', title: 'Vendor Transparency', score: scores.vendorTransparency, icon: 'eye' }
+    ];
+
+    insightsGrid.innerHTML = insights.map(item => {
+        const score = item.score ?? 'N/A';
+        const level = getRiskLevel(score);
+        return `
+            <div class="insight-card risk-${level.toLowerCase()}">
+                <div class="insight-icon">
+                    <i class="fas fa-${item.icon}"></i>
+                </div>
+                <div class="insight-content">
+                    <span class="insight-title">${item.title}</span>
+                    <span class="insight-value">${score}</span>
                 </div>
             </div>
+        `;
+    }).join('');
 
-            <!-- Main Score Card -->
-            <div class="main-score-card risk-${riskLevel}">
-                <div class="score-section">
-                    <div class="score-number">${results.finalScore}</div>
-                    <div class="score-label">${riskLabels[riskLevel]}</div>
-                </div>
-                <div class="score-description">
-                    <p>${riskDescriptions[riskLevel]}</p>
-                    ${results.source === 'database' ? 
-                        '<div class="data-source verified">✓ Verified Assessment Data</div>' : 
-                        '<div class="data-source estimated">⚠ Estimated Assessment</div>'
-                    }
-                </div>
-            </div>
+    // --- Recommendations ---
+    const recommendationsList = document.getElementById('recommendationsList');
+    const recommendations = results.recommendations || generateRecommendations(finalScore, results.formData);
+    recommendationsList.innerHTML = recommendations.map(rec => `
+        <li class="recommendation-item">
+            <span class="rec-bullet"></span>
+            <span class="rec-text">${rec}</span>
+        </li>
+    `).join('');
 
-            <!-- Summary Insights -->
-            <div class="insights-grid">
-                <div class="insight-card">
-                    <div class="insight-icon">📊</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Overall Security Score</div>
-                        <div class="insight-value">${results.finalScore}/100</div>
-                        <div class="insight-description">${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} risk based on ${results.source} data</div>
-                    </div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-icon">🛡️</div>
-                    <div class="insight-content">
-                        <div class="insight-title">High-Risk Components</div>
-                        <div class="insight-value">${highRiskComponents}/${totalComponents}</div>
-                        <div class="insight-description">Security areas needing review</div>
-                    </div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-icon">⚖️</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Compliance Score</div>
-                        <div class="insight-value">${complianceScore}/20</div>
-                        <div class="insight-description">Risk related to data type & use case</div>
-                    </div>
-                </div>
-            </div>
+    // --- Detailed Breakdown ---
+    const detailedBreakdownContainer = document.getElementById('detailedBreakdown');
+    detailedBreakdownContainer.innerHTML = generateDetailedBreakdown(results.breakdown, results.formData);
 
-            <!-- NEW: Detailed Breakdown Table (replaces old grid) -->
-            <div class="detailed-breakdown-section">
-                <h3>Risk Component Breakdown</h3>
-                
-                <!-- Header -->
-                <div class="breakdown-table-header">
-                    <div>Category</div>
-                    <div style="text-align: right;">Score</div>
-                    <div>Summary</div>
-                </div>
-                
-                <div class="breakdown-table">
-                    ${Object.entries(results.breakdown).map(([category, data]) => `
-                    <details class="breakdown-row-container" ${data.isDetailed ? '' : 'disabled'}>
-                        <summary class="breakdown-row">
-                            <div class="category-name">
-                                ${data.isDetailed ? '▸ ' : ''}${category}
-                            </div>
-                            <div class="category-score risk-${getRiskLevel(parseInt(data.score.split('/')[0]) * 4)}">
-                                ${data.score}
-                            </div>
-                            <div class="category-description">${data.description}</div>
-                        </summary>
-                        
-                        <!-- Detailed subcategories if available -->
-                        ${data.isDetailed && data.subcategories ? `
-                        <div class="subcategory-content">
-                            ${Object.entries(data.subcategories).map(([subKey, subData]) => `
-                            <div class="subcategory-item">
-                                <div class="subcategory-title">${subData.title}</div>
-                                <div class="subcategory-justification">${subData.justification}</div>
-                                <div class="subcategory-score" style="color: ${subData.score_color || '#1e293b'};">
-                                    ${subData.score_text || ''}
-                                </div>
-                            </div>
-                            `).join('')}
-                        </div>
-                        ` : ''}
-                    </details>
-                    `).join('')}
-                </div>
-            </div>
+    // --- Update Export Buttons ---
+    // Ensure export buttons are visible and updated
+    document.getElementById('exportMenu').style.visibility = 'visible';
+    currentAssessment = results; // Make sure the global assessment is set for export
+}
 
-            <!-- Key Strengths & Monitoring (Pro Feature) -->
-            ${results.enhancedInfo && (results.enhancedInfo.keyStrengths?.length > 0 || results.enhancedInfo.areasForMonitoring?.length > 0) ? `
-            <div class="strengths-monitoring-section">
-                <div class="strength-card">
-                    <h4>✅ Key Strengths</h4>
-                    <ul>${results.enhancedInfo.keyStrengths.map(s => `<li>${s}</li>`).join('')}</ul>
-                </div>
-                <div class="monitoring-card">
-                    <h4>⚠️ Areas for Monitoring</h4>
-                    <ul>${results.enhancedInfo.areasForMonitoring.map(a => `<li>${a}</li>`).join('')}</ul>
-                </div>
-            </div>
-            ` : ''}
-
-            <!-- Recommendations Section -->
-            <div class="recommendations-section">
-                <h3>📋 Recommendations</h3>
-                <div class="recommendations-list">
-                    ${results.recommendations.map(rec => `
-                        <div class="recommendation-item">
-                            <span class="rec-bullet">→</span>
-                            <span class="rec-text">${rec}</span>
-                        </div>
-                    `).join('')}
-                    
-                    <!-- Enhanced recommendations for Pro users -->
-                    ${results.enhancedInfo && results.enhancedInfo.recommendations?.length > 0 ? `
-                    ${results.enhancedInfo.recommendations.map(rec => `
-                        <div class="recommendation-item">
-                            <span class="rec-bullet">→</span>
-                            <span class="rec-text">${rec}</span>
-                        </div>
-                    `).join('')}` : ''}
-                    
-                    <!-- Placeholder for more recommendations in Pro -->
-                    <div class="recommendation-item more-available">
-                        <span class="rec-bullet">⭐</span>
-                        <span class="rec-text">
-                            More detailed, actionable recommendations are available in the 
-                            <a href="#" onclick="exportPremiumPDF()">Enterprise PDF report</a>.
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('resultsContent').innerHTML = resultsHTML;
-
-    // Add new styles for the breakdown table dynamically
-    const breakdownStyles = `
-        .detailed-breakdown-section { 
-            margin-top: 2.5rem; 
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
-        }
-        .detailed-breakdown-section h3 {
-            margin: 0 0 1.5rem 0;
-            font-size: 1.25rem;
-        }
-        .breakdown-table-header {
-            display: grid;
-            grid-template-columns: 2fr 1fr 4fr;
-            gap: 1rem;
-            padding: 0 1rem 0.5rem 1rem;
-            font-weight: 600;
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .breakdown-table {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .breakdown-row-container {
-            border-radius: 0.5rem;
-            overflow: hidden;
-            border: 1px solid #f1f5f9;
-        }
-        .breakdown-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 4fr;
-            gap: 1rem;
-            padding: 1rem;
-            background: #f8fafc;
-            cursor: pointer;
-            align-items: center;
-        }
-        .breakdown-row:hover { background: #f1f5f9; }
-        .category-name { font-weight: 600; color: #1e293b; }
-        .category-score { font-weight: 700; text-align: right; }
-        .category-description { font-size: 0.875rem; color: #475569; }
-        .subcategory-content {
-            padding: 1rem 1.5rem 1.5rem 2.5rem;
-            background: white;
-            border-top: 1px solid #e2e8f0;
-        }
-        .subcategory-item {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .subcategory-item:last-child { border-bottom: none; }
-        .subcategory-title { font-weight: 600; }
-        .subcategory-justification { font-size: 0.875rem; color: #64748b; grid-column: 1 / span 2; }
-        .subcategory-score { font-weight: 600; text-align: right; }
-        .strengths-monitoring-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        .strength-card, .monitoring-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
-        }
-        .strength-card h4 { color: #166534; }
-        .monitoring-card h4 { color: #b45309; }
-        .strength-card ul, .monitoring-card ul {
-            padding-left: 1.25rem;
-            margin-top: 1rem;
-        }
-    `;
-    
-    // Inject styles into the head
-    const styleEl = document.createElement('style');
-    styleEl.textContent = breakdownStyles;
-    document.head.appendChild(styleEl);
+// Helper to generate score description
+function getScoreDescription(score, level, toolName) {
+    let description = '';
+    if (level === 'Critical') {
+        description = `<strong>Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a critical risk and should not be used with sensitive company data until significant controls are implemented.`;
+    } else if (level === 'High') {
+        description = `<strong>Requires Review.</strong> With a score of ${score}, ${toolName} poses a high risk. Use should be restricted to non-sensitive data, and a formal review is required before broader deployment.`;
+    } else if (level === 'Medium') {
+        description = `<strong>Use With Caution.</strong> With a score of ${score}, ${toolName} presents a medium risk. It may be suitable for general business use, but should not handle confidential or regulated data.`;
+    } else {
+        description = `<strong>Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered low risk and is approved for general productivity and use with non-sensitive data.`;
+    }
+    return `<p>${description}</p>`;
 }
 
 // Export functions (new modular structure)

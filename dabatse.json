@@ -1,0 +1,170 @@
+[
+  {
+    "name": "ChatGPT Enterprise",
+    "total_score": 26,
+    "data_storage_score": 10,
+    "training_usage_score": 0,
+    "access_controls_score": 4,
+    "compliance_score": 12,
+    "vendor_transparency_score": 0,
+    "breakdown": {
+      "scores": {
+        "dataStorage": 10,
+        "trainingUsage": 0,
+        "accessControls": 4,
+        "complianceRisk": 12,
+        "vendorTransparency": 0
+      },
+      "subScores": {
+        "dataStorage": {
+          "retention": {
+            "note": "Configurable policies but no guaranteed short-term deletion, 30-day post-removal deletion only applies to user-initiated deletions",
+            "score": 5
+          },
+          "encryption": {
+            "note": "AES-256 encryption at rest, TLS 1.2+ in transit, comprehensive encryption standards",
+            "score": 2
+          },
+          "geographic": {
+            "note": "Enterprise data residency in controlled regions with some geographic flexibility",
+            "score": 3
+          }
+        },
+        "trainingUsage": {
+          "sharing": {
+            "note": "Complete data isolation in enterprise tier, no third-party sharing",
+            "score": 0
+          },
+          "training": {
+            "note": "Aero data retention (ZDR) available with contractual guarantee data never used for model training",
+            "score": 0
+          }
+        },
+        "accessControls": {
+          "admin": {
+            "note": "Comprehensive enterprise admin controls, workspace management, user provisioning, role-based access",
+            "score": 0
+          },
+          "audit": {
+            "note": "Detailed usage logging, conversation history, activity monitoring dashboard",
+            "score": 0
+          },
+          "integration": {
+            "note": "Enterprise SSO with SAML/OIDC support, limited API integration",
+            "score": 2
+          }
+        },
+        "complianceRisk": {
+          "violations": {
+            "note": "SOC 2 Type 1 certified progressing to Type 2, but CRITICAL GAP: OpenAI does not offer HIPAA Business Associate Agreements for ChatGPT Enterprise, creating major compliance barriers for healthcare, legal, and financial services handling regulated data",
+            "score": 12
+          },
+          "transparency": {
+            "note": "Comprehensive enterprise policies, dedicated trust portal, clear data processing documentation",
+            "score": 0
+          }
+        },
+        "vendorTransparency": {
+          "score": {
+            "note": "Excellent enterprise documentation, responsive support, detailed trust and safety portal",
+            "score": 0
+          }
+        }
+      },
+      "compliance": {
+        "pci": "non-compliant",
+        "sox": "compliant",
+        "gdpr": "compliant",
+        "hipaa": "non-compliant"
+      }
+    },
+    "details": {
+      "dataStorage": "Geographic: enterprise data residency in controlled regions. Encryption: AES-256 at rest, TLS 1.2+ in transit. Retention: configurable policies but no guaranteed short-term deletion.",
+      "trainingUsage": "Training: zero data retention (ZDR) available. Sharing: complete data isolation.",
+      "accessControls": "Admin: Comprehensive enterprise admin controls. Audit: detailed usage logging. Integration: enterprise SSO with SAML/OIDC support.",
+      "complianceRisk": "Violations: OpenAI does not offer HIPAA BAAs for ChatGPT Enterprise. Transparency: comprehensive enterprise policies.",
+      "vendorTransparency": "Excellent enterprise documentation, responsive support, detailed trust and safety portal."
+    }
+  },
+  {
+    "name": "ChatGPT Free",
+    "total_score": 72,
+    "data_storage_score": 21,
+    "training_usage_score": 20,
+    "access_controls_score": 20,
+    "compliance_score": 6,
+    "vendor_transparency_score": 4,
+    "breakdown": {
+      "scores": {
+        "dataStorage": 21,
+        "trainingUsage": 20,
+        "accessControls": 20,
+        "complianceRisk": 6,
+        "vendorTransparency": 4
+      },
+      "subScores": {
+        "dataStorage": {
+          "retention": {
+            "note": "Indefinite data retention by default unless user manually deletes conversations. Recent court order requires indefinite retention of all data including deleted content.",
+            "score": 10
+          },
+          "encryption": {
+            "note": "Standard encryption in transit and at rest documented, but not customer-controlled encryption and limited encryption specifications published.",
+            "score": 4
+          },
+          "geographic": {
+            "note": "Data stored in known secure regions (US) with some contractual protections, but exact locations not specified for free tier.",
+            "score": 3
+          }
+        },
+        "trainingUsage": {
+          "sharing": {
+            "note": "Limited sharing with clear disclosure in privacy policy, primarily for safety and compliance purposes.",
+            "score": 3
+          },
+          "training": {
+            "note": "Data used for training by default, but opt-out available through settings or privacy portal. However, training opt-out still retains data indefinitely.",
+            "score": 15
+          }
+        }
+      },
+      "accessControls": {
+        "admin": {
+          "note": "Free tier provides no organizational visibility or centralized management - individual accounts only.",
+          "score": 8
+        },
+        "audit": {
+          "note": "No audit capabilities available for free tier users - no activity logs or usage tracking accessible to administrators.",
+          "score": 7
+        },
+        "integration": {
+          "note": "Username/password authentication only - no SSO, SCIM provisioning, or enterprise identity management integration available.",
+          "score": 5
+        }
+      },
+      "complianceRisk": {
+        "violations": {
+          "note": "Basic compliance certifications present and privacy policy generally compliant with major regulations, though lacks specialized enterprise compliance features.",
+          "score": 3
+        },
+        "transparency": {
+          "note": "General data processing described with retention periods stated, though some third-party relationships and exact processing locations could be clearer.",
+          "score": 2
+        }
+      },
+      "vendorTransparency": {
+        "score": {
+          "note": "Clear privacy policy with basic security documentation available. Support available but can be slower for free tier users. Regular transparency reports not consistently published.",
+          "score": 4
+        }
+      }
+    },
+    "details": {
+      "dataStorage": "Geographic: US-based with some international infrastructure but good contractual protections | Encryption: Standard TLS and AES encryption documented but not customer-controlled | Retention: Indefinite retention by default, user can delete but recent court order may override deletions",
+      "trainingUsage": "Training: Used by default for model training but opt-out available through settings or privacy portal | Sharing: Limited third-party sharing primarily for safety/compliance with clear disclosure",
+      "accessControls": "Admin: No organizational controls for free tier - individual accounts only | Audit: No audit logs or activity tracking available | Integration: Basic username/password only, no enterprise identity integration",
+      "complianceRisk": "Violations: Basic certifications present, generally compliant privacy policy | Transparency: Good general documentation though some processing details could be clearer",
+      "vendorTransparency": "Clear privacy policy and basic security documentation available, support responsive but prioritizes paid users"
+    }
+  }
+]
