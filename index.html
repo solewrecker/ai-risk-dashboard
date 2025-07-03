@@ -291,99 +291,139 @@
 
                     <!-- Step 4: Results -->
                     <div class="step-section" id="section4">
-                        <div class="step-content" id="step4">
-                            <div class="container mx-auto px-4 py-8">
-                                <div class="text-center mb-8">
-                                    <h2 id="resultToolName" class="text-3xl font-bold mb-2">Tool Assessment Results</h2>
-                                    <p id="resultSubtitle" class="text-gray-600">Risk Assessment Results</p>
-                        </div>
-                        
-                                <div class="main-score-card bg-white p-8 rounded-xl flex flex-col md:flex-row items-center justify-between">
-                                    <div class="score-section text-center md:text-left mb-6 md:mb-0">
-                                        <div class="score-number" id="resultScore">--</div>
-                                        <div class="score-label" id="resultRiskLevel">Calculating...</div>
-                                        <div id="resultApproval" class="mt-2 text-lg font-medium"></div>
-                                </div>
-                                    <div class="score-details md:ml-8">
-                                        <p id="resultSummary" class="text-lg mb-4"></p>
-                                        <span id="resultSource" class="data-source">Assessment Source</span>
-                            </div>
-                        </div>
-                        
-                    <div class="insights-grid">
-                                    <div class="insight-card" id="dataStorageCard">
-                                        <div class="insight-icon">🔒</div>
-                            <div class="insight-content">
-                                            <div class="insight-title">Data Storage & Security</div>
-                                            <div class="insight-value" id="dataStorageScore">--</div>
-                            </div>
-                        </div>
-                                    <div class="insight-card" id="accessControlsCard">
-                                        <div class="insight-icon">🔑</div>
-                            <div class="insight-content">
-                                            <div class="insight-title">Access Controls</div>
-                                            <div class="insight-value" id="accessControlsScore">--</div>
-                            </div>
-                        </div>
-                                    <div class="insight-card" id="trainingDataCard">
-                                        <div class="insight-icon">🤖</div>
-                            <div class="insight-content">
-                                            <div class="insight-title">Training Data Usage</div>
-                                            <div class="insight-value" id="trainingDataScore">--</div>
-                            </div>
-                        </div>
-                                    <div class="insight-card" id="complianceCard">
-                                        <div class="insight-icon">⚖️</div>
-                                        <div class="insight-content">
-                                            <div class="insight-title">Compliance & Legal</div>
-                                            <div class="insight-value" id="complianceScore">--</div>
-                    </div>
-                                    </div>
-                                    <div class="insight-card" id="vendorCard">
-                                        <div class="insight-icon">👁️</div>
-                                        <div class="insight-content">
-                                            <div class="insight-title">Vendor Transparency</div>
-                                            <div class="insight-value" id="vendorScore">--</div>
-                                    </div>
-                            </div>
-                        </div>
-
-                                <div class="recommendations-section">
-                                    <h3>Key Recommendations</h3>
-                                    <ul class="recommendations-list" id="recommendations">
-                                        <li class="recommendation-item">
-                                            <span class="rec-bullet">•</span>
-                                            <span class="rec-text">Loading recommendations...</span>
-                                        </li>
-                        </ul>
-                    </div>
-
-                                <div class="detailed-breakdown-section" id="detailedBreakdown">
-                                    <h3>Detailed Breakdown</h3>
-                                    <p class="no-breakdown">Loading detailed assessment data...</p>
-                    </div>
-
-                                <div class="flex justify-between mt-10">
-                                    <button class="btn btn-secondary" id="backToAnalysis">Back</button>
-                                    <div class="relative">
-                                        <button class="btn btn-primary" id="exportBtn">Export Results</button>
-                                        <div id="exportMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden z-10">
-                                            <div class="py-1">
-                                                <a href="#" id="exportPDF" class="export-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as PDF</a>
-                                                <a href="#" id="exportCSV" class="export-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export as CSV</a>
-                                                <a href="#" id="shareLink" class="export-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Share Link</a>
-                    </div>
-                    </div>
-                        </div>
-                        </div>
-                        </div>
-                        </div>
-                    </div>
-                </form>
-                </div>
+                        <div id="resultsCard">
+                            <!-- Header Section -->
+                            <div class="results-header">
+                                <div class="tool-title-section">
+                                    <h2 id="toolNameResults" class="tool-name">Tool Name Loading...</h2>
+                                    <p class="results-subtitle">Risk Assessment Results</p>
                                 </div>
                             </div>
                             
+                            <!-- Main Score Card -->
+                            <div class="main-score-card">
+                                <div class="score-section">
+                                    <div id="mainScore" class="score-number">--</div>
+                                    <div id="riskLevel" class="score-label">Calculating...</div>
+                                </div>
+                                <div id="scoreDescription" class="score-description">
+                                    <p>Your assessment results are being generated. Please wait a moment.</p>
+                                    <div id="dataSource" class="data-source"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Insights Grid -->
+                            <div id="insightsGrid" class="insights-grid">
+                                <!-- Insight cards will be populated here -->
+                            </div>
+                            
+                            <!-- Recommendations Section -->
+                            <div class="recommendations-section">
+                                <h3>Recommendations</h3>
+                                <ul id="recommendationsList" class="recommendations-list">
+                                    <!-- Recommendations will be populated here -->
+                                </ul>
+                            </div>
+                            
+                            <!-- Detailed Breakdown -->
+                            <div id="detailedBreakdown" class="detailed-breakdown-section">
+                                <!-- Detailed breakdown will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <div style="position: relative; display: inline-block;">
+                                <button type="button" class="btn btn-secondary" id="exportMainBtn">
+                                    <i class="fas fa-file-export"></i> Export Options
+                                </button>
+                                <div id="exportMenu" style="
+                                    display: none;
+                                    position: absolute;
+                                    bottom: 100%;
+                                    left: 0;
+                                    background: white;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 0.5rem;
+                                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                                    z-index: 9999;
+                                    min-width: 220px;
+                                    margin-bottom: 0.5rem;
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                ">
+                                    <button type="button" class="export-option" id="exportFreePdfBtn" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                                    ">
+                                        <i class="fas fa-file-pdf"></i> <strong>Free Professional PDF</strong><br>
+                                        <small style="color: #166534;">Basic template • Risk score • Categories</small>
+                                    </button>
+
+                                    <button type="button" class="export-option" id="exportPremiumPdfBtn" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                                    ">
+                                        <i class="fas fa-star"></i> <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
+                                        <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
+                                    </button>
+
+                                    <button type="button" class="export-option" id="exportHtmlBtn" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                        border-bottom: 1px solid #e2e8f0;
+                                    ">
+                                        <i class="fas fa-globe"></i> <strong>HTML Report</strong><br>
+                                        <small style="color: #64748b;">Viewable in browser</small>
+                                    </button>
+                                    <button type="button" class="export-option" id="exportJsonBtn" style="
+                                        display: block;
+                                        width: 100%;
+                                        padding: 0.75rem 1rem;
+                                        border: none;
+                                        background: none;
+                                        text-align: left;
+                                        cursor: pointer;
+                                    ">
+                                        <i class="fas fa-code"></i> <strong>JSON Data</strong><br>
+                                        <small style="color: #64748b;">Raw assessment data</small>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="saveToDbBtn">
+                                <i class="fas fa-save"></i> Save to Database
+                            </button>
+                            <button type="button" class="btn btn-primary" id="newAssessmentBtn">
+                                <i class="fas fa-redo"></i> New Assessment
+                            </button>
+                            <a href="dashboard.html" class="btn btn-secondary">
+                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Load template binding before app.js -->
     <script type="module" src="js/assessment/main.js"></script>
 </body>
