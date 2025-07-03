@@ -96,58 +96,59 @@ function renderRecommendations(recommendations, finalScore, formData) {
 }
 
 function renderDetailedBreakdown(breakdownData) {
-    const detailedBreakdownContainer = document.getElementById('detailedBreakdown');
+    const container = document.getElementById('detailedBreakdown');
+    const details = breakdownData?.Assessment_details;
 
-    // Determine the correct object to iterate over. Prioritize 'Assessment_details'.
-    const categories = breakdownData?.Assessment_details || breakdownData;
-    
-    if (!categories || typeof categories !== 'object' || Object.keys(categories).length === 0) {
-        detailedBreakdownContainer.innerHTML = `
+    if (!details || typeof details !== 'object' || Object.keys(details).length === 0) {
+        container.innerHTML = `
             <h3>Detailed Breakdown</h3>
             <p class="no-breakdown">No detailed breakdown available for this assessment.</p>
         `;
         return;
     }
-    
-    let html = '<h3>Detailed Breakdown</h3>';
-    html += '<div class="breakdown-categories">';
 
-    for (const [category, subScores] of Object.entries(categories)) {
-        // Skip any top-level entries that aren't objects (like Tool_name)
-        if (typeof subScores !== 'object' || subScores === null) continue;
+    let html = '<h3>Detailed Breakdown</h3><div class="breakdown-categories">';
+
+    // `categoryName` is e.g., "Data_storage_and_security"
+    // `categoryObject` is the object containing sub-points like "Encryption"
+    for (const [categoryName, categoryObject] of Object.entries(details)) {
+        if (!categoryObject || typeof categoryObject !== 'object') continue;
 
         html += `
             <div class="breakdown-card">
                 <div class="breakdown-header">
-                    <h4 class="breakdown-title">${formatCategoryName(category)}</h4>
+                    <h4 class="breakdown-title">${formatCategoryName(categoryName)}</h4>
                 </div>
                 <div class="breakdown-content">
         `;
-        
-        if (typeof subScores === 'object' && subScores !== null) {
-            for (const [key, value] of Object.entries(subScores)) {
-                if (typeof value === 'object' && value !== null) {
-                    html += `
-                        <div class="breakdown-item">
-                            <div class="breakdown-item-header">
-                                <span class="breakdown-item-title">${formatItemName(key)}</span>
-                                <span class="breakdown-score">${value.score ?? 'N/A'}</span>
-                            </div>
-                            <div class="breakdown-item-note">${value.note || value.description || 'No details available'}</div>
+
+        let hasContent = false;
+        // `itemName` is e.g., "Encryption"
+        // `itemObject` is the final object with { score, note }
+        for (const [itemName, itemObject] of Object.entries(categoryObject)) {
+            if (itemObject && typeof itemObject === 'object') {
+                hasContent = true;
+                html += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-item-header">
+                            <span class="breakdown-item-title">${formatItemName(itemName)}</span>
+                            <span class="breakdown-score">${itemObject.score ?? 'N/A'}</span>
                         </div>
-                    `;
-                }
+                        <div class="breakdown-item-note">${itemObject.note || itemObject.description || 'No details available'}</div>
+                    </div>
+                `;
             }
         }
-        
-        html += `
-                </div>
-            </div>
-        `;
+
+        if (!hasContent) {
+            html += `<div class="breakdown-item-note">No detailed points available for this category.</div>`;
+        }
+
+        html += `</div></div>`; // Close content and card
     }
-    html += '</div>';
-    
-    detailedBreakdownContainer.innerHTML = html;
+
+    html += '</div>'; // Close categories
+    container.innerHTML = html;
 }
 
 // Helper functions for formatting
