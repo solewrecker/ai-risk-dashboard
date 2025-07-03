@@ -16,11 +16,11 @@ export async function getToolFromDatabase(formData) {
     try {
         // --- Attempt 1: Exact Phrase Match (e.g., "ChatGPT Free") ---
         const exactPhrase = `${toolName} ${toolVersion}`;
-        console.log(`Attempt 1: Exact match for "${exactPhrase}"`);
+        console.log(`Attempt 1: Case-insensitive exact match for "${exactPhrase}"`);
         let { data, error } = await supabase
             .from('ai_tools')
             .select('*')
-            .eq('name', exactPhrase)
+            .ilike('name', exactPhrase)
             .limit(1);
 
         if (data && data.length > 0) {
