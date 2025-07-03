@@ -97,7 +97,7 @@ function renderRecommendations(recommendations, finalScore, formData) {
 
 function renderDetailedBreakdown(breakdownData) {
     const container = document.getElementById('detailedBreakdown');
-    const details = breakdownData?.Assessment_details;
+    const details = breakdownData?.assessment_details;
 
     if (!details || typeof details !== 'object' || Object.keys(details).length === 0) {
         container.innerHTML = `
@@ -109,8 +109,6 @@ function renderDetailedBreakdown(breakdownData) {
 
     let html = '<h3>Detailed Breakdown</h3><div class="breakdown-categories">';
 
-    // `categoryName` is e.g., "Data_storage_and_security"
-    // `categoryObject` is the object containing sub-points like "Encryption"
     for (const [categoryName, categoryObject] of Object.entries(details)) {
         if (!categoryObject || typeof categoryObject !== 'object') continue;
 
@@ -123,9 +121,7 @@ function renderDetailedBreakdown(breakdownData) {
         `;
 
         let hasContent = false;
-        // `itemName` is e.g., "Encryption"
-        // `itemObject` is the final object with { score, note }
-        for (const [itemName, itemObject] of Object.entries(categoryObject)) {
+        for (const [itemName, itemObject] of Object.entries(categoryObject.criteria || categoryObject)) {
             if (itemObject && typeof itemObject === 'object') {
                 hasContent = true;
                 html += `
@@ -134,7 +130,7 @@ function renderDetailedBreakdown(breakdownData) {
                             <span class="breakdown-item-title">${formatItemName(itemName)}</span>
                             <span class="breakdown-score">${itemObject.score ?? 'N/A'}</span>
                         </div>
-                        <div class="breakdown-item-note">${itemObject.note || itemObject.description || 'No details available'}</div>
+                        <div class="breakdown-item-note">${itemObject.justification || itemObject.note || itemObject.description || 'No details available'}</div>
                     </div>
                 `;
             }
@@ -144,10 +140,10 @@ function renderDetailedBreakdown(breakdownData) {
             html += `<div class="breakdown-item-note">No detailed points available for this category.</div>`;
         }
 
-        html += `</div></div>`; // Close content and card
+        html += `</div></div>`;
     }
 
-    html += '</div>'; // Close categories
+    html += '</div>';
     container.innerHTML = html;
 }
 
