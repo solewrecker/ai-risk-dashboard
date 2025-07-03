@@ -1,0 +1,417 @@
+/* ==========================================================================
+   Results Page
+   ========================================================================== */
+
+/* Main Results container */
+.results-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.results-card.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.tool-name-results {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.results-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+/* Score section */
+.score-number {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.score-description p {
+    font-size: 1.125rem;
+    color: #374151;
+    max-width: 45ch;
+}
+
+.data-source {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 1rem;
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.data-source.database {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.data-source.heuristic {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.insight-icon {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.insight-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.insight-title {
+    font-size: 0.95rem;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+}
+
+.insight-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Risk level styling for insight cards */
+.insight-card.high-risk .insight-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.insight-card.medium-risk .insight-icon {
+    background: #fff7ed;
+    color: #f59e0b;
+}
+
+.insight-card.low-risk .insight-icon {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.insight-card.high-risk .insight-value {
+    color: #ef4444;
+}
+
+.insight-card.medium-risk .insight-value {
+    color: #f59e0b;
+}
+
+.insight-card.low-risk .insight-value {
+    color: #10b981;
+}
+
+
+/* Recommendations Section */
+.recommendations-section {
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.recommendations-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.recommendations-section h3:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 3px;
+}
+
+.recommendations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.recommendation-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-item:last-child {
+    margin-bottom: 0;
+}
+
+.rec-bullet {
+    color: #d97706;
+    font-weight: bold;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.rec-text {
+    flex: 1;
+    line-height: 1.6;
+    color: #78350f;
+    font-size: 1rem;
+}
+
+
+/* Detailed Breakdown Section */
+.detailed-breakdown-section {
+    margin-top: 2.5rem;
+}
+
+.detailed-breakdown-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.detailed-breakdown-section h3:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+}
+
+.breakdown-categories {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.breakdown-header {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.breakdown-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+}
+
+/* Category-specific icons */
+.breakdown-title[data-category="Access Controls"]::before {
+    content: "🔑";
+    margin-right: 0.75rem;
+}
+
+.breakdown-title[data-category="Training Data Usage"]::before {
+    content: "🤖";
+    margin-right: 0.75rem;
+}
+
+.breakdown-title[data-category="Vendor Transparency"]::before {
+    content: "👁️";
+    margin-right: 0.75rem;
+}
+
+.breakdown-title[data-category="Compliance And Legal Risk"]::before {
+    content: "⚖️";
+    margin-right: 0.75rem;
+}
+
+.breakdown-title[data-category="Data Storage And Security"]::before {
+    content: "🔒";
+    margin-right: 0.75rem;
+}
+
+.breakdown-content {
+    padding: 1.5rem;
+}
+
+.breakdown-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: all 0.2s ease;
+}
+
+.breakdown-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.breakdown-item:hover {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin: 0 -0.75rem 1.5rem;
+}
+
+.breakdown-item:hover:last-child {
+    margin-bottom: 0;
+}
+
+.breakdown-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.breakdown-item-title {
+    font-weight: 600;
+    color: #374151;
+    font-size: 1rem;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.breakdown-score {
+    background: #3b82f6;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 2rem;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.breakdown-score[data-score="high"] {
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+}
+
+.breakdown-score[data-score="medium"] {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.breakdown-score[data-score="low"] {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+}
+
+.breakdown-item-note {
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    border-left: 3px solid #e5e7eb;
+    margin-top: 0.75rem;
+}
+
+.no-breakdown {
+    text-align: center;
+    padding: 2.5rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    color: #6b7280;
+    font-style: italic;
+    border: 1px dashed #d1d5db;
+}
+
+/* Export Menu */
+#exportMenu {
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.export-option {
+    transition: all 0.2s ease;
+}
+
+.export-option:hover {
+    transform: translateX(4px);
+    background-color: #f9fafb;
+}
+
+@media (max-width: 767px) {
+    .breakdown-header {
+        padding: 1rem;
+    }
+    
+    .breakdown-content {
+        padding: 1.25rem;
+    }
+    
+    .breakdown-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .breakdown-item-title {
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+    
+    .breakdown-score {
+        align-self: flex-start;
+    }
+}
