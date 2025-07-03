@@ -3,7 +3,7 @@
 import { supabase } from './auth.js';
 import { applyClientSideMultipliers } from './scoring.js';
 
-export async function getToolFromDatabase(formData) {
+export async function fetchToolFromDatabase(formData) {
     if (!supabase) {
         console.warn('Supabase client not available for DB check.');
         return null;
@@ -66,7 +66,7 @@ export async function getToolFromDatabase(formData) {
         return null;
 
     } catch (err) {
-        console.error('Critical error in getToolFromDatabase:', err);
+        console.error('Critical error in fetchToolFromDatabase:', err);
         return null;
     }
 }
