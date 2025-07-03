@@ -1,607 +1,609 @@
-// js/dashboard.js
-
-let supabaseClient = null; // Global Supabase client instance
-let assessments = []; // Store all assessments for filtering
-let filteredAssessments = []; // Store currently filtered assessments
-let isAdmin = false; // Use a global variable for the admin state
+// Modern AI Risk Dashboard - Gamified Interface
+let supabaseClient = null;
+let currentUser = null;
+let isAdmin = false;
+let assessments = [];
+let currentTab = 'dashboard';
 let userTier = 'free';
-let userStats = {
-    assessmentCount: 0,
-    themesUnlocked: 1,
-    currentTheme: 'default'
-};
 
-// IMPORTANT: Replace with your actual Supabase project URL and Anon Key
+// Supabase configuration
 const SUPABASE_URL = "https://ffcjkccdfvkyofzpwgil.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmY2prY2NkZnZreW9mennwd2dpbCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzMwOTA3MDYzLCJleHAiOjIwNDY0ODMwNjN9.pM4pHFNgQW3N1Lk7JJiPR8Q7cYDUMH4R7BI6CdCJQ_s";
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Dashboard script loading...');
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Modern Dashboard initializing...');
     
-    if (SUPABASE_URL.includes("YOUR_SUPABASE_URL")) {
-        alert('Please configure SUPABASE_URL and SUPABASE_ANON_KEY in js/dashboard.js');
-        return;
-    }
-
-    // Create a single global Supabase client instance
+    // Initialize Supabase client
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('Supabase client initialized');
     
-    checkAuth();
+    // Check authentication
+    await checkAuth();
+    
+    // Initialize dashboard
+    if (currentUser) {
+        await initializeDashboard();
+    } else {
+        showLoginSection();
+    }
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Initialize icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 
-// Check authentication status
+// Authentication check
 async function checkAuth() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         
         if (session) {
-            console.log('User authenticated:', session.user.email);
+            currentUser = session.user;
             isAdmin = session.user.user_metadata?.role === 'admin';
             userTier = session.user.user_metadata?.tier || 'free';
             
-            updateUIForUser(session.user);
-            await loadAssessments();
-            await updateUserStats();
+            console.log('User authenticated:', session.user.email, 'Tier:', userTier, 'Admin:', isAdmin);
+            return true;
         } else {
-            console.log('User not authenticated');
-            showLogin();
+            console.log('No active session');
+            return false;
         }
     } catch (error) {
-        console.error('Auth check error:', error);
-        showLogin();
+        console.error('Auth check failed:', error);
+        return false;
     }
 }
 
-// Update UI based on user authentication and tier
-function updateUIForUser(user) {
-    console.log('Updating UI for user:', user.email, 'Tier:', userTier, 'Admin:', isAdmin);
-    
-    // Update user badge and navigation
-    const tierBadge = document.getElementById('tierBadge');
-    const progressTier = document.getElementById('progressTier');
-    const upgradePrompt = document.getElementById('upgradePrompt');
-    const userMenu = document.getElementById('userMenu');
-    
-    if (tierBadge) {
-        tierBadge.textContent = userTier.toUpperCase();
-        tierBadge.className = `tier-badge tier-${userTier}`;
-    }
-    
-    if (progressTier) {
-        progressTier.textContent = userTier === 'pro' ? 'Pro Tier' : 'Free Tier';
-    }
-    
-    // Show/hide upgrade prompt
-    if (upgradePrompt && userMenu) {
-        if (userTier === 'pro') {
-            upgradePrompt.style.display = 'none';
-            userMenu.innerHTML = `
-                <div class="user-info">
-                    <span class="user-email">${user.email}</span>
-                    <button onclick="logout()" class="btn-logout">Logout</button>
-                </div>
-            `;
-            userMenu.style.display = 'block';
-        } else {
-            upgradePrompt.style.display = 'block';
-            userMenu.style.display = 'none';
-        }
-    }
-    
-    // Update pro feature visibility
-    updateProFeatureVisibility();
-    
-    // Show import button for admin users
-    const importContainer = document.getElementById('importContainer');
-    if (importContainer) {
-        importContainer.style.display = isAdmin ? 'block' : 'none';
-    }
-    
-    // Show main content, hide login
-    const dashboardContent = document.getElementById('dashboard-section');
-    const loginSection = document.getElementById('loginSection');
-    
-    if (dashboardContent) dashboardContent.style.display = 'block';
-    if (loginSection) loginSection.style.display = 'none';
-}
-
-// Update pro feature visibility based on user tier
-function updateProFeatureVisibility() {
-    const proFeatures = document.querySelectorAll('.pro-feature');
-    const proOnlyElements = document.querySelectorAll('.pro-only');
-    
-    proFeatures.forEach(element => {
-        if (userTier === 'free') {
-            element.classList.add('tier-free');
-        } else {
-            element.classList.remove('tier-free');
-            // Hide the overlay for pro users
-            const overlay = element.querySelector('.pro-feature-overlay');
-            if (overlay) overlay.style.display = 'none';
-        }
-    });
-    
-    proOnlyElements.forEach(element => {
-        element.style.display = userTier === 'pro' ? 'block' : 'none';
-    });
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    // Navigation
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = item.dataset.section;
-            if (section) {
-                switchSection(section);
-                
-                // Update active nav item
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            }
-        });
-    });
-    
-    // Search and filter controls
-    const searchInput = document.getElementById('searchInput');
-    const riskFilter = document.getElementById('riskFilter');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const sortSelect = document.getElementById('sortSelect');
-    const clearFilters = document.getElementById('clearFilters');
-    const resetFilters = document.getElementById('resetFilters');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(filterAndDisplayAssessments, 300));
-    }
-    
-    if (riskFilter) {
-        riskFilter.addEventListener('change', filterAndDisplayAssessments);
-    }
-    
-    if (categoryFilter) {
-        categoryFilter.addEventListener('change', filterAndDisplayAssessments);
-    }
-    
-    if (sortSelect) {
-        sortSelect.addEventListener('change', filterAndDisplayAssessments);
-    }
-    
-    if (clearFilters) {
-        clearFilters.addEventListener('click', clearAllFilters);
-    }
-    
-    if (resetFilters) {
-        resetFilters.addEventListener('click', clearAllFilters);
-    }
-    
-    // Import modal
-    const importBtn = document.getElementById('importBtn');
-    const importModal = document.getElementById('importModal');
-    const closeModal = document.querySelector('.close');
-    
-    if (importBtn) {
-        importBtn.addEventListener('click', () => {
-            if (importModal) importModal.style.display = 'block';
-        });
-    }
-    
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            if (importModal) importModal.style.display = 'none';
-        });
-    }
-    
-    // Theme switching
-    const themeCards = document.querySelectorAll('.theme-card:not(.locked)');
-    themeCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const theme = card.dataset.theme;
-            if (theme && !card.classList.contains('locked')) {
-                switchTheme(theme);
-            }
-        });
-    });
-    
-    // Upgrade buttons
-    const upgradeButtons = document.querySelectorAll('.btn-upgrade, .btn-upgrade-feature, .btn-unlock-pro');
-    upgradeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // For demo purposes - in real app this would open payment modal
-            alert('Upgrade to Pro feature coming soon! 🚀');
-        });
-    });
-}
-
-// Switch between sections
-function switchSection(sectionName) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Show selected section
-    const targetSection = document.getElementById(`${sectionName}-section`);
-    if (targetSection) {
-        targetSection.classList.add('active');
-    }
-    
-    // Handle pro feature sections for free users
-    if (userTier === 'free' && ['compare', 'team', 'templates'].includes(sectionName)) {
-        // Show FOMO overlay
-        console.log('Free user trying to access pro feature:', sectionName);
-    }
-}
-
-// Switch theme
-function switchTheme(themeName) {
-    // Update data-theme attribute on body
-    document.body.setAttribute('data-theme', themeName);
-    
-    // Update active theme card
-    const themeCards = document.querySelectorAll('.theme-card');
-    themeCards.forEach(card => {
-        card.classList.remove('active');
-        if (card.dataset.theme === themeName) {
-            card.classList.add('active');
-        }
-    });
-    
-    // Save to user preferences (would be saved to database in real app)
-    userStats.currentTheme = themeName;
-    console.log('Switched to theme:', themeName);
-}
-
-// Update user statistics
-async function updateUserStats() {
-    // Get actual assessment count from database
-    userStats.assessmentCount = assessments.length;
-    
-    // Update progress displays
-    const assessmentCountEl = document.getElementById('assessmentCount');
-    const themeCountEl = document.getElementById('themeCount');
-    const achievementCountEl = document.getElementById('achievementCount');
-    const themeUnlockedEl = document.getElementById('themeUnlocked');
-    
-    if (assessmentCountEl) {
-        assessmentCountEl.textContent = userStats.assessmentCount;
-    }
-    
-    if (themeUnlockedEl) {
-        themeUnlockedEl.textContent = calculateUnlockedThemes();
-    }
-    
-    if (themeCountEl) {
-        themeCountEl.textContent = `${calculateUnlockedThemes()}/5`;
-    }
-    
-    if (achievementCountEl) {
-        achievementCountEl.textContent = `${calculateUnlockedAchievements()}/8`;
-    }
-    
-    // Update theme unlock status
-    updateThemeUnlockStatus();
-    
-    // Update achievement progress
-    updateAchievementProgress();
-}
-
-// Calculate unlocked themes based on assessment count
-function calculateUnlockedThemes() {
-    let unlocked = 1; // Default theme always unlocked
-    
-    if (userTier === 'pro') {
-        return 5; // Pro users get all themes
-    }
-    
-    if (userStats.assessmentCount >= 1) unlocked++; // Dark Coder
-    if (userStats.assessmentCount >= 10) unlocked++; // Matrix
-    if (userStats.assessmentCount >= 50) unlocked++; // Cyberpunk
-    // Corporate is Pro-only
-    
-    return unlocked;
-}
-
-// Calculate unlocked achievements
-function calculateUnlockedAchievements() {
-    let unlocked = 0;
-    
-    if (userStats.assessmentCount >= 1) unlocked++; // First Assessment
-    if (userStats.assessmentCount >= 10) unlocked++; // Risk Detective
-    if (userStats.assessmentCount >= 50) unlocked++; // Power User
-    
-    // Pro-only achievements
-    if (userTier === 'pro') {
-        unlocked++; // Team Player (example)
-    }
-    
-    return unlocked;
-}
-
-// Update theme unlock status
-function updateThemeUnlockStatus() {
-    const themes = [
-        { name: 'darkCoder', requirement: 1 },
-        { name: 'matrix', requirement: 10 },
-        { name: 'cyberpunk', requirement: 50 }
-    ];
-    
-    themes.forEach(theme => {
-        const card = document.querySelector(`[data-theme="${theme.name}"]`);
-        if (card) {
-            const isUnlocked = userStats.assessmentCount >= theme.requirement || userTier === 'pro';
-            
-            if (isUnlocked && card.classList.contains('locked')) {
-                // Unlock animation could go here
-                card.classList.remove('locked');
-                card.classList.add('unlocked');
-                card.querySelector('.theme-preview').classList.remove('blurred');
-                card.querySelector('.theme-status').textContent = '✅ Unlocked';
-                card.querySelector('.theme-status').className = 'theme-status unlocked';
-                
-                // Remove progress bar
-                const progress = card.querySelector('.theme-progress');
-                if (progress) progress.remove();
-            }
-            
-            // Update progress for locked themes
-            if (!isUnlocked) {
-                const progressBar = card.querySelector('.progress-fill');
-                const progressText = card.querySelector('.progress-text');
-                if (progressBar && progressText) {
-                    const percentage = (userStats.assessmentCount / theme.requirement) * 100;
-                    progressBar.style.width = `${Math.min(percentage, 100)}%`;
-                    progressText.textContent = `${userStats.assessmentCount}/${theme.requirement}`;
-                }
-            }
-        }
-    });
-}
-
-// Update achievement progress
-function updateAchievementProgress() {
-    // Update "Risk Detective" achievement (10 assessments)
-    const riskDetectiveCard = document.querySelector('.achievement-card.in-progress');
-    if (riskDetectiveCard) {
-        const progressBar = riskDetectiveCard.querySelector('.progress-fill');
-        const progressText = riskDetectiveCard.querySelector('.progress-text');
-        
-        if (progressBar && progressText) {
-            const percentage = (userStats.assessmentCount / 10) * 100;
-            progressBar.style.width = `${Math.min(percentage, 100)}%`;
-            progressText.textContent = `${userStats.assessmentCount}/10`;
+// Initialize dashboard data
+async function initializeDashboard() {
+    try {
+        // Show admin features if user is admin
+        if (isAdmin) {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'block';
+            });
         }
         
-        // Check if achievement is completed
-        if (userStats.assessmentCount >= 10) {
-            riskDetectiveCard.classList.remove('in-progress');
-            riskDetectiveCard.classList.add('unlocked');
-            riskDetectiveCard.innerHTML = `
-                <div class="achievement-icon">🔍</div>
-                <h4>Risk Detective</h4>
-                <p>Complete 10 risk assessments</p>
-                <span class="achievement-date">Unlocked just now!</span>
-            `;
-        }
-    }
-    
-    // Update next achievement progress in sidebar
-    const nextAchievementProgress = document.querySelector('.next-achievement .progress-fill');
-    const nextAchievementText = document.querySelector('.next-achievement .progress-text');
-    
-    if (nextAchievementProgress && nextAchievementText) {
-        if (userStats.assessmentCount < 10) {
-            const percentage = (userStats.assessmentCount / 10) * 100;
-            nextAchievementProgress.style.width = `${percentage}%`;
-            nextAchievementText.textContent = `${userStats.assessmentCount}/10`;
-        } else {
-            // Move to next achievement
-            const achievementInfo = document.querySelector('.achievement-info');
-            if (achievementInfo && userStats.assessmentCount < 50) {
-                achievementInfo.innerHTML = `
-                    <span class="achievement-name">Power User</span>
-                    <span class="achievement-desc">Complete 50 assessments</span>
-                `;
-                const percentage = (userStats.assessmentCount / 50) * 100;
-                nextAchievementProgress.style.width = `${percentage}%`;
-                nextAchievementText.textContent = `${userStats.assessmentCount}/50`;
-            }
-        }
+        // Load assessments
+        await loadAssessments();
+        
+        // Update dashboard stats
+        updateDashboardStats();
+        
+        // Update progress tracking
+        updateProgressTracking();
+        
+        // Load achievements
+        loadAchievements();
+        
+        // Update tier badge
+        updateTierBadge();
+        
+        console.log('Dashboard initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize dashboard:', error);
     }
 }
 
 // Load assessments from database
 async function loadAssessments() {
     try {
-        console.log('Loading assessments...');
-        const loadingState = document.getElementById('loading-state');
-        const assessmentList = document.getElementById('assessment-list');
-        
-        if (loadingState) loadingState.style.display = 'block';
-        if (assessmentList) assessmentList.style.display = 'none';
-        
         const { data, error } = await supabaseClient
             .from('ai_tools')
             .select('*')
             .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('Error loading assessments:', error);
-            return;
-        }
-        
+
+        if (error) throw error;
+
         assessments = data || [];
-        filteredAssessments = [...assessments];
-        
         console.log(`Loaded ${assessments.length} assessments`);
         
-        if (loadingState) loadingState.style.display = 'none';
-        if (assessmentList) assessmentList.style.display = 'block';
+        // Update assessment list in hidden section
+        renderAssessmentList();
         
-        filterAndDisplayAssessments();
-        await updateUserStats();
+        // Update recent assessments
+        renderRecentAssessments();
         
     } catch (error) {
-        console.error('Error in loadAssessments:', error);
-        const loadingState = document.getElementById('loading-state');
-        if (loadingState) {
-            loadingState.innerHTML = `
-                <h3>Error loading assessments</h3>
-                <p>Please try refreshing the page.</p>
-            `;
-        }
+        console.error('Error loading assessments:', error);
+        assessments = [];
     }
 }
 
-// Filter and display assessments
-function filterAndDisplayAssessments() {
+// Update dashboard statistics
+function updateDashboardStats() {
+    const totalCount = assessments.length;
+    const highRiskCount = assessments.filter(a => a.risk_level === 'high' || a.risk_level === 'critical').length;
+    const lowRiskCount = assessments.filter(a => a.risk_level === 'low').length;
+    const avgScore = totalCount > 0 ? Math.round(assessments.reduce((sum, a) => sum + (a.total_score || 0), 0) / totalCount) : 0;
+    
+    // Update stat cards
+    const totalEl = document.getElementById('totalAssessments');
+    const highEl = document.getElementById('highRiskCount');
+    const lowEl = document.getElementById('lowRiskCount');
+    const avgEl = document.getElementById('avgScore');
+    const badgeEl = document.getElementById('assessmentBadge');
+    const remainingEl = document.getElementById('remainingText');
+    
+    if (totalEl) totalEl.textContent = totalCount;
+    if (highEl) highEl.textContent = highRiskCount;
+    if (lowEl) lowEl.textContent = lowRiskCount;
+    if (avgEl) avgEl.textContent = avgScore;
+    if (badgeEl) badgeEl.textContent = totalCount;
+    
+    // Update remaining text
+    const remaining = Math.max(0, 25 - totalCount);
+    if (remainingEl) remainingEl.textContent = `${remaining} remaining in free tier`;
+}
+
+// Update progress tracking
+function updateProgressTracking() {
+    const totalCount = assessments.length;
+    const limit = 25; // Free tier limit
+    const percentage = Math.min((totalCount / limit) * 100, 100);
+    
+    // Update progress bar
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('assessmentProgress');
+    const remainingText = document.getElementById('remainingCount');
+    
+    if (progressBar) progressBar.style.width = `${percentage}%`;
+    if (progressText) progressText.textContent = `${totalCount}/${limit}`;
+    if (remainingText) remainingText.textContent = `${Math.max(0, limit - totalCount)} assessments remaining`;
+}
+
+// Load and display achievements
+function loadAchievements() {
+    const totalCount = assessments.length;
+    const achievements = [
+        {
+            id: 'first-assessment',
+            name: 'First Steps',
+            description: 'Complete your first risk assessment',
+            icon: '🎯',
+            unlocked: totalCount >= 1,
+            progress: Math.min(totalCount, 1),
+            requirement: 1
+        },
+        {
+            id: 'power-user',
+            name: 'Power User',
+            description: 'Complete 25 risk assessments',
+            icon: '⚡',
+            unlocked: totalCount >= 25,
+            progress: Math.min(totalCount, 25),
+            requirement: 25
+        },
+        {
+            id: 'risk-expert',
+            name: 'Risk Expert',
+            description: 'Complete 50 risk assessments',
+            icon: '🔍',
+            unlocked: totalCount >= 50,
+            progress: Math.min(totalCount, 50),
+            requirement: 50
+        }
+    ];
+    
+    renderAchievements(achievements);
+}
+
+// Render achievements list
+function renderAchievements(achievements) {
+    const container = document.getElementById('achievementsList');
+    if (!container) return;
+    
+    container.innerHTML = achievements.map(achievement => {
+        const progressPercent = (achievement.progress / achievement.requirement) * 100;
+        const statusClass = achievement.unlocked ? 'unlocked' : 'in-progress';
+        
+        return `
+            <div class="achievement-card ${statusClass}">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">${achievement.icon}</span>
+                        <h4 class="font-medium">${achievement.name}</h4>
+                    </div>
+                    ${achievement.unlocked ? '<span class="text-xs text-green-400">✓ Unlocked</span>' : ''}
+                </div>
+                <p class="text-sm text-gray-400 mb-2">${achievement.description}</p>
+                ${!achievement.unlocked ? `
+                    <div class="achievement-progress-bar">
+                        <div class="achievement-progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <span class="text-xs text-gray-400">${achievement.progress}/${achievement.requirement}</span>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// Render recent assessments
+function renderRecentAssessments() {
+    const container = document.getElementById('recentAssessmentsList');
+    if (!container) return;
+    
+    const recentAssessments = assessments.slice(0, 5);
+    
+    if (recentAssessments.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <p>No assessments yet</p>
+                <button onclick="window.location.href='index.html'" class="mt-2 text-blue-400 hover:text-blue-300">
+                    Create your first assessment →
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = recentAssessments.map(assessment => {
+        const date = new Date(assessment.created_at).toLocaleDateString();
+        
+        return `
+            <div class="assessment-item">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bot" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">${assessment.name}</h4>
+                        <p class="text-sm text-gray-400">${date}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                    <span class="text-sm font-medium">${assessment.total_score}/100</span>
+                    <button onclick="viewAssessment(${assessment.id})" class="p-1 text-gray-400 hover:text-white">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Re-initialize icons for new content
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+// Render full assessment list (for assessments tab)
+function renderAssessmentList() {
+    const container = document.getElementById('assessment-list');
+    if (!container) return;
+    
+    if (assessments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>No assessments found</h3>
+                <p>Start by creating your first AI tool risk assessment.</p>
+                <a href="index.html" class="btn btn-primary">Create Assessment</a>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = assessments.map(assessment => {
+        const date = new Date(assessment.created_at).toLocaleDateString();
+        
+        return `
+            <div class="list-item">
+                <div class="list-col-tool">
+                    <div class="tool-info">
+                        <h4>${assessment.name}</h4>
+                        <p>${assessment.category || 'General'}</p>
+                    </div>
+                </div>
+                <div class="list-col-score">
+                    <span class="score-badge">${assessment.total_score}/100</span>
+                </div>
+                <div class="list-col-level">
+                    <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                </div>
+                <div class="list-col-date">
+                    <span>${date}</span>
+                </div>
+                <div class="list-col-actions">
+                    <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
+                        <i data-lucide="eye"></i>
+                    </button>
+                    ${isAdmin ? `
+                        <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Update results count
+    const resultsCount = document.getElementById('resultsCount');
+    if (resultsCount) {
+        resultsCount.textContent = `${assessments.length} assessments found`;
+    }
+    
+    // Re-initialize icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+// Update tier badge
+function updateTierBadge() {
+    const tierBadge = document.getElementById('tierBadge');
+    if (tierBadge) {
+        const tier = currentUser?.user_metadata?.tier || 'free';
+        tierBadge.textContent = tier.toUpperCase();
+        tierBadge.className = `text-xs px-2 py-0.5 rounded-full ${
+            tier === 'pro' ? 'bg-purple-600' : 'bg-green-600'
+        }`;
+    }
+}
+
+// Tab switching functionality
+function switchTab(tabName) {
+    currentTab = tabName;
+    
+    // Update navigation buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('text-gray-300', 'hover:bg-gray-700');
+    });
+    
+    // Highlight active tab
+    const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-gray-300', 'hover:bg-gray-700');
+        activeBtn.classList.add('bg-blue-600', 'text-white');
+    }
+    
+    // Show/hide content sections
+    if (tabName === 'assessments') {
+        document.getElementById('assessments-content').classList.remove('hidden');
+        hideOtherSections(['assessments-content']);
+    } else {
+        document.getElementById('assessments-content').classList.add('hidden');
+        showDashboardContent();
+    }
+}
+
+// Helper functions
+function hideOtherSections(keepVisible) {
+    const sections = ['assessments-content'];
+    sections.forEach(sectionId => {
+        if (!keepVisible.includes(sectionId)) {
+            const section = document.getElementById(sectionId);
+            if (section) section.classList.add('hidden');
+        }
+    });
+}
+
+function showDashboardContent() {
+    hideOtherSections([]);
+}
+
+// Event listeners setup
+function setupEventListeners() {
+    // Import button
+    const importBtn = document.getElementById('importBtn');
+    if (importBtn) {
+        importBtn.addEventListener('click', () => {
+            document.getElementById('importModal').style.display = 'block';
+        });
+    }
+    
+    // Modal close
+    const modal = document.getElementById('importModal');
+    const closeBtn = modal?.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Search and filter functionality for assessments tab
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAssessments);
+    }
+    
+    const riskFilter = document.getElementById('riskFilter');
+    if (riskFilter) {
+        riskFilter.addEventListener('change', filterAssessments);
+    }
+    
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', filterAssessments);
+    }
+    
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', filterAssessments);
+    }
+}
+
+// Show login section
+function showLoginSection() {
+    document.getElementById('loginSection').style.display = 'block';
+    document.getElementById('loginSection').innerHTML = `
+        <div class="login-container">
+            <h2>Please Sign In</h2>
+            <p>You need to be signed in to access the dashboard.</p>
+            <a href="index.html" class="btn btn-primary">Go to Login</a>
+        </div>
+    `;
+}
+
+// View assessment details
+function viewAssessment(id) {
+    window.location.href = `assessment-detail.html?id=${id}`;
+}
+
+// Delete assessment (admin only)
+async function deleteAssessment(id) {
+    if (!isAdmin) {
+        alert('Access denied. Admin privileges required.');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this assessment?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('ai_tools')
+            .delete()
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        // Reload assessments
+        await loadAssessments();
+        updateDashboardStats();
+        updateProgressTracking();
+        
+        alert('Assessment deleted successfully');
+    } catch (error) {
+        console.error('Error deleting assessment:', error);
+        alert('Failed to delete assessment: ' + error.message);
+    }
+}
+
+// Filter assessments functionality
+function filterAssessments() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const riskFilter = document.getElementById('riskFilter')?.value || 'all';
     const categoryFilter = document.getElementById('categoryFilter')?.value || 'all';
-    const sortOption = document.getElementById('sortSelect')?.value || 'date_desc';
+    const sortBy = document.getElementById('sortSelect')?.value || 'date_desc';
     
-    // Filter assessments
-    filteredAssessments = assessments.filter(assessment => {
-        const matchesSearch = !searchTerm || assessment.name.toLowerCase().includes(searchTerm);
-        const matchesRisk = riskFilter === 'all' || assessment.risk_level === riskFilter;
-        const matchesCategory = categoryFilter === 'all' || assessment.category === categoryFilter;
-        
-        return matchesSearch && matchesRisk && matchesCategory;
-    });
+    let filteredAssessments = [...assessments];
     
-    // Sort assessments
+    // Apply filters
+    if (searchTerm) {
+        filteredAssessments = filteredAssessments.filter(assessment =>
+            assessment.name.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    if (riskFilter !== 'all') {
+        filteredAssessments = filteredAssessments.filter(assessment =>
+            assessment.risk_level === riskFilter
+        );
+    }
+    
+    if (categoryFilter !== 'all') {
+        filteredAssessments = filteredAssessments.filter(assessment =>
+            assessment.category === categoryFilter
+        );
+    }
+    
+    // Apply sorting
     filteredAssessments.sort((a, b) => {
-        switch (sortOption) {
+        switch (sortBy) {
             case 'date_asc':
                 return new Date(a.created_at) - new Date(b.created_at);
             case 'date_desc':
                 return new Date(b.created_at) - new Date(a.created_at);
             case 'score_asc':
-                return a.total_score - b.total_score;
+                return (a.total_score || 0) - (b.total_score || 0);
             case 'score_desc':
-                return b.total_score - a.total_score;
+                return (b.total_score || 0) - (a.total_score || 0);
             case 'name_asc':
                 return a.name.localeCompare(b.name);
             case 'name_desc':
                 return b.name.localeCompare(a.name);
             default:
-                return new Date(b.created_at) - new Date(a.created_at);
+                return 0;
         }
     });
     
-    displayAssessments();
-    updateResultsCount();
-    updateClearFiltersVisibility();
+    // Update display
+    renderFilteredAssessments(filteredAssessments);
+    
+    // Update results count
+    const resultsCount = document.getElementById('resultsCount');
+    if (resultsCount) {
+        resultsCount.textContent = `${filteredAssessments.length} assessments found`;
+    }
+    
+    // Show/hide clear filters button
+    const hasFilters = searchTerm || riskFilter !== 'all' || categoryFilter !== 'all' || sortBy !== 'date_desc';
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.style.display = hasFilters ? 'inline-block' : 'none';
+    }
 }
 
-// Display assessments in the list
-function displayAssessments() {
-    const assessmentList = document.getElementById('assessment-list');
-    const emptyState = document.getElementById('empty-state');
-    
-    if (!assessmentList) return;
+// Render filtered assessments
+function renderFilteredAssessments(filteredAssessments) {
+    const container = document.getElementById('assessment-list');
+    if (!container) return;
     
     if (filteredAssessments.length === 0) {
-        assessmentList.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'block';
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>No assessments found</h3>
+                <p>No assessments match your current filters.</p>
+                <button onclick="clearAllFilters()" class="btn btn-primary">Clear Filters</button>
+            </div>
+        `;
         return;
     }
     
-    if (emptyState) emptyState.style.display = 'none';
-    assessmentList.style.display = 'block';
-    
-    const assessmentItems = filteredAssessments.map(assessment => 
-        renderAssessmentItem(assessment)
-    ).join('');
-    
-    assessmentList.innerHTML = assessmentItems;
-}
-
-// Render individual assessment item
-function renderAssessmentItem(assessment) {
-    const date = new Date(assessment.created_at).toLocaleDateString();
-    const riskColor = getRiskColor(assessment.risk_level);
-    
-    let actionsHtml = `
-        <button class="btn-icon" title="View Details" onclick="viewAssessment('${assessment.id}')">
-            <i class="fas fa-eye"></i>
-        </button>
-    `;
-    
-    // Only show delete button to admin users
-    if (isAdmin) {
-        actionsHtml += `
-            <button class="btn-icon btn-delete" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-    }
-    
-    return `
-        <div class="list-item" data-id="${assessment.id}">
-            <div class="list-col-tool">
-                <strong>${assessment.name}</strong>
-                <small>${assessment.category || 'General'}</small>
-            </div>
-            <div class="list-col-score">
-                <span class="score-badge" style="background-color: ${riskColor}">
-                    ${assessment.total_score}
-                </span>
-            </div>
-            <div class="list-col-level">
-                <span class="risk-level ${assessment.risk_level}">
-                    ${assessment.risk_level}
-                </span>
-            </div>
-            <div class="list-col-date">${date}</div>
-            <div class="list-col-actions">
-                ${actionsHtml}
-            </div>
-        </div>
-    `;
-}
-
-// Get risk color
-function getRiskColor(riskLevel) {
-    switch(riskLevel) {
-        case 'low': return '#10b981';
-        case 'medium': return '#f59e0b';
-        case 'high': return '#ef4444';
-        case 'critical': return '#dc2626';
-        default: return '#6b7280';
-    }
-}
-
-// Update results count
-function updateResultsCount() {
-    const resultsCount = document.getElementById('resultsCount');
-    if (resultsCount) {
-        const total = assessments.length;
-        const filtered = filteredAssessments.length;
+    container.innerHTML = filteredAssessments.map(assessment => {
+        const date = new Date(assessment.created_at).toLocaleDateString();
         
-        if (filtered === total) {
-            resultsCount.textContent = `Showing ${total} assessment${total !== 1 ? 's' : ''}`;
-        } else {
-            resultsCount.textContent = `Showing ${filtered} of ${total} assessment${total !== 1 ? 's' : ''}`;
-        }
+        return `
+            <div class="list-item">
+                <div class="list-col-tool">
+                    <div class="tool-info">
+                        <h4>${assessment.name}</h4>
+                        <p>${assessment.category || 'General'}</p>
+                    </div>
+                </div>
+                <div class="list-col-score">
+                    <span class="score-badge">${assessment.total_score}/100</span>
+                </div>
+                <div class="list-col-level">
+                    <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                </div>
+                <div class="list-col-date">
+                    <span>${date}</span>
+                </div>
+                <div class="list-col-actions">
+                    <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
+                        <i data-lucide="eye"></i>
+                    </button>
+                    ${isAdmin ? `
+                        <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Re-initialize icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
-}
-
-// Update clear filters visibility
-function updateClearFiltersVisibility() {
-    const clearFilters = document.getElementById('clearFilters');
-    if (!clearFilters) return;
-    
-    const hasActiveFilters = 
-        (document.getElementById('searchInput')?.value || '') !== '' ||
-        (document.getElementById('riskFilter')?.value || 'all') !== 'all' ||
-        (document.getElementById('categoryFilter')?.value || 'all') !== 'all' ||
-        (document.getElementById('sortSelect')?.value || 'date_desc') !== 'date_desc';
-    
-    clearFilters.style.display = hasActiveFilters ? 'inline-block' : 'none';
 }
 
 // Clear all filters
@@ -616,117 +618,35 @@ function clearAllFilters() {
     if (categoryFilter) categoryFilter.value = 'all';
     if (sortSelect) sortSelect.value = 'date_desc';
     
-    filterAndDisplayAssessments();
+    filterAssessments();
 }
 
-// View assessment details
-function viewAssessment(id) {
-    window.location.href = `assessment-detail.html?id=${id}`;
-}
-
-// Delete assessment
-async function deleteAssessment(id) {
-    if (!isAdmin) {
-        alert('Only administrators can delete assessments.');
-        return;
-    }
-    
-    if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        const { error } = await supabaseClient
-            .from('ai_tools')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Error deleting assessment:', error);
-            alert('Error deleting assessment. Please try again.');
-            return;
-        }
-        
-        console.log('Assessment deleted successfully');
-        await loadAssessments(); // Reload the list
-        
-    } catch (error) {
-        console.error('Error in deleteAssessment:', error);
-        alert('Error deleting assessment. Please try again.');
-    }
-}
-
-// Show login interface
-function showLogin() {
-    const loginSection = document.getElementById('loginSection');
-    const dashboardContent = document.getElementById('dashboard-section');
-    
-    if (loginSection) {
-        loginSection.style.display = 'block';
-        loginSection.innerHTML = `
-            <div class="login-container">
-                <h2>Sign In to AI Risk Pro</h2>
-                <p>Access your premium dashboard and gamification features</p>
-                <button onclick="signInWithGoogle()" class="btn btn-primary">
-                    <i class="fab fa-google"></i> Continue with Google
-                </button>
-            </div>
-        `;
-    }
-    
-    if (dashboardContent) {
-        dashboardContent.style.display = 'none';
-    }
-}
-
-// Sign in with Google
-async function signInWithGoogle() {
-    try {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin + '/dashboard.html'
-            }
-        });
-        
-        if (error) {
-            console.error('Sign in error:', error);
-            alert('Sign in failed. Please try again.');
-        }
-    } catch (error) {
-        console.error('Sign in error:', error);
-        alert('Sign in failed. Please try again.');
-    }
-}
-
-// Logout function
-async function logout() {
-    try {
-        await supabaseClient.auth.signOut();
-        window.location.reload();
-    } catch (error) {
-        console.error('Logout error:', error);
+// Banner close functionality
+function closeBanner() {
+    const banner = document.getElementById('promoBanner');
+    if (banner) {
+        banner.style.display = 'none';
     }
 }
 
 // Import functionality
 function handleFileSelect(event) {
     const file = event.target.files[0];
-    const fileName = document.getElementById('fileName');
+    const fileNameElement = document.getElementById('fileName');
     const importOptions = document.getElementById('importOptions');
     
-    if (file && file.type === 'application/json') {
-        fileName.textContent = `Selected: ${file.name}`;
+    if (file) {
+        fileNameElement.textContent = `Selected: ${file.name}`;
         importOptions.style.display = 'block';
     } else {
-        fileName.textContent = 'Please select a valid JSON file.';
+        fileNameElement.textContent = '';
         importOptions.style.display = 'none';
     }
 }
 
 async function processImport() {
     if (!isAdmin) {
-        alert('Only administrators can import assessments.');
+        alert('Access denied. Admin privileges required.');
         return;
     }
     
@@ -742,38 +662,36 @@ async function processImport() {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await fetch('https://ffcjkccdfvkyofzpwgil.supabase.co/functions/v1/upload-assessment', {
+        const response = await fetch('/api/upload-assessment', {
             method: 'POST',
+            body: formData,
             headers: {
-                'Authorization': `Bearer ${supabaseClient.supabaseKey}`
-            },
-            body: formData
+                'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`
+            }
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const result = await response.json();
         
-        if (response.ok) {
+        if (result.success) {
             alert('Assessment imported successfully!');
             document.getElementById('importModal').style.display = 'none';
+            fileInput.value = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('importOptions').style.display = 'none';
+            
+            // Reload data
             await loadAssessments();
+            updateDashboardStats();
+            updateProgressTracking();
         } else {
-            alert(`Import failed: ${result.error}`);
+            throw new Error(result.error || 'Import failed');
         }
     } catch (error) {
         console.error('Import error:', error);
-        alert('Import failed. Please try again.');
+        alert('Import failed: ' + error.message);
     }
-}
-
-// Utility functions
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
 } 
