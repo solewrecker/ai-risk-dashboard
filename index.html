@@ -290,8 +290,44 @@
 
                     <!-- Step 4: Results -->
                     <div class="step-section" id="section4">
-                        <div id="resultsContent">
-                            <!-- Results will be populated by JavaScript -->
+                        <div id="resultsCard">
+                            <!-- Header Section -->
+                            <div class="results-header">
+                                <div class="tool-title-section">
+                                    <h2 id="toolNameResults" class="tool-name">Tool Name Loading...</h2>
+                                    <p class="results-subtitle">Risk Assessment Results</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Score Card -->
+                            <div class="main-score-card">
+                                <div class="score-section">
+                                    <div id="mainScore" class="score-number">--</div>
+                                    <div id="riskLevel" class="score-label">Calculating...</div>
+                                </div>
+                                <div id="scoreDescription" class="score-description">
+                                    <p>Your assessment results are being generated. Please wait a moment.</p>
+                                    <div id="dataSource" class="data-source"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Insights Grid -->
+                            <div id="insightsGrid" class="insights-grid">
+                                <!-- Insight cards will be populated here -->
+                            </div>
+                            
+                            <!-- Recommendations Section -->
+                            <div class="recommendations-section">
+                                <h3>Recommendations</h3>
+                                <ul id="recommendationsList" class="recommendations-list">
+                                    <!-- Recommendations will be populated here -->
+                                </ul>
+                            </div>
+                            
+                            <!-- Detailed Breakdown -->
+                            <div id="detailedBreakdown" class="detailed-breakdown-section">
+                                <!-- Detailed breakdown will be populated here -->
+                            </div>
                         </div>
                         
                         <div class="btn-group">
