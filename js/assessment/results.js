@@ -23,7 +23,7 @@ export function displayResults(results) {
     const scoreCard = document.querySelector('.main-score-card');
     scoreCard.className = `main-score-card risk-${riskLevel.toLowerCase()}`;
     
-    document.getElementById('scoreDescription').innerHTML = getScoreDescription(finalScore, riskLevel, toolName);
+    document.getElementById('scoreDescription').querySelector('p').innerHTML = getScoreDescription(finalScore, riskLevel, toolName);
     
     const dataSourceEl = document.getElementById('dataSource');
     dataSourceEl.textContent = source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis';
@@ -91,11 +91,12 @@ function renderDetailedBreakdown(breakdown, formData) {
 
 function getScoreDescription(score, level, toolName) {
     let description = '';
-    if (level === 'Critical') description = `<strong>Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a critical risk.`;
-    else if (level === 'High') description = `<strong>Requires Review.</strong> With a score of ${score}, ${toolName} poses a high risk.`;
-    else if (level === 'Medium') description = `<strong>Use With Caution.</strong> With a score of ${score}, ${toolName} presents a medium risk.`;
+    const risk = level.toLowerCase();
+    if (risk === 'critical') description = `<strong>Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a critical risk.`;
+    else if (risk === 'high') description = `<strong>Requires Review.</strong> With a score of ${score}, ${toolName} poses a high risk.`;
+    else if (risk === 'medium') description = `<strong>Use With Caution.</strong> With a score of ${score}, ${toolName} presents a medium risk.`;
     else description = `<strong>Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered low risk.`;
-    return `<p>${description}</p>`;
+    return description;
 }
 
 // --- Export Functions ---
