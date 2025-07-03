@@ -69,6 +69,34 @@ function setupEventListeners() {
         });
     });
     
+    // Specific step navigation buttons
+    const nextStepBtn1 = document.getElementById('nextStepBtn1');
+    if (nextStepBtn1) {
+        nextStepBtn1.addEventListener('click', () => {
+            navigateToStep(2);
+        });
+    }
+    
+    const nextStepBtn2 = document.getElementById('nextStepBtn2');
+    if (nextStepBtn2) {
+        nextStepBtn2.addEventListener('click', () => {
+            navigateToStep(3);
+            // Start the assessment process
+            setTimeout(() => {
+                const formData = new FormData(document.getElementById('assessmentForm'));
+                const assessmentData = collectFormData(formData);
+                processAssessment(assessmentData);
+            }, 500);
+        });
+    }
+    
+    const prevStepBtn2 = document.getElementById('prevStepBtn2');
+    if (prevStepBtn2) {
+        prevStepBtn2.addEventListener('click', () => {
+            navigateToStep(1);
+        });
+    }
+    
     // Sign out button
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) {
@@ -221,6 +249,61 @@ async function fetchAssessmentById(id) {
     } catch (error) {
         console.error('Error fetching assessment:', error);
         throw error;
+    }
+}
+
+function collectFormData(formData) {
+    return {
+        toolName: formData.get('toolName') || document.getElementById('toolName')?.value,
+        toolVersion: formData.get('toolVersion') || document.getElementById('toolVersion')?.value,
+        toolCategory: formData.get('toolCategory') || document.getElementById('toolCategory')?.value,
+        useCase: formData.get('useCase') || document.getElementById('useCase')?.value,
+        toolUrl: formData.get('toolUrl') || document.getElementById('toolUrl')?.value,
+        additionalContext: formData.get('additionalContext') || document.getElementById('additionalContext')?.value,
+        dataClassification: formData.get('dataClassification') || document.querySelector('input[name="dataClassification"]:checked')?.value
+    };
+}
+
+async function processAssessment(assessmentData) {
+    try {
+        // Update analysis status
+        const statusElement = document.getElementById('analysisStatus');
+        if (statusElement) {
+            statusElement.textContent = 'Checking database for existing assessment...';
+        }
+        
+        // First try to get from database
+        let toolData = await fetchToolFromDatabase(assessmentData);
+        
+        if (toolData) {
+            if (statusElement) {
+                statusElement.textContent = 'Found in database! Applying your specific context...';
+            }
+            currentAssessmentData = toolData;
+        } else {
+            if (statusElement) {
+                statusElement.textContent = 'Calculating heuristic risk score...';
+            }
+            // Calculate heuristic score
+            const scoringResult = calculateScore(assessmentData);
+            currentAssessmentData = {
+                ...assessmentData,
+                ...scoringResult,
+                timestamp: new Date().toISOString(),
+                source: 'heuristic'
+            };
+        }
+        
+        // Display results
+        setTimeout(() => {
+            displayResults(currentAssessmentData);
+            navigateToStep(4);
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Error processing assessment:', error);
+        showError('Failed to process assessment. Please try again.');
+        navigateToStep(1);
     }
 }
 

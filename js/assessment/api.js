@@ -112,4 +112,7 @@ export async function saveToDatabase(assessment) {
         console.error('Error saving to database:', error);
         return { error };
     }
-} 
+}
+
+// Alias for compatibility with main.js
+export { saveToDatabase as saveAssessment }; 
