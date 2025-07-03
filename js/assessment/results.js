@@ -12,27 +12,26 @@ export function displayResults(data) {
     }
 
     // Set tool name and basic info
-    document.getElementById('resultToolName').textContent = data.tool_name || 'Unknown Tool';
-    document.getElementById('resultScore').textContent = data.score || '--';
+    document.getElementById('resultToolName').textContent = data.toolName || data.tool_name || 'Unknown Tool';
+    document.getElementById('resultScore').textContent = data.finalScore || data.score || '--';
     
     // Set risk level and approval status
-    let riskLevel = '';
+    const score = data.finalScore || data.score || 0;
+    const toolName = data.toolName || data.tool_name || 'the tool';
+    const riskLevel = getRiskLevel(score);
     let approvalText = '';
     
-    if (data.score >= 80) {
-        riskLevel = 'LOW RISK';
-        approvalText = `Approved for General Use. With a score of ${data.score}, ${data.tool_name} is considered low risk.`;
-    } else if (data.score >= 60) {
-        riskLevel = 'MEDIUM RISK';
-        approvalText = `Limited Approval. With a score of ${data.score}, ${data.tool_name} requires supervision.`;
+    if (riskLevel === 'low') {
+        approvalText = `Approved for General Use. With a score of ${score}, ${toolName} is considered low risk.`;
+    } else if (riskLevel === 'medium') {
+        approvalText = `Limited Approval. With a score of ${score}, ${toolName} requires supervision.`;
     } else {
-        riskLevel = 'HIGH RISK';
-        approvalText = `Not Approved. With a score of ${data.score}, ${data.tool_name} poses significant security risks.`;
+        riskLevel = `Not Approved. With a score of ${score}, ${toolName} poses significant security risks.`;
     }
     
-    document.getElementById('resultRiskLevel').textContent = riskLevel;
+    document.getElementById('resultRiskLevel').textContent = riskLevel.toUpperCase().replace('-', ' ');
     document.getElementById('resultApproval').textContent = approvalText;
-    document.getElementById('resultSummary').textContent = data.summary || `This assessment evaluates the security and compliance risks of ${data.tool_name}.`;
+    document.getElementById('resultSummary').textContent = data.summary || `This assessment evaluates the security and compliance risks of ${toolName}.`;
     
     // Set data source indicator
     const sourceElement = document.getElementById('resultSource');
@@ -128,28 +127,27 @@ function displayRecommendations(recommendations) {
         return;
     }
     
-    let html = '';
-    recommendations.forEach(rec => {
+    container.innerHTML = recommendations.map(rec => {
         if (typeof rec === 'string') {
-            html += `
+            return `
                 <li class="recommendation-item">
                     <span class="rec-bullet">•</span>
                     <span class="rec-text">${rec}</span>
                 </li>
             `;
         } else if (rec && typeof rec === 'object') {
-            // Handle object format recommendations
-            const text = rec.text || rec.recommendation || JSON.stringify(rec);
-            html += `
+            // Handle new object format: { title, description }
+            const title = rec.title || 'Recommendation';
+            const description = rec.description || JSON.stringify(rec);
+            return `
                 <li class="recommendation-item">
                     <span class="rec-bullet">•</span>
-                    <span class="rec-text">${text}</span>
+                    <span class="rec-text"><strong>${title}:</strong> ${description}</span>
                 </li>
             `;
         }
-    });
-    
-    container.innerHTML = html;
+        return '';
+    }).join('');
 }
 
 function formatCategoryName(name) {
