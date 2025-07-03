@@ -2,218 +2,150 @@
 // Main entry point for the assessment tool.
 // Orchestrates all modules and handles the main application state.
 
-import { initAuth, getCurrentUser, signOut } from './auth.js';
-import { initUI, navigateToStep, showError, showSuccess } from './ui.js';
-import { calculateScore } from './scoring.js';
-import { fetchToolFromDatabase, saveAssessment } from './api.js';
-import { displayResults } from './results.js';
+import * as Auth from './auth.js';
+import * as UI from './ui.js';
+import * as API from './api.js';
+import * as Scoring from './scoring.js';
+import * as Results from './results.js';
 
-// Global state
-let currentAssessmentId = null;
-let currentAssessmentData = null;
+// --- State ---
+let currentAssessment = {};
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        await initAuth();
-        initUI();
-        setupEventListeners();
-        checkForSharedAssessment();
-    } catch (error) {
-        console.error('Error initializing app:', error);
-        showError('Failed to initialize the application. Please refresh the page.');
-    }
-});
+// --- Core Functions ---
+async function startAssessment() {
+    UI.showStep(3); // Show loading/analysis step
+    const formData = getFormData();
+    let toolData = await API.getToolFromDatabase(formData);
 
-function setupEventListeners() {
-    // Tool search functionality
-    const toolSearchInput = document.getElementById('toolSearchInput');
-    const searchButton = document.getElementById('searchToolBtn');
-    
-    if (toolSearchInput && searchButton) {
-        searchButton.addEventListener('click', handleToolSearch);
-        toolSearchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleToolSearch();
-            }
-        });
+    if (toolData) {
+        // Use database data
+        currentAssessment = {
+            formData: formData,
+            finalScore: toolData.total_score,
+            riskLevel: toolData.risk_level,
+            source: 'database',
+            breakdown: toolData.breakdown,
+            recommendations: toolData.recommendations,
+            detailedAssessment: toolData.detailed_assessment
+        };
+    } else {
+        // Generate heuristic score
+        const baseScore = Scoring.generateHeuristicScore(formData);
+        const finalScore = Scoring.applyMultipliers(baseScore, formData);
+        currentAssessment = {
+            formData: formData,
+            finalScore: finalScore,
+            riskLevel: Scoring.getRiskLevel(finalScore),
+            source: 'heuristic',
+            breakdown: { scores: { /* Basic heuristic scores could go here */ } },
+            recommendations: Scoring.generateRecommendations(finalScore, formData)
+        };
     }
-    
-    // Form submission
-    const assessmentForm = document.getElementById('assessmentForm');
-    if (assessmentForm) {
-        assessmentForm.addEventListener('submit', handleFormSubmit);
-    }
-    
-    // Navigation buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const targetStep = parseInt(e.target.dataset.step);
-            if (!isNaN(targetStep)) {
-                navigateToStep(targetStep);
-            }
-        });
+
+    simulateAnalysisSteps(() => {
+        UI.showStep(4);
+        Results.displayResults(currentAssessment);
     });
-    
-    // Sign out button
-    const signOutBtn = document.getElementById('signOutBtn');
-    if (signOutBtn) {
-        signOutBtn.addEventListener('click', () => {
-            signOut().then(() => {
-                window.location.href = 'index.html';
-            });
-        });
-    }
-    
-    // Dashboard button
-    const dashboardBtn = document.getElementById('dashboardBtn');
-    if (dashboardBtn) {
-        dashboardBtn.addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-    }
 }
 
-async function handleToolSearch() {
-    const toolSearchInput = document.getElementById('toolSearchInput');
-    const toolName = toolSearchInput.value.trim();
-    
-    if (!toolName) {
-        showError('Please enter a tool name to search');
+async function handleSaveToDatabase() {
+    if (!Auth.getIsAdmin()) {
+        UI.showMessage('You must be an admin to save assessments.', 'error');
+        return;
+    }
+    if (!currentAssessment || !currentAssessment.results) {
+        UI.showMessage('No assessment results to save.', 'error');
         return;
     }
     
-    try {
-        const tool = await fetchToolFromDatabase(toolName);
-        if (tool) {
-            // Pre-fill form with tool data
-            document.getElementById('toolName').value = tool.tool_name;
-            document.getElementById('toolDescription').value = tool.description || '';
-            document.getElementById('toolVendor').value = tool.vendor || '';
-            document.getElementById('toolWebsite').value = tool.website || '';
-            
-            // If there's a version dropdown, try to select the right option
-            const versionSelect = document.getElementById('toolVersion');
-            if (versionSelect) {
-                // Add "Pro" option if it doesn't exist
-                let hasProOption = false;
-                for (let i = 0; i < versionSelect.options.length; i++) {
-                    if (versionSelect.options[i].value === 'Pro') {
-                        hasProOption = true;
-                        break;
-                    }
-                }
-                
-                if (!hasProOption) {
-                    const proOption = document.createElement('option');
-                    proOption.value = 'Pro';
-                    proOption.textContent = 'Pro';
-                    versionSelect.appendChild(proOption);
-                }
-                
-                // Try to select the matching version
-                if (tool.version) {
-                    for (let i = 0; i < versionSelect.options.length; i++) {
-                        if (versionSelect.options[i].value.toLowerCase() === tool.version.toLowerCase()) {
-                            versionSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            showSuccess(`Found "${tool.tool_name}" in the database`);
-            navigateToStep(2);
+    UI.showMessage('Saving...', 'info');
+    const { data, error } = await API.saveToDatabase(currentAssessment);
+
+    if (error) {
+        UI.showMessage(`Error: ${error.message}`, 'error');
+    } else {
+        UI.showMessage('Assessment saved successfully!', 'success');
+    }
+}
+
+// --- Helper Functions ---
+function getFormData() {
+    const form = document.getElementById('assessmentForm');
+    const formData = new FormData(form);
+    return {
+        toolName: formData.get('toolName'),
+        toolVersion: formData.get('toolVersion'),
+        toolCategory: formData.get('toolCategory'),
+        dataClassification: formData.get('dataClassification'),
+        useCase: formData.get('useCase')
+    };
+}
+
+function simulateAnalysisSteps(callback) {
+    const steps = [
+        "Analyzing tool policies...",
+        "Assessing data handling protocols...",
+        "Evaluating vendor reputation...",
+        "Cross-referencing compliance databases...",
+        "Finalizing risk score..."
+    ];
+    let index = 0;
+    const interval = setInterval(() => {
+        if (index < steps.length) {
+            document.getElementById('analysisStatus').textContent = steps[index];
+            index++;
         } else {
-            showError(`No matching tool found for "${toolName}"`);
+            clearInterval(interval);
+            callback();
         }
-    } catch (error) {
-        console.error('Error searching for tool:', error);
-        showError('Failed to search for tool. Please try again.');
-    }
+    }, 600);
 }
 
-async function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    // Collect form data
-    const formData = new FormData(e.target);
-    const assessmentData = {
-        tool_name: formData.get('toolName'),
-        description: formData.get('toolDescription'),
-        vendor: formData.get('toolVendor'),
-        website: formData.get('toolWebsite'),
-        version: formData.get('toolVersion'),
-        data_classification: formData.get('dataClassification'),
-        data_storage_location: formData.get('dataStorageLocation'),
-        data_retention: formData.get('dataRetention'),
-        authentication_method: formData.get('authMethod'),
-        user_roles: formData.get('userRoles'),
-        admin_controls: formData.get('adminControls'),
-        training_data_usage: formData.get('trainingDataUsage'),
-        model_transparency: formData.get('modelTransparency'),
-        compliance_certifications: formData.get('complianceCerts'),
-        dpa_available: formData.get('dpaAvailable'),
-        additional_notes: formData.get('additionalNotes')
-    };
-    
-    // Calculate risk score
-    const scoringResult = calculateScore(assessmentData);
-    
-    // Combine all data
-    currentAssessmentData = {
-        ...assessmentData,
-        score: scoringResult.finalScore,
-        risk_level: scoringResult.riskLevel,
-        categories: scoringResult.categoryScores,
-        recommendations: scoringResult.recommendations,
-        detailed_assessment: scoringResult.detailedAssessment,
-        timestamp: new Date().toISOString(),
-        user_id: getCurrentUser()?.id || null,
-        source: 'heuristic'
-    };
-    
-    // Display results
-    displayResults(currentAssessmentData);
-    navigateToStep(4);
-}
+// --- Initialization ---
+function addEventListeners() {
+    // Auth
+    document.getElementById('signInTab')?.addEventListener('click', () => Auth.switchAuthTab('signin'));
+    document.getElementById('signUpTab')?.addEventListener('click', () => Auth.switchAuthTab('signup'));
+    document.getElementById('signInBtn')?.addEventListener('click', Auth.signInUser);
+    document.getElementById('signUpBtn')?.addEventListener('click', Auth.signUpUser);
+    document.getElementById('closeAuthModalBtn')?.addEventListener('click', Auth.closeAuthModal);
 
-async function checkForSharedAssessment() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const assessmentId = urlParams.get('assessment');
+    // Step Navigation
+    document.getElementById('nextStepBtn1')?.addEventListener('click', () => UI.nextStep(startAssessment));
+    document.getElementById('nextStepBtn2')?.addEventListener('click', () => UI.nextStep(startAssessment));
+    document.getElementById('prevStepBtn2')?.addEventListener('click', UI.prevStep);
     
-    if (assessmentId) {
-        try {
-            const assessment = await fetchAssessmentById(assessmentId);
-            if (assessment) {
-                currentAssessmentId = assessmentId;
-                currentAssessmentData = assessment;
-                displayResults(assessment);
-                navigateToStep(4);
-            }
-        } catch (error) {
-            console.error('Error fetching shared assessment:', error);
-            showError('Failed to load the shared assessment.');
+    // Results and Exports
+    document.getElementById('newAssessmentBtn')?.addEventListener('click', UI.startNewAssessment);
+    document.getElementById('saveToDbBtn')?.addEventListener('click', handleSaveToDatabase);
+    document.getElementById('exportMainBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent body click from hiding menu immediately
+        Results.toggleExportMenu();
+    });
+    document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
+    document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
+    document.getElementById('exportPremiumPdfBtn')?.addEventListener('click', Results.exportPremiumPDF);
+    // Add other export buttons if they exist, e.g., exportHtmlBtn
+    
+    // Global listeners
+    document.body.addEventListener('click', (e) => {
+        // Hide export menu if click is outside
+        if (!document.getElementById('exportMenu')?.contains(e.target) && !document.getElementById('exportMainBtn')?.contains(e.target)) {
+            Results.hideExportMenu();
         }
-    }
+    });
 }
 
-async function fetchAssessmentById(id) {
-    // Implementation will depend on your API structure
-    try {
-        const response = await fetch(`/api/assessments/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch assessment');
-        return await response.json();
-    } catch (error) {
-        console.error('Error fetching assessment:', error);
-        throw error;
-    }
+function initialize() {
+    Auth.initializeSupabase(UI.updateUIForAuth);
+    UI.setupEventListeners({ // For listeners that need to be setup in UI module
+        closeAuthModal: Auth.closeAuthModal,
+        signOut: Auth.signOut,
+        showAuthModal: Auth.showAuthModal
+    });
+    UI.updateUIForAuth();
+    UI.showStep(1);
+    addEventListeners();
 }
 
-// Export functions and variables that need to be accessed from other modules
-export {
-    navigateToStep,
-    currentAssessmentId,
-    currentAssessmentData
-}; 
+document.addEventListener('DOMContentLoaded', initialize); 
