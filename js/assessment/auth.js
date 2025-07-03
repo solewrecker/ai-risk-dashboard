@@ -11,18 +11,31 @@ let currentUser = null;
 let isAdmin = false;
 
 // --- Public Functions ---
-export function initializeSupabase(onAuthStateChange) {
+export function initAuth(onAuthStateChangeCallback) {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('Supabase client initialized.');
         
         supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event);
             currentUser = session?.user || null;
             isAdmin = session?.user?.user_metadata?.role === 'admin';
-            onAuthStateChange(); // Callback to update UI
+            if (onAuthStateChangeCallback) {
+                onAuthStateChangeCallback(); // Callback to update UI
+            }
+        });
+
+        // Set up auth modal event listeners
+        setupAuthModalListeners();
+        
+        // Return a promise that resolves with the initial user state
+        return supabase.auth.getSession().then(({ data: { session } }) => {
+            currentUser = session?.user || null;
+            isAdmin = session?.user?.user_metadata?.role === 'admin';
         });
     } else {
         console.error('Supabase client not found.');
+        return Promise.resolve();
     }
 }
 
@@ -111,34 +124,6 @@ export function switchAuthTab(tab) {
     document.getElementById('signUpTab').classList.toggle('active', tab === 'signup');
     document.getElementById('signInForm').classList.toggle('active', tab === 'signin');
     document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
-}
-
-export async function initAuth() {
-    return new Promise((resolve) => {
-        if (window.supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase client initialized.');
-            
-            // Get initial session
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                currentUser = session?.user || null;
-                isAdmin = session?.user?.user_metadata?.role === 'admin';
-                resolve();
-            });
-            
-            // Listen for auth changes
-            supabase.auth.onAuthStateChange((event, session) => {
-                currentUser = session?.user || null;
-                isAdmin = session?.user?.user_metadata?.role === 'admin';
-            });
-            
-            // Set up auth modal event listeners
-            setupAuthModalListeners();
-        } else {
-            console.error('Supabase client not found.');
-            resolve();
-        }
-    });
 }
 
 function setupAuthModalListeners() {

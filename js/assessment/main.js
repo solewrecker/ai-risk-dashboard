@@ -2,15 +2,14 @@
 // Main entry point for the assessment tool.
 // Orchestrates all modules and handles the main application state.
 
-import { initAuth, getCurrentUser, signOut } from './auth.js';
+import { initAuth, getCurrentUser, signOut, showAuthModal, closeAuthModal } from './auth.js';
 import { 
     initUI, 
     navigateToStep, 
     showError, 
     showSuccess,
     setupEventListeners as setupUIEventListeners,
-    showAuthModal,
-    closeAuthModal
+    updateUIForAuth
 } from './ui.js';
 import { calculateScore } from './scoring.js';
 import { fetchToolFromDatabase, saveAssessment } from './api.js';
@@ -23,7 +22,7 @@ let currentAssessmentData = null;
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await initAuth();
+        await initAuth(updateUIForAuth);
         initUI();
         setupEventListeners();
         setupUIEventListeners({
