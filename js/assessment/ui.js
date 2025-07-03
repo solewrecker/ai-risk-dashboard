@@ -161,4 +161,17 @@ export function setupEventListeners(callbacks) {
             e.target.closest('.classification-option').classList.add('selected');
         }
     });
+}
+
+// Aliases and helper exports to match main.js expectations
+export function navigateToStep(step) {
+    showStep(step);
+}
+
+export function showError(message) {
+    showMessage(message, 'error');
+}
+
+export function showSuccess(message) {
+    showMessage(message, 'success');
 } 
