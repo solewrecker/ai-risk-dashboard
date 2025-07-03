@@ -97,8 +97,11 @@ function renderRecommendations(recommendations, finalScore, formData) {
 
 function renderDetailedBreakdown(breakdownData) {
     const detailedBreakdownContainer = document.getElementById('detailedBreakdown');
+
+    // Determine the correct object to iterate over. Prioritize 'Assessment_details'.
+    const categories = breakdownData?.Assessment_details || breakdownData;
     
-    if (!breakdownData || Object.keys(breakdownData).length === 0) {
+    if (!categories || typeof categories !== 'object' || Object.keys(categories).length === 0) {
         detailedBreakdownContainer.innerHTML = `
             <h3>Detailed Breakdown</h3>
             <p class="no-breakdown">No detailed breakdown available for this assessment.</p>
@@ -109,8 +112,9 @@ function renderDetailedBreakdown(breakdownData) {
     let html = '<h3>Detailed Breakdown</h3>';
     html += '<div class="breakdown-categories">';
 
-    for (const [category, subScores] of Object.entries(breakdownData)) {
-        if (!subScores) continue; // Skip null/undefined categories
+    for (const [category, subScores] of Object.entries(categories)) {
+        // Skip any top-level entries that aren't objects (like Tool_name)
+        if (typeof subScores !== 'object' || subScores === null) continue;
 
         html += `
             <div class="breakdown-card">
