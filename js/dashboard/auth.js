@@ -22,7 +22,10 @@ export async function checkAuth() {
             isAdmin = currentUser.user_metadata?.role === 'admin';
             userTier = currentUser.user_metadata?.tier || 'free';
             
-            console.log('User authenticated:', currentUser.email, 'Tier:', userTier, 'Admin:', isAdmin);
+            console.log('User authenticated:', currentUser.email);
+            console.log('User metadata:', currentUser.user_metadata);
+            console.log('Tier:', userTier, 'Admin:', isAdmin);
+            console.log('Role from metadata:', currentUser.user_metadata?.role);
             return true;
         } else {
             console.log('No active session');

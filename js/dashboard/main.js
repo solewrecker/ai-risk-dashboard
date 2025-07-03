@@ -48,9 +48,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function initializeDashboard() {
     try {
-        if (getIsAdmin()) {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = 'block';
+        const isAdminUser = getIsAdmin();
+        console.log('Is Admin User:', isAdminUser);
+        
+        if (isAdminUser) {
+            const adminElements = document.querySelectorAll('.admin-only');
+            console.log('Found admin elements:', adminElements.length);
+            
+            adminElements.forEach(el => {
+                console.log('Showing admin element:', el);
+                el.classList.remove('admin-only');
+                el.classList.add('admin-visible');
+                // For navigation buttons, use flex display
+                if (el.classList.contains('nav-btn')) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'block';
+                }
             });
         }
         
