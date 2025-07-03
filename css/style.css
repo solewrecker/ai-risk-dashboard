@@ -19,6 +19,7 @@
 @import url('components/_cards.css');
 @import url('components/_forms.css');
 @import url('components/_results.css');
+@import url('components/_dashboard.css');
 
 /* --- Utilities --- */
 @import url('_utilities.css'); 
