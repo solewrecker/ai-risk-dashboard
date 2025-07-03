@@ -351,26 +351,33 @@ function updateTierBadge() {
 function switchTab(tabName) {
     currentTab = tabName;
     
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+
     // Update navigation buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-blue-600', 'text-white');
         btn.classList.add('text-gray-300', 'hover:bg-gray-700');
     });
     
-    // Highlight active tab
+    // Show the active tab content
+    const activeContent = document.getElementById(`${tabName}-content`);
+    if (activeContent) {
+        activeContent.classList.remove('hidden');
+    }
+    
+    // Highlight active tab in sidebar
     const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
     if (activeBtn) {
         activeBtn.classList.remove('text-gray-300', 'hover:bg-gray-700');
         activeBtn.classList.add('bg-blue-600', 'text-white');
     }
-    
-    // Show/hide content sections
-    if (tabName === 'assessments') {
-        document.getElementById('assessments-content').classList.remove('hidden');
-        hideOtherSections(['assessments-content']);
-    } else {
-        document.getElementById('assessments-content').classList.add('hidden');
-        showDashboardContent();
+
+    // Default to dashboard if tab content not found
+    if (!activeContent && tabName !== 'dashboard') {
+        switchTab('dashboard');
     }
 }
 
@@ -391,29 +398,31 @@ function showDashboardContent() {
 
 // Event listeners setup
 function setupEventListeners() {
-    // Import button
-    const importBtn = document.getElementById('importBtn');
-    if (importBtn) {
-        importBtn.addEventListener('click', () => {
-            document.getElementById('importModal').style.display = 'block';
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    if (dropzone) {
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('border-blue-500');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('border-blue-500');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-blue-500');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect({ target: fileInput });
+            }
         });
     }
-    
-    // Modal close
-    const modal = document.getElementById('importModal');
-    const closeBtn = modal?.querySelector('.close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
+
+    if(fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
     }
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
     
     // Search and filter functionality for assessments tab
     const searchInput = document.getElementById('searchInput');
@@ -631,17 +640,34 @@ function closeBanner() {
 
 // Import functionality
 function handleFileSelect(event) {
-    const file = event.target.files[0];
-    const fileNameElement = document.getElementById('fileName');
+    const files = event.target.files;
+    const fileListContainer = document.getElementById('file-upload-list');
     const importOptions = document.getElementById('importOptions');
     
-    if (file) {
-        fileNameElement.textContent = `Selected: ${file.name}`;
-        importOptions.style.display = 'block';
-    } else {
-        fileNameElement.textContent = '';
-        importOptions.style.display = 'none';
+    if (!files.length) {
+        return;
     }
+
+    fileListContainer.innerHTML = ''; // Clear previous list
+
+    Array.from(files).forEach(file => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg';
+        fileItem.innerHTML = `
+            <div class="flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-5 h-5 text-gray-400"></i>
+                <span class="text-sm">${file.name}</span>
+            </div>
+            <span class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)} KB</span>
+        `;
+        fileListContainer.appendChild(fileItem);
+    });
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    importOptions.style.display = 'block';
 }
 
 async function processImport() {
@@ -651,47 +677,66 @@ async function processImport() {
     }
     
     const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+    const files = fileInput.files;
     
-    if (!file) {
-        alert('Please select a file first.');
+    if (!files.length) {
+        alert('Please select one or more files first.');
         return;
     }
-    
-    try {
+
+    const uploadPromises = Array.from(files).map(file => {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await fetch('/api/upload-assessment', {
+        // Use the correct endpoint for your Supabase function
+        return fetch(`${SUPABASE_URL}/functions/v1/upload-assessment`, {
             method: 'POST',
             body: formData,
             headers: {
                 'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`
             }
         });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    });
+
+    try {
+        const responses = await Promise.all(uploadPromises);
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const response of responses) {
+            if (response.ok) {
+                successCount++;
+            } else {
+                errorCount++;
+                const errorData = await response.json();
+                console.error('Import failed for a file:', errorData.error);
+            }
         }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Assessment imported successfully!');
-            document.getElementById('importModal').style.display = 'none';
-            fileInput.value = '';
-            document.getElementById('fileName').textContent = '';
-            document.getElementById('importOptions').style.display = 'none';
-            
-            // Reload data
-            await loadAssessments();
-            updateDashboardStats();
-            updateProgressTracking();
-        } else {
-            throw new Error(result.error || 'Import failed');
+
+        let alertMessage = '';
+        if (successCount > 0) {
+            alertMessage += `${successCount} assessment(s) imported successfully!`;
         }
+        if (errorCount > 0) {
+            alertMessage += `\n${errorCount} assessment(s) failed to import. Check the console for details.`;
+        }
+
+        alert(alertMessage);
+
+        // Clear file input and list
+        fileInput.value = '';
+        document.getElementById('file-upload-list').innerHTML = '';
+        document.getElementById('importOptions').style.display = 'none';
+
+        // Reload data and switch back to dashboard
+        await loadAssessments();
+        updateDashboardStats();
+        updateProgressTracking();
+        switchTab('dashboard');
+
     } catch (error) {
-        console.error('Import error:', error);
-        alert('Import failed: ' + error.message);
+        console.error('Import process error:', error);
+        alert('A critical error occurred during the import process: ' + error.message);
     }
 } 

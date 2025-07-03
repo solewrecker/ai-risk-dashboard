@@ -113,6 +113,14 @@
                     </div>
                     <span class="bg-gray-600 px-2 py-0.5 rounded-full text-xs">1/8</span>
                 </button>
+                
+                <!-- Admin Only Import Button -->
+                <button id="importNavBtn" onclick="switchTab('import')" class="nav-btn admin-only w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700" style="display: none;">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        <span>Import</span>
+                    </div>
+                </button>
             </nav>
 
             <!-- Upgrade CTA -->
@@ -143,12 +151,6 @@
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span>New Assessment</span>
                     </button>
-                    <div id="importContainer" class="admin-only" style="display: none;">
-                        <button id="importBtn" class="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                            <i data-lucide="upload" class="w-4 h-4"></i>
-                            <span>Import</span>
-                        </button>
-                    </div>
                     <button class="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
                         <i data-lucide="bell" class="w-5 h-5"></i>
                     </button>
@@ -158,138 +160,141 @@
                 </div>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-2 bg-blue-600/20 rounded-lg">
-                            <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
+            <!-- Main dashboard content -->
+            <div id="dashboard-content" class="tab-content active">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-blue-600/20 rounded-lg">
+                                <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
+                            </div>
+                            <span class="text-2xl font-bold text-blue-400" id="totalAssessments">18</span>
                         </div>
-                        <span class="text-2xl font-bold text-blue-400" id="totalAssessments">18</span>
+                        <h3 class="font-medium mb-1">Total Assessments</h3>
+                        <p class="text-sm text-gray-400" id="remainingText">7 remaining in free tier</p>
                     </div>
-                    <h3 class="font-medium mb-1">Total Assessments</h3>
-                    <p class="text-sm text-gray-400" id="remainingText">7 remaining in free tier</p>
+
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-red-600/20 rounded-lg">
+                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                            </div>
+                            <span class="text-2xl font-bold text-red-400" id="highRiskCount">3</span>
+                        </div>
+                        <h3 class="font-medium mb-1">High Risk Tools</h3>
+                        <p class="text-sm text-gray-400">Require immediate attention</p>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-green-600/20 rounded-lg">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-green-400"></i>
+                            </div>
+                            <span class="text-2xl font-bold text-green-400" id="lowRiskCount">7</span>
+                        </div>
+                        <h3 class="font-medium mb-1">Low Risk Tools</h3>
+                        <p class="text-sm text-gray-400">Safe for deployment</p>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-purple-600/20 rounded-lg">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-purple-400"></i>
+                            </div>
+                            <span class="text-2xl font-bold text-purple-400" id="avgScore">74</span>
+                        </div>
+                        <h3 class="font-medium mb-1">Average Score</h3>
+                        <p class="text-sm text-gray-400">Across all assessments</p>
+                    </div>
                 </div>
 
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-2 bg-red-600/20 rounded-lg">
-                            <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Assessments -->
+                    <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold">Recent Assessments</h3>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </button>
+                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                                    <i data-lucide="filter" class="w-4 h-4"></i>
+                                </button>
+                                <button class="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span class="text-sm">Export PDF</span>
+                                </button>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-red-400" id="highRiskCount">3</span>
-                    </div>
-                    <h3 class="font-medium mb-1">High Risk Tools</h3>
-                    <p class="text-sm text-gray-400">Require immediate attention</p>
-                </div>
 
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-2 bg-green-600/20 rounded-lg">
-                            <i data-lucide="check-circle" class="w-6 h-6 text-green-400"></i>
+                        <div id="recentAssessmentsList" class="space-y-4">
+                            <!-- Assessments will be populated by JavaScript -->
                         </div>
-                        <span class="text-2xl font-bold text-green-400" id="lowRiskCount">7</span>
-                    </div>
-                    <h3 class="font-medium mb-1">Low Risk Tools</h3>
-                    <p class="text-sm text-gray-400">Safe for deployment</p>
-                </div>
 
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-2 bg-purple-600/20 rounded-lg">
-                            <i data-lucide="trending-up" class="w-6 h-6 text-purple-400"></i>
-                        </div>
-                        <span class="text-2xl font-bold text-purple-400" id="avgScore">74</span>
-                    </div>
-                    <h3 class="font-medium mb-1">Average Score</h3>
-                    <p class="text-sm text-gray-400">Across all assessments</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Recent Assessments -->
-                <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold">Recent Assessments</h3>
-                        <div class="flex items-center space-x-2">
-                            <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                                <i data-lucide="search" class="w-4 h-4"></i>
+                        <div class="mt-6 text-center">
+                            <button onclick="switchTab('assessments')" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                View All Assessments →
                             </button>
-                            <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                                <i data-lucide="filter" class="w-4 h-4"></i>
-                            </button>
-                            <button class="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                <i data-lucide="download" class="w-4 h-4"></i>
-                                <span class="text-sm">Export PDF</span>
-                            </button>
                         </div>
                     </div>
 
-                    <div id="recentAssessmentsList" class="space-y-4">
-                        <!-- Assessments will be populated by JavaScript -->
-                    </div>
+                    <!-- Achievements Panel -->
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold">Achievements</h3>
+                            <i data-lucide="trophy" class="w-6 h-6 text-yellow-400"></i>
+                        </div>
 
-                    <div class="mt-6 text-center">
-                        <button onclick="switchTab('assessments')" class="text-blue-400 hover:text-blue-300 transition-colors">
-                            View All Assessments →
+                        <div id="achievementsList" class="space-y-4">
+                            <!-- Achievements will be populated by JavaScript -->
+                        </div>
+
+                        <div class="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <i data-lucide="award" class="w-5 h-5 text-yellow-400"></i>
+                                <span class="font-medium">Almost There!</span>
+                            </div>
+                            <p class="text-sm text-gray-300" id="nextAchievementText">
+                                Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-8 bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="window.location.href='index.html'" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i data-lucide="plus" class="w-6 h-6 text-blue-400"></i>
+                            <div class="text-left">
+                                <h4 class="font-medium">Start New Assessment</h4>
+                                <p class="text-sm text-gray-400">Evaluate an AI tool's risk profile</p>
+                            </div>
+                        </button>
+                        
+                        <button onclick="switchTab('compare')" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i>
+                            <div class="text-left">
+                                <h4 class="font-medium">Compare Tools</h4>
+                                <p class="text-sm text-gray-400">Side-by-side risk analysis</p>
+                            </div>
+                        </button>
+                        
+                        <button class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i data-lucide="download" class="w-6 h-6 text-purple-400"></i>
+                            <div class="text-left">
+                                <h4 class="font-medium">Export Report</h4>
+                                <p class="text-sm text-gray-400">Generate PDF summary</p>
+                            </div>
                         </button>
                     </div>
                 </div>
-
-                <!-- Achievements Panel -->
-                <div class="bg-gray-800 rounded-lg p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold">Achievements</h3>
-                        <i data-lucide="trophy" class="w-6 h-6 text-yellow-400"></i>
-                    </div>
-
-                    <div id="achievementsList" class="space-y-4">
-                        <!-- Achievements will be populated by JavaScript -->
-                    </div>
-
-                    <div class="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i data-lucide="award" class="w-5 h-5 text-yellow-400"></i>
-                            <span class="font-medium">Almost There!</span>
-                        </div>
-                        <p class="text-sm text-gray-300" id="nextAchievementText">
-                            Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
-                        </p>
-                    </div>
-                </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="mt-8 bg-gray-800 rounded-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button onclick="window.location.href='index.html'" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <i data-lucide="plus" class="w-6 h-6 text-blue-400"></i>
-                        <div class="text-left">
-                            <h4 class="font-medium">Start New Assessment</h4>
-                            <p class="text-sm text-gray-400">Evaluate an AI tool's risk profile</p>
-                        </div>
-                    </button>
-                    
-                    <button onclick="switchTab('compare')" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i>
-                        <div class="text-left">
-                            <h4 class="font-medium">Compare Tools</h4>
-                            <p class="text-sm text-gray-400">Side-by-side risk analysis</p>
-                        </div>
-                    </button>
-                    
-                    <button class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                        <i data-lucide="download" class="w-6 h-6 text-purple-400"></i>
-                        <div class="text-left">
-                            <h4 class="font-medium">Export Report</h4>
-                            <p class="text-sm text-gray-400">Generate PDF summary</p>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Hidden sections for other tabs -->
-            <div id="assessments-content" class="hidden">
+            <!-- Assessments Tab Content -->
+            <div id="assessments-content" class="hidden tab-content">
                 <!-- Original assessment list content -->
                 <div class="dashboard-controls mb-6">
                     <div class="search-container">
@@ -349,6 +354,30 @@
                         <h3>No tools found</h3>
                         <p>No tools match your current filters. Try adjusting your search.</p>
                         <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Clear All Filters</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Import Tab Content (Admin Only) -->
+            <div id="import-content" class="hidden tab-content bg-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Import Assessments</h2>
+                <p class="text-gray-400 mb-6">Upload a JSON file containing one or more assessments to add them to the database.</p>
+                
+                <div class="max-w-md">
+                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors" id="dropzone">
+                        <input type="file" id="fileInput" accept=".json" class="hidden" multiple>
+                        <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i>
+                        <p class="font-semibold">Click to upload or drag and drop</p>
+                        <p class="text-xs text-gray-500">JSON up to 10MB</p>
+                    </div>
+                    
+                    <div id="file-upload-list" class="mt-4 space-y-2"></div>
+    
+                    <div id="importOptions" class="mt-6" style="display:none;">
+                        <button class="w-full flex items-center justify-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" onclick="processImport()">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span>Start Import</span>
+                        </button>
                     </div>
                 </div>
             </div>
