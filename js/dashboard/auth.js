@@ -19,8 +19,10 @@ export async function checkAuth() {
         
         if (session) {
             currentUser = session.user;
-            isAdmin = currentUser.user_metadata?.role === 'admin';
+            // Determine user tier
             userTier = currentUser.user_metadata?.tier || 'free';
+            // Only treat explicit admin role as admin
+            isAdmin = currentUser.user_metadata?.role === 'admin';
             
             console.log('User authenticated:', currentUser.email);
             console.log('User metadata:', currentUser.user_metadata);
