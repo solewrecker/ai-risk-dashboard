@@ -375,3 +375,27 @@ CREATE INDEX idx_scheduled_updates_priority ON scheduled_updates(priority, sched
 - Separate tables for performance metrics and billing to avoid joins on hot paths
 
 This architecture supports the "AI Security Council" approach while maintaining cost control and providing detailed analytics for both users and platform optimization.
+
+---
+
+## Frontend Theming and Customization
+
+### Architecture Decision: CSS Swapping
+
+After discussion, the chosen approach for user-facing customization is **CSS swapping**. This method was selected over a more complex database-driven layout system for its simplicity, maintainability, and performance.
+
+The core idea is to maintain a consistent HTML structure for dynamic components and allow users to select different "themes" that apply new styles by loading a different CSS stylesheet.
+
+### Database Schema for Theming
+
+To support this, the following database changes will be implemented:
+
+1.  **`dashboard_themes` Table**: A new table to store available theme options.
+    *   `id` (UUID): Primary key for the theme.
+    *   `name` (TEXT): A user-friendly name for the theme (e.g., "Default Dark", "Light Mode").
+    *   `stylesheet_url` (TEXT): The path to the theme's main CSS file (e.g., `/css/style.css`).
+
+2.  **`profiles` Table Modification**: A new column will be added to the user profiles table.
+    *   `selected_theme_id` (UUID): A foreign key that references the `id` in the `dashboard_themes` table. This stores the user's current theme preference.
+
+This setup allows for easy addition of new themes in the future and persists user preferences without altering the core application logic.

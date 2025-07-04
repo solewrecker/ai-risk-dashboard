@@ -45,6 +45,7 @@ export function updateProgressTracking() {
     if (remainingText) remainingText.textContent = `${Math.max(0, limit - totalCount)} assessments remaining`;
 }
 
+/*
 export function loadAchievements() {
     const totalCount = getAssessments().length;
     const achievements = [
@@ -107,4 +108,5 @@ function renderAchievements(achievements) {
             </div>
         `;
     }).join('');
-} 
+}
+*/ 

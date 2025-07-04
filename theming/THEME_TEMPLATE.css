@@ -1,0 +1,216 @@
+/* ==========================================================================
+   THEME TEMPLATE
+   ==========================================================================
+   Instructions:
+   1. Define your color palette in the :root section.
+   2. Use these variables throughout the file to style the dashboard.
+   3. All necessary selectors are provided. Focus on changing colors,
+      backgrounds, borders, and fonts.
+   4. Do NOT change the layout (display, flex, grid, etc.)
+========================================================================== */
+
+/* 1. ---- Base Color Palette & Fonts ---- */
+:root {
+  /* -- TEXT -- */
+  --theme-text-primary: #f9fafb;
+  --theme-text-secondary: #9ca3af;
+  --theme-text-accent: #60a5fa;
+
+  /* -- BACKGROUND -- */
+  --theme-bg-primary: #111827;     /* Main background */
+  --theme-bg-secondary: #1f2937;   /* Cards, sidebar, etc. */
+  --theme-bg-tertiary: #374151;    /* Hover states, borders */
+
+  /* -- ACCENTS -- */
+  --theme-accent-primary: #3b82f6; /* Buttons, links, highlights */
+  --theme-accent-secondary: #8b5cf6;/* Secondary accents */
+
+  /* -- BORDERS -- */
+  --theme-border-color: #374151;
+  --theme-border-accent: #4f46e5;
+
+  /* -- RISK COLORS -- */
+  --theme-risk-low: #4ade80;
+  --theme-risk-medium: #facc15;
+  --theme-risk-high: #f87171;
+  --theme-risk-critical: #a78bfa;
+
+  /* -- FONT FAMILY -- */
+  --theme-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+
+/* 2. ---- General Body & Layout ---- */
+body.dashboard-page {
+  background-color: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+  font-family: var(--theme-font-sans);
+}
+
+.flex-1 { /* Main content area */
+  /* This is the main content pane */
+}
+
+
+/* 3. ---- Sidebar ---- */
+.w-64.bg-gray-800 { /* Sidebar container */
+  background-color: var(--theme-bg-secondary);
+}
+
+h1.text-xl.font-bold { /* Sidebar Title */
+  color: var(--theme-text-primary);
+}
+
+span#tierBadge { /* Tier badge (Free, Pro) */
+  background-color: var(--theme-accent-primary);
+  color: var(--theme-text-primary);
+}
+
+/* -- Progress Bar -- */
+.p-3.bg-gray-700 { /* Progress bar container */
+  background-color: var(--theme-bg-tertiary);
+}
+#progressBar { /* Progress bar fill */
+  background-color: var(--theme-accent-primary);
+}
+
+/* -- Navigation Buttons -- */
+nav .nav-btn {
+  color: var(--theme-text-secondary);
+}
+nav .nav-btn:hover {
+  background-color: var(--theme-bg-tertiary);
+  color: var(--theme-text-primary);
+}
+nav .nav-btn.bg-blue-600 { /* Active nav button */
+  background-color: var(--theme-accent-primary);
+  color: var(--theme-text-primary);
+}
+
+
+/* 4. ---- Main Content Header ---- */
+.mb-8 h2 { /* Dashboard title */
+  color: var(--theme-text-primary);
+}
+
+.mb-8 p { /* Dashboard subtitle */
+  color: var(--theme-text-secondary);
+}
+
+/* -- "New Assessment" Button -- */
+.flex.items-center.space-x-4 > button.flex {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.flex.items-center.space-x-4 > button.flex:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* 5. ---- Stat Cards ---- */
+.grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 .bg-gray-800 {
+  background-color: var(--theme-bg-secondary);
+}
+.grid .p-2 { /* Icon container */
+  background-color: var(--theme-accent-primary);
+}
+.grid h3 { /* Card titles */
+  color: var(--theme-text-primary);
+}
+.grid p { /* Card subtitles */
+  color: var(--theme-text-secondary);
+}
+
+
+/* 6. ---- Recent Assessments ---- */
+.assessment-list {
+  background-color: var(--theme-bg-secondary);
+}
+
+.assessment-list-title {
+  color: var(--theme-text-primary);
+}
+
+.assessment-list-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+/* -- Assessment Item -- */
+.assessment-item {
+  background: rgba(30, 41, 59, 0.5); /* Use a slight variation of secondary bg */
+  border: 1px solid var(--theme-border-color);
+}
+.assessment-item:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: var(--theme-border-accent);
+}
+
+/* -- Item Icon -- */
+.assessment-icon {
+  background-color: var(--theme-bg-tertiary);
+}
+.assessment-risk-indicator.bg-green-500 { background-color: var(--theme-risk-low); }
+.assessment-risk-indicator.bg-yellow-500 { background-color: var(--theme-risk-medium); }
+.assessment-risk-indicator.bg-red-500 { background-color: var(--theme-risk-high); }
+.assessment-risk-indicator.bg-purple-500 { background-color: var(--theme-risk-critical); }
+.assessment-risk-indicator { border-color: var(--theme-bg-secondary); }
+
+/* -- Item Text -- */
+.assessment-name {
+  color: var(--theme-text-primary);
+}
+.assessment-meta {
+  color: var(--theme-text-secondary);
+}
+.assessment-meta-divider {
+  color: var(--theme-text-secondary);
+}
+
+/* -- Score Box -- */
+.assessment-score {
+  background: rgba(17, 24, 39, 0.4); /* Darker than the item */
+  border-color: var(--theme-border-color);
+}
+.score-label {
+  color: var(--theme-text-secondary);
+}
+.score-value.risk-low { color: var(--theme-risk-low); }
+.score-value.risk-medium { color: var(--theme-risk-medium); }
+.score-value.risk-high { color: var(--theme-risk-high); }
+.score-value.risk-critical { color: var(--theme-risk-critical); }
+
+/* -- Action Buttons (in list) -- */
+.action-button {
+  background: rgba(17, 24, 39, 0.4);
+  border-color: var(--theme-border-color);
+  color: var(--theme-text-secondary);
+}
+.action-button:hover {
+  background-color: var(--theme-bg-tertiary);
+  color: var(--theme-text-primary);
+}
+
+/* -- "View All" Link -- */
+.view-all-link {
+  color: var(--theme-text-accent);
+}
+.view-all-link:hover {
+  background-color: var(--theme-bg-tertiary);
+}
+
+
+/* 7. ---- Header Action Buttons (Search, Filter, Export) ---- */
+.assessment-list-actions .icon-button {
+  background-color: var(--theme-bg-tertiary);
+  color: var(--theme-text-secondary);
+}
+.assessment-list-actions .icon-button:hover {
+  background-color: var(--theme-accent-primary);
+  color: var(--theme-text-primary);
+}
+.assessment-list-actions .export-button {
+  background-color: var(--theme-accent-primary);
+  color: var(--theme-text-primary);
+}
+.assessment-list-actions .export-button:hover {
+  opacity: 0.8;
+} 
