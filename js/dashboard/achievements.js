@@ -84,17 +84,25 @@ export class AchievementsManager {
     renderProgress(progress) {
         if (progress.isUnlocked) {
             return `
+                <div class="achievement-progress-wrapper">
+                    <div class="achievement-progress">
+                        <div class="progress-bar complete" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-numbers">${progress.required}/${progress.required}</div>
+                </div>
                 <div class="unlock-status unlocked">
-                    <i data-lucide="unlock"></i>
+                    <i data-lucide="check-circle"></i>
                     <span>Unlocked!</span>
                 </div>
             `;
         }
 
         return `
-            <div class="achievement-progress">
-                <div class="progress-bar in-progress" style="width: ${progress.percentage}%"></div>
-                <span class="progress-text">${progress.current} / ${progress.required}</span>
+            <div class="achievement-progress-wrapper">
+                <div class="achievement-progress">
+                    <div class="progress-bar in-progress" style="width: ${progress.percentage}%"></div>
+                </div>
+                <div class="progress-numbers">${progress.current}/${progress.required}</div>
             </div>
         `;
     }
