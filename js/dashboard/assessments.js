@@ -345,4 +345,96 @@ export function clearAllFilters() {
     if (sortSelect) sortSelect.value = 'date_desc';
     
     filterAssessments();
-} 
+}
+
+function renderAssessmentItem(assessment) {
+    const riskLevelClass = getRiskLevelClass(assessment.total_score);
+    const riskLevelText = getRiskLevelText(assessment.total_score);
+    
+    return `
+        <div class="assessment-item">
+            <div class="assessment-content">
+                <div class="assessment-icon">
+                    <i class="fas ${getToolIcon(assessment.category)}"></i>
+                </div>
+                <div class="assessment-info">
+                    <h3 class="assessment-name">${assessment.name}</h3>
+                    <p class="assessment-category">${assessment.category}</p>
+                </div>
+            </div>
+            <div class="assessment-meta">
+                <span class="risk-level ${riskLevelClass.toLowerCase()}">${riskLevelText}</span>
+                <span class="assessment-score">${assessment.total_score}</span>
+                <span class="assessment-date">${formatDate(assessment.created_at)}</span>
+                <button class="icon-button" onclick="viewAssessment(${assessment.id})" aria-label="More options">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function getToolIcon(category) {
+    const icons = {
+        'Content Generation': 'fa-pen-fancy',
+        'Code Analysis': 'fa-code',
+        'Development': 'fa-laptop-code',
+        'Image Generation': 'fa-image',
+        'Productivity': 'fa-tasks',
+        'default': 'fa-robot'
+    };
+    return icons[category] || icons.default;
+}
+
+function getRiskLevelClass(score) {
+    if (score >= 80) return 'low';
+    if (score >= 60) return 'medium';
+    if (score >= 40) return 'high';
+    return 'critical';
+}
+
+function getRiskLevelText(score) {
+    if (score >= 80) return 'Low Risk';
+    if (score >= 60) return 'Medium Risk';
+    if (score >= 40) return 'High Risk';
+    return 'Critical Risk';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+}
+
+// Update the assessment list
+function updateAssessmentsList(assessments) {
+    const container = document.getElementById('assessmentsList');
+    if (!container) return;
+    
+    // Sort by date descending and take the 5 most recent
+    const recentAssessments = assessments
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+    
+    container.innerHTML = recentAssessments
+        .map(assessment => renderAssessmentItem(assessment))
+        .join('');
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Search button handler
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.addEventListener('click', () => {
+            // Implement search functionality
+        });
+    }
+
+    // Filter button handler
+    const filterButton = document.getElementById('filterButton');
+    if (filterButton) {
+        filterButton.addEventListener('click', () => {
+            // Implement filter functionality
+        });
+    }
+}); 

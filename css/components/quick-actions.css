@@ -1,0 +1,87 @@
+/* Quick Actions Section */
+.quick-actions {
+    margin-top: 2rem;
+}
+
+.quick-actions-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-white);
+    margin-bottom: 1rem;
+}
+
+.quick-actions-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.quick-action-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 0.75rem;
+    transition: all 150ms ease;
+    text-decoration: none;
+    color: var(--color-white);
+}
+
+.quick-action-card:hover {
+    background: var(--color-gray-700);
+    transform: translateY(-1px);
+    border-color: var(--color-gray-600);
+}
+
+.quick-action-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-gray-700);
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+}
+
+.quick-action-icon.new {
+    color: var(--color-blue-400);
+}
+
+.quick-action-icon.import {
+    color: var(--color-green-400);
+}
+
+.quick-action-icon.export {
+    color: var(--color-purple-400);
+}
+
+.quick-action-content {
+    flex: 1;
+}
+
+.quick-action-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-white);
+    margin-bottom: 0.25rem;
+}
+
+.quick-action-description {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .quick-actions-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .quick-actions-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+} 
