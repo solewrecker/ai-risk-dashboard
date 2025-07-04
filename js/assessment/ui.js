@@ -72,6 +72,7 @@ export function updateUIForAuth() {
     if (loginSection) {
         if (currentUser) {
             const userTier = currentUser.user_metadata?.tier || 'free';
+            const dashClass = isAdmin ? 'btn btn-primary' : 'btn btn-secondary';
             loginSection.innerHTML = `
                 <div class="login-user"><i class="fas fa-check-circle"></i><span>${currentUser.email}</span></div>
                 <div class="login-badges">
@@ -79,7 +80,7 @@ export function updateUIForAuth() {
                     ${isAdmin ? '<span class="badge badge-admin">ADMIN</span>' : ''}
                 </div>
                 <div class="login-actions">
-                    <a href="dashboard.html" class="btn btn-secondary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="dashboard.html" class="${dashClass}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     <button id="signOutBtn" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
                 </div>
             `;
