@@ -34,16 +34,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    background: var(--color-gray-700/50);
+    padding: 1.25rem;
+    background: rgba(30, 41, 59, 0.5);  /* Slightly different than container background */
+    border: 1px solid rgba(55, 65, 81, 0.3);  /* Subtle border */
     border-radius: 0.75rem;
-    margin-bottom: 0.75rem;
-    transition: all 150ms ease;
+    margin-bottom: 1rem;
+    transition: all 200ms ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .assessment-item:hover {
-    background: var(--color-gray-700);
+    background: rgba(30, 41, 59, 0.8);
     transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .assessment-item:last-child {
@@ -110,23 +113,55 @@
 .assessment-score {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    margin-right: 1rem;
+    align-items: center;
+    background: rgba(17, 24, 39, 0.4);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-right: 1.5rem;
+    min-width: 80px;
+    border: 1px solid rgba(55, 65, 81, 0.2);
 }
 
 .score-value {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--color-blue-400), var(--color-purple-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.score-value.risk-low { color: var(--color-green-400); }
-.score-value.risk-medium { color: var(--color-yellow-400); }
-.score-value.risk-high { color: var(--color-red-400); }
-.score-value.risk-critical { color: var(--color-purple-400); }
+.score-value.risk-low { 
+    background: linear-gradient(135deg, var(--color-green-400), var(--color-green-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.score-value.risk-medium { 
+    background: linear-gradient(135deg, var(--color-yellow-400), var(--color-yellow-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.score-value.risk-high { 
+    background: linear-gradient(135deg, var(--color-red-400), var(--color-red-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.score-value.risk-critical { 
+    background: linear-gradient(135deg, var(--color-purple-400), var(--color-purple-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
 .score-label {
     font-size: 0.75rem;
+    font-weight: 500;
     color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* Assessment Actions */
@@ -137,15 +172,27 @@
 }
 
 .action-button {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    color: var(--color-gray-400);
-    transition: all 150ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    color: var(--color-gray-300);
+    background: rgba(17, 24, 39, 0.4);
+    border: 1px solid rgba(55, 65, 81, 0.2);
+    transition: all 200ms ease;
 }
 
 .action-button:hover {
-    background: var(--color-gray-600);
+    background: var(--color-gray-700);
     color: var(--color-white);
+    border-color: rgba(55, 65, 81, 0.4);
+    transform: translateY(-1px);
+}
+
+.action-button:active {
+    transform: translateY(0);
 }
 
 /* Risk Badges */
