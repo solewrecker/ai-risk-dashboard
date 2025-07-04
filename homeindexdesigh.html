@@ -1,389 +1,904 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  Plus, 
-  Search, 
-  Filter, 
-  Download, 
-  Users, 
-  Trophy, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  Star,
-  BarChart3,
-  FileText,
-  Settings,
-  Bell,
-  ChevronDown,
-  Zap,
-  Target,
-  Award,
-  Eye,
-  Edit,
-  MoreHorizontal,
-  Calendar,
-  Gift,
-  Crown
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Pro Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const Dashboard = () => {
-  const [selectedTab, setSelectedTab] = useState('dashboard');
-  const [showPromoBanner, setShowPromoBanner] = useState(true);
-  const [assessmentProgress] = useState(18); // Out of 25 free assessments
-  const [currentTheme, setCurrentTheme] = useState('dark-coder');
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-  // Mock data
-  const recentAssessments = [
-    { id: 1, tool: 'ChatGPT-4', category: 'Content Generation', risk: 'Medium', score: 72, date: '2025-07-01', status: 'complete' },
-    { id: 2, tool: 'Claude 3', category: 'Code Analysis', risk: 'Low', score: 85, date: '2025-06-30', status: 'complete' },
-    { id: 3, tool: 'GitHub Copilot', category: 'Development', risk: 'Medium', score: 68, date: '2025-06-29', status: 'complete' },
-    { id: 4, tool: 'Midjourney', category: 'Image Generation', risk: 'High', score: 45, date: '2025-06-28', status: 'review' },
-    { id: 5, tool: 'Notion AI', category: 'Productivity', risk: 'Low', score: 88, date: '2025-06-27', status: 'complete' }
-  ];
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-  const achievements = [
-    { id: 1, title: 'Risk Assessment Rookie', desc: 'Complete your first assessment', unlocked: true, icon: Target },
-    { id: 2, title: 'Risk Detective', desc: 'Complete 10 assessments', unlocked: true, icon: Search },
-    { id: 3, title: 'Power User', desc: 'Complete 25 assessments', unlocked: false, progress: 72, icon: Zap },
-    { id: 4, title: 'Theme Collector', desc: 'Unlock all free themes', unlocked: false, progress: 66, icon: Star }
-  ];
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
 
-  const riskStats = {
-    totalAssessments: 18,
-    highRisk: 3,
-    mediumRisk: 8,
-    lowRisk: 7,
-    avgScore: 74
-  };
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
 
-  const getRiskColor = (risk) => {
-    switch(risk) {
-      case 'High': return 'text-red-400 bg-red-900/20';
-      case 'Medium': return 'text-yellow-400 bg-yellow-900/20';
-      case 'Low': return 'text-green-400 bg-green-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
-    }
-  };
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-  const getStatusIcon = (status) => {
-    switch(status) {
-      case 'complete': return <CheckCircle className="w-4 h-4 text-green-400" />;
-      case 'review': return <Clock className="w-4 h-4 text-yellow-400" />;
-      default: return <AlertTriangle className="w-4 h-4 text-red-400" />;
-    }
-  };
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 2px;
+        }
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Promotional Banner */}
-      {showPromoBanner && (
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 relative">
-          <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <div className="flex items-center space-x-3">
-              <Gift className="w-5 h-5 text-yellow-300" />
-              <span className="font-medium">🎉 Limited Time: Double your assessment limit to 50 this week!</span>
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Ends in 3 days</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <button className="bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
-                Claim Bonus
-              </button>
-              <button 
-                onClick={() => setShowPromoBanner(false)}
-                className="text-white/80 hover:text-white"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-gray-800 min-h-screen p-4">
-          <div className="flex items-center space-x-3 mb-8">
-            <Shield className="w-8 h-8 text-blue-400" />
-            <div>
-              <h1 className="text-xl font-bold">AI Risk Pro</h1>
-              <span className="text-xs bg-green-600 px-2 py-0.5 rounded-full">FREE</span>
-            </div>
-          </div>
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
 
-          {/* Progress Bar */}
-          <div className="mb-6 p-3 bg-gray-700 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Assessments Used</span>
-              <span className="text-xs text-gray-400">{assessmentProgress}/25</span>
-            </div>
-            <div className="w-full bg-gray-600 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(assessmentProgress / 25) * 100}%` }}
-              ></div>
-            </div>
-            <p className="text-xs text-gray-400 mt-2">7 assessments remaining</p>
-          </div>
+        .brand-info h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
 
-          {/* Navigation */}
-          <nav className="space-y-2">
-            {[
-              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'assessments', label: 'Assessments', icon: FileText, badge: assessmentProgress },
-              { id: 'compare', label: 'Compare Tools', icon: TrendingUp, locked: false },
-              { id: 'team', label: 'Team', icon: Users, locked: true },
-              { id: 'themes', label: 'Themes', icon: Star, badge: '1/3' },
-              { id: 'templates', label: 'Templates', icon: FileText, locked: true },
-              { id: 'achievements', label: 'Achievements', icon: Trophy, badge: '1/8' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setSelectedTab(item.id)}
-                className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
-                  selectedTab === item.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-300 hover:bg-gray-700'
-                } ${item.locked ? 'opacity-50' : ''}`}
-                disabled={item.locked}
-              >
-                <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                  {item.locked && <Crown className="w-4 h-4 text-yellow-400" />}
+        .tier-badge {
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+        }
+
+        .header-info h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .icon-btn {
+            width: 2.75rem;
+            height: 2.75rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-icon {
+            width: 2rem;
+            height: 2rem;
+            color: #3b82f6;
+        }
+
+        /* Recent Assessments */
+        .recent-assessments {
+            grid-column: 1 / -1;
+        }
+
+        .assessment-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .assessment-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .assessment-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .assessment-details {
+            flex: 1;
+        }
+
+        .assessment-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .assessment-type {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .assessment-score {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #f59e0b;
+            margin-right: 1rem;
+        }
+
+        .risk-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .risk-low { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .risk-medium { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .risk-high { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+
+        .assessment-date {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Achievements */
+        .achievements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .achievement-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .achievement-info h4 {
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .achievement-info p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .action-icon.blue { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .action-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+        .action-icon.purple { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+
+        .action-content h4 {
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-content p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* Progress Indicator */
+        .progress-near-achievement {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-header svg {
+            color: #f59e0b;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: #f59e0b;
+        }
+
+        .progress-description {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-info h2 {
+                font-size: 1.875rem;
+            }
+
+            .assessment-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .assessment-details {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            width: 2.75rem;
+            height: 2.75rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+        }
+
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .achievements {
+            grid-column: 1 / -1;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .achievement-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .achievement-info h4 {
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .achievement-info p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
                 </div>
-                {item.badge && (
-                  <span className="bg-gray-600 px-2 py-0.5 rounded-full text-xs">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </nav>
-
-          {/* Upgrade CTA */}
-          <div className="mt-8 p-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30">
-            <div className="flex items-center space-x-2 mb-2">
-              <Crown className="w-5 h-5 text-yellow-400" />
-              <span className="font-medium">Ready to Scale?</span>
-            </div>
-            <p className="text-sm text-gray-300 mb-3">
-              Unlock team collaboration and unlimited assessments
-            </p>
-            <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all">
-              Upgrade to Pro - $29/mo
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Dashboard</h2>
-              <p className="text-gray-400">Manage your AI risk assessment program</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                <Plus className="w-4 h-4" />
-                <span>New Assessment</span>
-              </button>
-              <button className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-blue-600/20 rounded-lg">
-                  <FileText className="w-6 h-6 text-blue-400" />
+                <div class="brand-info">
+                    <h1>AI Risk Pro</h1>
+                    <span class="tier-badge">FREE</span>
                 </div>
-                <span className="text-2xl font-bold text-blue-400">{riskStats.totalAssessments}</span>
-              </div>
-              <h3 className="font-medium mb-1">Total Assessments</h3>
-              <p className="text-sm text-gray-400">7 remaining in free tier</p>
             </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-red-600/20 rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-red-400" />
-                </div>
-                <span className="text-2xl font-bold text-red-400">{riskStats.highRisk}</span>
-              </div>
-              <h3 className="font-medium mb-1">High Risk Tools</h3>
-              <p className="text-sm text-gray-400">Require immediate attention</p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-green-600/20 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-400" />
-                </div>
-                <span className="text-2xl font-bold text-green-400">{riskStats.lowRisk}</span>
-              </div>
-              <h3 className="font-medium mb-1">Low Risk Tools</h3>
-              <p className="text-sm text-gray-400">Safe for deployment</p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-purple-600/20 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-purple-400" />
-                </div>
-                <span className="text-2xl font-bold text-purple-400">{riskStats.avgScore}</span>
-              </div>
-              <h3 className="font-medium mb-1">Average Score</h3>
-              <p className="text-sm text-gray-400">Across all assessments</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Recent Assessments */}
-            <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold">Recent Assessments</h3>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                    <Search className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                    <Filter className="w-4 h-4" />
-                  </button>
-                  <button className="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <Download className="w-4 h-4" />
-                    <span className="text-sm">Export PDF</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {recentAssessments.map((assessment) => (
-                  <div key={assessment.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-650 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      {getStatusIcon(assessment.status)}
-                      <div>
-                        <h4 className="font-medium">{assessment.tool}</h4>
-                        <p className="text-sm text-gray-400">{assessment.category}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getRiskColor(assessment.risk)}`}>
-                        {assessment.risk} Risk
-                      </span>
-                      <span className="text-lg font-bold text-blue-400">{assessment.score}</span>
-                      <span className="text-sm text-gray-400">{assessment.date}</span>
-                      <button className="p-2 hover:bg-gray-600 rounded transition-colors">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 text-center">
-                <button className="text-blue-400 hover:text-blue-300 transition-colors">
-                  View All Assessments →
+            
+            <nav class="nav-menu">
+                <button class="nav-btn active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Dashboard
                 </button>
-              </div>
-            </div>
-
-            {/* Achievements Panel */}
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold">Achievements</h3>
-                <Trophy className="w-6 h-6 text-yellow-400" />
-              </div>
-
-              <div className="space-y-4">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className={`p-4 rounded-lg border ${
-                    achievement.unlocked 
-                      ? 'bg-green-900/20 border-green-600/30' 
-                      : 'bg-gray-700 border-gray-600'
-                  }`}>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <achievement.icon className={`w-5 h-5 ${
-                        achievement.unlocked ? 'text-green-400' : 'text-gray-400'
-                      }`} />
-                      <h4 className={`font-medium ${
-                        achievement.unlocked ? 'text-green-400' : 'text-gray-300'
-                      }`}>
-                        {achievement.title}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-2">{achievement.desc}</p>
-                    {!achievement.unlocked && achievement.progress && (
-                      <div className="w-full bg-gray-600 rounded-full h-2 mb-2">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${achievement.progress}%` }}
-                        ></div>
-                      </div>
-                    )}
-                    {achievement.unlocked && (
-                      <div className="flex items-center space-x-2 text-green-400">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-sm">Unlocked!</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Award className="w-5 h-5 text-yellow-400" />
-                  <span className="font-medium">Almost There!</span>
-                </div>
-                <p className="text-sm text-gray-300">
-                  Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-8 bg-gray-800 rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <Plus className="w-6 h-6 text-blue-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Start New Assessment</h4>
-                  <p className="text-sm text-gray-400">Evaluate an AI tool's risk profile</p>
-                </div>
-              </button>
-              
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <TrendingUp className="w-6 h-6 text-green-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Compare Tools</h4>
-                  <p className="text-sm text-gray-400">Side-by-side risk analysis</p>
-                </div>
-              </button>
-              
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <Download className="w-6 h-6 text-purple-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Export Report</h4>
-                  <p className="text-sm text-gray-400">Generate PDF summary</p>
-                </div>
-              </button>
-            </div>
-          </div>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    Assessments
+                </button>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                    </svg>
+                    Compare Tools
+                </button>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team
+                </button>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                    </svg>
+                    Themes
+                </button>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                    Templates
+                </button>
+                <button class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                        <path d="M4 22h16"/>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                    </svg>
+                    Achievements
+                </button>
+            </nav>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default Dashboard;
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-info">
+                    <h2>Dashboard</h2>
+                    <p>Manage your AI risk assessment program</p>
+                </div>
+                <div class="header-actions">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
+                    </button>
+                    <button class="btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="16"/>
+                            <line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                        New Assessment
+                    </button>
+                    <button class="icon-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Assessments -->
+                <div class="card recent-assessments">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Assessments</h3>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="icon-btn" style="width: 2rem; height: 2rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn" style="width: 2rem; height: 2rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                                </svg>
+                            </button>
+                            <button class="btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7,10 12,15 17,10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="assessment-item">
+                        <div class="assessment-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22,4 12,14.01 9,11.01"/>
+                            </svg>
+                        </div>
+                        <div class="assessment-details">
+                            <div class="assessment-name">ChatGPT-4</div>
+                            <div class="assessment-type">Content Generation</div>
+                        </div>
+                        <div class="assessment-score">72</div>
+                        <div class="risk-badge risk-medium">Medium Risk</div>
+                        <div class="assessment-date">2025-07-01</div>
+                    </div>
+                    <div class="assessment-item">
+                        <div class="assessment-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22,4 12,14.01 9,11.01"/>
+                            </svg>
+                        </div>
+                        <div class="assessment-details">
+                            <div class="assessment-name">GitHub Copilot</div>
+                            <div class="assessment-type">Code Generation</div>
+                        </div>
+                        <div class="assessment-score">45</div>
+                        <div class="risk-badge risk-low">Low Risk</div>
+                        <div class="assessment-date">2025-06-28</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button style="background: none; border: none; color: #3b82f6; cursor: pointer; font-weight: 500;">
+                            View All Assessments →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card achievements">
+                    <div class="card-header">
+                        <h3 class="card-title">Achievements</h3>
+                        <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                            <path d="M4 22h16"/>
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                        </svg>
+                    </div>
+                    <div class="achievements-list">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏆</div>
+                            <div class="achievement-info">
+                                <h4>First Assessment</h4>
+                                <p>Completed your first risk assessment</p>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">⭐</div>
+                            <div class="achievement-info">
+                                <h4>Quick Learner</h4>
+                                <p>Completed 5 assessments in one day</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i data-lucide="award" class="w-5 h-5 text-yellow-400"></i>
+                            <span class="font-medium">Almost There!</span>
+                        </div>
+                        <p class="text-sm text-gray-300" id="nextAchievementText">
+                            Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card quick-actions">
+                    <div class="action-btn">
+                        <div class="action-icon blue">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>New Assessment</h4>
+                            <p>Start a new risk assessment</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon green">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Assessments</h4>
+                            <p>View all risk assessments</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon purple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Compare Tools</h4>
+                            <p>Compare different AI tools</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Team</h4>
+                            <p>Manage your team</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Themes</h4>
+                            <p>Customize your dashboard theme</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Templates</h4>
+                            <p>Use predefined templates</p>
+                        </div>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                                <path d="M4 22h16"/>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h4>Achievements</h4>
+                            <p>View your achievements</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -2124,4 +2124,116 @@ body {
     .btn-group {
         padding: 30px 20px;
     }
+}
+
+.recent-assessments {
+    grid-column: 1 / -1;
+}
+
+.assessment-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.assessment-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateX(4px);
+}
+
+.assessment-icon {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.assessment-details {
+    flex: 1;
+}
+
+.assessment-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 0.25rem;
+}
+
+.assessment-type {
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+.assessment-score {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-right: 1rem;
+}
+
+.risk-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-right: 1rem;
+}
+
+.risk-low { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+.risk-medium { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+.risk-high { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+
+.assessment-date {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.achievements {
+    grid-column: 1 / -1;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.achievement-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.achievement-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.achievement-info h4 {
+    color: #f1f5f9;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-info p {
+    color: #94a3b8;
+    font-size: 0.875rem;
 } 
