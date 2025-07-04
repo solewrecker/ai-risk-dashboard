@@ -207,41 +207,34 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Recent Assessments -->
                     <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-xl font-semibold">Recent Assessments</h3>
-                                <p class="text-sm text-gray-400 mt-1">Latest AI tool risk evaluations</p>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="flex bg-gray-700 rounded-lg p-1">
-                                    <button class="p-2 rounded hover:bg-gray-600 transition-colors" title="Grid View">
-                                        <i data-lucide="grid" class="w-4 h-4"></i>
+                        <section class="assessment-list">
+                            <div class="assessment-list-header">
+                                <div>
+                                    <h2 class="assessment-list-title">Recent Assessments</h2>
+                                    <p class="assessment-list-subtitle">Latest AI tool risk evaluations</p>
+                                </div>
+                                <div class="assessment-list-actions">
+                                    <button class="icon-button" id="searchButton" aria-label="Search">
+                                        <i class="fas fa-search"></i>
                                     </button>
-                                    <button class="p-2 rounded bg-gray-600" title="List View">
-                                        <i data-lucide="list" class="w-4 h-4"></i>
+                                    <button class="icon-button" id="filterButton" aria-label="Filter">
+                                        <i class="fas fa-filter"></i>
+                                    </button>
+                                    <button class="export-button">
+                                        <i class="fas fa-file-export"></i>
+                                        Export PDF
                                     </button>
                                 </div>
-                                <button class="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                    <i data-lucide="download" class="w-4 h-4"></i>
-                                    <span class="text-sm">Export</span>
-                                </button>
                             </div>
-                        </div>
 
-                        <div id="recentAssessmentsList" class="space-y-3">
-                            <!-- Assessment items will be populated by JavaScript -->
-                        </div>
-
-                        <div class="mt-6 flex items-center justify-between">
-                            <button onclick="switchTab('assessments')" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-2">
-                                <span>View All Assessments</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
-                            <div class="flex items-center space-x-2 text-sm text-gray-400">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                                <span>Auto-updates every 5 min</span>
+                            <div id="assessmentsList">
+                                <!-- Assessment items will be dynamically populated here -->
                             </div>
-                        </div>
+
+                            <a href="/assessments" class="view-all-link">
+                                View All Assessments →
+                            </a>
+                        </section>
                     </div>
 
                     <!-- Achievements Panel -->
@@ -268,34 +261,40 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="mt-8 bg-gray-800 rounded-lg p-6">
-                    <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button onclick="window.location.href='index.html'" class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
-                            <i data-lucide="plus" class="w-6 h-6 text-blue-400"></i>
-                            <div class="text-left">
-                                <h4 class="font-medium text-white mb-1">Start New Assessment</h4>
-                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Evaluate an AI tool's risk profile</p>
+                <section class="quick-actions">
+                    <h2 class="quick-actions-title">Quick Actions</h2>
+                    <div class="quick-actions-grid">
+                        <a href="/new-assessment" class="quick-action-card">
+                            <div class="quick-action-icon new">
+                                <i class="fas fa-plus"></i>
                             </div>
-                        </button>
-                        
-                        <button onclick="switchTab('compare')" class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
-                            <i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i>
-                            <div class="text-left">
-                                <h4 class="font-medium text-white mb-1">Compare Tools</h4>
-                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Side-by-side risk analysis</p>
+                            <div class="quick-action-content">
+                                <h3 class="quick-action-title">Start New Assessment</h3>
+                                <p class="quick-action-description">Evaluate a new AI tool or service</p>
                             </div>
-                        </button>
-                        
-                        <button class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
-                            <i data-lucide="download" class="w-6 h-6 text-purple-400"></i>
-                            <div class="text-left">
-                                <h4 class="font-medium text-white mb-1">Export Report</h4>
-                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Generate PDF summary</p>
+                        </a>
+
+                        <a href="/import" class="quick-action-card">
+                            <div class="quick-action-icon import">
+                                <i class="fas fa-file-import"></i>
                             </div>
-                        </button>
+                            <div class="quick-action-content">
+                                <h3 class="quick-action-title">Import Assessment</h3>
+                                <p class="quick-action-description">Upload an existing assessment</p>
+                            </div>
+                        </a>
+
+                        <a href="/export" class="quick-action-card">
+                            <div class="quick-action-icon export">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h3 class="quick-action-title">Export Results</h3>
+                                <p class="quick-action-description">Download PDF reports</p>
+                            </div>
+                        </a>
                     </div>
-                </div>
+                </section>
             </div>
 
             <!-- Assessments Tab Content -->

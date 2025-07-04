@@ -2,10 +2,12 @@
 @import 'layout.css';
 @import 'utilities.css';
 
-/* Component Styles */
+/* Components */
 @import 'components/buttons.css';
-@import 'components/results.css';
 @import 'components/dashboard.css';
+@import 'components/results.css';
+@import 'components/assessment-list.css';
+@import 'components/quick-actions.css';
 
 /* Reset */
 * {
