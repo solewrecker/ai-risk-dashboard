@@ -8,6 +8,7 @@
 @import 'components/results.css';
 @import 'components/assessment-list.css';
 @import 'components/quick-actions.css';
+@import 'components/achievements.css';
 
 /* Reset */
 * {
