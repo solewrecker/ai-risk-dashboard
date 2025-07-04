@@ -139,16 +139,19 @@
                     <p class="text-gray-400">Manage your AI risk assessment program</p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors text-white">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span>New Assessment</span>
                     </button>
-                    <button class="header-icon-btn">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                    </button>
-                    <button class="header-icon-btn">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <button class="relative p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors" title="Notifications">
+                            <i data-lucide="bell" class="w-5 h-5 text-gray-300"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <button class="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors" title="Settings">
+                            <i data-lucide="settings" class="w-5 h-5 text-gray-300"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -205,29 +208,39 @@
                     <!-- Recent Assessments -->
                     <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-semibold">Recent Assessments</h3>
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                                    <i data-lucide="search" class="w-4 h-4"></i>
-                                </button>
-                                <button class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                                    <i data-lucide="filter" class="w-4 h-4"></i>
-                                </button>
+                            <div>
+                                <h3 class="text-xl font-semibold">Recent Assessments</h3>
+                                <p class="text-sm text-gray-400 mt-1">Latest AI tool risk evaluations</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex bg-gray-700 rounded-lg p-1">
+                                    <button class="p-2 rounded hover:bg-gray-600 transition-colors" title="Grid View">
+                                        <i data-lucide="grid" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 rounded bg-gray-600" title="List View">
+                                        <i data-lucide="list" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
                                 <button class="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                                     <i data-lucide="download" class="w-4 h-4"></i>
-                                    <span class="text-sm">Export PDF</span>
+                                    <span class="text-sm">Export</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div id="recentAssessmentsList" class="space-y-4">
-                            <!-- Assessments will be populated by JavaScript -->
+                        <div id="recentAssessmentsList" class="space-y-3">
+                            <!-- Assessment items will be populated by JavaScript -->
                         </div>
 
-                        <div class="mt-6 text-center">
-                            <button onclick="switchTab('assessments')" class="text-blue-400 hover:text-blue-300 transition-colors">
-                                View All Assessments →
+                        <div class="mt-6 flex items-center justify-between">
+                            <button onclick="switchTab('assessments')" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-2">
+                                <span>View All Assessments</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
+                            <div class="flex items-center space-x-2 text-sm text-gray-400">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                <span>Auto-updates every 5 min</span>
+                            </div>
                         </div>
                     </div>
 
@@ -258,27 +271,27 @@
                 <div class="mt-8 bg-gray-800 rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button onclick="window.location.href='index.html'" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <button onclick="window.location.href='index.html'" class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
                             <i data-lucide="plus" class="w-6 h-6 text-blue-400"></i>
                             <div class="text-left">
-                                <h4 class="font-medium">Start New Assessment</h4>
-                                <p class="text-sm text-gray-400">Evaluate an AI tool's risk profile</p>
+                                <h4 class="font-medium text-white mb-1">Start New Assessment</h4>
+                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Evaluate an AI tool's risk profile</p>
                             </div>
                         </button>
                         
-                        <button onclick="switchTab('compare')" class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <button onclick="switchTab('compare')" class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
                             <i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i>
                             <div class="text-left">
-                                <h4 class="font-medium">Compare Tools</h4>
-                                <p class="text-sm text-gray-400">Side-by-side risk analysis</p>
+                                <h4 class="font-medium text-white mb-1">Compare Tools</h4>
+                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Side-by-side risk analysis</p>
                             </div>
                         </button>
                         
-                        <button class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                        <button class="flex items-center space-x-3 p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors group">
                             <i data-lucide="download" class="w-6 h-6 text-purple-400"></i>
                             <div class="text-left">
-                                <h4 class="font-medium">Export Report</h4>
-                                <p class="text-sm text-gray-400">Generate PDF summary</p>
+                                <h4 class="font-medium text-white mb-1">Export Report</h4>
+                                <p class="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">Generate PDF summary</p>
                             </div>
                         </button>
                     </div>
