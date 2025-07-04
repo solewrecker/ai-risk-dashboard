@@ -7,7 +7,7 @@ import { updateDashboardStats, updateProgressTracking } from './gamification.js'
 import { switchTab } from './ui.js';
 
 let supabaseClient = null;
-const SUPABASE_URL = "https://ffcjkccdfvkyofzpwgil.supabase.co";
+const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
 
 export function initImport(client) {
     supabaseClient = client;
