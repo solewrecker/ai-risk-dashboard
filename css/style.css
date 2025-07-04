@@ -1764,7 +1764,7 @@ body {
 }
 
 .admin-only {
-    display: none;
+    display: none !important;
 }
 
 /* Modern Dashboard Styles (Tailwind-inspired) */
