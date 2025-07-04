@@ -1,0 +1,138 @@
+/* Achievements Section */
+.achievements {
+    background: var(--color-gray-800);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.achievements-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.achievements-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+.trophy-icon {
+    color: var(--color-yellow-400);
+    font-size: 1.25rem;
+}
+
+/* Achievement Cards */
+.achievement-card {
+    background: var(--color-gray-900/50);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-gray-700);
+}
+
+.achievement-card:last-child {
+    margin-bottom: 0;
+}
+
+.achievement-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-icon.unlocked {
+    color: var(--color-green-400);
+}
+
+.achievement-icon.locked {
+    color: var(--color-gray-500);
+}
+
+.achievement-icon.in-progress {
+    color: var(--color-blue-400);
+}
+
+.achievement-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-white);
+}
+
+.achievement-name.unlocked {
+    color: var(--color-green-400);
+}
+
+.achievement-description {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    margin-bottom: 0.75rem;
+}
+
+/* Progress Bar */
+.achievement-progress {
+    background: var(--color-gray-700);
+    border-radius: 9999px;
+    height: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 300ms ease;
+}
+
+.progress-bar.complete {
+    background: var(--color-green-400);
+}
+
+.progress-bar.in-progress {
+    background: var(--color-blue-400);
+}
+
+/* Unlock Status */
+.unlock-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.unlock-status.unlocked {
+    color: var(--color-green-400);
+}
+
+.unlock-status.locked {
+    color: var(--color-gray-400);
+}
+
+/* Almost There Card */
+.almost-there {
+    background: linear-gradient(to right, var(--color-gray-900), var(--color-gray-800));
+    border: 1px solid var(--color-yellow-500/30);
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+}
+
+.almost-there-icon {
+    color: var(--color-yellow-400);
+}
+
+.almost-there-text {
+    color: var(--color-gray-300);
+    font-size: 0.875rem;
+} 

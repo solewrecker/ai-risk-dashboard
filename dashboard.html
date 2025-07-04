@@ -239,24 +239,76 @@
 
                     <!-- Achievements Panel -->
                     <div class="bg-gray-800 rounded-lg p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-semibold">Achievements</h3>
-                            <i data-lucide="trophy" class="w-6 h-6 text-yellow-400"></i>
-                        </div>
-
-                        <div id="achievementsList" class="space-y-4">
-                            <!-- Achievements will be populated by JavaScript -->
-                        </div>
-
-                        <div class="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
-                            <div class="flex items-center space-x-2 mb-2">
-                                <i data-lucide="award" class="w-5 h-5 text-yellow-400"></i>
-                                <span class="font-medium">Almost There!</span>
+                        <section class="achievements">
+                            <div class="achievements-header">
+                                <h2 class="achievements-title">Achievements</h2>
+                                <i class="fas fa-trophy trophy-icon"></i>
                             </div>
-                            <p class="text-sm text-gray-300" id="nextAchievementText">
-                                Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
-                            </p>
-                        </div>
+
+                            <div class="achievement-card">
+                                <div class="achievement-header">
+                                    <div class="achievement-icon unlocked">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h3 class="achievement-name unlocked">Risk Assessment Rookie</h3>
+                                </div>
+                                <p class="achievement-description">Complete your first assessment</p>
+                                <div class="unlock-status unlocked">
+                                    <i class="fas fa-unlock"></i>
+                                    <span>Unlocked!</span>
+                                </div>
+                            </div>
+
+                            <div class="achievement-card">
+                                <div class="achievement-header">
+                                    <div class="achievement-icon unlocked">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <h3 class="achievement-name unlocked">Risk Detective</h3>
+                                </div>
+                                <p class="achievement-description">Complete 10 assessments</p>
+                                <div class="unlock-status unlocked">
+                                    <i class="fas fa-unlock"></i>
+                                    <span>Unlocked!</span>
+                                </div>
+                            </div>
+
+                            <div class="achievement-card">
+                                <div class="achievement-header">
+                                    <div class="achievement-icon in-progress">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <h3 class="achievement-name">Power User</h3>
+                                </div>
+                                <p class="achievement-description">Complete 25 assessments</p>
+                                <div class="achievement-progress">
+                                    <div class="progress-bar in-progress" style="width: 72%"></div>
+                                </div>
+                            </div>
+
+                            <div class="achievement-card">
+                                <div class="achievement-header">
+                                    <div class="achievement-icon locked">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <h3 class="achievement-name">Theme Collector</h3>
+                                </div>
+                                <p class="achievement-description">Unlock all free themes</p>
+                                <div class="achievement-progress">
+                                    <div class="progress-bar in-progress" style="width: 45%"></div>
+                                </div>
+                            </div>
+
+                            <div class="almost-there">
+                                <div class="achievement-header">
+                                    <div class="achievement-icon almost-there-icon">
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    <h3 class="achievement-name">Almost There!</h3>
+                                </div>
+                                <p class="almost-there-text">Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!</p>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
