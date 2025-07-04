@@ -18,16 +18,20 @@ export function getAssessments() {
 export async function loadAssessments() {
     const user = getCurrentUser();
     const container = document.getElementById('assessment-list');
+    const resultsCount = document.getElementById('resultsCount');
 
     if (!container) return;
 
     // 1. Show Loader
     container.innerHTML = `
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading AI tool database...</p>
+        <div class="loading-state-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading AI tool database...</p>
         </div>
     `;
+    if (resultsCount) {
+        resultsCount.textContent = 'Loading assessments...';
+    }
 
     if (!user) {
         console.log('No user found, cannot load assessments.');
@@ -44,7 +48,6 @@ export async function loadAssessments() {
             .select('*')
             .order('created_at', { ascending: false });
 
-        // Only filter by user_id if the user is not an admin
         if (!getIsAdmin()) {
             query.eq('user_id', user.id);
         }
@@ -63,9 +66,24 @@ export async function loadAssessments() {
     } catch (error) {
         console.error('Error loading assessments:', error);
         assessments = [];
-        // Still render to show empty/error state
-        renderAssessmentList(); 
-        document.dispatchEvent(new Event('assessmentsUpdated'));
+        // Render error state
+        container.innerHTML = `
+            <div class="error-state-container">
+                <i data-lucide="alert-triangle" class="error-icon"></i>
+                <h3 class="error-title">Failed to Load Assessments</h3>
+                <p class="error-message">Could not fetch the assessment data. Please try again later.</p>
+                <button onclick="loadAssessments()" class="btn btn-secondary">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                    Retry
+                </button>
+            </div>
+        `;
+        if (resultsCount) {
+            resultsCount.textContent = 'Error loading assessments';
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 }
 
