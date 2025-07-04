@@ -171,6 +171,24 @@
     background: var(--color-blue-700);
 }
 
+/* Icon Button */
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-gray-700);
+    border-radius: 0.5rem;
+    color: var(--color-gray-400);
+    transition: all 150ms ease;
+}
+
+.icon-button:hover {
+    background: var(--color-gray-600);
+    color: var(--color-white);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .assessment-meta {

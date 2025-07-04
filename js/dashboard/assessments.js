@@ -53,7 +53,7 @@ export async function loadAssessments() {
 }
 
 function renderRecentAssessments() {
-    const container = document.getElementById('recentAssessmentsList');
+    const container = document.getElementById('assessmentsList');
     if (!container) return;
     
     const recentAssessments = assessments.slice(0, 5);
