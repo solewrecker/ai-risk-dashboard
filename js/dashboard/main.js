@@ -2,11 +2,12 @@
 // Main entry point for the dashboard application.
 // Initializes the app, loads modules, and coordinates everything.
 
-import { initAuth, checkAuth, showLoginSection, getIsAdmin } from './auth.js';
+import { initAuth, checkAuth, getIsAdmin } from './auth.js';
 import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessments, clearAllFilters } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking, loadAchievements } from './gamification.js';
 import { updateTierBadge, switchTab, setupEventListeners, closeBanner } from './ui.js';
+import { injectDashboardAdminUI } from './admin-ui.js';
 
 const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
@@ -63,20 +64,7 @@ async function initializeDashboard() {
         console.log('Is Admin User:', isAdminUser);
         
         if (isAdminUser) {
-            const adminElements = document.querySelectorAll('.admin-only');
-            console.log('Found admin elements:', adminElements.length);
-            
-            adminElements.forEach(el => {
-                console.log('Showing admin element:', el);
-                el.classList.remove('admin-only');
-                el.classList.add('admin-visible');
-                // For navigation buttons, use flex display
-                if (el.classList.contains('nav-btn')) {
-                    el.style.display = 'flex';
-                } else {
-                    el.style.display = 'block';
-                }
-            });
+            injectDashboardAdminUI();
         }
         
         await loadAssessments();
