@@ -5,7 +5,8 @@
 import { initAuth, checkAuth, getIsAdmin } from './auth.js';
 import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessments, clearAllFilters } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
-import { updateDashboardStats, updateProgressTracking, loadAchievements } from './gamification.js';
+import { updateDashboardStats, updateProgressTracking } from './gamification.js';
+import { AchievementsManager } from './achievements.js';
 import { updateTierBadge, switchTab, setupEventListeners, closeBanner } from './ui.js';
 import { injectDashboardAdminUI } from './admin-ui.js';
 
@@ -22,7 +23,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // so that inline onclick handlers in the HTML can call them.
     window.switchTab = switchTab;
     window.viewAssessment = viewAssessment;
-    window.deleteAssessment = deleteAssessment;
+    window.deleteAssessment = async (id) => {
+        await deleteAssessment(id);
+        // Refresh achievements after deletion
+        if (window.achievementsManager) {
+            window.achievementsManager.updateProgress();
+        }
+    };
     window.clearAllFilters = clearAllFilters;
     window.closeBanner = closeBanner;
     window.handleFileSelect = handleFileSelect;
@@ -71,7 +78,11 @@ async function initializeDashboard() {
         
         updateDashboardStats();
         updateProgressTracking();
-        loadAchievements();
+        
+        // Initialize achievements
+        window.achievementsManager = new AchievementsManager();
+        window.achievementsManager.initialize();
+
         updateTierBadge();
         
         console.log('Dashboard initialized successfully');
