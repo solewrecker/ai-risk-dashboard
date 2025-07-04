@@ -61,41 +61,42 @@ export function startNewAssessment() {
 export function updateUIForAuth() {
     const loginSection = document.getElementById('loginSection');
     const currentUser = getCurrentUser();
-    const isAdmin = getIsAdmin();
 
-    // Dynamically inject the "Save to Database" button for admins
+    // The "Save to Database" button is no longer needed with auto-saving.
+    // This entire block can be removed.
+    /*
+    const isAdmin = getIsAdmin();
     const resultsBtnGroup = document.querySelector('#section4 .btn-group');
     const saveBtn = document.getElementById('saveToDbBtn');
 
-    if (isAdmin) {
+    if (currentUser) {
         if (resultsBtnGroup && !saveBtn) {
             const saveButtonHTML = `
                 <button type="button" class="btn btn-secondary" id="saveToDbBtn">
-                    <i class="fas fa-save"></i> Save to Database
+                    <i class="fas fa-save"></i> Save Assessment
                 </button>
             `;
-            // Inject it before the "New Assessment" button
             const newAssessmentBtn = document.getElementById('newAssessmentBtn');
             if (newAssessmentBtn) {
                 newAssessmentBtn.insertAdjacentHTML('beforebegin', saveButtonHTML);
             }
         }
     } else {
-        // If the user is not an admin, ensure the button is removed
         if (saveBtn) {
             saveBtn.remove();
         }
     }
+    */
 
     if (loginSection) {
         if (currentUser) {
             const userTier = currentUser.user_metadata?.tier || 'free';
-            const dashClass = isAdmin ? 'btn btn-primary' : 'btn btn-secondary';
+            const dashClass = getIsAdmin() ? 'btn btn-primary' : 'btn btn-secondary';
             loginSection.innerHTML = `
                 <div class="login-user"><i class="fas fa-check-circle"></i><span>${currentUser.email}</span></div>
                 <div class="login-badges">
                     ${userTier === 'enterprise' ? '<span class="badge badge-enterprise">ENTERPRISE</span>' : ''}
-                    ${isAdmin ? '<span class="badge badge-admin">ADMIN</span>' : ''}
+                    ${getIsAdmin() ? '<span class="badge badge-admin">ADMIN</span>' : ''}
                 </div>
                 <div class="login-actions">
                     <a href="dashboard.html" class="${dashClass}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>

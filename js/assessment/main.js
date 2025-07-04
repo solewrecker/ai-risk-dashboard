@@ -42,12 +42,25 @@ async function startAssessment() {
         };
     }
 
-    simulateAnalysisSteps(() => {
+    simulateAnalysisSteps(async () => {
+        // --- Auto-save to database ---
+        console.log('Automatically saving assessment to database...');
+        const { data: savedData, error: saveError } = await API.saveToDatabase(currentAssessment);
+        if (saveError) {
+            console.error('Auto-save failed:', saveError);
+            UI.showMessage(`Could not save assessment to your history: ${saveError.message}`, 'error');
+        } else {
+            console.log('Auto-save successful:', savedData);
+        }
+
+        // --- Show Results ---
         UI.showStep(4);
-        Results.displayResults(currentAssessment);
+        Results.render(currentAssessment);
     });
 }
 
+// This function is no longer needed with auto-saving
+/*
 async function handleSaveToDatabase() {
     if (!Auth.getIsAdmin()) {
         UI.showMessage('You must be an admin to save assessments.', 'error');
@@ -67,6 +80,7 @@ async function handleSaveToDatabase() {
         UI.showMessage('Assessment saved successfully!', 'success');
     }
 }
+*/
 
 // --- Helper Functions ---
 function getFormData() {
@@ -118,12 +132,14 @@ function addEventListeners() {
     // Results and Exports
     document.getElementById('newAssessmentBtn')?.addEventListener('click', UI.startNewAssessment);
     
-    // Use event delegation for the dynamically added save button
+    // The dynamic save button and its handler are no longer needed
+    /*
     document.querySelector('.form-content').addEventListener('click', (e) => {
         if (e.target.matches('#saveToDbBtn') || e.target.closest('#saveToDbBtn')) {
             handleSaveToDatabase();
         }
     });
+    */
 
     document.getElementById('exportMainBtn')?.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent body click from hiding menu immediately
