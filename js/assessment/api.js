@@ -89,11 +89,11 @@ export async function saveToDatabase(assessment) {
         category: formData.toolCategory,
         total_score: finalScore,
         risk_level: riskLevel,
-        data_storage_score: breakdown.scores.dataStorage,
-        training_usage_score: breakdown.scores.trainingUsage,
-        access_controls_score: breakdown.scores.accessControls,
-        compliance_score: breakdown.scores.complianceRisk,
-        vendor_transparency_score: breakdown.scores.vendorTransparency,
+        data_storage_score: breakdown?.scores?.dataStorage ?? 0,
+        training_usage_score: breakdown?.scores?.trainingUsage ?? 0,
+        access_controls_score: breakdown?.scores?.accessControls ?? 0,
+        compliance_score: breakdown?.scores?.complianceRisk ?? 0,
+        vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
         breakdown: breakdown,
         summary_and_recommendation: (recommendations || []).join(' ')
     };

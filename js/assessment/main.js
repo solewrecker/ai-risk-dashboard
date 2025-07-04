@@ -55,7 +55,7 @@ async function startAssessment() {
 
         // --- Show Results ---
         UI.showStep(4);
-        Results.render(currentAssessment);
+        Results.displayResults(currentAssessment);
     });
 }
 
