@@ -76,14 +76,16 @@ export class AchievementsManager {
 
         return `
             <div class="achievement-card ${status}">
-                <div class="achievement-header">
-                    <div class="achievement-icon ${status}">
-                        <i data-lucide="${achievement.icon}"></i>
+                <div class="achievement-content">
+                    <div class="achievement-header">
+                        <div class="achievement-icon ${status}">
+                            <i data-lucide="${achievement.icon}"></i>
+                        </div>
+                        <div class="achievement-name ${status}">${achievement.name}</div>
                     </div>
-                    <h3 class="achievement-name">${achievement.name}</h3>
+                    <div class="achievement-description">${achievement.description}</div>
+                    ${this.renderProgress(progress)}
                 </div>
-                <p class="achievement-description">${achievement.description}</p>
-                ${this.renderProgress(progress)}
             </div>
         `;
     }
