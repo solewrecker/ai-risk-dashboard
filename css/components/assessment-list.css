@@ -127,33 +127,22 @@
     font-weight: 700;
     line-height: 1;
     margin-bottom: 0.25rem;
-    background: linear-gradient(135deg, var(--color-blue-400), var(--color-purple-400));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .score-value.risk-low { 
-    background: linear-gradient(135deg, var(--color-green-400), var(--color-green-300));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-green-400);
 }
 
 .score-value.risk-medium { 
-    background: linear-gradient(135deg, var(--color-yellow-400), var(--color-yellow-300));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-yellow-400);
 }
 
 .score-value.risk-high { 
-    background: linear-gradient(135deg, var(--color-red-400), var(--color-red-300));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-red-400);
 }
 
 .score-value.risk-critical { 
-    background: linear-gradient(135deg, var(--color-purple-400), var(--color-purple-300));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-purple-400);
 }
 
 .score-label {
