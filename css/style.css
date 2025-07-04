@@ -1439,7 +1439,8 @@ body.assessment-page {
 }
 
 .progress-bar.mini {
-    height: 0.375rem;
+    height: 4px;
+    background: var(--color-gray-700);
 }
 
 .progress-fill {
