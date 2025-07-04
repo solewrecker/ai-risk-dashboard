@@ -74,7 +74,9 @@ export async function getToolFromDatabase(formData) {
 export async function saveToDatabase(assessment) {
     if (!supabase) return { error: { message: 'Not connected to database.' } };
     
-    const { formData, results } = assessment;
+    // The assessment object from main.js doesn't have a 'results' property.
+    // The data is directly on the assessment object itself.
+    const { formData, finalScore, riskLevel, breakdown, recommendations } = assessment;
     const user = getCurrentUser();
 
     if (!user) {
@@ -85,15 +87,15 @@ export async function saveToDatabase(assessment) {
         user_id: user.id,
         name: formData.toolName,
         category: formData.toolCategory,
-        total_score: results.finalScore,
-        risk_level: results.riskLevel,
-        data_storage_score: results.breakdown.scores.dataStorage,
-        training_usage_score: results.breakdown.scores.trainingUsage,
-        access_controls_score: results.breakdown.scores.accessControls,
-        compliance_score: results.breakdown.scores.complianceRisk,
-        vendor_transparency_score: results.breakdown.scores.vendorTransparency,
-        breakdown: results.breakdown,
-        summary_and_recommendation: (results.recommendations || []).join(' ')
+        total_score: finalScore,
+        risk_level: riskLevel,
+        data_storage_score: breakdown.scores.dataStorage,
+        training_usage_score: breakdown.scores.trainingUsage,
+        access_controls_score: breakdown.scores.accessControls,
+        compliance_score: breakdown.scores.complianceRisk,
+        vendor_transparency_score: breakdown.scores.vendorTransparency,
+        breakdown: breakdown,
+        summary_and_recommendation: (recommendations || []).join(' ')
     };
     
     try {
