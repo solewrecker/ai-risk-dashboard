@@ -117,7 +117,14 @@ function addEventListeners() {
     
     // Results and Exports
     document.getElementById('newAssessmentBtn')?.addEventListener('click', UI.startNewAssessment);
-    document.getElementById('saveToDbBtn')?.addEventListener('click', handleSaveToDatabase);
+    
+    // Use event delegation for the dynamically added save button
+    document.querySelector('.form-content').addEventListener('click', (e) => {
+        if (e.target.matches('#saveToDbBtn') || e.target.closest('#saveToDbBtn')) {
+            handleSaveToDatabase();
+        }
+    });
+
     document.getElementById('exportMainBtn')?.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent body click from hiding menu immediately
         Results.toggleExportMenu();

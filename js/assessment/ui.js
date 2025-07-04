@@ -59,14 +59,32 @@ export function startNewAssessment() {
 
 // --- UI Updates ---
 export function updateUIForAuth() {
-    const saveButton = document.getElementById('saveToDbBtn');
     const loginSection = document.getElementById('loginSection');
     const currentUser = getCurrentUser();
     const isAdmin = getIsAdmin();
 
-    if (saveButton) {
-        saveButton.style.display = isAdmin ? 'inline-flex' : 'none';
-        if(isAdmin) saveButton.innerHTML = '<i class="fas fa-save"></i> Save to Database (Admin)';
+    // Dynamically inject the "Save to Database" button for admins
+    const resultsBtnGroup = document.querySelector('#section4 .btn-group');
+    const saveBtn = document.getElementById('saveToDbBtn');
+
+    if (isAdmin) {
+        if (resultsBtnGroup && !saveBtn) {
+            const saveButtonHTML = `
+                <button type="button" class="btn btn-secondary" id="saveToDbBtn">
+                    <i class="fas fa-save"></i> Save to Database
+                </button>
+            `;
+            // Inject it before the "New Assessment" button
+            const newAssessmentBtn = document.getElementById('newAssessmentBtn');
+            if (newAssessmentBtn) {
+                newAssessmentBtn.insertAdjacentHTML('beforebegin', saveButtonHTML);
+            }
+        }
+    } else {
+        // If the user is not an admin, ensure the button is removed
+        if (saveBtn) {
+            saveBtn.remove();
+        }
     }
 
     if (loginSection) {
