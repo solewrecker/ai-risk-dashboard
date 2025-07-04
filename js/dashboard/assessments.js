@@ -1,7 +1,7 @@
 // js/dashboard/assessments.js
 // Handles fetching, rendering, filtering, and managing assessments. 
 
-import { getIsAdmin } from './auth.js';
+import { getIsAdmin, getCurrentUser } from './auth.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 
 let supabaseClient = null;
@@ -16,11 +16,27 @@ export function getAssessments() {
 }
 
 export async function loadAssessments() {
+    const user = getCurrentUser();
+    if (!user) {
+        console.log('No user found, cannot load assessments.');
+        assessments = [];
+        renderAssessmentList();
+        renderRecentAssessments();
+        return;
+    }
+
     try {
-        const { data, error } = await supabaseClient
+        const query = supabaseClient
             .from('ai_tools')
             .select('*')
             .order('created_at', { ascending: false });
+
+        // Only filter by user_id if the user is not an admin
+        if (!getIsAdmin()) {
+            query.eq('user_id', user.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
