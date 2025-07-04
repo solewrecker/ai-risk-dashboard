@@ -78,37 +78,23 @@ export class AchievementsManager {
             <div class="achievement-card ${status}">
                 <div class="achievement-content">
                     <div class="achievement-header">
-                        <div class="achievement-icon ${status}">
-                            <i data-lucide="${achievement.icon}"></i>
+                        <i data-lucide="${achievement.icon}" class="achievement-icon ${status}"></i>
+                        <span class="achievement-name ${status}">${achievement.name}</span>
+                    </div>
+                    <p class="achievement-description">${achievement.description}</p>
+                    
+                    <div class="achievement-progress-wrapper">
+                        <div class="achievement-progress">
+                            <div class="progress-bar ${status}" style="width: ${progress.percentage}%"></div>
                         </div>
-                        <div class="achievement-name ${status}">${achievement.name}</div>
+                        <span class="progress-numbers">${progress.current}/${progress.required}</span>
                     </div>
-                    <div class="achievement-description">${achievement.description}</div>
-                    ${this.renderProgress(progress)}
-                </div>
-            </div>
-        `;
-    }
-
-    renderProgress(progress) {
-        const isExactlyMet = progress.current === progress.required;
-        const progressBarClass = isExactlyMet ? 'complete' : 'in-progress';
-        
-        return `
-            <div class="achievement-progress-wrapper">
-                <div class="achievement-progress">
-                    <div class="progress-bar ${progressBarClass}" 
-                         style="width: ${progress.percentage}%">
+                    <div class="unlock-status">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Unlocked!</span>
                     </div>
                 </div>
-                <div class="progress-numbers">${progress.current}/${progress.required}</div>
             </div>
-            ${progress.isUnlocked ? `
-                <div class="unlock-status">
-                    <i data-lucide="check-circle"></i>
-                    <span>Unlocked!</span>
-                </div>
-            ` : ''}
         `;
     }
 
@@ -163,4 +149,57 @@ export class AchievementsManager {
 document.addEventListener('DOMContentLoaded', () => {
     const achievementsManager = new AchievementsManager();
     achievementsManager.initialize();
-}); 
+});
+
+function renderAchievements(completedCount) {
+    const container = document.querySelector('.achievements');
+    if (!container) return;
+
+    const achievements = getAchievements();
+
+    const content = achievements.map(achievement => {
+        const isUnlocked = completedCount >= achievement.goal;
+        const progress = Math.min(completedCount, achievement.goal);
+        const percentage = achievement.goal > 0 ? (progress / achievement.goal) * 100 : 0;
+        
+        const status = isUnlocked ? 'unlocked' : (progress > 0 ? 'in-progress' : 'locked');
+        const icon = isUnlocked ? 'check-circle-2' : achievement.icon;
+
+        return `
+            <div class="achievement-card ${status}">
+                <div class="achievement-content">
+                    <div class="achievement-header">
+                        <i data-lucide="${icon}" class="achievement-icon ${status}"></i>
+                        <span class="achievement-name ${status}">${achievement.name}</span>
+                    </div>
+                    <p class="achievement-description">${achievement.description}</p>
+                    
+                    <div class="achievement-progress-wrapper">
+                        <div class="achievement-progress">
+                            <div class="progress-bar ${status}" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="progress-numbers">${progress}/${achievement.goal}</span>
+                    </div>
+                    <div class="unlock-status">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Unlocked!</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="achievements-header">
+            <h2 class="achievements-title">Achievements</h2>
+            <i data-lucide="trophy" class="trophy-icon"></i>
+        </div>
+        <div class="achievements-grid">
+            ${content}
+        </div>
+    `;
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+} 

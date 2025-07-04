@@ -164,10 +164,13 @@ function renderRecentAssessments() {
 
 function renderAssessmentList() {
     const container = document.getElementById('assessment-list');
+    const resultsCount = document.getElementById('resultsCount');
+
     if (!container) return;
-    
-    // This function is now also responsible for clearing the loading state
-    
+
+    // Clear loading state
+    container.innerHTML = '';
+
     if (assessments.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -176,10 +179,13 @@ function renderAssessmentList() {
                 <a href="index.html" class="btn btn-primary">Create Assessment</a>
             </div>
         `;
+        if (resultsCount) {
+            resultsCount.textContent = '0 assessments found';
+        }
         return;
     }
-    
-    container.innerHTML = assessments.map(assessment => {
+
+    const listContent = assessments.map(assessment => {
         const date = new Date(assessment.created_at).toLocaleDateString();
         
         return `
@@ -213,7 +219,8 @@ function renderAssessmentList() {
         `;
     }).join('');
     
-    const resultsCount = document.getElementById('resultsCount');
+    container.innerHTML = listContent;
+    
     if (resultsCount) {
         resultsCount.textContent = `${assessments.length} assessments found`;
     }
