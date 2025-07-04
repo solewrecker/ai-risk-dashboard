@@ -139,12 +139,11 @@
 
 /* Unlock Status */
 .unlock-status {
+    display: none;
+}
+
+.achievement-card.unlocked .unlock-status {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--color-green-400);
 }
 
 /* Almost There Card */
@@ -172,4 +171,8 @@
 .almost-there-text {
     color: var(--color-yellow-400);
     font-weight: 500;
+}
+
+.achievement-card.unlocked .achievement-progress-wrapper {
+    display: none;
 } 
