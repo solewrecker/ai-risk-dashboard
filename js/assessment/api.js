@@ -1,7 +1,7 @@
 // js/assessment/api.js
 // Handles all API calls to the Supabase backend.
 import { supabase, getCurrentUser } from './auth.js';
-import { applyClientSideMultipliers } from './scoring.js';
+import { applyClientSideMultipliers, getRiskLevel } from './scoring.js';
 
 export async function getToolFromDatabase(formData) {
     if (!supabase) {
@@ -74,21 +74,22 @@ export async function getToolFromDatabase(formData) {
 export async function saveToDatabase(assessment) {
     if (!supabase) return { error: { message: 'Not connected to database.' } };
     
-    // The assessment object from main.js doesn't have a 'results' property.
-    // The data is directly on the assessment object itself.
-    const { formData, finalScore, riskLevel, breakdown, recommendations } = assessment;
+    const { formData, finalScore, breakdown, recommendations } = assessment;
     const user = getCurrentUser();
 
     if (!user) {
         return { error: { message: 'User must be logged in to save an assessment.' } };
     }
 
+    // Defensively re-calculate risk level to ensure it's always valid for the DB.
+    const validRiskLevel = getRiskLevel(finalScore);
+
     const record = {
         user_id: user.id,
         name: formData.toolName,
         category: formData.toolCategory,
         total_score: finalScore,
-        risk_level: riskLevel,
+        risk_level: validRiskLevel, // Use the guaranteed valid risk level
         data_storage_score: breakdown?.scores?.dataStorage ?? 0,
         training_usage_score: breakdown?.scores?.trainingUsage ?? 0,
         access_controls_score: breakdown?.scores?.accessControls ?? 0,
