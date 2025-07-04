@@ -58,15 +58,17 @@ export async function processImport() {
         return;
     }
 
-    const uploadPromises = Array.from(files).map(file => {
+    const uploadPromises = Array.from(files).map(async file => {
         const formData = new FormData();
         formData.append('file', file);
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
         
         return fetch(`${SUPABASE_URL}/functions/v1/upload-assessment`, {
             method: 'POST',
             body: formData,
             headers: {
-                'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`
+                'Authorization': `Bearer ${session?.access_token}`
             }
         });
     });
