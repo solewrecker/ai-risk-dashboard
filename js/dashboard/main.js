@@ -8,8 +8,8 @@ import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking, loadAchievements } from './gamification.js';
 import { updateTierBadge, switchTab, setupEventListeners, closeBanner } from './ui.js';
 
-const SUPABASE_URL = "https://ffcjkccdfvkyofzpwgil.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmY2prY2NkZnZreW9mennwd2dpbCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzMwOTA3MDYzLCJleHAiOjIwNDY0ODMwNjN9.pM4pHFNgQW3N1Lk7JJiPR8Q7cYDUMH4R7BI6CdCJQ_s";
+const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
