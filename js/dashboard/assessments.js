@@ -79,56 +79,42 @@ function renderRecentAssessments() {
             critical: 'bg-purple-500'
         };
         const riskColor = riskColors[assessment.risk_level?.toLowerCase()] || 'bg-gray-500';
+        const scoreColorClass = assessment.total_score >= 75 ? 'risk-critical' : 
+                              assessment.total_score >= 50 ? 'risk-high' : 
+                              assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
         
         return `
-            <div class="assessment-item bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700 transition-all">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <div class="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-                                <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
-                            </div>
-                            <div class="absolute -bottom-1 -right-1 w-4 h-4 ${riskColor} rounded-full border-2 border-gray-800"></div>
-                        </div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-medium text-white">${assessment.name}</h4>
-                                <span class="text-xs px-2 py-0.5 bg-gray-600 rounded-full">${assessment.category || 'General'}</span>
-                            </div>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <span class="text-sm text-gray-400">${date}</span>
-                                <span class="text-gray-500">•</span>
-                                <span class="text-sm text-gray-400">by ${assessment.created_by || 'Anonymous'}</span>
-                            </div>
-                        </div>
+            <div class="assessment-item">
+                <div class="assessment-content">
+                    <div class="assessment-icon">
+                        <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
+                        <div class="assessment-risk-indicator ${riskColor}"></div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <div class="text-2xl font-bold ${assessment.total_score >= 75 ? 'text-red-400' : assessment.total_score >= 50 ? 'text-yellow-400' : 'text-green-400'}">${assessment.total_score}</div>
-                            <div class="text-xs text-gray-400">Risk Score</div>
+                    <div class="assessment-info">
+                        <div class="assessment-name">${assessment.name}</div>
+                        <div class="assessment-meta">
+                            <span>${date}</span>
+                            <span class="assessment-meta-divider">•</span>
+                            <span>by ${assessment.created_by || 'Anonymous'}</span>
+                            <span class="assessment-meta-divider">•</span>
+                            <span>${assessment.category || 'General'}</span>
                         </div>
-                        <button onclick="viewAssessment(${assessment.id})" class="p-2 hover:bg-gray-600 rounded-lg transition-colors" title="View Details">
-                            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
-                        </button>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="flex items-center space-x-1">
-                            <i data-lucide="shield-alert" class="w-4 h-4 text-gray-400"></i>
-                            <span class="text-sm text-gray-400">${assessment.risk_level?.toUpperCase()}</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <i data-lucide="check-circle" class="w-4 h-4 text-gray-400"></i>
-                            <span class="text-sm text-gray-400">${assessment.controls_implemented || 0} Controls</span>
-                        </div>
+                <div class="flex items-center space-x-4">
+                    <div class="assessment-score">
+                        <div class="score-value ${scoreColorClass}">${assessment.total_score}</div>
+                        <div class="score-label">Risk Score</div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button class="p-1.5 hover:bg-gray-600 rounded transition-colors" title="Export PDF">
-                            <i data-lucide="download" class="w-4 h-4 text-gray-400"></i>
+                    <div class="assessment-actions">
+                        <button onclick="viewAssessment(${assessment.id})" class="action-button" title="View Details">
+                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
                         </button>
-                        <button class="p-1.5 hover:bg-gray-600 rounded transition-colors" title="Share">
-                            <i data-lucide="share-2" class="w-4 h-4 text-gray-400"></i>
+                        <button class="action-button" title="Export PDF">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                        </button>
+                        <button class="action-button" title="Share">
+                            <i data-lucide="share-2" class="w-5 h-5"></i>
                         </button>
                     </div>
                 </div>
