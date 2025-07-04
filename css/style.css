@@ -1,10 +1,10 @@
 /* Base Styles */
-@import '_layout.css';
-@import '_utilities.css';
+@import 'layout.css';
+@import 'utilities.css';
 
 /* Component Styles */
-@import 'components/_buttons.css';
-@import 'components/_results.css';
+@import 'components/buttons.css';
+@import 'components/results.css';
 
 /* Reset */
 * {
@@ -34,8 +34,8 @@ body {
 }
 
 [data-theme="matrix"] {
-    --primary-color: var(--color-green-500);
-    --secondary-color: var(--color-green-300);
+    --primary-color: var(--color-green-400);
+    --secondary-color: var(--color-green-600);
 }
 
 /* Custom Components */
