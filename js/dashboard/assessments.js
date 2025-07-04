@@ -22,6 +22,7 @@ export async function loadAssessments() {
         assessments = [];
         renderAssessmentList();
         renderRecentAssessments();
+        document.dispatchEvent(new Event('assessmentsUpdated'));
         return;
     }
 
@@ -45,10 +46,12 @@ export async function loadAssessments() {
         
         renderAssessmentList();
         renderRecentAssessments();
+        document.dispatchEvent(new Event('assessmentsUpdated'));
         
     } catch (error) {
         console.error('Error loading assessments:', error);
         assessments = [];
+        document.dispatchEvent(new Event('assessmentsUpdated'));
     }
 }
 
