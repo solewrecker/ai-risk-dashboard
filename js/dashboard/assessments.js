@@ -27,7 +27,7 @@ export async function loadAssessments() {
 
     try {
         const query = supabaseClient
-            .from('ai_tools')
+            .from('assessments')
             .select('*')
             .order('created_at', { ascending: false });
 
@@ -175,7 +175,7 @@ export async function deleteAssessment(id) {
     
     try {
         const { error } = await supabaseClient
-            .from('ai_tools')
+            .from('assessments')
             .delete()
             .eq('id', id);
         

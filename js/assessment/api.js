@@ -93,13 +93,12 @@ export async function saveToDatabase(assessment) {
         compliance_score: results.breakdown.scores.complianceRisk,
         vendor_transparency_score: results.breakdown.scores.vendorTransparency,
         breakdown: results.breakdown,
-        summary_and_recommendation: (results.recommendations || []).join(' '),
-        // Add other new fields as needed from the assessment object
+        summary_and_recommendation: (results.recommendations || []).join(' ')
     };
     
     try {
         const { data, error } = await supabase
-            .from('ai_tools')
+            .from('assessments')
             .insert([record])
             .select();
             
