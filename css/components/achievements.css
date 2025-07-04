@@ -34,14 +34,16 @@
 .achievement-card {
     background: var(--color-gray-900);
     border-radius: 0.75rem;
-    padding: 1rem;
+    padding: 1.25rem;
     transition: all 200ms ease;
     position: relative;
     overflow: hidden;
+    border: 1px solid var(--color-gray-800);
 }
 
 .achievement-card.unlocked {
-    background: var(--color-green-500/10);
+    background: var(--color-green-500/5);
+    border-color: var(--color-green-500/20);
 }
 
 /* Achievement Content */
@@ -81,11 +83,15 @@
 .achievement-name {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--color-gray-300);
+    color: var(--color-gray-200);
 }
 
 .achievement-name.unlocked {
     color: var(--color-green-400);
+}
+
+.achievement-name.in-progress {
+    color: var(--color-blue-400);
 }
 
 .achievement-description {
@@ -126,7 +132,7 @@
 .progress-numbers {
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--color-gray-400);
+    color: var(--color-gray-300);
     min-width: 2.5rem;
     text-align: right;
 }
