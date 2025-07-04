@@ -153,21 +153,81 @@
 }
 
 /* Loading State */
-.results-loading {
-    text-align: center;
-    padding: 3rem 1.5rem;
-    color: var(--color-gray-400);
+.loading-state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background-color: var(--color-gray-800);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    transition: opacity 300ms ease-in-out;
+    opacity: 1;
 }
 
-.results-spinner {
-    margin-bottom: 1rem;
-    color: var(--color-blue-400);
+.loading-state-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--color-blue-400-translucent);
+    border-top-color: var(--color-blue-400);
+    border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-right: 1rem;
 }
 
+.loading-text {
+    font-size: 1rem;
+    color: var(--color-gray-300);
+    font-weight: 500;
+}
+
+/* Error State */
+.error-state-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background-color: var(--color-red-900-translucent);
+    border: 1px solid var(--color-red-500-translucent);
+    color: var(--color-red-300);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.error-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-red-400);
+}
+
+.error-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.error-message {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    margin-bottom: 1.5rem;
+}
+
+/* Keyframes for spinner animation */
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive Design */
