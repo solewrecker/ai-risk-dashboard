@@ -13,7 +13,14 @@ export class AchievementsManager {
             console.warn('Achievements container not found.');
             return;
         }
+        
+        // Initial update
         this.updateProgress();
+        
+        // Listen for assessment changes
+        document.addEventListener('assessmentsUpdated', () => {
+            this.updateProgress();
+        });
     }
 
     getAchievementDefinitions() {
@@ -73,7 +80,7 @@ export class AchievementsManager {
                     <div class="achievement-icon ${status}">
                         <i data-lucide="${achievement.icon}"></i>
                     </div>
-                    <h3 class="achievement-name">${achievement.name}</h3>
+                    <h3 class="achievement-name ${status}">${achievement.name}</h3>
                 </div>
                 <p class="achievement-description">${achievement.description}</p>
                 ${this.renderProgress(progress)}
@@ -82,14 +89,20 @@ export class AchievementsManager {
     }
 
     renderProgress(progress) {
+        const progressBar = `
+            <div class="achievement-progress-wrapper">
+                <div class="achievement-progress">
+                    <div class="progress-bar ${progress.isUnlocked ? 'complete' : 'in-progress'}" 
+                         style="width: ${progress.percentage}%">
+                    </div>
+                </div>
+                <div class="progress-numbers">${progress.current}/${progress.required}</div>
+            </div>
+        `;
+
         if (progress.isUnlocked) {
             return `
-                <div class="achievement-progress-wrapper">
-                    <div class="achievement-progress">
-                        <div class="progress-bar complete" style="width: 100%"></div>
-                    </div>
-                    <div class="progress-numbers">${progress.required}/${progress.required}</div>
-                </div>
+                ${progressBar}
                 <div class="unlock-status unlocked">
                     <i data-lucide="check-circle"></i>
                     <span>Unlocked!</span>
@@ -97,14 +110,7 @@ export class AchievementsManager {
             `;
         }
 
-        return `
-            <div class="achievement-progress-wrapper">
-                <div class="achievement-progress">
-                    <div class="progress-bar in-progress" style="width: ${progress.percentage}%"></div>
-                </div>
-                <div class="progress-numbers">${progress.current}/${progress.required}</div>
-            </div>
-        `;
+        return progressBar;
     }
 
     render() {
@@ -114,6 +120,26 @@ export class AchievementsManager {
             .map(achievement => this.renderAchievementCard(achievement))
             .join('');
 
+        // Find the next achievement to unlock
+        const nextAchievement = this.achievementsData.find(achievement => 
+            this.assessmentsCount < achievement.requiredCount
+        );
+
+        let almostThereHTML = '';
+        if (nextAchievement) {
+            const remaining = nextAchievement.requiredCount - this.assessmentsCount;
+            almostThereHTML = `
+                <div class="almost-there">
+                    <div class="almost-there-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <div class="almost-there-text">
+                        Complete ${remaining} more assessment${remaining > 1 ? 's' : ''} to unlock the "${nextAchievement.name}" achievement!
+                    </div>
+                </div>
+            `;
+        }
+
         this.container.innerHTML = `
             <div class="achievements-header">
                 <h2 class="achievements-title">Achievements</h2>
@@ -121,6 +147,7 @@ export class AchievementsManager {
             </div>
             <div class="achievements-grid">
                 ${achievementsHTML}
+                ${almostThereHTML}
             </div>
         `;
 
@@ -139,7 +166,4 @@ export class AchievementsManager {
 document.addEventListener('DOMContentLoaded', () => {
     const achievementsManager = new AchievementsManager();
     achievementsManager.initialize();
-
-    // Example: Update achievements when an assessment is completed
-    window.updateAchievements = () => achievementsManager.updateProgress();
 }); 
