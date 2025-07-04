@@ -1,6 +1,6 @@
 // js/assessment/api.js
 // Handles all API calls to the Supabase backend.
-import { supabase } from './auth.js';
+import { supabase, getCurrentUser } from './auth.js';
 import { applyClientSideMultipliers } from './scoring.js';
 
 export async function getToolFromDatabase(formData) {
@@ -75,8 +75,14 @@ export async function saveToDatabase(assessment) {
     if (!supabase) return { error: { message: 'Not connected to database.' } };
     
     const { formData, results } = assessment;
+    const user = getCurrentUser();
+
+    if (!user) {
+        return { error: { message: 'User must be logged in to save an assessment.' } };
+    }
 
     const record = {
+        user_id: user.id,
         name: formData.toolName,
         category: formData.toolCategory,
         total_score: results.finalScore,
