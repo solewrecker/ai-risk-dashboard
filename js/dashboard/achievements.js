@@ -89,10 +89,13 @@ export class AchievementsManager {
     }
 
     renderProgress(progress) {
+        const isExactlyMet = progress.current === progress.required;
+        const progressBarClass = isExactlyMet ? 'complete' : 'in-progress';
+        
         return `
             <div class="achievement-progress-wrapper">
                 <div class="achievement-progress">
-                    <div class="progress-bar ${progress.isUnlocked ? 'complete' : 'in-progress'}" 
+                    <div class="progress-bar ${progressBarClass}" 
                          style="width: ${progress.percentage}%">
                     </div>
                 </div>

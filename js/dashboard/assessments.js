@@ -17,6 +17,18 @@ export function getAssessments() {
 
 export async function loadAssessments() {
     const user = getCurrentUser();
+    const container = document.getElementById('assessment-list');
+
+    if (!container) return;
+
+    // 1. Show Loader
+    container.innerHTML = `
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading AI tool database...</p>
+        </div>
+    `;
+
     if (!user) {
         console.log('No user found, cannot load assessments.');
         assessments = [];
@@ -51,6 +63,8 @@ export async function loadAssessments() {
     } catch (error) {
         console.error('Error loading assessments:', error);
         assessments = [];
+        // Still render to show empty/error state
+        renderAssessmentList(); 
         document.dispatchEvent(new Event('assessmentsUpdated'));
     }
 }
@@ -133,6 +147,8 @@ function renderRecentAssessments() {
 function renderAssessmentList() {
     const container = document.getElementById('assessment-list');
     if (!container) return;
+    
+    // This function is now also responsible for clearing the loading state
     
     if (assessments.length === 0) {
         container.innerHTML = `
