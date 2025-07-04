@@ -1,15 +1,101 @@
+/* Base Styles */
+@import '_layout.css';
+@import '_utilities.css';
+
+/* Component Styles */
+@import 'components/_buttons.css';
+@import 'components/_results.css';
+
+/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base Styles */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
-    color: #1a1a1a;
-    background: #f8fafc;
+    background: var(--color-gray-900);
+    color: var(--color-white);
     min-height: 100vh;
+}
+
+/* Theme Variations */
+[data-theme="default"] {
+    --primary-color: var(--color-blue-600);
+    --secondary-color: var(--color-purple-600);
+}
+
+[data-theme="darkCoder"] {
+    --primary-color: var(--color-green-400);
+    --secondary-color: var(--color-blue-400);
+}
+
+[data-theme="matrix"] {
+    --primary-color: var(--color-green-500);
+    --secondary-color: var(--color-green-300);
+}
+
+/* Custom Components */
+.assessment-item {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.risk-badge.risk-low { 
+    background-color: rgba(22, 163, 74, 0.2);
+    color: var(--color-green-400);
+}
+
+.risk-badge.risk-medium { 
+    background-color: rgba(202, 138, 4, 0.2);
+    color: var(--color-yellow-400);
+}
+
+.risk-badge.risk-high { 
+    background-color: rgba(220, 38, 38, 0.2);
+    color: var(--color-red-400);
+}
+
+.risk-badge.risk-critical { 
+    background-color: rgba(147, 51, 234, 0.2);
+    color: var(--color-purple-400);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .premium-nav {
+        width: 4rem;
+    }
+    .main-content {
+        margin-left: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .premium-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 4rem;
+    }
 }
 
 .container {
@@ -563,40 +649,6 @@ body {
 .rec-text {
     color: #374151;
     line-height: 1.5;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .results-header {
-        padding: 30px 20px 40px;
-    }
-    .tool-name {
-        font-size: 2rem;
-    }
-    .main-score-card {
-        flex-direction: column;
-        margin: -30px 20px 30px;
-        padding: 30px;
-        gap: 20px;
-    }
-    .score-description {
-        padding-left: 0;
-        border-left: none;
-        border-top: 3px solid #e5e7eb;
-        padding-top: 20px;
-    }
-    .insights-grid {
-        grid-template-columns: 1fr;
-        padding: 0 20px 30px;
-    }
-    .recommendations-section,
-    .detailed-breakdown-section {
-        margin: 0 20px 30px;
-        padding: 20px;
-    }
-    .btn-group {
-        padding: 30px 20px;
-    }
 }
 
 /* Messages */
@@ -1722,39 +1774,24 @@ body {
 /* Responsive Design */
 @media (max-width: 1024px) {
     .premium-nav {
-        width: 240px;
+        width: 4rem;
     }
-    
     .main-content {
-        margin-left: 240px;
-    }
-    
-    .progress-overview {
-        grid-template-columns: 1fr;
+        margin-left: 4rem;
     }
 }
 
 @media (max-width: 768px) {
     .premium-nav {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
     }
-    
-    .premium-nav.mobile-open {
-        transform: translateX(0);
-    }
-    
     .main-content {
         margin-left: 0;
-        padding: 1rem;
-    }
-    
-    .theme-gallery {
-        grid-template-columns: 1fr;
-    }
-    
-    .achievements-grid {
-        grid-template-columns: 1fr;
+        margin-bottom: 4rem;
     }
 }
 
@@ -1794,12 +1831,6 @@ body {
 .w-6 { width: 1.5rem; }
 .w-8 { width: 2rem; }
 .w-10 { width: 2.5rem; }
-.h-2 { height: 0.5rem; }
-.h-4 { height: 1rem; }
-.h-5 { height: 1.25rem; }
-.h-6 { height: 1.5rem; }
-.h-8 { height: 2rem; }
-.h-10 { height: 2.5rem; }
 
 /* Spacing utilities */
 .p-3 { padding: 0.75rem; }
