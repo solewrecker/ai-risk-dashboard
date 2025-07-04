@@ -59,7 +59,7 @@ export function startNewAssessment() {
 
 // --- UI Updates ---
 export function updateUIForAuth() {
-    const saveButton = document.querySelector('button[onclick="saveToDatabase()"]');
+    const saveButton = document.getElementById('saveToDbBtn');
     const loginSection = document.getElementById('loginSection');
     const currentUser = getCurrentUser();
     const isAdmin = getIsAdmin();
