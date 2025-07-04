@@ -80,7 +80,7 @@ export class AchievementsManager {
                     <div class="achievement-icon ${status}">
                         <i data-lucide="${achievement.icon}"></i>
                     </div>
-                    <h3 class="achievement-name ${status}">${achievement.name}</h3>
+                    <h3 class="achievement-name">${achievement.name}</h3>
                 </div>
                 <p class="achievement-description">${achievement.description}</p>
                 ${this.renderProgress(progress)}
@@ -89,7 +89,7 @@ export class AchievementsManager {
     }
 
     renderProgress(progress) {
-        const progressBar = `
+        return `
             <div class="achievement-progress-wrapper">
                 <div class="achievement-progress">
                     <div class="progress-bar ${progress.isUnlocked ? 'complete' : 'in-progress'}" 
@@ -98,19 +98,13 @@ export class AchievementsManager {
                 </div>
                 <div class="progress-numbers">${progress.current}/${progress.required}</div>
             </div>
-        `;
-
-        if (progress.isUnlocked) {
-            return `
-                ${progressBar}
-                <div class="unlock-status unlocked">
+            ${progress.isUnlocked ? `
+                <div class="unlock-status">
                     <i data-lucide="check-circle"></i>
                     <span>Unlocked!</span>
                 </div>
-            `;
-        }
-
-        return progressBar;
+            ` : ''}
+        `;
     }
 
     render() {
@@ -131,11 +125,9 @@ export class AchievementsManager {
             almostThereHTML = `
                 <div class="almost-there">
                     <div class="almost-there-icon">
-                        <i data-lucide="award"></i>
+                        <i data-lucide="trophy"></i>
                     </div>
-                    <div class="almost-there-text">
-                        Complete ${remaining} more assessment${remaining > 1 ? 's' : ''} to unlock the "${nextAchievement.name}" achievement!
-                    </div>
+                    <span>Complete ${remaining} more to unlock "${nextAchievement.name}"</span>
                 </div>
             `;
         }
@@ -147,8 +139,8 @@ export class AchievementsManager {
             </div>
             <div class="achievements-grid">
                 ${achievementsHTML}
-                ${almostThereHTML}
             </div>
+            ${almostThereHTML}
         `;
 
         if (window.lucide) {
