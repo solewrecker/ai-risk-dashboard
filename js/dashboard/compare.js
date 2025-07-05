@@ -133,12 +133,18 @@ function renderModal() {
             ${availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
               availableTools.map(tool => {
                 const isSelected = modalSelectedTools.some(t => String(t.id) === String(tool.id));
+                const risk = (tool.risk_level || '').toLowerCase();
+                const score = tool.total_score || 0;
                 return `
                   <div class="compare-tools__modal-item${isSelected ? ' compare-tools__modal-item--selected' : ''}" data-tool-id="${tool.id}">
                     <div class="compare-tools__modal-item-check">${isSelected ? '&#10003;' : ''}</div>
                     <div class="compare-tools__modal-item-info">
                       <div class="compare-tools__modal-item-name">${tool.name}</div>
                       <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
+                    </div>
+                    <div class="compare-tools__modal-item-score-group">
+                      <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk}">${score}</span>
+                      ${getRiskBadge(risk, score)}
                     </div>
                   </div>
                 `;
@@ -279,4 +285,28 @@ function normalizeAssessments(raw) {
         total_score: a.total_score || 0,
         // Add more fields if needed
     }));
+}
+
+// Add helper for risk badge
+function getRiskBadge(risk, score) {
+    let color = '', icon = '', label = '';
+    switch ((risk || '').toLowerCase()) {
+        case 'high':
+            color = 'compare-tools__risk-badge--high';
+            icon = '⚠️';
+            label = 'HIGH';
+            break;
+        case 'medium':
+            color = 'compare-tools__risk-badge--medium';
+            icon = '👁️';
+            label = 'MEDIUM';
+            break;
+        case 'low':
+        default:
+            color = 'compare-tools__risk-badge--low';
+            icon = '✔️';
+            label = 'LOW';
+            break;
+    }
+    return `<span class="compare-tools__risk-badge ${color}">${icon} ${label}</span>`;
 } 
