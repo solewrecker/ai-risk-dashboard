@@ -54,3 +54,125 @@ body.creator-page {
         display: none; /* Hide headers on mobile, use data attributes instead */
     }
 }
+
+/* ==========================================================================
+   Page: Assessment List
+   ========================================================================== */
+
+body.assessment-page {
+    background: #0f172a; /* Dark background to match dashboard */
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+/* Main content area */
+.assessment-content-area {
+    padding: 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Search and filters section */
+.assessment-controls {
+    background: var(--color-gray-900); /* Darker background */
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-gray-800);
+}
+
+/* Search input to match dark theme */
+.assessment-controls .search-input {
+    background: var(--color-gray-800);
+    color: #e2e8f0;
+    border: 1px solid var(--color-gray-700);
+}
+
+.assessment-controls .search-input::placeholder {
+    color: var(--color-gray-500);
+}
+
+/* Table header */
+.assessment-table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--color-gray-900);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-gray-400);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-gray-800);
+}
+
+/* List item styling */
+.assessment-list-item {
+    background: var(--color-gray-800);
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.assessment-list-item:hover {
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.assessment-list-item .tool-name {
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+.assessment-list-item .tool-category {
+    color: var(--color-gray-400);
+}
+
+/* Risk level badges */
+.risk-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.risk-badge.risk-low { 
+    background-color: rgba(22, 163, 74, 0.2);
+    color: var(--color-green-400);
+}
+
+.risk-badge.risk-medium { 
+    background-color: rgba(202, 138, 4, 0.2);
+    color: var(--color-yellow-400);
+}
+
+.risk-badge.risk-high { 
+    background-color: rgba(220, 38, 38, 0.2);
+    color: var(--color-red-400);
+}
+
+.risk-badge.risk-critical { 
+    background-color: rgba(147, 51, 234, 0.2);
+    color: var(--color-purple-400);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .assessment-content-area {
+        padding: 1rem;
+    }
+    
+    .assessment-controls {
+        padding: 1rem;
+    }
+    
+    .assessment-table-header {
+        display: none; /* Hide headers on mobile, use data attributes instead */
+    }
+}
