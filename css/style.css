@@ -26,6 +26,7 @@
 @import 'components/dashboard/achievements.css';
 @import 'components/import/import.css';
 @import 'components/compare/compare-tools.css';
+@import 'components/admin/upload-tool.css';
 
 /* Theme Variations */
 [data-theme="default"] {
