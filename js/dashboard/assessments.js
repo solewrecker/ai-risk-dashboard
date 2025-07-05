@@ -22,11 +22,11 @@ export async function loadAssessments() {
 
     if (!container) return;
 
-    // 1. Show Loader
+    // 1. Show Loader using the correct CSS classes
     container.innerHTML = `
-        <div class="loading-state-container">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading AI tool database...</p>
+        <div class="loading-state" style="text-align: center; padding: 40px;">
+            <div class="spinner"></div>
+            <p>Loading AI tool database...</p>
         </div>
     `;
     if (resultsCount) {
