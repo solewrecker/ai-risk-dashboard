@@ -22,6 +22,7 @@
 @import 'components/assessment-list.css';
 @import 'components/quick-actions.css';
 @import 'components/achievements.css';
+@import 'components/dashboard/quick-actions.css';
 
 /* Theme Variations */
 [data-theme="default"] {
