@@ -1,6 +1,8 @@
 // js/dashboard/compare.js
 // Logic for the Compare Tools tab: dynamic rendering, tool selection, and interactivity
 
+import { loadAssessments, getAssessments } from './assessments.js';
+
 // Placeholder for tool data (to be replaced with real data integration)
 let allTools = [];
 let selectedTools = [];
@@ -164,7 +166,9 @@ function setupEventListeners() {
         }
     });
     // Add Tool button
-    document.querySelector('.compare-tools__add-btn').addEventListener('click', () => {
+    document.querySelector('.compare-tools__add-btn').addEventListener('click', async () => {
+        await loadAssessments();
+        initCompareTools(getAssessments());
         showModal = true;
         modalSearchTerm = '';
         renderModal();
