@@ -92,9 +92,23 @@ function renderModal() {
         modal.id = 'compare-tools-modal';
         document.body.appendChild(modal);
     }
-    // Always use allTools (the user's assessments) for available tools
-    const availableTools = allTools.filter(tool => !selectedTools.some(sel => sel.id === tool.id) &&
-        (tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()))));
+    // --- Modal State for Multi-Select ---
+    // Use a local copy of selectedTools for modal state
+    if (!window._modalSelectedTools) window._modalSelectedTools = [...selectedTools];
+    let modalSelectedTools = window._modalSelectedTools;
+    // --- Filters ---
+    const riskLevels = ['ALL', 'HIGH', 'MEDIUM', 'LOW'];
+    const vendors = Array.from(new Set(allTools.map(t => t.vendor).filter(Boolean)));
+    const riskFilter = window._modalRiskFilter || 'ALL';
+    const vendorFilter = window._modalVendorFilter || 'ALL';
+    // --- Filtering ---
+    const availableTools = allTools.filter(tool => {
+        const matchesSearch = tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()));
+        const matchesRisk = riskFilter === 'ALL' || (tool.risk_level || tool.riskLevel || '').toUpperCase() === riskFilter;
+        const matchesVendor = vendorFilter === 'ALL' || tool.vendor === vendorFilter;
+        return matchesSearch && matchesRisk && matchesVendor;
+    });
+    // --- Modal HTML ---
     modal.innerHTML = `
       <div class="compare-tools__modal-overlay">
         <div class="compare-tools__modal-content">
@@ -102,22 +116,40 @@ function renderModal() {
             <h2>Select AI Tools to Compare</h2>
             <button class="compare-tools__modal-close" title="Close">&times;</button>
           </div>
-          <div class="compare-tools__modal-search">
-            <input type="text" class="compare-tools__modal-search-input" placeholder="Search tools..." value="${modalSearchTerm}" />
+          <div class="compare-tools__modal-search-row">
+            <div class="compare-tools__modal-search">
+              <input type="text" class="compare-tools__modal-search-input" placeholder="Search tools..." value="${modalSearchTerm}" />
+            </div>
+            <select class="compare-tools__modal-filter" data-filter="risk">
+              ${riskLevels.map(risk => `<option value="${risk}"${risk === riskFilter ? ' selected' : ''}>${risk === 'ALL' ? 'All Risk Levels' : risk.charAt(0) + risk.slice(1).toLowerCase() + ' Risk'}</option>`).join('')}
+            </select>
+            <select class="compare-tools__modal-filter" data-filter="vendor">
+              <option value="ALL"${vendorFilter === 'ALL' ? ' selected' : ''}>All Vendors</option>
+              ${vendors.map(vendor => `<option value="${vendor}"${vendor === vendorFilter ? ' selected' : ''}>${vendor}</option>`).join('')}
+            </select>
           </div>
-          <div class="compare-tools__modal-list">
+          <div class="compare-tools__modal-list-grid">
             ${availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
-              availableTools.map(tool => `
-                <div class="compare-tools__modal-item" data-tool-id="${tool.id}">
-                  <div class="compare-tools__modal-item-name">${tool.name}</div>
-                  <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
-                </div>
-              `).join('')}
+              availableTools.map(tool => {
+                const isSelected = modalSelectedTools.some(t => String(t.id) === String(tool.id));
+                return `
+                  <div class="compare-tools__modal-item${isSelected ? ' compare-tools__modal-item--selected' : ''}" data-tool-id="${tool.id}">
+                    <div class="compare-tools__modal-item-check">${isSelected ? '&#10003;' : ''}</div>
+                    <div class="compare-tools__modal-item-info">
+                      <div class="compare-tools__modal-item-name">${tool.name}</div>
+                      <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+          </div>
+          <div class="compare-tools__modal-footer">
+            <button class="compare-tools__modal-cancel">Cancel</button>
+            <button class="compare-tools__modal-apply">Apply Selection</button>
           </div>
         </div>
       </div>
     `;
-    // Modal styles are handled in CSS
 }
 
 function setupEventListeners() {
@@ -146,11 +178,15 @@ function setupModalListeners() {
     // Close modal
     modal.querySelector('.compare-tools__modal-close').addEventListener('click', () => {
         showModal = false;
+        window._modalSelectedTools = undefined;
         renderModal();
     });
-    modal.querySelector('.compare-tools__modal-overlay').addEventListener('click', () => {
-        showModal = false;
-        renderModal();
+    modal.querySelector('.compare-tools__modal-overlay').addEventListener('click', (e) => {
+        if (e.target === modal.querySelector('.compare-tools__modal-overlay')) {
+            showModal = false;
+            window._modalSelectedTools = undefined;
+            renderModal();
+        }
     });
     // Search input
     modal.querySelector('.compare-tools__modal-search-input').addEventListener('input', (e) => {
@@ -158,20 +194,50 @@ function setupModalListeners() {
         renderModal();
         setupModalListeners();
     });
-    // Tool selection
+    // Filter dropdowns
+    modal.querySelectorAll('.compare-tools__modal-filter').forEach(select => {
+        select.addEventListener('change', (e) => {
+            if (select.dataset.filter === 'risk') {
+                window._modalRiskFilter = select.value;
+            } else if (select.dataset.filter === 'vendor') {
+                window._modalVendorFilter = select.value;
+            }
+            renderModal();
+            setupModalListeners();
+        });
+    });
+    // Tool selection (multi-select)
     modal.querySelectorAll('.compare-tools__modal-item').forEach(item => {
         item.addEventListener('click', () => {
             const toolId = item.getAttribute('data-tool-id');
-            const tool = allTools.find(t => String(t.id) === String(toolId));
-            if (tool) {
-                selectedTools.push(tool);
-                showModal = false;
-                renderSummaryCards();
-                renderSelectedTags();
-                renderTable();
-                renderModal();
+            let modalSelectedTools = window._modalSelectedTools || [];
+            const idx = modalSelectedTools.findIndex(t => String(t.id) === String(toolId));
+            if (idx > -1) {
+                modalSelectedTools.splice(idx, 1);
+            } else {
+                const tool = allTools.find(t => String(t.id) === String(toolId));
+                if (tool) modalSelectedTools.push(tool);
             }
+            window._modalSelectedTools = modalSelectedTools;
+            renderModal();
+            setupModalListeners();
         });
+    });
+    // Cancel button
+    modal.querySelector('.compare-tools__modal-cancel').addEventListener('click', () => {
+        showModal = false;
+        window._modalSelectedTools = undefined;
+        renderModal();
+    });
+    // Apply button
+    modal.querySelector('.compare-tools__modal-apply').addEventListener('click', () => {
+        selectedTools = [...(window._modalSelectedTools || [])];
+        showModal = false;
+        window._modalSelectedTools = undefined;
+        renderSummaryCards();
+        renderSelectedTags();
+        renderTable();
+        renderModal();
     });
 }
 
