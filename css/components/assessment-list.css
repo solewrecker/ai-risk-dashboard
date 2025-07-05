@@ -1,21 +1,19 @@
 /* Dashboard Assessment List Container */
 .dashboard-assessment-list {
     background: var(--color-gray-800);
-    border-radius: 0.5rem;
-    overflow: hidden;
+    border-radius: 1rem;
+    padding: 1.5rem;
 }
 
-/* Dashboard Assessment List Header */
 .dashboard-assessment-list-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--color-gray-700);
+    margin-bottom: 1.5rem;
 }
 
 .dashboard-assessment-list-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--color-white);
 }
@@ -31,24 +29,22 @@
     gap: 0.75rem;
 }
 
-/* Dashboard Assessment Items Container */
-#assessmentsList {
-    padding: 1rem;
-}
-
 /* Dashboard Assessment Item */
 .dashboard-assessment-item {
     display: flex;
     align-items: center;
-    padding: 1rem;
-    background: var(--color-gray-700);
-    border-radius: 0.5rem;
-    margin-bottom: 0.75rem;
-    transition: background-color 150ms;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    transition: all 200ms ease;
 }
 
 .dashboard-assessment-item:hover {
-    background: var(--color-gray-600);
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
 }
 
 .dashboard-assessment-item:last-child {
@@ -60,18 +56,32 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex: 1;
 }
 
 .dashboard-assessment-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    position: relative;
+    width: 3rem;
+    height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--color-gray-600);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
+}
+
+.dashboard-assessment-icon i {
+    font-size: 1.5rem;
     color: var(--color-blue-400);
+}
+
+.dashboard-assessment-risk-indicator {
+    position: absolute;
+    bottom: -0.25rem;
+    right: -0.25rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    border: 2px solid var(--color-gray-800);
 }
 
 .dashboard-assessment-info {
@@ -93,59 +103,103 @@
     color: var(--color-gray-400);
 }
 
-/* Risk Score Display */
-.risk-score {
+.dashboard-assessment-meta-divider {
+    color: var(--color-gray-500);
+}
+
+/* Dashboard Assessment Score */
+.dashboard-assessment-score {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    margin-left: 1.5rem;
+    align-items: center;
+    background: var(--color-gray-900);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-right: 1.5rem;
+    min-width: 80px;
+    border: 1px solid var(--color-gray-700);
 }
 
-.risk-score-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-orange-400);
+.score-value {
+    font-size: 1.75rem;
+    font-weight: 700;
     line-height: 1;
+    margin-bottom: 0.25rem;
 }
 
-.risk-score-label {
+.score-value.risk-low { 
+    color: var(--color-green-400);
+}
+
+.score-value.risk-medium { 
+    color: var(--color-yellow-400);
+}
+
+.score-value.risk-high { 
+    color: var(--color-red-400);
+}
+
+.score-value.risk-critical { 
+    color: var(--color-purple-400);
+}
+
+.score-label {
     font-size: 0.75rem;
+    font-weight: 500;
     color: var(--color-gray-400);
     text-transform: uppercase;
-    margin-top: 0.25rem;
+    letter-spacing: 0.05em;
 }
 
-/* Action Buttons */
+/* Dashboard Assessment Actions */
+.dashboard-assessment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .action-button {
-    width: 2rem;
-    height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-gray-800);
-    border-radius: 0.375rem;
-    color: var(--color-gray-400);
-    transition: all 150ms;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    color: var(--color-gray-300);
+    background: rgba(17, 24, 39, 0.4);
+    border: 1px solid rgba(55, 65, 81, 0.2);
+    transition: all 200ms ease;
 }
 
 .action-button:hover {
     background: var(--color-gray-700);
     color: var(--color-white);
+    border-color: rgba(55, 65, 81, 0.4);
+    transform: translateY(-1px);
 }
+
+.action-button:active {
+    transform: translateY(0);
+}
+
+/* Risk badges are defined in style.css - removed duplicates */
 
 /* View All Link */
 .view-all-link {
     display: block;
     text-align: center;
     padding: 1rem;
+    margin-top: 1.5rem;
     color: var(--color-blue-400);
     font-weight: 500;
-    border-top: 1px solid var(--color-gray-700);
-    transition: background-color 150ms;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 150ms ease;
 }
 
 .view-all-link:hover {
     background: var(--color-gray-700);
+    color: var(--color-blue-300);
 }
 
 /* Export Button */
@@ -191,9 +245,8 @@
         gap: 1rem;
     }
     
-    .risk-score {
-        margin-left: 0;
-        align-items: flex-start;
+    .dashboard-assessment-meta {
+        flex-wrap: wrap;
     }
     
     .dashboard-assessment-actions {
@@ -201,26 +254,57 @@
         justify-content: flex-end;
         margin-top: 0.5rem;
     }
+    
+    .dashboard-assessment-score {
+        margin-right: 0;
+        margin-top: 0.5rem;
+    }
+    
+    .dashboard-assessment-list-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .export-button {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
-/* Loading, Error and Empty States */
+/* Loading, Empty and Error States */
 .loading-state-container, .error-state-container, .empty-state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 250px;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    background: rgba(31, 41, 55, 0.5); /* gray-800 with alpha */
     text-align: center;
-    padding: 3rem 1.5rem;
-    color: var(--color-gray-400);
+}
+
+.loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 4px solid rgba(96, 165, 250, 0.2); /* blue-400 with alpha */
+    border-top-color: var(--color-blue-400);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
 }
 
 .loading-text, .error-title, .empty-state-title {
-    font-weight: 500;
-    margin: 1rem 0 0.5rem;
-    color: var(--color-white);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-gray-100);
 }
 
 .error-message, .empty-state-message {
     font-size: 0.875rem;
     color: var(--color-gray-400);
-    max-width: 20rem;
-    margin: 0 auto;
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .error-state-container {
