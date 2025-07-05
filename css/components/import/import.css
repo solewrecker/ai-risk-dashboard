@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Component: Import Tab Panel
+   ========================================================================== */
+
+.import-panel {
+    background: var(--color-gray-800);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.import-panel__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+    margin-bottom: 1rem;
+}
+
+.import-panel__desc {
+    color: var(--color-gray-400);
+    margin-bottom: 2rem;
+}
+
+.import-panel__dropzone {
+    border: 2px dashed var(--color-gray-600);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--color-gray-900);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 1.5rem;
+}
+.import-panel__dropzone:hover, .import-panel__dropzone.active {
+    border-color: var(--color-blue-500);
+}
+.import-panel__icon {
+    font-size: 2.5rem;
+    color: var(--color-gray-500);
+    margin-bottom: 1rem;
+}
+.import-panel__file-list {
+    margin-top: 1rem;
+    color: var(--color-gray-300);
+    font-size: 0.95rem;
+}
+.import-panel__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--color-blue-600);
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background 0.2s;
+}
+.import-panel__button:hover {
+    background: var(--color-blue-700);
+}
+.import-panel__error {
+    color: var(--color-red-400);
+    margin-top: 1rem;
+    font-size: 0.95rem;
+} 

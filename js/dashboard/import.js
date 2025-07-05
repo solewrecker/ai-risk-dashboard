@@ -26,7 +26,7 @@ export function handleFileSelect(event) {
 
     Array.from(files).forEach(file => {
         const fileItem = document.createElement('div');
-        fileItem.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg';
+        fileItem.className = 'import-panel__file-list-item';
         fileItem.innerHTML = `
             <div class="flex items-center space-x-2">
                 <i data-lucide="file-text" class="w-5 h-5 text-gray-400"></i>

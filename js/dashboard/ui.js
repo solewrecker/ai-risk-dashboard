@@ -58,14 +58,14 @@ export function setupEventListeners() {
         dropzone.addEventListener('click', () => fileInput.click());
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropzone.classList.add('border-blue-500');
+            dropzone.classList.add('active');
         });
         dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('border-blue-500');
+            dropzone.classList.remove('active');
         });
         dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropzone.classList.remove('border-blue-500');
+            dropzone.classList.remove('active');
             if (e.dataTransfer.files.length) {
                 fileInput.files = e.dataTransfer.files;
                 handleFileSelect({ target: fileInput });
