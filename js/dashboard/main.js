@@ -7,7 +7,7 @@ import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, fil
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 import { AchievementsManager } from './achievements.js';
-import { updateTierBadge, switchTab, setupEventListeners, closeBanner } from './ui.js';
+import { updateTierBadge, setupEventListeners, closeBanner } from './ui.js';
 import { injectDashboardAdminUI } from './admin-ui.js';
 import { initCompareTools } from './compare.js';
 
