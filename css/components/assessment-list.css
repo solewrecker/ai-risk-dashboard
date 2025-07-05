@@ -1,66 +1,64 @@
-/* Assessment List Container */
-.assessment-list {
+/* Dashboard Assessment List Container */
+.dashboard-assessment-list {
     background: var(--color-gray-800);
     border-radius: 1rem;
     padding: 1.5rem;
 }
 
-.assessment-list-header {
+.dashboard-assessment-list-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.5rem;
 }
 
-.assessment-list-title {
+.dashboard-assessment-list-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--color-white);
 }
 
-.assessment-list-subtitle {
+.dashboard-assessment-list-subtitle {
     font-size: 0.875rem;
     color: var(--color-gray-400);
     margin-top: 0.25rem;
 }
 
-.assessment-list-actions {
+.dashboard-assessment-list-actions {
     display: flex;
     gap: 0.75rem;
 }
 
-/* Assessment Item */
-.assessment-item {
+/* Dashboard Assessment Item */
+.dashboard-assessment-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem;
-    background: rgba(30, 41, 59, 0.5);  /* Slightly different than container background */
-    border: 1px solid rgba(55, 65, 81, 0.3);  /* Subtle border */
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
     border-radius: 0.75rem;
     margin-bottom: 1rem;
     transition: all 200ms ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.assessment-item:hover {
-    background: rgba(30, 41, 59, 0.8);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+.dashboard-assessment-item:hover {
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
 }
 
-.assessment-item:last-child {
+.dashboard-assessment-item:last-child {
     margin-bottom: 0;
 }
 
-/* Assessment Content */
-.assessment-content {
+/* Dashboard Assessment Content */
+.dashboard-assessment-content {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.assessment-icon {
+.dashboard-assessment-icon {
     position: relative;
     width: 3rem;
     height: 3rem;
@@ -71,12 +69,12 @@
     border-radius: 0.75rem;
 }
 
-.assessment-icon i {
+.dashboard-assessment-icon i {
     font-size: 1.5rem;
     color: var(--color-blue-400);
 }
 
-.assessment-risk-indicator {
+.dashboard-assessment-risk-indicator {
     position: absolute;
     bottom: -0.25rem;
     right: -0.25rem;
@@ -86,18 +84,18 @@
     border: 2px solid var(--color-gray-800);
 }
 
-.assessment-info {
+.dashboard-assessment-info {
     flex: 1;
 }
 
-.assessment-name {
+.dashboard-assessment-name {
     font-size: 1rem;
     font-weight: 500;
     color: var(--color-white);
     margin-bottom: 0.25rem;
 }
 
-.assessment-meta {
+.dashboard-assessment-meta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -105,21 +103,21 @@
     color: var(--color-gray-400);
 }
 
-.assessment-meta-divider {
+.dashboard-assessment-meta-divider {
     color: var(--color-gray-500);
 }
 
-/* Assessment Score */
-.assessment-score {
+/* Dashboard Assessment Score */
+.dashboard-assessment-score {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(17, 24, 39, 0.4);
+    background: var(--color-gray-900);
     padding: 0.75rem 1rem;
     border-radius: 0.75rem;
     margin-right: 1.5rem;
     min-width: 80px;
-    border: 1px solid rgba(55, 65, 81, 0.2);
+    border: 1px solid var(--color-gray-700);
 }
 
 .score-value {
@@ -153,8 +151,8 @@
     letter-spacing: 0.05em;
 }
 
-/* Assessment Actions */
-.assessment-actions {
+/* Dashboard Assessment Actions */
+.dashboard-assessment-actions {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -241,28 +239,28 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .assessment-item {
+    .dashboard-assessment-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
     
-    .assessment-meta {
+    .dashboard-assessment-meta {
         flex-wrap: wrap;
     }
     
-    .assessment-actions {
+    .dashboard-assessment-actions {
         width: 100%;
         justify-content: flex-end;
         margin-top: 0.5rem;
     }
     
-    .assessment-score {
+    .dashboard-assessment-score {
         margin-right: 0;
         margin-top: 0.5rem;
     }
     
-    .assessment-list-actions {
+    .dashboard-assessment-list-actions {
         flex-direction: column;
         width: 100%;
     }

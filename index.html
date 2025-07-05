@@ -43,10 +43,10 @@
     
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="assessment-page">
-    <div class="container">
+<body class="creator-page">
+    <div class="page-container">
         <!-- Header -->
-        <div class="header">
+        <div class="creator-header">
             <h1>AI Tool Risk Assessment</h1>
             <p>Enterprise-grade security analysis for AI tools and platforms</p>
         </div>
@@ -291,47 +291,21 @@
 
                     <!-- Step 4: Results -->
                     <div class="step-section" id="section4">
-                        <div id="resultsCard">
-                            <!-- Header Section -->
-                            <div class="results-header">
-                                <div class="tool-title-section">
-                                    <h2 id="toolNameResults" class="tool-name">Tool Name Loading...</h2>
-                                    <p class="results-subtitle">Risk Assessment Results</p>
+                        <div class="creator-results-container modern-results-container">
+                            <!-- This is where the results will be displayed -->
+                            <div class="creator-results-header">
+                                <h3 class="creator-results-title">Analysis Complete</h3>
+                                <p class="creator-results-subtitle">Risk Assessment Results</p>
+                            </div>
+                            <div id="resultsContent" class="p-6">
+                                <!-- Detailed results will be injected here by JavaScript -->
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Generating your detailed risk report...</p>
                                 </div>
-                            </div>
-                            
-                            <!-- Main Score Card -->
-                            <div class="main-score-card">
-                                <div class="score-section">
-                                    <div id="mainScore" class="score-number">--</div>
-                                    <div id="riskLevel" class="score-label">Calculating...</div>
-                                </div>
-                                <div id="scoreDescription" class="score-description">
-                                    <p>Your assessment results are being generated. Please wait a moment.</p>
-                                    <div id="dataSource" class="data-source"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Insights Grid -->
-                            <div id="insightsGrid" class="insights-grid">
-                                <!-- Insight cards will be populated here -->
-                            </div>
-                            
-                            <!-- Recommendations Section -->
-                            <div class="recommendations-section">
-                                <h3>Recommendations</h3>
-                                <ul id="recommendationsList" class="recommendations-list">
-                                    <!-- Recommendations will be populated here -->
-                                </ul>
-                            </div>
-                            
-                            <!-- Detailed Breakdown -->
-                            <div id="detailedBreakdown" class="detailed-breakdown-section">
-                                <!-- Detailed breakdown will be populated here -->
                             </div>
                         </div>
-                        
-                        <div class="btn-group">
+                        <div class="btn-group mt-6">
                             <div style="position: relative; display: inline-block;">
                                 <button type="button" class="btn btn-secondary" id="exportMainBtn">
                                     <i class="fas fa-file-export"></i> Export Options
