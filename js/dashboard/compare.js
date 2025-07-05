@@ -194,9 +194,17 @@ function setupModalListeners() {
     });
     // Search input
     modal.querySelector('.compare-tools__modal-search-input').addEventListener('input', (e) => {
-        modalSearchTerm = e.target.value;
+        const value = e.target.value;
+        const cursorPos = e.target.selectionStart;
+        modalSearchTerm = value;
         renderModal();
         setupModalListeners();
+        // Restore focus and cursor position
+        const input = document.querySelector('.compare-tools__modal-search-input');
+        if (input) {
+            input.focus();
+            input.setSelectionRange(cursorPos, cursorPos);
+        }
     });
     // Filter dropdowns
     modal.querySelectorAll('.compare-tools__modal-filter').forEach(select => {
