@@ -184,35 +184,7 @@
     transform: translateY(0);
 }
 
-/* Risk Badges */
-.risk-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.risk-badge.risk-low { 
-    background: rgba(22, 163, 74, 0.2);
-    color: var(--color-green-400);
-}
-
-.risk-badge.risk-medium { 
-    background: rgba(202, 138, 4, 0.2);
-    color: var(--color-yellow-400);
-}
-
-.risk-badge.risk-high { 
-    background: rgba(220, 38, 38, 0.2);
-    color: var(--color-red-400);
-}
-
-.risk-badge.risk-critical { 
-    background: rgba(147, 51, 234, 0.2);
-    color: var(--color-purple-400);
-}
+/* Risk badges are defined in style.css - removed duplicates */
 
 /* View All Link */
 .view-all-link {
