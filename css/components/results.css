@@ -1,25 +1,27 @@
 /* Creator Results Container */
 .creator-results-container {
-    background: var(--color-gray-800);
+    background: white;
     border-radius: 0.5rem;
     overflow: hidden;
+    border: 1px solid #e2e8f0;
 }
 
 /* Creator Results Header */
 .creator-results-header {
+    text-align: center;
     padding: 1.5rem;
-    border-bottom: 1px solid var(--color-gray-700);
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .creator-results-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--color-white);
+    color: #1e293b;
     margin-bottom: 0.5rem;
 }
 
 .creator-results-subtitle {
-    color: var(--color-gray-400);
+    color: #64748b;
     font-size: 0.875rem;
 }
 
