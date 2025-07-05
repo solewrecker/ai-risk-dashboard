@@ -23,15 +23,17 @@
     background: var(--color-gray-800);
     border: 1px solid var(--color-gray-700);
     border-radius: 0.75rem;
-    transition: all 150ms ease;
+    transition: all 200ms ease;
     text-decoration: none;
     color: var(--color-white);
+    cursor: pointer;
 }
 
 .quick-action-card:hover {
     background: var(--color-gray-700);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     border-color: var(--color-gray-600);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .quick-action-icon {
@@ -47,14 +49,27 @@
 
 .quick-action-icon.new {
     color: var(--color-blue-400);
+    background: var(--color-blue-500/10);
+}
+
+.quick-action-icon.compare {
+    color: var(--color-purple-400);
+    background: var(--color-purple-500/10);
 }
 
 .quick-action-icon.import {
     color: var(--color-green-400);
+    background: var(--color-green-500/10);
 }
 
 .quick-action-icon.export {
     color: var(--color-purple-400);
+    background: var(--color-purple-500/10);
+}
+
+.quick-action-icon i {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .quick-action-content {
