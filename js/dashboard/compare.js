@@ -168,7 +168,7 @@ function setupEventListeners() {
     // Add Tool button
     document.querySelector('.compare-tools__add-btn').addEventListener('click', async () => {
         await loadAssessments();
-        initCompareTools(getAssessments());
+        initCompareTools(normalizeAssessments(getAssessments()));
         showModal = true;
         modalSearchTerm = '';
         renderModal();
@@ -260,4 +260,15 @@ function getRiskLevel(tool) {
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function normalizeAssessments(raw) {
+    return raw.map(a => ({
+        id: a.id,
+        name: a.name || 'Unknown Tool',
+        vendor: a.category || '', // Use category as vendor for the modal
+        risk_level: a.risk_level || '',
+        total_score: a.total_score || 0,
+        // Add more fields if needed
+    }));
 } 
