@@ -105,4 +105,106 @@
         font-weight: 500;
         color: var(--color-gray-300);
     }
+}
+
+/* --- Enhanced Search Bar & Filter Controls --- */
+.dashboard-controls {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--color-gray-900);
+    border-bottom: 1px solid var(--color-gray-700);
+    border-radius: 0.75rem 0.75rem 0 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-container {
+    position: relative;
+    flex: 2 1 300px;
+    background: var(--color-gray-800);
+    border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.search-container:focus-within {
+    box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+}
+
+.search-container i {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-blue-400);
+    font-size: 1.1rem;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1rem;
+    background: transparent;
+    color: var(--color-white);
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: none;
+}
+
+.search-input::placeholder {
+    color: var(--color-gray-400);
+    opacity: 1;
+}
+
+.search-input:focus {
+    outline: none;
+    background: var(--color-gray-700);
+    box-shadow: 0 0 0 2px var(--color-blue-400);
+}
+
+.filter-container {
+    display: flex;
+    gap: 0.75rem;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    background: var(--color-gray-800);
+    color: var(--color-white);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: background 0.2s, box-shadow 0.2s;
+    min-width: 140px;
+    cursor: pointer;
+}
+
+.filter-select:focus,
+.filter-select:hover {
+    background: var(--color-gray-700);
+    box-shadow: 0 0 0 2px var(--color-blue-400);
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    .dashboard-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    .search-container, .filter-container {
+        width: 100%;
+    }
 } 
