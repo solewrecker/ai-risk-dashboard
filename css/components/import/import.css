@@ -1,8 +1,10 @@
+/* (All import-panel styles have been migrated to admin-upload-tool.css) */
+
 /* ==========================================================================
    Component: Import Tab Panel
    ========================================================================== */
 
-.import-panel {
+/* .import-panel {
     background: var(--color-gray-800);
     border-radius: 0.75rem;
     padding: 2rem;
@@ -68,4 +70,4 @@
     color: var(--color-red-400);
     margin-top: 1rem;
     font-size: 0.95rem;
-} 
+} */ 

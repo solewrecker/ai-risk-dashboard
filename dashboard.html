@@ -333,25 +333,26 @@
             
             <!-- Import Tab Content (Admin Only) -->
             <div id="import-content" class="tab-content">
-                <section class="import-panel">
-                    <h2 class="import-panel__title">Import Assessments</h2>
-                    <p class="import-panel__desc">Upload a JSON file containing one or more assessments to add them to the database.</p>
-                    <div class="import-panel__dropzone" id="dropzone">
-                        <input type="file" id="fileInput" accept=".json" class="hidden" multiple>
-                        <div class="import-panel__icon">
-                            <i data-lucide="upload-cloud"></i>
+                <section class="admin-upload-tool">
+                    <h2 class="admin-upload-tool__title">Upload Tool Assessment</h2>
+                    <form class="admin-upload-tool__form">
+                        <div class="admin-upload-tool__dropzone" id="dropzone">
+                            <input type="file" id="fileInput" class="admin-upload-tool__input" accept=".json" multiple>
+                            <div class="admin-upload-tool__icon">
+                                <i data-lucide="upload-cloud"></i>
+                            </div>
+                            <p class="admin-upload-tool__desc">Click to upload or drag and drop</p>
+                            <p class="admin-upload-tool__desc" style="font-size:0.85rem;">JSON up to 10MB</p>
                         </div>
-                        <p class="import-panel__desc">Click to upload or drag and drop</p>
-                        <p class="import-panel__desc" style="font-size:0.85rem;">JSON up to 10MB</p>
-                    </div>
-                    <div id="file-upload-list" class="import-panel__file-list"></div>
-                    <div id="importOptions" style="display:none;">
-                        <button class="import-panel__button" onclick="processImport()">
-                            <i data-lucide="check-circle"></i>
-                            <span>Start Import</span>
-                        </button>
-                    </div>
-                    <div id="importError" class="import-panel__error" style="display:none;"></div>
+                        <div id="file-upload-list" class="admin-upload-tool__file-list"></div>
+                        <div id="importOptions" style="display:none;">
+                            <button class="admin-upload-tool__button" onclick="processImport()">
+                                <i data-lucide="check-circle"></i>
+                                <span>Start Upload</span>
+                            </button>
+                        </div>
+                        <div id="importError" class="admin-upload-tool__error" style="display:none;"></div>
+                    </form>
                 </section>
             </div>
 
