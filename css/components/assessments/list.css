@@ -4,7 +4,10 @@
 
 /* The main container for the assessments tab content */
 .assessments-page {
-    /* Styles for the overall tab content area can go here if needed */
+    background: var(--color-gray-800);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
 }
 
 .assessments-page__header {

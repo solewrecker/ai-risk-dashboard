@@ -22,25 +22,27 @@ export function updateTierBadge() {
 
 export function switchTab(tabName) {
     currentTab = tabName;
-    
+
+    // Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
+        content.classList.remove('active');
     });
 
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white');
-        btn.classList.add('text-gray-300', 'hover:bg-gray-700');
+    // Update nav button styles
+    document.querySelectorAll('.dashboard-nav').forEach(btn => {
+        btn.classList.remove('active');
     });
-    
+
+    // Show the selected tab content
     const activeContent = document.getElementById(`${tabName}-content`);
     if (activeContent) {
-        activeContent.classList.remove('hidden');
+        activeContent.classList.add('active');
     }
-    
+
+    // Highlight the selected nav button
     const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
     if (activeBtn) {
-        activeBtn.classList.remove('text-gray-300', 'hover:bg-gray-700');
-        activeBtn.classList.add('bg-blue-600', 'text-white');
+        activeBtn.classList.add('active');
     }
 
     if (!activeContent && tabName !== 'dashboard') {
