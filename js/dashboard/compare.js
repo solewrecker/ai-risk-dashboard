@@ -42,6 +42,9 @@ function renderSelectedTags() {
             <button class="compare-tools__tag-remove" data-tool-id="${tool.id}" title="Remove">&times;</button>
         </span>
     `).join('');
+    if (selectedTools.length > 0) {
+        container.innerHTML += `<button class="compare-tools__clear-all-btn" title="Clear All">Clear All</button>`;
+    }
 }
 
 function renderTable() {
@@ -168,6 +171,12 @@ function setupEventListeners() {
             renderSelectedTags();
             renderTable();
         }
+        if (e.target.classList.contains('compare-tools__clear-all-btn')) {
+            selectedTools = [];
+            renderSummaryCards();
+            renderSelectedTags();
+            renderTable();
+        }
     });
     // Add Tool button
     document.querySelector('.compare-tools__add-btn').addEventListener('click', async () => {
@@ -225,7 +234,8 @@ function setupModalListeners() {
     });
     // Tool selection (multi-select)
     modal.querySelectorAll('.compare-tools__modal-item').forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent bubbling to overlay
             const toolId = item.getAttribute('data-tool-id');
             let modalSelectedTools = window._modalSelectedTools || [];
             const idx = modalSelectedTools.findIndex(t => String(t.id) === String(toolId));
@@ -239,6 +249,10 @@ function setupModalListeners() {
             renderModal();
             setupModalListeners();
         });
+    });
+    // Prevent modal content clicks from bubbling to overlay
+    modal.querySelector('.compare-tools__modal-content').addEventListener('click', (e) => {
+        e.stopPropagation();
     });
     // Cancel button
     modal.querySelector('.compare-tools__modal-cancel').addEventListener('click', () => {
