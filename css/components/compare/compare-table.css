@@ -1,0 +1,231 @@
+/* ===========================================================================
+   Compare Tools Table - Styles for main table, expandable rows, badges, etc.
+   =========================================================================== */
+
+/* === Table Container & Layout === */
+.compare-table__container {
+  background: #181f2a;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.compare-table__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* === Table Header === */
+.compare-table__thead {
+  background: #232b3a;
+}
+.compare-table__th {
+  color: #b6c2df;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1.25rem 1rem;
+  text-align: left;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid #232b3a;
+}
+
+/* === Table Row & Expandable Row === */
+.compare-table__row {
+  background: #181f2a;
+  transition: background 0.18s;
+}
+.compare-table__row:hover {
+  background: #232b3a;
+}
+.compare-table__row--expanded {
+  box-shadow: 0 2px 12px rgba(59,130,246,0.10);
+}
+.compare-table__td {
+  padding: 1.1rem 1rem;
+  vertical-align: middle;
+  color: #e2e8f0;
+  font-size: 1rem;
+  border-bottom: 1px solid #232b3a;
+}
+
+.compare-table__details-row {
+  background: #20283a;
+}
+.compare-table__details-td {
+  padding: 0;
+  border: none;
+}
+.compare-table__details {
+  margin: 0.5rem 0 1.5rem 0;
+  padding: 2rem 2.5rem;
+  background: #232b3a;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 2px 16px rgba(59,130,246,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.compare-table__details-section {
+  background: #181f2a;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  color: #cbd5e1;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* === Tool Name, Vendor, Chevron === */
+.compare-table__tool-info {
+  display: inline-block;
+  margin-left: 0.75rem;
+  vertical-align: middle;
+}
+.compare-table__tool-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1.08rem;
+}
+.compare-table__tool-vendor {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin-top: 0.1rem;
+}
+.compare-table__chevron-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.2rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: color 0.18s, transform 0.18s;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+}
+.compare-table__chevron-btn:hover {
+  color: #3b82f6;
+  background: #232b3a;
+  transform: scale(1.12);
+}
+.compare-table__chevron {
+  font-size: 1.2rem;
+  display: inline-block;
+}
+
+/* === Risk Level Badge === */
+.compare-table__risk-badge {
+  display: inline-block;
+  padding: 0.45em 1.1em;
+  border-radius: 9999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-right: 0.1em;
+}
+.compare-table__risk-badge--high {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  border: 1.5px solid #f87171;
+}
+.compare-table__risk-badge--medium {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1.5px solid #fbbf24;
+}
+.compare-table__risk-badge--low {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1.5px solid #34d399;
+}
+.compare-table__risk-badge--critical {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+  border: 1.5px solid #ef4444;
+}
+
+/* === Score, Category Columns === */
+.compare-table__score {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #60a5fa;
+}
+.compare-table__score-max {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-left: 0.2em;
+}
+
+/* === Compliance Icons === */
+.compare-table__compliance-icon {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: middle;
+  margin-right: 0.2em;
+}
+
+/* === Recommendations Section === */
+.compare-table__recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #20283a;
+  border-radius: 10px;
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 0.7rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.compare-table__recommendation-dot {
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  margin-top: 0.4em;
+}
+.compare-table__recommendation-dot--high {
+  background: #f87171;
+}
+.compare-table__recommendation-dot--medium {
+  background: #fbbf24;
+}
+.compare-table__recommendation-dot--low {
+  background: #34d399;
+}
+
+/* === Action Button === */
+.compare-table__action-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.3em 0.7em;
+  border-radius: 8px;
+  transition: background 0.18s, color 0.18s;
+}
+.compare-table__action-btn:hover {
+  background: #232b3a;
+  color: #2563eb;
+}
+
+/* === Responsive Styles === */
+@media (max-width: 900px) {
+  .compare-table__details {
+    padding: 1.2rem 0.7rem;
+  }
+  .compare-table__th, .compare-table__td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+@media (max-width: 600px) {
+  .compare-table__container {
+    border-radius: 0;
+  }
+  .compare-table__details {
+    padding: 0.7rem 0.2rem;
+  }
+  .compare-table__details-section {
+    padding: 0.7rem 0.5rem;
+  }
+} 
