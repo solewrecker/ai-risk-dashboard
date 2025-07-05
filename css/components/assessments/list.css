@@ -1,0 +1,105 @@
+/* ==========================================================================
+   Component: Assessments Page List
+   ========================================================================== */
+
+/* The main container for the assessments tab content */
+.assessments-page {
+    /* Styles for the overall tab content area can go here if needed */
+}
+
+.assessments-page__header {
+    display: flex;
+    padding: 1rem;
+    background: var(--color-gray-800);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+}
+
+.assessments-page__list-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-gray-800);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background-color 150ms ease;
+}
+
+.assessments-page__list-item:hover {
+    background: var(--color-gray-700);
+}
+
+.assessments-page__list-item:last-child {
+    border-bottom: none;
+}
+
+/* Column wrappers */
+.assessments-page__col {
+    display: flex;
+    align-items: center;
+}
+
+.assessments-page__col--tool { flex: 3; gap: 1rem; font-weight: 500; }
+.assessments-page__col--score { flex: 1; justify-content: center; }
+.assessments-page__col--level { flex: 1; gap: 0.5rem; }
+.assessments-page__col--date { flex: 1.5; color: var(--color-gray-400); }
+.assessments-page__col--actions { flex: 1; justify-content: flex-end; }
+
+/* Specific elements within columns */
+.assessments-page__tool-info {
+    /* Styles for the container of the tool name and category */
+}
+.assessments-page__tool-info h4 {
+    font-weight: 500;
+    color: var(--color-white);
+    margin: 0 0 0.25rem;
+}
+.assessments-page__tool-info p {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    margin: 0;
+}
+
+.assessments-page__score-badge {
+    color: white;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    background-color: var(--color-gray-600); /* A neutral default */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .assessments-page__header {
+        display: none;
+    }
+    
+    .assessments-page__list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .assessments-page__col {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--color-gray-700);
+    }
+
+    .assessments-page__list-item:last-child .assessments-page__col:last-child {
+        border-bottom: none;
+    }
+
+    .assessments-page__col::before {
+        content: attr(data-label);
+        font-weight: 500;
+        color: var(--color-gray-300);
+    }
+} 

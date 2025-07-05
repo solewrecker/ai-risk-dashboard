@@ -119,15 +119,15 @@ function renderRecentAssessments() {
                               assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
         
         return `
-            <div class="dashboard-assessment-item">
-                <div class="dashboard-assessment-content">
+            <div class="dashboard-summary-assessments__item">
+                <div class="dashboard-summary-assessments__content">
                     <div class="dashboard-assessment-icon">
                         <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
                         <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
                     </div>
-                    <div class="dashboard-assessment-info">
-                        <div class="dashboard-assessment-name">${assessment.name}</div>
-                        <div class="dashboard-assessment-meta">
+                    <div class="dashboard-summary-assessments__info">
+                        <div class="dashboard-summary-assessments__name">${assessment.name}</div>
+                        <div class="dashboard-summary-assessments__meta">
                             <span>${date}</span>
                             <span class="dashboard-assessment-meta-divider">•</span>
                             <span>by ${assessment.created_by || 'Anonymous'}</span>
@@ -189,23 +189,23 @@ function renderAssessmentList() {
         const date = new Date(assessment.created_at).toLocaleDateString();
         
         return `
-            <div class="list-item">
-                <div class="list-col-tool">
-                    <div class="tool-info">
+            <div class="assessments-page__list-item">
+                <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                    <div class="assessments-page__tool-info">
                         <h4>${assessment.name}</h4>
                         <p>${assessment.category || 'General'}</p>
                     </div>
                 </div>
-                <div class="list-col-score">
-                    <span class="score-badge">${assessment.total_score}/100</span>
+                <div class="assessments-page__col assessments-page__col--score" data-label="Score">
+                    <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
                 </div>
-                <div class="list-col-level">
+                <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
                     <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
                 </div>
-                <div class="list-col-date">
+                <div class="assessments-page__col assessments-page__col--date" data-label="Date">
                     <span>${date}</span>
                 </div>
-                <div class="list-col-actions">
+                <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
                     <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
                         <i data-lucide="eye"></i>
                     </button>
@@ -328,23 +328,23 @@ function renderFilteredAssessments(filteredData) {
         const date = new Date(assessment.created_at).toLocaleDateString();
         
         return `
-            <div class="list-item">
-                <div class="list-col-tool">
-                    <div class="tool-info">
+            <div class="assessments-page__list-item">
+                <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                    <div class="assessments-page__tool-info">
                         <h4>${assessment.name}</h4>
                         <p>${assessment.category || 'General'}</p>
                     </div>
                 </div>
-                <div class="list-col-score">
-                    <span class="score-badge">${assessment.total_score}/100</span>
+                <div class="assessments-page__col assessments-page__col--score" data-label="Score">
+                    <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
                 </div>
-                <div class="list-col-level">
+                <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
                     <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
                 </div>
-                <div class="list-col-date">
+                <div class="assessments-page__col assessments-page__col--date" data-label="Date">
                     <span>${date}</span>
                 </div>
-                <div class="list-col-actions">
+                <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
                     <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
                         <i data-lucide="eye"></i>
                     </button>

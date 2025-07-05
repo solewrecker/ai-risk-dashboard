@@ -60,58 +60,58 @@
 
             <!-- Navigation -->
             <nav class="space-y-2">
-                <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors bg-blue-600 text-white">
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('dashboard')" class="dashboard-nav active">
+                    <div class="dashboard-nav__content">
                         <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                        <span>Dashboard</span>
+                        <span class="dashboard-nav__text">Dashboard</span>
                     </div>
                 </button>
                 
-                <button onclick="switchTab('assessments')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('assessments')" class="dashboard-nav">
+                    <div class="dashboard-nav__content">
                         <i data-lucide="file-text" class="w-5 h-5"></i>
-                        <span>Assessments</span>
+                        <span class="dashboard-nav__text">Assessments</span>
                     </div>
-                    <span class="bg-gray-600 px-2 py-0.5 rounded-full text-xs" id="assessmentBadge">18</span>
+                    <span class="dashboard-nav__badge bg-gray-600 px-2 py-0.5 rounded-full text-xs" id="assessmentBadge">18</span>
                 </button>
                 
-                <button onclick="switchTab('compare')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('compare')" class="dashboard-nav">
+                    <div class="dashboard-nav__content">
                         <i data-lucide="trending-up" class="w-5 h-5"></i>
-                        <span>Compare Tools</span>
+                        <span class="dashboard-nav__text">Compare Tools</span>
                     </div>
                 </button>
                 
-                <button onclick="switchTab('team')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700 opacity-50" disabled>
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('team')" class="dashboard-nav" disabled>
+                    <div class="dashboard-nav__content">
                         <i data-lucide="users" class="w-5 h-5"></i>
-                        <span>Team</span>
+                        <span class="dashboard-nav__text">Team</span>
                     </div>
-                    <i data-lucide="crown" class="w-4 h-4 text-yellow-400"></i>
+                    <i data-lucide="crown" class="w-4 h-4 dashboard-nav__pro-icon"></i>
                 </button>
                 
-                <button onclick="switchTab('themes')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('themes')" class="dashboard-nav">
+                    <div class="dashboard-nav__content">
                         <i data-lucide="star" class="w-5 h-5"></i>
-                        <span>Themes</span>
+                        <span class="dashboard-nav__text">Themes</span>
                     </div>
-                    <span class="bg-gray-600 px-2 py-0.5 rounded-full text-xs">1/3</span>
+                    <span class="dashboard-nav__badge bg-gray-600 px-2 py-0.5 rounded-full text-xs">1/3</span>
                 </button>
                 
-                <button onclick="switchTab('templates')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700 opacity-50" disabled>
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('templates')" class="dashboard-nav" disabled>
+                    <div class="dashboard-nav__content">
                         <i data-lucide="file-text" class="w-5 h-5"></i>
-                        <span>Templates</span>
+                        <span class="dashboard-nav__text">Templates</span>
                     </div>
-                    <i data-lucide="crown" class="w-4 h-4 text-yellow-400"></i>
+                    <i data-lucide="crown" class="w-4 h-4 dashboard-nav__pro-icon"></i>
                 </button>
                 
-                <button onclick="switchTab('achievements')" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
-                    <div class="flex items-center space-x-3">
+                <button onclick="switchTab('achievements')" class="dashboard-nav">
+                    <div class="dashboard-nav__content">
                         <i data-lucide="trophy" class="w-5 h-5"></i>
-                        <span>Achievements</span>
+                        <span class="dashboard-nav__text">Achievements</span>
                     </div>
-                    <span class="bg-gray-600 px-2 py-0.5 rounded-full text-xs">1/8</span>
+                    <span class="dashboard-nav__badge bg-gray-600 px-2 py-0.5 rounded-full text-xs">1/8</span>
                 </button>
             </nav>
 
@@ -158,62 +158,62 @@
             <!-- Main dashboard content -->
             <div id="dashboard-content" class="tab-content active">
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-blue-600/20 rounded-lg">
-                                <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
+                <div class="dashboard-stats-grid">
+                    <div class="dashboard-stat-card dashboard-stat-card--assessments">
+                        <div class="dashboard-stat-card__header">
+                            <div class="dashboard-stat-card__icon-wrapper">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-2xl font-bold text-blue-400" id="totalAssessments">18</span>
+                            <span class="dashboard-stat-card__value" id="totalAssessments">18</span>
                         </div>
-                        <h3 class="font-medium mb-1">Total Assessments</h3>
-                        <p class="text-sm text-gray-400" id="remainingText">7 remaining in free tier</p>
+                        <h3 class="dashboard-stat-card__title">Total Assessments</h3>
+                        <p class="dashboard-stat-card__description" id="remainingText">7 remaining in free tier</p>
                     </div>
 
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-red-600/20 rounded-lg">
-                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                    <div class="dashboard-stat-card dashboard-stat-card--high-risk">
+                        <div class="dashboard-stat-card__header">
+                            <div class="dashboard-stat-card__icon-wrapper">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-2xl font-bold text-red-400" id="highRiskCount">3</span>
+                            <span class="dashboard-stat-card__value" id="highRiskCount">3</span>
                         </div>
-                        <h3 class="font-medium mb-1">High Risk Tools</h3>
-                        <p class="text-sm text-gray-400">Require immediate attention</p>
+                        <h3 class="dashboard-stat-card__title">High Risk Tools</h3>
+                        <p class="dashboard-stat-card__description">Require immediate attention</p>
                     </div>
 
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-green-600/20 rounded-lg">
-                                <i data-lucide="check-circle" class="w-6 h-6 text-green-400"></i>
+                    <div class="dashboard-stat-card dashboard-stat-card--low-risk">
+                        <div class="dashboard-stat-card__header">
+                            <div class="dashboard-stat-card__icon-wrapper">
+                                <i data-lucide="check-circle" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-2xl font-bold text-green-400" id="lowRiskCount">7</span>
+                            <span class="dashboard-stat-card__value" id="lowRiskCount">7</span>
                         </div>
-                        <h3 class="font-medium mb-1">Low Risk Tools</h3>
-                        <p class="text-sm text-gray-400">Safe for deployment</p>
+                        <h3 class="dashboard-stat-card__title">Low Risk Tools</h3>
+                        <p class="dashboard-stat-card__description">Safe for deployment</p>
                     </div>
 
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-2 bg-purple-600/20 rounded-lg">
-                                <i data-lucide="trending-up" class="w-6 h-6 text-purple-400"></i>
+                    <div class="dashboard-stat-card dashboard-stat-card--average-score">
+                        <div class="dashboard-stat-card__header">
+                            <div class="dashboard-stat-card__icon-wrapper">
+                                <i data-lucide="trending-up" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-2xl font-bold text-purple-400" id="avgScore">74</span>
+                            <span class="dashboard-stat-card__value" id="avgScore">74</span>
                         </div>
-                        <h3 class="font-medium mb-1">Average Score</h3>
-                        <p class="text-sm text-gray-400">Across all assessments</p>
+                        <h3 class="dashboard-stat-card__title">Average Score</h3>
+                        <p class="dashboard-stat-card__description">Across all assessments</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Recent Assessments -->
                     <div class="lg:col-span-2 bg-gray-800 rounded-lg p-6">
-                        <section class="dashboard-assessment-list">
-                            <div class="dashboard-assessment-list-header">
+                        <section class="dashboard-summary-assessments">
+                            <div class="dashboard-summary-assessments__header">
                                 <div>
-                                    <h2 class="dashboard-assessment-list-title">Recent Assessments</h2>
-                                    <p class="dashboard-assessment-list-subtitle">Latest AI tool risk evaluations</p>
+                                    <h2 class="dashboard-summary-assessments__title">Recent Assessments</h2>
+                                    <p class="dashboard-summary-assessments__subtitle">Latest AI tool risk evaluations</p>
                                 </div>
-                                <div class="dashboard-assessment-list-actions">
+                                <div class="dashboard-summary-assessments__actions">
                                     <button class="icon-button" id="searchButton" aria-label="Search">
                                         <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
                                     </button>
@@ -228,10 +228,11 @@
                             </div>
 
                             <div id="assessmentsList">
-                                <!-- Assessment items will be dynamically populated here -->
+                                <!-- Assessment items will be dynamically populated here.
+                                     The JS should populate items with classes like .dashboard-summary-assessments__item -->
                             </div>
 
-                            <a href="/assessments" class="view-all-link">
+                            <a href="/assessments" class="dashboard-summary-assessments__view-all-link">
                                 View All Assessments →
                             </a>
                         </section>
@@ -283,63 +284,47 @@
             </div>
 
             <!-- Assessments Tab Content -->
-            <div id="assessments-content" class="hidden tab-content">
-                <!-- Original assessment list content -->
-                <div class="dashboard-controls mb-6">
+            <div id="assessments-content" class="tab-content assessments-page">
+                <div class="dashboard-controls">
                     <div class="search-container">
-                        <i data-lucide="search"></i>
-                        <input type="text" id="searchInput" placeholder="Search by tool name..." class="search-input">
+                        <i data-lucide="search" class="w-5 h-5 absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by tool name...">
                     </div>
                     <div class="filter-container">
-                        <select id="riskFilter" class="filter-select" aria-label="Filter by risk">
+                        <select id="riskFilter" class="filter-select">
                             <option value="all">All Risk Levels</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
                             <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
                         </select>
-                        <select id="categoryFilter" class="filter-select" aria-label="Filter by category">
+                        <select id="categoryFilter" class="filter-select">
                             <option value="all">All Categories</option>
-                            <option value="General">General</option>
-                            <option value="Communication">Communication</option>
-                            <option value="Development">Development</option>
-                            <option value="Note-taking">Note-taking</option>
-                            <option value="Writing">Writing</option>
+                            <!-- Options populated by JS -->
                         </select>
-                    </div>
-                    <div class="sort-container">
-                        <select id="sortSelect" class="filter-select" aria-label="Sort by">
-                            <option value="date_desc">Sort: Newest</option>
-                            <option value="date_asc">Sort: Oldest</option>
-                            <option value="score_desc">Sort: Highest Risk</option>
-                            <option value="score_asc">Sort: Lowest Risk</option>
-                            <option value="name_asc">Sort: Name A-Z</option>
-                            <option value="name_desc">Sort: Name Z-A</option>
+                        <select id="sortControl" class="filter-select">
+                            <option value="newest">Sort: Newest</option>
+                            <option value="oldest">Sort: Oldest</option>
+                            <option value="score_desc">Score: High to Low</option>
+                            <option value="score_asc">Score: Low to High</option>
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="results-summary">
-                    <span id="resultsCount">Loading...</span>
-                    <button id="clearFilters" class="btn-link" style="display: none;">Clear Filters</button>
+                    <span id="resultsCount"></span>
                 </div>
                 
-                <div id="assessment-list-container">
-                    <div class="list-header">
-                        <div class="list-col-tool">Tool</div>
-                        <div class="list-col-score">Score</div>
-                        <div class="list-col-level">Risk Level</div>
-                        <div class="list-col-date">Date</div>
-                        <div class="list-col-actions">Actions</div>
-                    </div>
-                    <div id="assessment-list">
-                        <!-- Assessment items will be populated here -->
-                    </div>
-                    <div id="empty-state" style="display: none; text-align: center; padding: 40px;">
-                        <h3>No tools found</h3>
-                        <p>No tools match your current filters. Try adjusting your search.</p>
-                        <button id="resetFilters" class="btn btn-primary" style="margin-top: 20px;">Clear All Filters</button>
-                    </div>
+                <div class="list-header assessments-page__header">
+                    <div class="assessments-page__col assessments-page__col--tool">Tool</div>
+                    <div class="assessments-page__col assessments-page__col--score">Score</div>
+                    <div class="assessments-page__col assessments-page__col--level">Risk Level</div>
+                    <div class="assessments-page__col assessments-page__col--date">Date</div>
+                    <div class="assessments-page__col assessments-page__col--actions">Actions</div>
+                </div>
+
+                <div id="assessment-list">
+                    <!-- Dynamic list content is rendered here by JS -->
                 </div>
             </div>
             

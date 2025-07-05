@@ -14,6 +14,10 @@
 /* Components */
 @import 'components/buttons.css';
 @import 'components/dashboard.css';
+@import 'components/dashboard/navigation.css';
+@import 'components/dashboard/summary-assessments.css';
+@import 'components/dashboard/stats.css';
+@import 'components/assessments/list.css';
 @import 'components/results.css';
 @import 'components/assessment-list.css';
 @import 'components/quick-actions.css';
@@ -755,50 +759,6 @@
     gap: 1rem;
 }
 
-/* Assessment List Styles */
-.list-header {
-    display: flex;
-    font-weight: 600;
-    color: #475569;
-    padding: 0.75rem 1.5rem;
-    border-bottom: 2px solid #e2e8f0;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-.list-item {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    transition: background-color 0.2s;
-}
-.list-item:hover {
-    background-color: #f8fafc;
-}
-.list-item:last-child {
-    border-bottom: none;
-}
-.list-col-tool { flex: 3; display: flex; align-items: center; gap: 1rem; font-weight: 500; }
-.list-col-score { flex: 1; text-align: center; }
-.list-col-level { flex: 1; display: flex; align-items: center; gap: 0.5rem; }
-.list-col-date { flex: 1.5; color: #64748b; }
-.list-col-actions { flex: 1; text-align: right; }
-.list-item-icon { color: #3b82f6; }
-.score-badge {
-    color: white;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-}
-.level-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-
-
 /* Auth Modal Styles */
 .auth-modal-overlay {
     display: none;
@@ -906,7 +866,6 @@
     background: white;
     cursor: pointer;
 }
-
 
 .auth-footer {
     text-align: center;
@@ -1038,16 +997,12 @@
     font-size: 0.875rem;
 }
 
-
-
 @media (max-width: 768px) {
     .dashboard-controls {
         flex-direction: column;
         align-items: stretch;
     }
 }
-
-
 
 .nav-brand {
     padding: 2rem 1.5rem;
@@ -1129,9 +1084,6 @@
     padding: 1rem 1.5rem;
     border-top: 1px solid rgba(255,255,255,0.2);
 }
-
-
-
 
 .content-section {
     display: none;
@@ -1272,8 +1224,6 @@
     font-weight: 600;
     color: #1e293b;
 }
-
-
 
 /* Assessment Dashboard Updates */
 .assessment-dashboard {
