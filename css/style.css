@@ -25,6 +25,7 @@
 @import 'components/dashboard/quick-actions.css';
 @import 'components/dashboard/achievements.css';
 @import 'components/import/import.css';
+@import 'components/compare/compare-tools.css';
 
 /* Theme Variations */
 [data-theme="default"] {

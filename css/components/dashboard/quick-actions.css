@@ -46,9 +46,9 @@
     border-radius: 0.75rem;
     font-size: 1.5rem;
 }
-.dashboard-quick-actions__icon.new { background: rgba(59,130,246,0.15); color: #3b82f6; }
-.dashboard-quick-actions__icon.compare { background: rgba(168,85,247,0.15); color: #a855f7; }
-.dashboard-quick-actions__icon.export { background: rgba(16,185,129,0.15); color: #10b981; }
+.dashboard-quick-actions__icon--new { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.dashboard-quick-actions__icon--compare { background: rgba(168,85,247,0.15); color: #a855f7; }
+.dashboard-quick-actions__icon--export { background: rgba(16,185,129,0.15); color: #10b981; }
 
 .dashboard-quick-actions__content {
     flex: 1;

@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Component: Compare Tools Tab
+   ========================================================================== */
+
+.compare-tools {
+    background: var(--color-gray-800);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.compare-tools__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+    margin-bottom: 1.5rem;
+}
+
+.compare-tools__desc {
+    color: var(--color-gray-400);
+    margin-bottom: 2rem;
+}
+
+.compare-tools__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-gray-900);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+.compare-tools__thead th {
+    background: var(--color-gray-700);
+    color: var(--color-gray-300);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--color-gray-800);
+}
+.compare-tools__tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-gray-800);
+    color: var(--color-gray-200);
+    font-size: 0.95rem;
+}
+.compare-tools__row:last-child td {
+    border-bottom: none;
+}
+.compare-tools__tool-name {
+    font-weight: 500;
+    color: var(--color-white);
+}
+.compare-tools__score {
+    font-weight: 600;
+    color: #60a5fa;
+}
+.compare-tools__risk {
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+.compare-tools__risk--low { background: rgba(16,185,129,0.15); color: #10b981; }
+.compare-tools__risk--medium { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.compare-tools__risk--high { background: rgba(239,68,68,0.15); color: #ef4444; }
+.compare-tools__risk--critical { background: rgba(168,85,247,0.15); color: #a855f7; }
+
+.compare-tools__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.compare-tools__action-btn {
+    background: var(--color-blue-600);
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.compare-tools__action-btn:hover {
+    background: var(--color-blue-700);
+}
+
+@media (max-width: 900px) {
+    .compare-tools__table, .compare-tools__thead, .compare-tools__tbody, .compare-tools__row, .compare-tools__thead th, .compare-tools__tbody td {
+        display: block;
+        width: 100%;
+    }
+    .compare-tools__thead { display: none; }
+    .compare-tools__tbody td {
+        padding: 1rem 0.5rem;
+        border-bottom: 1px solid var(--color-gray-800);
+        position: relative;
+    }
+    .compare-tools__tbody td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--color-gray-400);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+} 

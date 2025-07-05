@@ -254,7 +254,7 @@
                     <h2 class="dashboard-quick-actions__title">Quick Actions</h2>
                     <div class="dashboard-quick-actions__grid">
                         <a href="index.html" class="dashboard-quick-actions__card">
-                            <div class="dashboard-quick-actions__icon new">
+                            <div class="dashboard-quick-actions__icon dashboard-quick-actions__icon--new">
                                 <i data-lucide="plus"></i>
                             </div>
                             <div class="dashboard-quick-actions__content">
@@ -264,7 +264,7 @@
                         </a>
 
                         <a href="compare.html" class="dashboard-quick-actions__card">
-                            <div class="dashboard-quick-actions__icon compare">
+                            <div class="dashboard-quick-actions__icon dashboard-quick-actions__icon--compare">
                                 <i data-lucide="bar-chart-2"></i>
                             </div>
                             <div class="dashboard-quick-actions__content">
@@ -274,7 +274,7 @@
                         </a>
 
                         <a href="export.html" class="dashboard-quick-actions__card">
-                            <div class="dashboard-quick-actions__icon export">
+                            <div class="dashboard-quick-actions__icon dashboard-quick-actions__icon--export">
                                 <i data-lucide="download"></i>
                             </div>
                             <div class="dashboard-quick-actions__content">
@@ -359,21 +359,28 @@
             <div id="loginSection" style="display: none;">
                 <!-- Login UI will be populated by JavaScript -->
             </div>
-        </div>
-    </div>
 
-    <!-- Import Modal -->
-    <div id="importModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Import Assessment from JSON</h2>
-            <p>Select a valid JSON assessment file to upload it to the database.</p>
-            <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)" class="form-input">
-            <p id="fileName" style="margin-top: 15px; font-style: italic; color: #64748b;"></p>
-            <div id="importOptions" style="display:none; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="processImport()">
-                    <i data-lucide="check"></i> Start Import
-                </button>
+            <!-- Compare Tab Content -->
+            <div id="compare-content" class="tab-content">
+                <section class="compare-tools">
+                    <h2 class="compare-tools__title">Compare Tools</h2>
+                    <p class="compare-tools__desc">Compare risk scores, risk levels, and categories across your assessed AI tools.</p>
+                    <table class="compare-tools__table">
+                        <thead class="compare-tools__thead">
+                            <tr class="compare-tools__row">
+                                <th>Tool</th>
+                                <th>Score</th>
+                                <th>Risk Level</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="compare-tools__tbody">
+                            <!-- Tool rows will be dynamically populated by JS using the new BEM classes -->
+                        </tbody>
+                    </table>
+                </section>
             </div>
         </div>
     </div>
