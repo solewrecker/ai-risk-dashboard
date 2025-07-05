@@ -94,7 +94,6 @@ function renderModal() {
         document.body.appendChild(modal);
     }
     // --- Modal State for Multi-Select ---
-    // Use a local copy of selectedTools for modal state
     if (!window._modalSelectedTools) window._modalSelectedTools = [...selectedTools];
     let modalSelectedTools = window._modalSelectedTools;
     // --- Filters ---
@@ -119,7 +118,7 @@ function renderModal() {
           </div>
           <div class="compare-tools__modal-search-row">
             <div class="compare-tools__modal-search">
-              <input type="text" class="compare-tools__modal-search-input" placeholder="Search tools..." value="${modalSearchTerm}" />
+              <input type="text" class="compare-tools__modal-search-input" placeholder="Search AI tools..." value="${modalSearchTerm}" />
             </div>
             <select class="compare-tools__modal-filter" data-filter="risk">
               ${riskLevels.map(risk => `<option value="${risk}"${risk === riskFilter ? ' selected' : ''}>${risk === 'ALL' ? 'All Risk Levels' : risk.charAt(0) + risk.slice(1).toLowerCase() + ' Risk'}</option>`).join('')}
