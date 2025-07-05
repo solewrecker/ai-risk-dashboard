@@ -90,35 +90,7 @@
     gap: 0.5rem;
 }
 
-/* Risk Badges */
-.risk-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.risk-badge.risk-low { 
-    background-color: rgba(22, 163, 74, 0.2);
-    color: var(--color-green-400);
-}
-
-.risk-badge.risk-medium { 
-    background-color: rgba(202, 138, 4, 0.2);
-    color: var(--color-yellow-400);
-}
-
-.risk-badge.risk-high { 
-    background-color: rgba(220, 38, 38, 0.2);
-    color: var(--color-red-400);
-}
-
-.risk-badge.risk-critical { 
-    background-color: rgba(147, 51, 234, 0.2);
-    color: var(--color-purple-400);
-}
+/* Risk badges are defined in style.css - removed duplicates */
 
 /* Score Display */
 .score-display {
@@ -173,7 +145,7 @@
 .loading-spinner {
     width: 2rem;
     height: 2rem;
-    border: 3px solid var(--color-blue-400-translucent);
+    border: 3px solid rgba(96, 165, 250, 0.3);
     border-top-color: var(--color-blue-400);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -193,8 +165,8 @@
     justify-content: center;
     align-items: center;
     min-height: 200px;
-    background-color: var(--color-red-900-translucent);
-    border: 1px solid var(--color-red-500-translucent);
+    background-color: rgba(127, 29, 29, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
     color: var(--color-red-300);
     border-radius: 0.5rem;
     padding: 2rem;
