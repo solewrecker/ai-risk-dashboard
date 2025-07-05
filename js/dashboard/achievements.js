@@ -72,17 +72,35 @@ export class AchievementsManager {
 
     renderAchievementCard(achievement) {
         const progress = this.calculateProgress(achievement);
-        const status = progress.isUnlocked ? '' : ' dashboard-achievements__item--locked';
+        const isUnlocked = progress.isUnlocked;
+        const percentage = progress.percentage;
+        let status = '';
+        if (isUnlocked) status = 'unlocked';
+        else if (percentage > 0) status = 'in-progress';
+        else status = 'locked';
+
+        // Icon color class
+        const iconClass = `achievement-icon ${status}`;
+        const nameClass = `achievement-name ${status}`;
 
         return `
-            <div class="dashboard-achievements__item${status}">
-                <div class="dashboard-achievements__icon">
-                    <i data-lucide="${achievement.icon}"></i>
-                </div>
-                <div class="dashboard-achievements__content">
-                    <div class="dashboard-achievements__name">${achievement.name}</div>
-                    <div class="dashboard-achievements__desc">${achievement.description}</div>
-                    <div class="dashboard-achievements__badge">${progress.current}/${progress.required}</div>
+            <div class="achievement-card ${status}">
+                <div class="achievement-content">
+                    <div class="achievement-header">
+                        <i data-lucide="${achievement.icon}" class="${iconClass}"></i>
+                        <span class="${nameClass}">${achievement.name}</span>
+                    </div>
+                    <p class="achievement-description">${achievement.description}</p>
+                    <div class="achievement-progress-wrapper">
+                        <div class="achievement-progress">
+                            <div class="progress-bar ${status}" style="width: ${percentage}%;"></div>
+                        </div>
+                        <span class="progress-numbers">${progress.current}/${progress.required}</span>
+                    </div>
+                    <div class="unlock-status">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Unlocked!</span>
+                    </div>
                 </div>
             </div>
         `;
