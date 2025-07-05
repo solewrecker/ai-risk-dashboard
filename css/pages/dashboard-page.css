@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Page: Dashboard
+   ========================================================================== */
+
+/* Page-specific background */
+body.dashboard-page {
+    background: var(--color-gray-900);
+    color: var(--color-white);
+}
+
+/* Premium App Layout */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+/* Premium Navigation */
+.premium-nav {
+    width: 280px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .premium-nav {
+        width: 4rem;
+    }
+    .main-content {
+        margin-left: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .premium-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 4rem;
+    }
+}
