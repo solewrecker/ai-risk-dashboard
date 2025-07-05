@@ -2,7 +2,7 @@ import { getAssessments } from './assessments.js';
 
 // Achievement data management and rendering
 export class AchievementsManager {
-    constructor(containerSelector = '.achievements') {
+    constructor(containerSelector = '.dashboard-achievements') {
         this.container = document.querySelector(containerSelector);
         this.achievementsData = this.getAchievementDefinitions();
         this.assessmentsCount = 0;
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderAchievements(completedCount) {
-    const container = document.querySelector('.achievements');
+    const container = document.querySelector('.dashboard-achievements');
     if (!container) return;
 
     const achievements = getAchievements();

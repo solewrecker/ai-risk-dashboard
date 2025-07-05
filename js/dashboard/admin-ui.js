@@ -3,7 +3,7 @@
  * This function should only be called after verifying the user is an admin.
  */
 export function injectDashboardAdminUI() {
-    const navMenu = document.querySelector('.w-64 .space-y-2');
+    const navMenu = document.querySelector('nav.space-y-2');
     if (!navMenu) {
         console.error("Admin UI injection point not found.");
         return;
@@ -15,23 +15,15 @@ export function injectDashboardAdminUI() {
     }
 
     const adminButtonHTML = `
-        <button id="importNavBtn" class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
-            <div class="flex items-center space-x-3">
+        <button id="importNavBtn" onclick="switchTab('import')" class="dashboard-nav">
+            <div class="dashboard-nav__content">
                 <i data-lucide="upload" class="w-5 h-5"></i>
-                <span>Upload Tool Assessment</span>
+                <span class="dashboard-nav__text">Upload Tool Assessment</span>
             </div>
         </button>
     `;
 
     navMenu.insertAdjacentHTML('beforeend', adminButtonHTML);
-
-    // Attach the event listener programmatically
-    document.getElementById('importNavBtn').addEventListener('click', () => {
-        // Assuming switchTab is globally available as per main.js
-        if (window.switchTab) {
-            window.switchTab('import');
-        }
-    });
 
     // Re-initialize icons if necessary
     if (typeof lucide !== 'undefined') {
