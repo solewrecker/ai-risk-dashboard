@@ -1,6 +1,15 @@
 /* Base Styles */
+@import 'base/reset.css';
+@import 'base/variables.css';
+@import 'base/typography.css';
 @import 'layout.css';
 @import 'utilities.css';
+@import 'utilities/loading-states.css';
+@import 'utilities/spacing.css';
+
+/* Pages */
+@import 'pages/dashboard-page.css';
+@import 'pages/assessment-page.css';
 
 /* Components */
 @import 'components/buttons.css';
@@ -9,31 +18,6 @@
 @import 'components/assessment-list.css';
 @import 'components/quick-actions.css';
 @import 'components/achievements.css';
-
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Base Styles */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-/* Page-specific backgrounds */
-body.dashboard-page {
-    background: var(--color-gray-900);
-    color: var(--color-white);
-}
-
-body.assessment-page {
-    background: #f8fafc;
-    color: #1e293b;
-}
 
 /* Theme Variations */
 [data-theme="default"] {
@@ -427,85 +411,6 @@ body.assessment-page {
     color: #64748b;
 }
 
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    gap: 0.5rem;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
-}
-
-.btn-primary:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-secondary {
-    background: #f8fafc;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-}
-
-.btn-secondary:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-}
-
-.btn-group {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
-/* Loading States */
-.loading {
-    display: none;
-    text-align: center;
-    padding: 2rem;
-}
-
-.loading.active {
-    display: block;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid var(--color-gray-600);
-    border-top-color: var(--color-blue-400);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* Results Section */
 .results-card {
     display: none;
@@ -848,11 +753,6 @@ body.assessment-page {
     gap: 1rem;
 }
 
-.login-actions .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
 /* Assessment List Styles */
 .list-header {
     display: flex;
@@ -895,19 +795,7 @@ body.assessment-page {
     height: 10px;
     border-radius: 50%;
 }
-.btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #94a3b8;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: all 0.2s;
-}
-.btn-icon:hover {
-    color: #1e293b;
-    background-color: #e2e8f0;
-}
+
 
 /* Auth Modal Styles */
 .auth-modal-overlay {
@@ -1017,22 +905,6 @@ body.assessment-page {
     cursor: pointer;
 }
 
-.auth-button {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: white;
-    background: #3b82f6;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.auth-button:hover {
-    background: #2563eb;
-}
 
 .auth-footer {
     text-align: center;
@@ -1164,23 +1036,7 @@ body.assessment-page {
     font-size: 0.875rem;
 }
 
-.btn-link {
-    background: none;
-    border: none;
-    color: #3b82f6;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    transition: all 0.2s ease;
-}
 
-.btn-link:hover {
-    color: #1d4ed8;
-    text-decoration: underline;
-}
 
 @media (max-width: 768px) {
     .dashboard-controls {
@@ -1189,26 +1045,7 @@ body.assessment-page {
     }
 }
 
-/* Premium App Layout */
-.app-container {
-    display: flex;
-    min-height: 100vh;
-    background: #f8fafc;
-}
 
-/* Premium Navigation */
-.premium-nav {
-    width: 280px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    height: 100vh;
-    overflow-y: auto;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-}
 
 .nav-brand {
     padding: 2rem 1.5rem;
@@ -1291,34 +1128,8 @@ body.assessment-page {
     border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-.btn-upgrade {
-    width: 100%;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #1a1a1a;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
 
-.btn-upgrade:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
-}
 
-/* Main Content Area */
-.main-content {
-    flex: 1;
-    margin-left: 280px;
-    padding: 2rem;
-    min-height: 100vh;
-}
 
 .content-section {
     display: none;
@@ -1460,27 +1271,7 @@ body.assessment-page {
     color: #1e293b;
 }
 
-.btn-skip-progress {
-    width: 100%;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #1a1a1a;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
 
-.btn-skip-progress:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
-}
 
 /* Assessment Dashboard Updates */
 .assessment-dashboard {
@@ -1510,17 +1301,6 @@ body.assessment-page {
     display: flex;
     gap: 1rem;
     align-items: center;
-}
-
-.dashboard-actions .btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-}
-
-.dashboard-actions .btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-1px);
 }
 
 /* Pro Feature Overlays */
@@ -1562,25 +1342,6 @@ body.assessment-page {
 .pro-feature-content p {
     color: #64748b;
     margin-bottom: 1.5rem;
-}
-
-.btn-upgrade-feature {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #1a1a1a;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-upgrade-feature:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
 }
 
 /* Theme Gallery */
@@ -1694,25 +1455,6 @@ body.assessment-page {
     margin-top: 1rem;
 }
 
-.btn-unlock-pro {
-    margin-top: 1rem;
-    width: 100%;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #1a1a1a;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-unlock-pro:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
-}
-
 /* Theme System - CSS Variables */
 [data-theme="default"] {
     --nav-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1758,26 +1500,11 @@ body.assessment-page {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-    .premium-nav {
-        width: 4rem;
-    }
-    .main-content {
-        margin-left: 4rem;
-    }
+  
 }
 
 @media (max-width: 768px) {
-    .premium-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: auto;
-    }
-    .main-content {
-        margin-left: 0;
-        margin-bottom: 4rem;
-    }
+   
 }
 
 /* Hide/Show based on user tier */
@@ -1806,9 +1533,6 @@ body.assessment-page {
 
 /* Layout utilities */
 .min-h-screen { min-height: 100vh; }
-.flex { display: flex; }
-.grid { display: grid; }
-.hidden { display: none; }
 .w-64 { width: 16rem; }
 .w-full { width: 100%; }
 .w-5 { width: 1.25rem; }
@@ -1837,21 +1561,7 @@ body.assessment-page {
 .mt-6 { margin-top: 1.5rem; }
 .mt-8 { margin-top: 2rem; }
 
-/* Flexbox utilities */
-.flex-1 { flex: 1 1 0%; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.space-x-2 > * + * { margin-left: 0.5rem; }
-.space-x-3 > * + * { margin-left: 0.75rem; }
-.space-x-4 > * + * { margin-left: 1rem; }
-.space-y-2 > * + * { margin-top: 0.5rem; }
-.space-y-4 > * + * { margin-top: 1rem; }
 
-/* Grid utilities */
-.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
 
 /* Typography */
 .text-xs { font-size: 0.75rem; line-height: 1rem; }
@@ -1919,76 +1629,6 @@ body.assessment-page {
     background: linear-gradient(90deg, #9333ea, #2563eb);
     position: relative;
     z-index: 50;
-}
-
-/* Navigation Button Styles */
-.nav-btn {
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    background: transparent;
-    width: 100%;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    border-radius: 0.5rem;
-    transition: all 0.15s ease;
-}
-
-.nav-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.6 !important;
-}
-
-.nav-btn:disabled:hover {
-    background-color: transparent !important;
-}
-
-/* Active nav button styling */
-.nav-btn.active {
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-}
-
-.nav-btn:not(:disabled):not(.active):hover {
-    background-color: #374151 !important;
-    transform: translateX(2px);
-}
-
-.nav-btn .flex.items-center {
-    min-width: 0;
-    flex: 1;
-}
-
-.nav-btn .flex.items-center span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Badge and crown styling */
-.nav-btn .bg-gray-600 {
-    flex-shrink: 0;
-    margin-left: auto;
-}
-
-.nav-btn [data-lucide="crown"] {
-    margin-left: 0.5rem;
-    color: #facc15;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-/* Disabled state improvements */
-.nav-btn:disabled {
-    background-color: transparent !important;
-    filter: grayscale(100%);
-}
-
-/* Ensure proper crown icon positioning */
-.nav-btn [data-lucide="crown"] {
-    flex-shrink: 0;
 }
 
 /* Detailed Breakdown Styling */
@@ -2063,15 +1703,7 @@ body.assessment-page {
     line-height: 1.5;
 }
 
-.btn-group {
-    display: flex;
-    gap: 15px;
-    padding: 40px;
-    justify-content: center;
-    flex-wrap: wrap;
-    background: #f8fafc;
-    border-top: 1px solid #e5e7eb;
-}
+
 
 @media (max-width: 768px) {
     .results-header {
@@ -2104,10 +1736,6 @@ body.assessment-page {
     .btn-group {
         padding: 30px 20px;
     }
-}
-
-.list-col-actions .btn-icon:hover {
-    background-color: var(--color-gray-600);
 }
 
 /* Loading and Empty States */
