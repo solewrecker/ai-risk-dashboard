@@ -7,28 +7,56 @@ let currentAssessment = null;
 
 export function displayResults(results) {
     currentAssessment = results; // Cache the full results object
-    const resultsCard = document.getElementById('resultsCard');
-    if (!resultsCard) {
-        console.error("Could not find resultsCard element to display results.");
+    const resultsContainer = document.getElementById('resultsContent');
+    if (!resultsContainer) {
+        console.error("Could not find resultsContent element to display results.");
         return;
     }
+
+    // Clear loading state
+    resultsContainer.innerHTML = '';
 
     const { formData, finalScore, riskLevel, source, recommendations, breakdown, detailedAssessment } = results;
     const toolName = formData.toolName || 'Unknown Tool';
 
-    document.getElementById('toolNameResults').textContent = toolName;
-    document.getElementById('mainScore').textContent = finalScore;
-    document.getElementById('riskLevel').textContent = riskLevel;
+    // Build the results HTML
+    const resultsHTML = `
+        <!-- Main Score Card -->
+        <div class="main-score-card risk-${riskLevel.toLowerCase()}">
+            <div class="score-section">
+                <div id="mainScore" class="score-number">${finalScore}</div>
+                <div id="riskLevel" class="score-label">${riskLevel}</div>
+            </div>
+            <div id="scoreDescription" class="score-description">
+                <p>${getScoreDescription(finalScore, riskLevel, toolName)}</p>
+                <div id="dataSource" class="data-source ${source}">
+                    ${source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis'}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Insights Grid -->
+        <div id="insightsGrid" class="insights-grid">
+            <!-- Insight cards will be populated here -->
+        </div>
+        
+        <!-- Recommendations Section -->
+        <div class="recommendations-section">
+            <h3>Recommendations</h3>
+            <ul id="recommendationsList" class="recommendations-list">
+                <!-- Recommendations will be populated here -->
+            </ul>
+        </div>
+        
+        <!-- Detailed Breakdown -->
+        <div id="detailedBreakdown" class="detailed-breakdown-section">
+            <!-- Detailed breakdown will be populated here -->
+        </div>
+    `;
 
-    const scoreCard = document.querySelector('.main-score-card');
-    scoreCard.className = `main-score-card risk-${riskLevel.toLowerCase()}`;
-    
-    document.getElementById('scoreDescription').querySelector('p').innerHTML = getScoreDescription(finalScore, riskLevel, toolName);
-    
-    const dataSourceEl = document.getElementById('dataSource');
-    dataSourceEl.textContent = source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis';
-    dataSourceEl.className = `data-source ${source}`;
+    resultsContainer.innerHTML = resultsHTML;
 
+    // Now that the DOM is updated, render the components
     renderInsights(breakdown);
     renderRecommendations(recommendations, finalScore, formData);
 
