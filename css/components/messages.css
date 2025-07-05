@@ -1,0 +1,21 @@
+/* Messages and Alerts */
+.message {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.message-success {
+    background: rgba(22, 163, 74, 0.1);
+    color: #15803d;
+}
+
+.message-error {
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
+}
+
+.message-warning {
+    background: rgba(234, 179, 8, 0.1);
+    color: #a16207;
+} 
