@@ -2,7 +2,7 @@
 // Main entry point for the dashboard application.
 // Initializes the app, loads modules, and coordinates everything.
 
-import { initAuth, checkAuth, getIsAdmin } from './auth.js';
+import { initAuth, checkAuth, getIsAdmin, getCurrentUser } from './auth.js';
 import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessments, clearAllFilters } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('Supabase client initialized');
 
-    // Make functions available globally on the window object
+    // Make functions available globally on the window object immediately
     // so that inline onclick handlers in the HTML can call them.
     window.switchTab = switchTab;
     window.viewAssessment = viewAssessment;
@@ -69,9 +69,13 @@ async function initializeDashboard() {
     try {
         const isAdminUser = getIsAdmin();
         console.log('Is Admin User:', isAdminUser);
+        console.log('Current user metadata:', getCurrentUser()?.user_metadata);
         
         if (isAdminUser) {
+            console.log('Injecting admin UI...');
             injectDashboardAdminUI();
+        } else {
+            console.log('User is not admin, skipping admin UI injection');
         }
         
         await loadAssessments();

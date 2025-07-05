@@ -36,4 +36,82 @@ export function handleFileSelect(event) {
         `;
         fileListContainer.appendChild(fileItem);
     });
+
+    // Show import options
+    if (importOptions) {
+        importOptions.style.display = 'block';
+    }
+}
+
+export async function processImport() {
+    if (!getIsAdmin()) {
+        alert('Access denied. Admin privileges required.');
+        return;
+    }
+
+    const fileInput = document.getElementById('fileInput');
+    const importError = document.getElementById('importError');
+    const importOptions = document.getElementById('importOptions');
+
+    if (!fileInput.files.length) {
+        showError('Please select a file to upload.');
+        return;
+    }
+
+    try {
+        // Hide error and show loading
+        if (importError) importError.style.display = 'none';
+        if (importOptions) importOptions.style.display = 'none';
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async function(e) {
+            try {
+                const assessmentData = JSON.parse(e.target.result);
+                
+                // Validate the assessment data structure
+                if (!assessmentData.tool_name || !assessmentData.risk_score) {
+                    throw new Error('Invalid assessment file format. Missing required fields.');
+                }
+
+                // Upload to Supabase
+                const { data, error } = await supabaseClient
+                    .from('assessments')
+                    .insert([assessmentData]);
+
+                if (error) {
+                    throw new Error(`Upload failed: ${error.message}`);
+                }
+
+                // Success
+                alert('Assessment uploaded successfully!');
+                
+                // Clear the form
+                fileInput.value = '';
+                document.getElementById('file-upload-list').innerHTML = '';
+                
+                // Refresh the assessments list
+                await loadAssessments();
+                updateDashboardStats();
+                updateProgressTracking();
+
+            } catch (error) {
+                showError(`Error processing file: ${error.message}`);
+            }
+        };
+
+        reader.readAsText(file);
+
+    } catch (error) {
+        showError(`Upload failed: ${error.message}`);
+    }
+}
+
+function showError(message) {
+    const importError = document.getElementById('importError');
+    if (importError) {
+        importError.textContent = message;
+        importError.style.display = 'block';
+    }
 }

@@ -382,22 +382,22 @@ function renderAssessmentItem(assessment) {
     const riskLevelText = getRiskLevelText(assessment.total_score);
     
     return `
-        <div class="assessment-item">
-            <div class="assessment-content">
-                <div class="assessment-icon">
-                    <i class="fas ${getToolIcon(assessment.category)}"></i>
+        <div class="dashboard-summary-assessments__item">
+            <div class="dashboard-summary-assessments__item-content">
+                <div class="dashboard-summary-assessments__item-icon">
+                    <i data-lucide="${getToolIcon(assessment.category)}" class="w-5 h-5"></i>
                 </div>
-                <div class="assessment-info">
-                    <h3 class="assessment-name">${assessment.name}</h3>
-                    <p class="assessment-category">${assessment.category}</p>
+                <div class="dashboard-summary-assessments__item-info">
+                    <h3 class="dashboard-summary-assessments__item-name">${assessment.name}</h3>
+                    <p class="dashboard-summary-assessments__item-category">${assessment.category || 'General'}</p>
                 </div>
             </div>
-            <div class="assessment-meta">
-                <span class="risk-level ${riskLevelClass.toLowerCase()}">${riskLevelText}</span>
-                <span class="assessment-score">${assessment.total_score}</span>
-                <span class="assessment-date">${formatDate(assessment.created_at)}</span>
-                <button class="icon-button" onclick="viewAssessment(${assessment.id})" aria-label="More options">
-                    <i class="fas fa-ellipsis-v"></i>
+            <div class="dashboard-summary-assessments__item-meta">
+                <span class="dashboard-summary-assessments__item-risk risk-${riskLevelClass.toLowerCase()}">${riskLevelText}</span>
+                <span class="dashboard-summary-assessments__item-score">${assessment.total_score}/100</span>
+                <span class="dashboard-summary-assessments__item-date">${formatDate(assessment.created_at)}</span>
+                <button class="dashboard-summary-assessments__item-action" onclick="viewAssessment(${assessment.id})" aria-label="View Details">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
@@ -406,12 +406,12 @@ function renderAssessmentItem(assessment) {
 
 function getToolIcon(category) {
     const icons = {
-        'Content Generation': 'fa-pen-fancy',
-        'Code Analysis': 'fa-code',
-        'Development': 'fa-laptop-code',
-        'Image Generation': 'fa-image',
-        'Productivity': 'fa-tasks',
-        'default': 'fa-robot'
+        'Content Generation': 'pen-tool',
+        'Code Analysis': 'code',
+        'Development': 'laptop',
+        'Image Generation': 'image',
+        'Productivity': 'check-square',
+        'default': 'bot'
     };
     return icons[category] || icons.default;
 }

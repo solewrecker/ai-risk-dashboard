@@ -5,7 +5,8 @@
 export function injectDashboardAdminUI() {
     const navMenu = document.querySelector('nav.space-y-2');
     if (!navMenu) {
-        console.error("Admin UI injection point not found.");
+        console.error("Admin UI injection point not found. Looking for nav.space-y-2");
+        console.log("Available nav elements:", document.querySelectorAll('nav'));
         return;
     }
 
