@@ -364,23 +364,54 @@
             <!-- Compare Tab Content -->
             <div id="compare-content" class="tab-content">
                 <section class="compare-tools">
-                    <h2 class="compare-tools__title">Compare Tools</h2>
-                    <p class="compare-tools__desc">Compare risk scores, risk levels, and categories across your assessed AI tools.</p>
-                    <table class="compare-tools__table">
-                        <thead class="compare-tools__thead">
-                            <tr class="compare-tools__row">
-                                <th>Tool</th>
-                                <th>Score</th>
-                                <th>Risk Level</th>
-                                <th>Category</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="compare-tools__tbody">
-                            <!-- Tool rows will be dynamically populated by JS using the new BEM classes -->
-                        </tbody>
-                    </table>
+                    <div class="compare-tools__header">
+                        <div>
+                            <h2 class="compare-tools__title">AI Tool Risk Assessment Comparison</h2>
+                            <p class="compare-tools__subtitle">Compare risk assessments across multiple AI tools</p>
+                        </div>
+                        <div class="compare-tools__actions">
+                            <button class="compare-tools__add-btn btn btn-primary">
+                                <i data-lucide="plus"></i> Add Tool
+                            </button>
+                            <button class="compare-tools__export-btn btn btn-secondary">
+                                <i data-lucide="download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="compare-tools__summary-cards">
+                        <!-- Summary cards: Total, High, Medium, Low Risk (populate via JS) -->
+                        <div class="compare-tools__summary-card" id="compare-summary-total"></div>
+                        <div class="compare-tools__summary-card" id="compare-summary-high"></div>
+                        <div class="compare-tools__summary-card" id="compare-summary-medium"></div>
+                        <div class="compare-tools__summary-card" id="compare-summary-low"></div>
+                    </div>
+                    <div class="compare-tools__tags" id="compare-selected-tags">
+                        <!-- Selected tool tags (populate via JS) -->
+                    </div>
+                    <div class="compare-tools__table-wrapper">
+                        <table class="compare-tools__table">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Risk Level</th>
+                                    <th>Total Score</th>
+                                    <th>Data Storage</th>
+                                    <th>Training Usage</th>
+                                    <th>Access Controls</th>
+                                    <th>Compliance Risk</th>
+                                    <th>Vendor Transparency</th>
+                                    <th>Compliance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compare-tools-table-body">
+                                <!-- Tool rows (populate via JS) -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="compare-tools__legend" id="compare-tools-legend">
+                        <!-- Scoring legend (populate via JS) -->
+                    </div>
                 </section>
             </div>
         </div>

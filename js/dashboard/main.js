@@ -9,6 +9,7 @@ import { updateDashboardStats, updateProgressTracking } from './gamification.js'
 import { AchievementsManager } from './achievements.js';
 import { updateTierBadge, switchTab, setupEventListeners, closeBanner } from './ui.js';
 import { injectDashboardAdminUI } from './admin-ui.js';
+import { initCompareTools } from './compare.js';
 
 const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
@@ -92,5 +93,45 @@ async function initializeDashboard() {
         console.log('Dashboard initialized successfully');
     } catch (error) {
         console.error('Failed to initialize dashboard:', error);
+    }
+}
+
+export function switchTab(tabName) {
+    currentTab = tabName;
+
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Update nav button styles
+    document.querySelectorAll('.dashboard-nav').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show the selected tab content
+    const activeContent = document.getElementById(`${tabName}-content`);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
+
+    // Highlight the selected nav button
+    const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+
+    if (!activeContent && tabName !== 'dashboard') {
+        switchTab('dashboard');
+    }
+
+    // Initialize Compare Tools tab when activated
+    if (tabName === 'compare') {
+        // Use getAssessments() or similar to get the data
+        if (typeof getAssessments === 'function') {
+            initCompareTools(getAssessments());
+        } else {
+            initCompareTools([]);
+        }
     }
 } 
