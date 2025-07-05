@@ -1687,4 +1687,8 @@
 .empty-state p {
     color: var(--color-gray-400);
     margin-bottom: 1.5rem;
-} 
+}
+
+/* Tab content visibility control */
+.tab-content { display: none; }
+.tab-content.active { display: block; } 
