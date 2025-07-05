@@ -96,23 +96,24 @@ function renderModal() {
     const availableTools = allTools.filter(tool => !selectedTools.some(sel => sel.id === tool.id) &&
         (tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()))));
     modal.innerHTML = `
-      <div class="compare-tools__modal-overlay"></div>
-      <div class="compare-tools__modal-content">
-        <div class="compare-tools__modal-header">
-          <h2>Select AI Tools to Compare</h2>
-          <button class="compare-tools__modal-close" title="Close">&times;</button>
-        </div>
-        <div class="compare-tools__modal-search">
-          <input type="text" class="compare-tools__modal-search-input" placeholder="Search tools..." value="${modalSearchTerm}" />
-        </div>
-        <div class="compare-tools__modal-list">
-          ${availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
-            availableTools.map(tool => `
-              <div class="compare-tools__modal-item" data-tool-id="${tool.id}">
-                <div class="compare-tools__modal-item-name">${tool.name}</div>
-                <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
-              </div>
-            `).join('')}
+      <div class="compare-tools__modal-overlay">
+        <div class="compare-tools__modal-content">
+          <div class="compare-tools__modal-header">
+            <h2>Select AI Tools to Compare</h2>
+            <button class="compare-tools__modal-close" title="Close">&times;</button>
+          </div>
+          <div class="compare-tools__modal-search">
+            <input type="text" class="compare-tools__modal-search-input" placeholder="Search tools..." value="${modalSearchTerm}" />
+          </div>
+          <div class="compare-tools__modal-list">
+            ${availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
+              availableTools.map(tool => `
+                <div class="compare-tools__modal-item" data-tool-id="${tool.id}">
+                  <div class="compare-tools__modal-item-name">${tool.name}</div>
+                  <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
+                </div>
+              `).join('')}
+          </div>
         </div>
       </div>
     `;
