@@ -101,41 +101,6 @@
     min-width: 150px;
 }
 
-/* Assessment List */
-.list-header {
-    display: flex;
-    padding: 1rem;
-    background: var(--color-gray-800);
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    font-weight: 500;
-    color: var(--color-gray-400);
-}
-
-.list-item {
-    display: flex;
-    padding: 1rem;
-    background: var(--color-gray-800);
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    transition: background-color 150ms;
-}
-
-.list-item:hover {
-    background: var(--color-gray-700);
-}
-
-.list-col {
-    display: flex;
-    align-items: center;
-}
-
-.list-col-tool { flex: 3; gap: 1rem; }
-.list-col-score { flex: 1; justify-content: center; }
-.list-col-level { flex: 1; gap: 0.5rem; }
-.list-col-date { flex: 1.5; color: var(--color-gray-400); }
-.list-col-actions { flex: 1; justify-content: flex-end; }
-
 /* Progress Overview */
 .progress-overview {
     display: grid;

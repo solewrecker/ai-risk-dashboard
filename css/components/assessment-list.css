@@ -250,73 +250,69 @@
     }
     
     .dashboard-assessment-actions {
-        width: 100%;
-        justify-content: flex-end;
-        margin-top: 0.5rem;
+        margin-top: 1rem;
+        align-self: flex-end;
     }
     
     .dashboard-assessment-score {
+        width: 100%;
         margin-right: 0;
-        margin-top: 0.5rem;
     }
     
     .dashboard-assessment-list-actions {
-        flex-direction: column;
-        width: 100%;
+        gap: 0.5rem;
     }
     
     .export-button {
-        width: 100%;
-        justify-content: center;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
     }
 }
 
-/* Loading, Empty and Error States */
+/* State Containers for Dynamic Content Loading */
 .loading-state-container, .error-state-container, .empty-state-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    min-height: 250px;
-    padding: 2rem;
-    border-radius: 0.75rem;
-    background: rgba(31, 41, 55, 0.5); /* gray-800 with alpha */
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    padding: 4rem 2rem;
+    border: 2px dashed var(--color-gray-700);
+    border-radius: 1rem;
+    margin-top: 1.5rem;
 }
 
 .loading-spinner {
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 4px solid rgba(96, 165, 250, 0.2); /* blue-400 with alpha */
-    border-top-color: var(--color-blue-400);
+    border: 4px solid var(--color-gray-600);
+    border-top: 4px solid var(--color-blue-500);
     border-radius: 50%;
+    width: 40px;
+    height: 40px;
     animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
 }
 
 .loading-text, .error-title, .empty-state-title {
+    margin-top: 1.5rem;
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--color-gray-100);
+    color: var(--color-white);
 }
 
 .error-message, .empty-state-message {
-    font-size: 0.875rem;
+    margin-top: 0.5rem;
     color: var(--color-gray-400);
-    margin-top: 0.25rem;
-    margin-bottom: 1.5rem;
+    max-width: 400px;
 }
 
 .error-state-container {
-    background: rgba(127, 29, 29, 0.2); /* red-900 with alpha */
-    border: 1px solid rgba(239, 68, 68, 0.3); /* red-500 with alpha */
+    border-color: var(--color-red-500);
+    color: var(--color-red-400);
 }
 
 .error-icon, .empty-state-icon {
     width: 3rem;
     height: 3rem;
-    color: var(--color-gray-600);
-    margin-bottom: 1rem;
+    color: var(--color-gray-500);
 }
 
 .error-state-container .error-icon {
@@ -324,5 +320,6 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 } 

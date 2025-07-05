@@ -1,0 +1,151 @@
+/* ==========================================================================
+   Component: Dashboard Summary Assessments
+   ========================================================================== */
+
+/* Main container for the summary list on the dashboard */
+.dashboard-summary-assessments {
+    background: var(--color-gray-800);
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.dashboard-summary-assessments__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-summary-assessments__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+.dashboard-summary-assessments__subtitle {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    margin-top: 0.25rem;
+}
+
+.dashboard-summary-assessments__actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Individual assessment item in the summary list */
+.dashboard-summary-assessments__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    transition: all 200ms ease;
+}
+
+.dashboard-summary-assessments__item:hover {
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
+}
+
+.dashboard-summary-assessments__item:last-child {
+    margin-bottom: 0;
+}
+
+.dashboard-summary-assessments__content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dashboard-summary-assessments__info {
+    flex: 1;
+}
+
+.dashboard-summary-assessments__name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-white);
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-summary-assessments__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+}
+
+/* "View All" link at the bottom of the summary */
+.dashboard-summary-assessments__view-all-link {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    color: var(--color-blue-400);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 150ms ease;
+}
+
+.dashboard-summary-assessments__view-all-link:hover {
+    background: var(--color-gray-700);
+    color: var(--color-blue-300);
+}
+
+/* Generic icon and action buttons that might be used here */
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-gray-700);
+    border-radius: 0.5rem;
+    color: var(--color-gray-400);
+    transition: all 150ms ease;
+}
+
+.icon-button:hover {
+    background: var(--color-gray-600);
+    color: var(--color-white);
+}
+
+.export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-blue-600);
+    color: var(--color-white);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 150ms ease;
+}
+
+.export-button:hover {
+    background: var(--color-blue-700);
+}
+
+/* Responsive adjustments for the summary list */
+@media (max-width: 768px) {
+    .dashboard-summary-assessments__item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .dashboard-summary-assessments__actions {
+        margin-top: 1rem;
+        align-self: flex-end;
+    }
+
+    .export-button {
+        display: none; /* Hide on small screens for simplicity */
+    }
+} 
