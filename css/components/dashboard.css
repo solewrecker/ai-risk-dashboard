@@ -252,4 +252,61 @@
     .list-col-actions {
         justify-content: flex-start;
     }
+}
+
+/* ==========================================================================
+   Component: Dashboard
+   ========================================================================== */
+
+.dashboard-page {
+    background: var(--color-gray-900);
+    color: var(--color-gray-100);
+    min-height: 100vh;
+}
+
+/* Main content area */
+.dashboard-content {
+    padding: 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Search and filters section */
+.dashboard-controls {
+    background: var(--color-gray-800);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-gray-700);
+}
+
+/* Table header */
+.dashboard-table-header {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--color-gray-800);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-gray-400);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-content {
+        padding: 1rem;
+    }
+    
+    .dashboard-controls {
+        padding: 1rem;
+    }
+    
+    .dashboard-table-header {
+        display: none; /* Hide headers on mobile, use data attributes instead */
+    }
 } 

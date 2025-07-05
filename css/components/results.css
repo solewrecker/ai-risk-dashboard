@@ -1,34 +1,34 @@
-/* Results Container */
-.results-container {
+/* Creator Results Container */
+.creator-results-container {
     background: var(--color-gray-800);
     border-radius: 0.5rem;
     overflow: hidden;
 }
 
-/* Results Header */
-.results-header {
+/* Creator Results Header */
+.creator-results-header {
     padding: 1.5rem;
     border-bottom: 1px solid var(--color-gray-700);
 }
 
-.results-title {
+.creator-results-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-white);
     margin-bottom: 0.5rem;
 }
 
-.results-subtitle {
+.creator-results-subtitle {
     color: var(--color-gray-400);
     font-size: 0.875rem;
 }
 
-/* Results List */
-.results-list {
+/* Creator Results List */
+.creator-results-list {
     padding: 1rem;
 }
 
-.result-item {
+.creator-result-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,22 +39,22 @@
     transition: background-color 150ms;
 }
 
-.result-item:hover {
+.creator-result-item:hover {
     background: var(--color-gray-600);
 }
 
-.result-item:last-child {
+.creator-result-item:last-child {
     margin-bottom: 0;
 }
 
-/* Result Content */
-.result-content {
+/* Creator Result Content */
+.creator-result-content {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.result-icon {
+.creator-result-icon {
     width: 2.5rem;
     height: 2.5rem;
     display: flex;
@@ -65,17 +65,17 @@
     color: var(--color-blue-400);
 }
 
-.result-info {
+.creator-result-info {
     flex: 1;
 }
 
-.result-title {
+.creator-result-title {
     font-weight: 500;
     color: var(--color-white);
     margin-bottom: 0.25rem;
 }
 
-.result-meta {
+.creator-result-meta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -83,8 +83,8 @@
     font-size: 0.875rem;
 }
 
-/* Result Actions */
-.result-actions {
+/* Creator Result Actions */
+.creator-result-actions {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -108,31 +108,31 @@
 }
 
 /* Empty State */
-.results-empty {
+.creator-results-empty {
     text-align: center;
     padding: 3rem 1.5rem;
     color: var(--color-gray-400);
 }
 
-.results-empty-icon {
+.creator-results-empty-icon {
     margin-bottom: 1rem;
     color: var(--color-gray-600);
 }
 
-.results-empty-title {
+.creator-results-empty-title {
     font-weight: 500;
     margin-bottom: 0.5rem;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .result-item {
+    .creator-result-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
     
-    .result-actions {
+    .creator-result-actions {
         width: 100%;
         justify-content: flex-end;
     }
