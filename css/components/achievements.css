@@ -42,8 +42,23 @@
 }
 
 .achievement-card.unlocked {
-    background: var(--color-green-500/5);
-    border-color: var(--color-green-500/20);
+    background: var(--color-green-500/10);
+    border-color: var(--color-green-500/30);
+    box-shadow: 0 0 0 1px var(--color-green-500/20), 0 2px 8px var(--color-green-500/10);
+    transition: all 200ms ease;
+}
+
+.achievement-card.unlocked .achievement-icon {
+    color: var(--color-green-400);
+}
+
+.achievement-card.unlocked .achievement-name {
+    color: var(--color-green-400);
+    font-weight: 600;
+}
+
+.achievement-card.unlocked .achievement-description {
+    color: var(--color-gray-300);
 }
 
 /* Achievement Content */
@@ -144,6 +159,20 @@
 
 .achievement-card.unlocked .unlock-status {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-green-400);
+    background: var(--color-green-500/10);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    width: fit-content;
+}
+
+.unlock-status i {
+    color: var(--color-green-400);
 }
 
 /* Almost There Card */
