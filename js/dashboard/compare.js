@@ -221,9 +221,8 @@ function setupModalListeners() {
     modal.querySelector('.compare-tools__modal-search-input').addEventListener('input', (e) => {
         const value = e.target.value;
         const cursorPos = e.target.selectionStart;
-        modalSearchTerm = value;
-        renderModal();
-        setupModalListeners();
+        window._modalSearchTerm = value;
+        updateModalToolList();
         // Restore focus and cursor position
         const input = document.querySelector('.compare-tools__modal-search-input');
         if (input) {
@@ -239,8 +238,7 @@ function setupModalListeners() {
             } else if (select.dataset.filter === 'vendor') {
                 window._modalVendorFilter = select.value;
             }
-            renderModal();
-            setupModalListeners();
+            updateModalToolList();
         });
     });
     // Tool selection (multi-select)
@@ -257,8 +255,7 @@ function setupModalListeners() {
                 if (tool) modalSelectedTools.push(tool);
             }
             window._modalSelectedTools = modalSelectedTools;
-            renderModal();
-            setupModalListeners();
+            updateModalToolList();
         });
     });
     // Prevent modal content clicks from bubbling to overlay
@@ -333,4 +330,59 @@ function getRiskBadge(risk, score) {
             break;
     }
     return `<span class="compare-tools__risk-badge ${color}">${icon} ${label}</span>`;
+}
+
+// Add this helper to update only the tool list in the modal
+function updateModalToolList() {
+    const modal = document.getElementById('compare-tools-modal');
+    if (!modal) return;
+    const listGrid = modal.querySelector('.compare-tools__modal-list-grid');
+    if (!listGrid) return;
+    // Use the same filtering/search logic as in renderModal
+    const riskFilter = window._modalRiskFilter || 'ALL';
+    const vendorFilter = window._modalVendorFilter || 'ALL';
+    const modalSearchTerm = window._modalSearchTerm || '';
+    const modalSelectedTools = window._modalSelectedTools || [];
+    const availableTools = allTools.filter(tool => {
+        const matchesSearch = tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()));
+        const matchesRisk = riskFilter === 'ALL' || (tool.risk_level || tool.riskLevel || '').toUpperCase() === riskFilter;
+        const matchesVendor = vendorFilter === 'ALL' || tool.vendor === vendorFilter;
+        return matchesSearch && matchesRisk && matchesVendor;
+    });
+    listGrid.innerHTML = availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
+        availableTools.map(tool => {
+            const isSelected = modalSelectedTools.some(t => String(t.id) === String(tool.id));
+            const risk = (tool.risk_level || '').toLowerCase();
+            const score = tool.total_score || 0;
+            return `
+              <div class="compare-tools__modal-item${isSelected ? ' compare-tools__modal-item--selected' : ''}" data-tool-id="${tool.id}">
+                <div class="compare-tools__modal-item-check">${isSelected ? '&#10003;' : ''}</div>
+                <div class="compare-tools__modal-item-info">
+                  <div class="compare-tools__modal-item-name">${tool.name}</div>
+                  <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
+                </div>
+                <div class="compare-tools__modal-item-score-group">
+                  <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk}">${score}</span>
+                  ${getRiskBadge(risk, score)}
+                </div>
+              </div>
+            `;
+        }).join('');
+    // Re-attach listeners for tool selection
+    listGrid.querySelectorAll('.compare-tools__modal-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const toolId = item.getAttribute('data-tool-id');
+            let modalSelectedTools = window._modalSelectedTools || [];
+            const idx = modalSelectedTools.findIndex(t => String(t.id) === String(toolId));
+            if (idx > -1) {
+                modalSelectedTools.splice(idx, 1);
+            } else {
+                const tool = allTools.find(t => String(t.id) === String(toolId));
+                if (tool) modalSelectedTools.push(tool);
+            }
+            window._modalSelectedTools = modalSelectedTools;
+            updateModalToolList();
+        });
+    });
 } 
