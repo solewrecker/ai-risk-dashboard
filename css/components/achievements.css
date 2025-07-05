@@ -1,3 +1,5 @@
+/* (All styles for achievements have been refactored to components/dashboard/achievements.css) */
+
 /* Achievements Section */
 .achievements {
     background: var(--color-gray-800);

@@ -240,8 +240,11 @@
 
                     <!-- Achievements Panel -->
                     <div class="bg-gray-800 rounded-lg p-6">
-                        <section class="achievements">
-                            <!-- Achievement content will be dynamically populated by JavaScript -->
+                        <section class="dashboard-achievements">
+                            <h2 class="dashboard-achievements__title">Achievements</h2>
+                            <div class="dashboard-achievements__list">
+                                <!-- Achievement items will be dynamically populated by JavaScript using the new BEM classes -->
+                            </div>
                         </section>
                     </div>
                 </div>
@@ -329,27 +332,27 @@
             </div>
             
             <!-- Import Tab Content (Admin Only) -->
-            <div id="import-content" class="hidden tab-content bg-gray-800 rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Import Assessments</h2>
-                <p class="text-gray-400 mb-6">Upload a JSON file containing one or more assessments to add them to the database.</p>
-                
-                <div class="max-w-md">
-                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors" id="dropzone">
+            <div id="import-content" class="tab-content">
+                <section class="import-panel">
+                    <h2 class="import-panel__title">Import Assessments</h2>
+                    <p class="import-panel__desc">Upload a JSON file containing one or more assessments to add them to the database.</p>
+                    <div class="import-panel__dropzone" id="dropzone">
                         <input type="file" id="fileInput" accept=".json" class="hidden" multiple>
-                        <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i>
-                        <p class="font-semibold">Click to upload or drag and drop</p>
-                        <p class="text-xs text-gray-500">JSON up to 10MB</p>
+                        <div class="import-panel__icon">
+                            <i data-lucide="upload-cloud"></i>
+                        </div>
+                        <p class="import-panel__desc">Click to upload or drag and drop</p>
+                        <p class="import-panel__desc" style="font-size:0.85rem;">JSON up to 10MB</p>
                     </div>
-                    
-                    <div id="file-upload-list" class="mt-4 space-y-2"></div>
-    
-                    <div id="importOptions" class="mt-6" style="display:none;">
-                        <button class="w-full flex items-center justify-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" onclick="processImport()">
-                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    <div id="file-upload-list" class="import-panel__file-list"></div>
+                    <div id="importOptions" style="display:none;">
+                        <button class="import-panel__button" onclick="processImport()">
+                            <i data-lucide="check-circle"></i>
                             <span>Start Import</span>
                         </button>
                     </div>
-                </div>
+                    <div id="importError" class="import-panel__error" style="display:none;"></div>
+                </section>
             </div>
 
             <!-- Login Section -->
