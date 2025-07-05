@@ -119,29 +119,29 @@ function renderRecentAssessments() {
                               assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
         
         return `
-            <div class="assessment-item">
-                <div class="assessment-content">
-                    <div class="assessment-icon">
+            <div class="dashboard-assessment-item">
+                <div class="dashboard-assessment-content">
+                    <div class="dashboard-assessment-icon">
                         <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
-                        <div class="assessment-risk-indicator ${riskColor}"></div>
+                        <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
                     </div>
-                    <div class="assessment-info">
-                        <div class="assessment-name">${assessment.name}</div>
-                        <div class="assessment-meta">
+                    <div class="dashboard-assessment-info">
+                        <div class="dashboard-assessment-name">${assessment.name}</div>
+                        <div class="dashboard-assessment-meta">
                             <span>${date}</span>
-                            <span class="assessment-meta-divider">•</span>
+                            <span class="dashboard-assessment-meta-divider">•</span>
                             <span>by ${assessment.created_by || 'Anonymous'}</span>
-                            <span class="assessment-meta-divider">•</span>
+                            <span class="dashboard-assessment-meta-divider">•</span>
                             <span>${assessment.category || 'General'}</span>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div class="assessment-score">
+                    <div class="dashboard-assessment-score">
                         <div class="score-value ${scoreColorClass}">${assessment.total_score}</div>
                         <div class="score-label">Risk Score</div>
                     </div>
-                    <div class="assessment-actions">
+                    <div class="dashboard-assessment-actions">
                         <button onclick="viewAssessment(${assessment.id})" class="action-button" title="View Details">
                             <i data-lucide="chevron-right" class="w-5 h-5"></i>
                         </button>
