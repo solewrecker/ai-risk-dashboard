@@ -299,4 +299,60 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Loading, Empty and Error States */
+.loading-state-container, .error-state-container, .empty-state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 250px;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    background: rgba(31, 41, 55, 0.5); /* gray-800 with alpha */
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 4px solid rgba(96, 165, 250, 0.2); /* blue-400 with alpha */
+    border-top-color: var(--color-blue-400);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.loading-text, .error-title, .empty-state-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-gray-100);
+}
+
+.error-message, .empty-state-message {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-state-container {
+    background: rgba(127, 29, 29, 0.2); /* red-900 with alpha */
+    border: 1px solid rgba(239, 68, 68, 0.3); /* red-500 with alpha */
+}
+
+.error-icon, .empty-state-icon {
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-gray-600);
+    margin-bottom: 1rem;
+}
+
+.error-state-container .error-icon {
+    color: var(--color-red-400);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 } 
