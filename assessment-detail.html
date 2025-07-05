@@ -14,12 +14,12 @@
     
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="assessment-page">
-    <div class="assessment-container">
+<body>
+    <div class="container">
         <!-- Header -->
-        <div class="assessment-header">
-            <h1>AI Tool Assessment</h1>
-            <p>Comprehensive analysis and risk evaluation of your AI tool implementation.</p>
+        <div class="header">
+            <h1>Assessment Details</h1>
+            <p>A detailed view of your risk assessment.</p>
             <div class="header-buttons">
                 <a href="dashboard.html" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
@@ -27,48 +27,19 @@
             </div>
         </div>
 
-        <!-- Progress Steps -->
-        <div class="progress-steps">
-            <div class="progress-step completed">
-                <div class="step-number">1</div>
-                <div class="step-label">Tool Info</div>
-            </div>
-            <div class="step-connector"></div>
-            <div class="progress-step completed">
-                <div class="step-number">2</div>
-                <div class="step-label">Data Classification</div>
-            </div>
-            <div class="step-connector"></div>
-            <div class="progress-step active">
-                <div class="step-number">3</div>
-                <div class="step-label">Analysis</div>
-            </div>
-            <div class="step-connector"></div>
-            <div class="progress-step">
-                <div class="step-number">4</div>
-                <div class="step-label">Results</div>
-            </div>
-        </div>
-
         <!-- Main Content -->
         <div class="form-card" id="detailContent">
-            <div id="loading-state" class="loading-state">
-                <div class="loading-spinner"></div>
-                <h3>Analyzing Your Tool</h3>
-                <p id="analysisStatus">Evaluating security parameters...</p>
+            <div id="loading-state" style="text-align: center; padding: 40px;">
+                <div class="spinner"></div>
+                <p>Loading assessment details...</p>
             </div>
-            
             <div id="resultsContent" style="display: none;">
                 <!-- Full assessment results will be rendered here by js/assessment-detail.js -->
             </div>
-            
-            <div id="error-state" class="error-message" style="display: none;">
-                <i class="fas fa-exclamation-circle fa-2x"></i>
-                <h3>Error Loading Assessment</h3>
+            <div id="error-state" style="display: none; text-align: center; padding: 40px; color: red;">
+                <h3>Error</h3>
                 <p id="errorMessage">Could not load assessment details.</p>
-                <a href="dashboard.html" class="btn btn-primary" style="margin-top: 1.5rem;">
-                    Return to Dashboard
-                </a>
+                 <a href="dashboard.html" class="btn btn-primary" style="margin-top: 20px;">Return to Dashboard</a>
             </div>
         </div>
     </div>
