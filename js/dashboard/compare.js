@@ -12,7 +12,6 @@ let modalSearchTerm = '';
 export function initCompareTools(toolData) {
     // Use only the user's real assessments as the source of truth
     allTools = toolData || [];
-    selectedTools = [...allTools];
     showModal = false;
     modalSearchTerm = '';
     renderSummaryCards();
@@ -169,6 +168,7 @@ function setupEventListeners() {
     document.querySelector('.compare-tools__add-btn').addEventListener('click', async () => {
         await loadAssessments();
         initCompareTools(normalizeAssessments(getAssessments()));
+        window._modalSelectedTools = [...selectedTools];
         showModal = true;
         modalSearchTerm = '';
         renderModal();
