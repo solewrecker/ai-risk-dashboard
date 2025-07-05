@@ -134,4 +134,5 @@ export function switchTab(tabName) {
             initCompareTools([]);
         }
     }
-} 
+}
+window.switchTab = switchTab; 
