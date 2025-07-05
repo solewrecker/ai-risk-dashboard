@@ -162,6 +162,8 @@ function renderModal() {
 }
 
 function setupEventListeners() {
+    if (window._compareEventListenersAttached) return;
+    window._compareEventListenersAttached = true;
     // Remove tool tag
     document.getElementById('compare-selected-tags').addEventListener('click', (e) => {
         if (e.target.classList.contains('compare-tools__tag-remove')) {
@@ -179,14 +181,23 @@ function setupEventListeners() {
         }
     });
     // Add Tool button
-    document.querySelector('.compare-tools__add-btn').addEventListener('click', async () => {
-        await loadAssessments();
-        initCompareTools(normalizeAssessments(getAssessments()));
-        window._modalSelectedTools = [...selectedTools];
-        showModal = true;
-        modalSearchTerm = '';
-        renderModal();
-        setupModalListeners();
+    const addBtn = document.querySelector('.compare-tools__add-btn');
+    addBtn.addEventListener('click', async () => {
+        if (addBtn.disabled) return;
+        addBtn.disabled = true;
+        addBtn.classList.add('loading');
+        try {
+            await loadAssessments();
+            initCompareTools(normalizeAssessments(getAssessments()));
+            window._modalSelectedTools = [...selectedTools];
+            showModal = true;
+            modalSearchTerm = '';
+            renderModal();
+            setupModalListeners();
+        } finally {
+            addBtn.disabled = false;
+            addBtn.classList.remove('loading');
+        }
     });
 }
 
