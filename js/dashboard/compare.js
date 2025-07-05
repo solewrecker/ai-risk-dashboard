@@ -8,6 +8,7 @@ let showModal = false;
 let modalSearchTerm = '';
 
 export function initCompareTools(toolData) {
+    // Use only the user's real assessments as the source of truth
     allTools = toolData || [];
     selectedTools = [...allTools];
     showModal = false;
@@ -91,7 +92,7 @@ function renderModal() {
         modal.id = 'compare-tools-modal';
         document.body.appendChild(modal);
     }
-    // Filter available tools
+    // Always use allTools (the user's assessments) for available tools
     const availableTools = allTools.filter(tool => !selectedTools.some(sel => sel.id === tool.id) &&
         (tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()))));
     modal.innerHTML = `
