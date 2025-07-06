@@ -73,8 +73,27 @@ export async function processImport() {
             showError('Invalid JSON file.');
             return;
         }
-        if (!assessmentData.name) {
-            showError('Invalid assessment file format. Missing required field: name.');
+        // Validate required fields based on database schema
+        const requiredFields = ['name', 'category', 'total_score', 'risk_level', 'vendor'];
+        const missingFields = requiredFields.filter(field => !assessmentData[field]);
+        
+        if (missingFields.length > 0) {
+            showError(`Invalid assessment file format. Missing required fields: ${missingFields.join(', ')}`);
+            return;
+        }
+        
+        // Validate score fields
+        const scoreFields = ['data_storage_score', 'training_usage_score', 'access_controls_score', 'compliance_score', 'vendor_transparency_score'];
+        const missingScores = scoreFields.filter(field => assessmentData[field] === undefined || assessmentData[field] === null);
+        
+        if (missingScores.length > 0) {
+            showError(`Invalid assessment file format. Missing score fields: ${missingScores.join(', ')}`);
+            return;
+        }
+        
+        // Validate detailed_assessment structure
+        if (!assessmentData.detailed_assessment || typeof assessmentData.detailed_assessment !== 'object') {
+            showError('Invalid assessment file format. Missing or invalid detailed_assessment field.');
             return;
         }
         // Prepare multipart/form-data
