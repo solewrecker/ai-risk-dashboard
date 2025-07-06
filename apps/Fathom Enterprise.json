@@ -1,0 +1,152 @@
+{
+  "name": "Fathom Enterprise",
+  "vendor": "Fathom Video Corp",
+  "license_type": "SaaS Subscription",
+  "total_score": 38,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 11,
+  "training_usage_score": 10,
+  "access_controls_score": 6,
+  "compliance_score": 6,
+  "vendor_transparency_score": 5,
+  "summary_and_recommendation": "Fathom Enterprise presents low risk with strong security certifications (SOC2 Type II, HIPAA, GDPR compliance) and appropriate data handling practices. While some policies lack explicit detail around AI training and data retention, the vendor demonstrates solid enterprise-grade security practices. The tool's meeting recording capabilities require standard consent protocols but pose minimal risk with proper implementation. Recommendation: Approve for general use with standard enterprise controls - implement explicit consent protocols for recording, establish data classification guidelines, and maintain regular compliance monitoring.",
+  "primary_use_case": "AI-powered meeting transcription and summarization",
+  "data_classification": "Internal Communications/Meeting Content",
+  "category": "AI Meeting Assistant",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.7,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Assessment based on public privacy policy, security page, and help documentation. Limited enterprise-specific documentation available. Higher confidence would require enterprise sales engagement and detailed security questionnaire responses.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "microsoft.graph.calendars.read",
+      "microsoft.graph.onlineMeetings.read",
+      "microsoft.graph.user.read"
+    ],
+    "recommended_restrictions": [
+      "Block access to PHI/PII meetings",
+      "Require explicit consent for recording",
+      "Implement data retention controls",
+      "Monitor usage patterns"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Implement Explicit Recording Consent Protocol",
+      "description": "Establish mandatory consent procedures for all meeting participants before Fathom joins meetings, especially for sensitive discussions involving PHI or confidential information.",
+      "priority": "high",
+      "category": "privacy"
+    },
+    {
+      "title": "Establish Data Classification Restrictions",
+      "description": "Create clear policies restricting Fathom use for meetings containing PHI, financial data, or trade secrets until enterprise-grade controls are verified.",
+      "priority": "high",
+      "category": "data_governance"
+    },
+    {
+      "title": "Negotiate Enterprise Agreement",
+      "description": "Pursue enterprise agreement with explicit AI training opt-out, defined data retention periods, and enhanced admin controls before broader organizational deployment.",
+      "priority": "medium",
+      "category": "compliance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://fathom.video/privacy",
+      "title": "Fathom Privacy Policy",
+      "last_updated": "2024-11-12"
+    },
+    {
+      "url": "https://help.fathom.video/en/articles/296512",
+      "title": "Fathom Security Documentation",
+      "last_updated": "2024-01-15"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Fathom Enterprise",
+    "final_risk_score": 38,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Fathom Enterprise presents low risk with strong security certifications (SOC2 Type II, HIPAA, GDPR compliance) and appropriate data handling practices. While some policies lack explicit detail around AI training and data retention, the vendor demonstrates solid enterprise-grade security practices. The tool's meeting recording capabilities require standard consent protocols but pose minimal risk with proper implementation. Recommendation: Approve for general use with standard enterprise controls - implement explicit consent protocols for recording, establish data classification guidelines, and maintain regular compliance monitoring.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 11,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "Privacy policy indicates data processing occurs in secure regions with enterprise-grade hosting infrastructure, but lacks specific geographic control commitments or data residency guarantees. The policy mentions compliance with regional regulations (GDPR, CCPA) suggesting appropriate geographic considerations, but no explicit customer-controlled data residency options are documented. Limited transparency on specific data center locations or cross-border data transfer policies."
+          },
+          "encryption_standards": {
+            "score": 4,
+            "justification": "Security documentation claims 'end-to-end encryption' and 'enterprise-grade encryption standards' but lacks detailed technical specifications. Privacy policy mentions 'reasonable physical, technical, organizational and electronic safeguards' without specifying encryption algorithms, key management procedures, or technical implementation details. While security certifications suggest proper encryption implementation, the absence of published encryption specifications and technical whitepapers prevents verification of customer-controlled encryption capabilities."
+          },
+          "data_retention": {
+            "score": 4,
+            "justification": "Privacy policy states data is retained 'for as long as necessary to fulfill the purposes set out in this Privacy Policy, or for as long as we are required to do so by law' - this represents standard legal language but lacks specific time limits. The policy mentions deletion upon request with reasonable timelines, suggesting some customer control over retention. While not optimal, this represents limited retention with some deletion procedures available rather than indefinite retention without recourse. The lack of specific retention periods and automatic deletion procedures prevents a lower score."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 10,
+        "criteria": {
+          "model_training": {
+            "score": 10,
+            "justification": "Privacy policy does not explicitly address whether meeting content is used for AI model training or improvement. While the policy mentions sharing with 'vendors and service providers' for service delivery, there are no specific statements about machine learning model development using customer data. The absence of clear training policies creates uncertainty rather than confirmed training use. The policy does not indicate default training use or difficult opt-out procedures, but the lack of explicit guarantees against training use represents a policy gap that creates moderate risk rather than high risk."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "Privacy policy explicitly states 'We do not sell Meeting Content Information or information about your meeting attendees to anyone' and 'We do not sell, or share your personal information with non affiliated companies for their own direct marketing purposes, unless we have your permission.' Clear limitations on third-party sharing are documented with explicit consent requirements for any data sharing beyond service delivery purposes. Meeting content sharing is limited to meeting participants and specified service providers necessary for platform functionality."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 6,
+        "criteria": {
+          "admin_management": {
+            "score": 2,
+            "justification": "Platform provides advanced user management capabilities through team features, meeting sharing controls, and organizational account structures. Evidence suggests availability of admin dashboard functionality with user provisioning capabilities and role-based permissions for meeting access and sharing. The platform supports organizational accounts with some centralized management features, though detailed enterprise admin capabilities like domain verification and advanced group management are not clearly documented in available public materials."
+          },
+          "audit_capabilities": {
+            "score": 2,
+            "justification": "Platform provides basic activity tracking through meeting recording logs and sharing history, with some user action tracking capabilities evident in the interface. Meeting records and sharing activities appear to be logged and accessible to users, providing basic audit trail functionality. However, comprehensive enterprise-grade audit logging with exportable reports and detailed user activity monitoring is not clearly documented in available public materials. Some audit capabilities exist but may lack enterprise-level comprehensiveness."
+          },
+          "integration": {
+            "score": 2,
+            "justification": "Platform offers solid enterprise integration capabilities including calendar integration (Google Calendar, Outlook), CRM integrations (HubSpot, Salesforce), and productivity tool connections (Slack, Zapier). SSO capabilities are indicated through third-party login options mentioned in privacy policy (Google, Microsoft, SSO). The platform's core functionality requires calendar integration, suggesting enterprise-grade connectivity. However, detailed SCIM provisioning and advanced enterprise identity management features are not clearly documented in available public materials."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 6,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 3,
+            "justification": "Vendor demonstrates strong compliance credentials with documented SOC2 Type II, HIPAA, and GDPR compliance certifications. Security documentation explicitly states 'Fathom is HIPAA, SOC2 Type II, and GDPR-compliant and has passed extensive security reviews by Zoom.' Privacy policy shows clear alignment with major regulatory requirements including CCPA and GDPR provisions. The presence of multiple third-party certifications and regulatory compliance statements indicates robust compliance framework, though specific audit reports and detailed certification scopes are not publicly available."
+          },
+          "data_processing_transparency": {
+            "score": 3,
+            "justification": "Privacy policy provides reasonable transparency about data collection, processing purposes, and retention practices with clear descriptions of what data is collected and how it's used. Third-party service provider relationships are disclosed with some detail about data sharing for service delivery. However, detailed data flow diagrams, specific processing locations, and comprehensive third-party processor lists are not provided. Processing transparency meets basic regulatory requirements but lacks the comprehensive detail needed for full enterprise risk assessment."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 5,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 5,
+            "justification": "Vendor provides adequate public documentation including privacy policy, basic security information, and help documentation. The privacy policy is comprehensive and recently updated (November 2024), demonstrating ongoing maintenance of legal documentation. Security certifications are clearly claimed and the vendor maintains help documentation. However, detailed security whitepapers, technical architecture documentation, and comprehensive transparency reports are not publicly available. Support responsiveness and incident response procedures are not well-documented in available materials, requiring direct vendor engagement for enterprise-level security discussions."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Internal Communications/Meeting Content",
+      "data_classification": "Internal Communications",
+      "base_score": 38,
+      "final_score_with_multiplier": 38
+    }
+  }
+}

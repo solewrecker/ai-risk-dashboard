@@ -22,12 +22,18 @@
 
 ### Objective Scoring Methodology
 
-**To ensure consistent, defensible assessments, all criteria use measurable, objective standards:**
+**To ensure consistent, defensible assessments, all criteria use measurable, objective standards with tiered documentation requirements:**
 
-- **Specific Documentation Requirements**: Rather than "good" vs "poor" documentation, criteria specify exactly what documents must be present (e.g., "Published security whitepaper + detailed privacy policy")
-- **Quantifiable Thresholds**: Time-based criteria (e.g., "retention ≤90 days", "support response within 48 hours") eliminate subjective interpretation
-- **Boolean Verification**: Criteria use verifiable facts (e.g., "SOC 2 certification published" vs subjective quality assessments)
-- **Multiple Evidence Points**: Higher scores require multiple verified deficiencies, preventing single-point-of-failure assessments
+- **Tiered Documentation Assessment**: 
+  - **Tier 1**: Public documentation (privacy policies, websites, public whitepapers)
+  - **Tier 2**: Private enterprise documentation (security questionnaires, NDAs, DPAs)
+  - **Tier 3**: Third-party validation (certifications, audits, security assessments)
+  - **Tier 4**: Direct vendor engagement (security calls, detailed responses)
+
+- **Documentation Confidence Modifier**: Each assessment includes a confidence score (0.0-1.0) based on available evidence quality
+- **Quantifiable Thresholds**: Time-based criteria (e.g., "retention ≤90 days") eliminate subjective interpretation
+- **Context-Aware Penalties**: Missing documentation penalties adjusted based on tool type and vendor maturity
+- **Multiple Evidence Points**: Higher scores require multiple verified deficiencies
 
 ### Detailed Scoring Criteria
 
@@ -105,6 +111,20 @@
 - **MEDIUM RISK (35-59 points):** Standard enterprise controls required
 - **LOW RISK (0-34 points):** Basic monitoring sufficient
 
+## Assessment Confidence and Documentation Tiers
+
+### Confidence Scoring (0.0-1.0)
+- **0.9-1.0**: Comprehensive public + private documentation, recent third-party validation
+- **0.7-0.8**: Good public documentation, some private/vendor communication
+- **0.5-0.6**: Basic public documentation only, limited vendor response
+- **0.3-0.4**: Minimal documentation, vendor unresponsive
+- **0.0-0.2**: No documentation, assessment based on assumptions
+
+### Documentation Penalty Adjustments
+- **Established Enterprise Vendors**: 50% reduction in "missing documentation" penalties when Tier 2+ evidence available
+- **Startup/New Vendors**: Standard penalties apply
+- **Open Source Tools**: Alternative documentation standards (code review, community validation)
+
 ## Use Case Risk Multipliers
 Apply after calculating base score (results capped at 100):
 - **Legal/Compliance/Audit**: 1.3x
@@ -128,12 +148,12 @@ Data Classification:
 ## Quick Assessment Guide
 
 ### Red Flags (Automatic High Risk)
-- Data used for training with no opt-out
-- Unclear or indefinite data retention
-- No enterprise admin controls
-- Automatic capture of sensitive meetings
-- No encryption or unclear encryption practices
-- Vendor refuses transparency documentation
+- Data used for training with no opt-out **AND** no enterprise contractual guarantees
+- Unclear or indefinite data retention **AND** no private DPA available
+- No enterprise admin controls **AND** vendor won't provide security questionnaire
+- Automatic capture of sensitive meetings without clear opt-out
+- No encryption **OR** vendor refuses to discuss encryption practices
+- Vendor completely unresponsive to security documentation requests
 
 ### Decision Tree
 1. **Is data used for AI training?** → If yes with no opt-out: HIGH RISK

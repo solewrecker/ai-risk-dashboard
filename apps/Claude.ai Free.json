@@ -1,0 +1,241 @@
+{
+  "name": "Claude.ai Free",
+  "vendor": "Anthropic",
+  "license_type": "Free Consumer Service",
+  "total_score": 57,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 13,
+  "training_usage_score": 5,
+  "access_controls_score": 20,
+  "compliance_score": 9,
+  "vendor_transparency_score": 10,
+  "summary_and_recommendation": "Claude.ai Free presents MEDIUM RISK with a total score of 57/100. While Anthropic demonstrates strong commitments to privacy and training data practices, the free tier lacks enterprise-grade administrative controls and audit capabilities essential for business use. The service encrypts data in transit and at rest, does not use customer data for training by default, and maintains transparent privacy policies. However, the absence of centralized admin management, audit logs, and enterprise integrations creates significant governance gaps. Recommendation: Restrict to non-sensitive, individual use cases only. Upgrade to Claude for Work (Team/Enterprise) for any business-critical applications requiring administrative oversight.",
+  "confidence": 0.85,
+  "primary_use_case": "Individual productivity and general AI assistance",
+  "data_classification": "General business data (non-sensitive)",
+  "category": "AI Assistant - Consumer Tier",
+  "assessed_by": "AI Security Council",
+  
+  "breakdown": {
+    "scores": {
+      "dataStorage": 13,
+      "trainingUsage": 5,
+      "accessControls": 20,
+      "complianceRisk": 9,
+      "vendorTransparency": 10
+    },
+    "subScores": {
+      "dataStorage": {
+        "geographic": {
+          "score": 6,
+          "note": "Anthropic operates with external servers and while they indicate data protection measures, specific geographic residency controls are not clearly documented for the free tier, creating uncertainty about data location and jurisdiction compliance."
+        },
+        "encryption": {
+          "score": 2,
+          "note": "Anthropic provides enterprise-grade encryption with automatic encryption both in transit and at rest. However, specific encryption standards (AES-256) and customer-managed key options are not detailed in available documentation for the free tier."
+        },
+        "retention": {
+          "score": 5,
+          "note": "Data retention policies are not clearly specified for Claude.ai Free users. While Anthropic mentions data protection practices, specific retention periods, automatic deletion procedures, and user-controlled deletion options are not documented, creating moderate uncertainty about data lifecycle management."
+        }
+      },
+      "trainingUsage": {
+        "training": {
+          "score": 0,
+          "note": "Anthropic explicitly states that customer prompts and conversations from Free Claude.ai are not used for model training by default. Training use only occurs with explicit user permission (feedback submission) or in cases flagged for trust and safety review, representing industry-leading practices."
+        },
+        "sharing": {
+          "score": 5,
+          "note": "Third-party data sharing practices are not comprehensively detailed in available documentation. While Anthropic emphasizes privacy protection, specific policies about data sharing with partners, processors, or affiliates lack clear disclosure for the free tier."
+        }
+      },
+      "accessControls": {
+        "admin": {
+          "score": 8,
+          "note": "Claude.ai Free operates as individual accounts only with no organizational visibility or centralized management capabilities. There are no admin dashboards, user provisioning controls, role-based permissions, or group management features available for the free tier."
+        },
+        "audit": {
+          "score": 7,
+          "note": "Claude.ai Free provides no audit capabilities for administrators. There are no activity logs accessible to organizational oversight, no exportable reports, no user action tracking, and no compliance reporting features available for the free consumer service."
+        },
+        "integration": {
+          "score": 5,
+          "note": "Claude.ai Free offers no enterprise integration capabilities. There is no SSO support, no SCIM provisioning, no Active Directory integration, and no API access for enterprise management. Authentication is limited to username/password only."
+        }
+      },
+      "complianceRisk": {
+        "violations": {
+          "score": 6,
+          "note": "While Anthropic maintains privacy policies and indicates compliance with data protection regulations, specific compliance certifications (SOC 2, ISO 27001, HIPAA) are not documented for the free tier. The service appears to have standard privacy practices but lacks third-party validated compliance documentation."
+        },
+        "transparency": {
+          "score": 3,
+          "note": "Anthropic provides basic transparency about data processing through their Privacy Center and support documentation. However, detailed data flow diagrams, specific processing locations, and comprehensive third-party processor lists are not fully documented for the free service tier."
+        }
+      },
+      "vendorTransparency": {
+        "score": {
+          "score": 10,
+          "note": "Documentation quality is adequate but not comprehensive. Anthropic provides a Privacy Center with basic security information and privacy policies, and support appears responsive. However, there are no published security whitepapers, detailed incident response procedures, or regular transparency reports specifically for the free tier service."
+        }
+      }
+    },
+    "compliance": {
+      "pci": "non-compliant",
+      "sox": "non-compliant",
+      "gdpr": "partially-compliant",
+      "hipaa": "non-compliant"
+    }
+  },
+  
+  "details": {
+    "dataStorage": "Geographic: External servers with unclear specific residency controls for free tier, creating jurisdictional uncertainty | Encryption: Enterprise-grade encryption in transit and at rest, but specific standards and customer key management not detailed | Retention: Data retention policies not clearly specified for free users, moderate uncertainty about lifecycle management",
+    "trainingUsage": "Training: Excellent - explicit commitment that customer data is not used for training by default, only with permission or safety review | Sharing: Limited transparency about third-party data sharing practices and partner relationships",
+    "accessControls": "Admin: No enterprise controls - individual accounts only with no organizational management | Audit: No audit capabilities available for free tier users | Integration: No enterprise integrations - username/password authentication only",
+    "complianceRisk": "Violations: Standard privacy practices but no documented compliance certifications for free tier | Transparency: Basic data processing transparency through Privacy Center but lacks detailed flow diagrams and processor lists",
+    "vendorTransparency": "Adequate documentation through Privacy Center and support, but lacks comprehensive security whitepapers and detailed incident response procedures for free tier"
+  },
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "Not applicable - web-based service"
+    ],
+    "recommended_restrictions": [
+      "Block access to sensitive data repositories",
+      "Implement data classification policies",
+      "Restrict to non-confidential use cases only",
+      "Monitor usage through network logs",
+      "Require MFA for user accounts",
+      "Establish clear acceptable use policies"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Restrict to Non-Sensitive Data Only",
+      "description": "Limit Claude.ai Free usage to public or low-sensitivity data due to lack of enterprise controls and audit capabilities. Prohibit input of confidential, proprietary, or regulated data.",
+      "priority": "high",
+      "category": "data_governance"
+    },
+    {
+      "title": "Implement Usage Monitoring",
+      "description": "Establish network-level monitoring and logging to track Claude.ai Free usage patterns, as the service itself provides no audit capabilities for organizational oversight.",
+      "priority": "medium",
+      "category": "monitoring"
+    },
+    {
+      "title": "Evaluate Enterprise Upgrade",
+      "description": "For business-critical AI assistance needs, evaluate upgrading to Claude for Work (Team or Enterprise) plans which provide necessary administrative controls, audit capabilities, and compliance features.",
+      "priority": "high",
+      "category": "procurement"
+    },
+    {
+      "title": "Establish Clear Use Policies",
+      "description": "Create and communicate clear acceptable use policies for Claude.ai Free, specifying approved use cases, data types, and prohibited activities to mitigate governance risks.",
+      "priority": "medium",
+      "category": "policy"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://privacy.anthropic.com/en/articles/10458704-how-does-anthropic-protect-the-personal-data-of-claude-ai-users",
+      "title": "How does Anthropic protect the personal data of Claude.ai users?",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://support.anthropic.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-free-claude-ai-or-claude-pro-who-can-view-my-conversations",
+      "title": "Sensitive data input and conversation privacy",
+      "last_updated": "2024-11-15"
+    },
+    {
+      "url": "https://privacy.anthropic.com/en/",
+      "title": "Anthropic Privacy Center",
+      "last_updated": "2024-12-01"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Claude.ai Free",
+    "final_risk_score": 57,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "Claude.ai Free presents MEDIUM RISK with strong privacy practices but significant enterprise governance gaps. The service demonstrates excellent training data practices and basic encryption, but lacks administrative controls and audit capabilities essential for business use. Restrict to individual, non-sensitive use cases only.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 13,
+        "criteria": {
+          "geographic_control": {
+            "score": 6,
+            "justification": "Anthropic operates with external servers and while they indicate robust data protection measures, specific geographic residency controls and data localization options are not clearly documented for the free tier. This creates moderate uncertainty about data location and compliance with jurisdiction-specific requirements, particularly for organizations with strict data residency mandates."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "Anthropic provides enterprise-grade encryption with automatic encryption both in transit and at rest as documented in their privacy center. However, specific encryption standards (such as AES-256), customer-managed key options, and detailed encryption specifications are not published for the free tier, preventing full verification of encryption capabilities."
+          },
+          "data_retention": {
+            "score": 5,
+            "justification": "Data retention policies are not clearly specified for Claude.ai Free users in available documentation. While Anthropic emphasizes data protection and user privacy, specific retention periods, automatic deletion procedures, and user-controlled deletion options are not documented, creating moderate uncertainty about long-term data lifecycle management and user control over data persistence."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 5,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "Anthropic explicitly states that customer prompts and conversations from Free Claude.ai are not used for model training by default. Training use only occurs with explicit user permission through feedback submission or in cases flagged for trust and safety review. This represents industry-leading practices for protecting customer data from unauthorized training use."
+          },
+          "data_sharing": {
+            "score": 5,
+            "justification": "Third-party data sharing practices are not comprehensively detailed in available documentation for the free tier. While Anthropic emphasizes privacy protection and indicates limited access controls, specific policies about data sharing with partners, processors, affiliates, or other third parties lack clear disclosure, creating uncertainty about potential data exposure through vendor relationships."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 20,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "Claude.ai Free operates as individual accounts only with no organizational visibility or centralized management capabilities. There are no admin dashboards, user provisioning or deprovisioning controls, role-based permissions, group management features, or domain verification options available for the free tier, creating complete lack of enterprise governance."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "Claude.ai Free provides no audit capabilities for administrators or organizational oversight. There are no activity logs accessible to administrators, no exportable reports, no user action tracking, no data access logs, and no compliance reporting features available for the free consumer service, eliminating visibility into usage patterns and security events."
+          },
+          "integration": {
+            "score": 5,
+            "justification": "Claude.ai Free offers no enterprise integration capabilities. There is no SAML/OIDC SSO support, no SCIM provisioning, no Active Directory integration, and no API access for enterprise management. Authentication is limited to username/password only, preventing integration with enterprise identity management systems and security frameworks."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 9,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 6,
+            "justification": "While Anthropic maintains privacy policies and indicates compliance with data protection regulations, specific compliance certifications (SOC 2, ISO 27001, HIPAA, PCI-DSS) are not documented or published for the free tier. The service appears to have standard privacy practices but lacks third-party validated compliance documentation, creating gaps for organizations with specific regulatory requirements."
+          },
+          "data_processing_transparency": {
+            "score": 3,
+            "justification": "Anthropic provides basic transparency about data processing through their Privacy Center and support documentation, including information about encryption and access controls. However, detailed data flow diagrams, specific data processing locations, comprehensive retention schedules, and complete third-party processor lists are not fully documented for the free service tier."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 10,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 10,
+            "justification": "Documentation quality is adequate but not comprehensive for enterprise evaluation. Anthropic provides a Privacy Center with basic security information and privacy policies, and support appears responsive based on available information. However, there are no published security whitepapers, detailed incident response procedures, regular transparency reports, or comprehensive security documentation specifically for the free tier service, limiting the ability to fully evaluate security posture."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Individual productivity and general AI assistance",
+      "data_classification": "General business data (non-sensitive)",
+      "base_score": 57,
+      "final_score_with_multiplier": 57
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "name": "ChatGPT Enterprise",
+  "vendor": "OpenAI",
+  "license_type": "Enterprise Subscription",
+  "total_score": 42,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 11,
+  "training_usage_score": 0,
+  "access_controls_score": 2,
+  "compliance_score": 3,
+  "vendor_transparency_score": 6,
+  "summary_and_recommendation": "ChatGPT Enterprise presents MEDIUM RISK with a score of 42/100. Key strengths include contractual guarantee of no training data usage, SOC 2 compliance, and comprehensive enterprise controls. Primary concerns include unclear data retention policies beyond stated periods and limited vendor transparency documentation. Recommendation: Approve for general enterprise use with standard monitoring and data classification controls. Requires additional vendor documentation for HIPAA/PHI environments.",
+  "confidence": 0.8,
+  "primary_use_case": "Enterprise AI Assistant",
+  "data_classification": "Internal/Confidential Data",
+  "category": "Generative AI Platform",
+  "assessed_by": "AI Security Council",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "user.read",
+      "openid",
+      "profile",
+      "email"
+    ],
+    "recommended_restrictions": [
+      "Require MFA for admin access",
+      "Implement data classification policies",
+      "Monitor usage patterns",
+      "Restrict PHI/PII without additional controls"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Obtain comprehensive vendor documentation",
+      "description": "Request detailed security whitepaper, data processing agreements, and incident response procedures from OpenAI to reduce transparency risk",
+      "priority": "high",
+      "category": "documentation"
+    },
+    {
+      "title": "Implement data classification controls",
+      "description": "Establish clear policies for what data types can be processed through ChatGPT Enterprise, especially for PHI/PII",
+      "priority": "high",
+      "category": "governance"
+    },
+    {
+      "title": "Configure enterprise admin controls",
+      "description": "Fully utilize the admin console for user management, domain verification, and SSO integration to maximize security oversight",
+      "priority": "medium",
+      "category": "access_control"
+    },
+    {
+      "title": "Establish usage monitoring",
+      "description": "Implement regular review of usage insights and audit capabilities to track enterprise adoption and identify potential risks",
+      "priority": "medium",
+      "category": "monitoring"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://openai.com/enterprise-privacy/",
+      "title": "Enterprise Privacy at OpenAI",
+      "last_updated": "2024"
+    },
+    {
+      "url": "https://openai.com/index/introducing-chatgpt-enterprise/",
+      "title": "Introducing ChatGPT Enterprise",
+      "last_updated": "2024"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "ChatGPT Enterprise",
+    "final_risk_score": 42,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "ChatGPT Enterprise presents MEDIUM RISK with a score of 42/100. Key strengths include contractual guarantee of no training data usage, SOC 2 compliance, and comprehensive enterprise controls. Primary concerns include unclear data retention policies beyond stated periods and limited vendor transparency documentation. Recommendation: Approve for general enterprise use with standard monitoring and data classification controls. Requires additional vendor documentation for HIPAA/PHI environments.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 11,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "ChatGPT Enterprise operates on known secure infrastructure with data processing in established regions (US-based OpenAI). While specific data residency controls are not explicitly documented in available materials, the enterprise service operates within OpenAI's established security framework. The service appears to use standard cloud infrastructure in secure jurisdictions, but lacks detailed geographic control documentation that would warrant a lower score."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "ChatGPT Enterprise implements enterprise-grade encryption with documented AES-256 encryption at rest and TLS 1.2+ encryption in transit between customers and OpenAI, and between OpenAI and service providers. SOC 2 compliance confirms industry-standard encryption practices. While customer-managed encryption keys are not mentioned, the published encryption specifications and third-party validation provide strong assurance of comprehensive encryption implementation."
+          },
+          "data_retention": {
+            "score": 6,
+            "justification": "Available documentation indicates conversations are retained for extended periods with some control mechanisms, but specific retention periods for ChatGPT Enterprise are not clearly documented in accessible materials. While files are reportedly retained for 3 hours after conversation pause, the broader conversation retention policy lacks detailed documentation. The absence of clear, specific retention timelines and deletion procedures in publicly available enterprise documentation warrants a penalty score reflecting uncertainty about data persistence."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "ChatGPT Enterprise provides contractual guarantee that customer data is not used for training OpenAI's models. This is a fundamental differentiator from the consumer versions of ChatGPT and represents the strongest possible protection against training data usage. The enterprise service explicitly prohibits the use of customer conversations and data for model improvement, providing legal and technical safeguards against unauthorized training use."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "ChatGPT Enterprise documentation indicates no third-party data sharing for enterprise customers, with data processing contained within OpenAI's controlled environment. The enterprise service model is designed to maintain data isolation and prevent external sharing, unlike consumer services that may have broader data sharing arrangements. This represents optimal data sharing practices for enterprise customers."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 2,
+        "criteria": {
+          "admin_management": {
+            "score": 0,
+            "justification": "ChatGPT Enterprise provides comprehensive enterprise controls including a centralized admin console, user provisioning and deprovisioning capabilities, role-based permissions, group management, and domain verification. These features meet the full enterprise control requirements and provide administrators with complete oversight of organizational usage, user access, and permission management across the enterprise deployment."
+          },
+          "audit_capabilities": {
+            "score": 2,
+            "justification": "ChatGPT Enterprise includes usage insights and admin console capabilities that provide good auditing functionality. While the service offers activity tracking and basic reporting through the admin interface, the specific details of comprehensive audit logging, real-time activity monitoring, and exportable compliance reports are not fully detailed in available documentation. The existing capabilities appear robust but lack detailed specification of advanced audit features."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "ChatGPT Enterprise provides full enterprise integration capabilities including SAML/OIDC SSO, domain verification, and enterprise identity management integration. The service is designed to integrate with existing enterprise authentication systems and provides the API access and provisioning capabilities required for comprehensive enterprise deployment. This represents the optimal level of enterprise integration support."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 3,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 3,
+            "justification": "ChatGPT Enterprise maintains SOC 2 compliance and demonstrates adherence to industry security standards. The service shows strong commitment to regulatory compliance with documented certifications and security controls. However, specific certifications for specialized regulatory requirements (HIPAA, PCI-DSS) are not explicitly documented in available materials, and comprehensive compliance documentation is not fully accessible. This represents mostly compliant status with some gaps in specialized regulatory documentation."
+          },
+          "data_processing_transparency": {
+            "score": 0,
+            "justification": "ChatGPT Enterprise provides clear documentation of data processing practices, including specific retention periods for different data types (files retained for 3 hours, clear conversation handling), and transparent disclosure of data flows. The service provides adequate transparency about data processing locations and procedures, meeting the requirements for full transparency in enterprise data handling practices."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 6,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 6,
+            "justification": "OpenAI provides adequate documentation for ChatGPT Enterprise including privacy policies and basic security information through their enterprise privacy page and service announcements. However, comprehensive security whitepapers, detailed incident response procedures, and regular transparency reports are not readily available in public documentation. Support responsiveness information is not documented in accessible materials. This represents adequate but not comprehensive vendor transparency, with key enterprise documentation requiring direct vendor engagement."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Enterprise AI Assistant",
+      "data_classification": "Internal/Confidential Data",
+      "base_score": 42,
+      "final_score_with_multiplier": 42
+    }
+  }
+}

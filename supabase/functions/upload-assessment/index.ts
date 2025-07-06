@@ -50,7 +50,7 @@ serve(async (req) => {
     );
     
     // --- Data Mapping and Validation (same as before) ---
-    const { name, vendor, license_type, total_score, risk_level, data_storage_score, training_usage_score, access_controls_score, compliance_score, vendor_transparency_score, summary_and_recommendation, confidence, primary_use_case, data_classification, category, assessed_by, breakdown, details, azure_permissions, recommendations, sources, detailed_assessment } = toolData;
+    const { name, vendor, license_type, total_score, risk_level, data_storage_score, training_usage_score, access_controls_score, compliance_score, vendor_transparency_score, summary_and_recommendation, confidence, primary_use_case, data_classification, category, assessed_by, breakdown, details, azure_permissions, recommendations, sources, detailed_assessment, documentation_tier, assessment_notes } = toolData;
 
     if (!name) {
       throw new Error("The 'name' field is required.");
@@ -78,7 +78,9 @@ serve(async (req) => {
       azure_permissions: azure_permissions || {},
       recommendations: recommendations || {},
       sources: sources || [],
-      detailed_assessment: detailed_assessment || toolData
+      detailed_assessment: detailed_assessment || toolData,
+      documentation_tier: documentation_tier || null,
+      assessment_notes: assessment_notes || null
     };
 
     const { data, error } = await supabaseAdmin.from('ai_tools').upsert(recordToInsert, {
