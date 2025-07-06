@@ -78,6 +78,8 @@ export async function processImport() {
         const missingFields = requiredFields.filter(field => !assessmentData[field]);
         
         if (missingFields.length > 0) {
+            console.log('Assessment data:', assessmentData);
+            console.log('Missing fields:', missingFields);
             showError(`Invalid assessment file format. Missing required fields: ${missingFields.join(', ')}`);
             return;
         }
