@@ -114,10 +114,36 @@ export async function saveToDatabase(assessment) {
             throw error;
         }
         
+        // Increment total assessments created counter
+        await incrementTotalAssessmentsCreated();
+        
         console.log('Successfully saved to database:', data);
         return { data };
     } catch (error) {
         console.error('Error saving to database:', error);
         return { error };
+    }
+}
+
+// New function to increment the total assessments created counter
+async function incrementTotalAssessmentsCreated() {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    try {
+        const currentTotal = user.user_metadata?.total_assessments_created || 0;
+        const newTotal = currentTotal + 1;
+        
+        const { error } = await supabase.auth.updateUser({
+            data: { total_assessments_created: newTotal }
+        });
+        
+        if (error) {
+            console.error('Failed to update total assessments created:', error);
+        } else {
+            console.log(`Updated total assessments created: ${currentTotal} → ${newTotal}`);
+        }
+    } catch (error) {
+        console.error('Error incrementing total assessments created:', error);
     }
 } 
