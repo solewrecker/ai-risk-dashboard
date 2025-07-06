@@ -82,7 +82,11 @@ export async function loadAssessments() {
             resultsCount.textContent = 'Error loading assessments';
         }
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            try {
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error creating Lucide icons in renderAssessmentList:', error);
+            }
         }
     }
 }
@@ -158,7 +162,11 @@ function renderRecentAssessments() {
     }).join('');
     
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        try {
+            lucide.createIcons();
+        } catch (error) {
+            console.error('Error creating Lucide icons in renderRecentAssessments:', error);
+        }
     }
 }
 
@@ -226,7 +234,11 @@ function renderAssessmentList() {
     }
     
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        try {
+            lucide.createIcons();
+        } catch (error) {
+            console.error('Error creating Lucide icons in renderAssessmentList:', error);
+        }
     }
 }
 
@@ -376,7 +388,11 @@ function renderFilteredAssessments(filteredData) {
     }).join('');
     
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        try {
+            lucide.createIcons();
+        } catch (error) {
+            console.error('Error creating Lucide icons in renderFilteredAssessments:', error);
+        }
     }
 }
 
