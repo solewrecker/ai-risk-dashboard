@@ -245,18 +245,35 @@ export async function deleteAssessment(id) {
     }
     
     try {
-        const { error } = await supabaseClient
-            .from('assessments')
-            .delete()
-            .eq('id', id);
+        // Get Supabase access token
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
         
-        if (error) throw error;
+        if (!accessToken) {
+            throw new Error('Authentication error: No access token found. Please log in again.');
+        }
+        
+        // Call the edge function for secure deletion
+        const response = await fetch('https://lgybmsziqjdmmxdiyils.functions.supabase.co/delete-assessment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ assessmentId: id })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Delete failed');
+        }
         
         await loadAssessments();
         updateDashboardStats();
         updateProgressTracking();
         
-        alert('Assessment deleted successfully');
+        alert(result.message || 'Assessment deleted successfully');
     } catch (error) {
         console.error('Error deleting assessment:', error);
         alert('Failed to delete assessment: ' + error.message);
