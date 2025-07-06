@@ -1,0 +1,165 @@
+{
+  "name": "Microsoft Copilot Enterprise",
+  "vendor": "Microsoft Corporation",
+  "license_type": "Enterprise Subscription",
+  "total_score": 8,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 2,
+  "training_usage_score": 0,
+  "access_controls_score": 0,
+  "compliance_score": 0,
+  "vendor_transparency_score": 6,
+  "summary_and_recommendation": "Microsoft Copilot Enterprise demonstrates exceptional security controls and enterprise-grade protections. The tool provides comprehensive data protection with customer-controlled encryption, no training data usage, full enterprise admin controls, and strong compliance certifications. The only minor concern is limited public transparency regarding some technical implementation details, though this is offset by Microsoft's established enterprise documentation practices. RECOMMENDATION: Approve for general enterprise use including sensitive data processing.",
+  "primary_use_case": "Enterprise AI Assistant",
+  "data_classification": "All data classifications supported with appropriate controls",
+  "category": "Productivity/AI Assistant",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.85,
+  "documentation_tier": "Tier 2: Public + Private Enterprise Documentation",
+  "assessment_notes": "High confidence assessment based on comprehensive Microsoft Learn documentation, DPA terms, and established enterprise security practices. Some technical implementation details require private enterprise documentation.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "Microsoft.Graph.User.Read",
+      "Microsoft.Graph.Mail.Read",
+      "Microsoft.Graph.Calendars.Read",
+      "Microsoft.Graph.Files.Read.All",
+      "Microsoft.Graph.Sites.Read.All"
+    ],
+    "recommended_restrictions": [
+      "Enable Microsoft Purview DLP policies",
+      "Configure sensitivity labels for encryption",
+      "Implement Microsoft Entra Conditional Access",
+      "Enable audit logging and monitoring"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Enable comprehensive audit logging",
+      "description": "Configure Microsoft Purview audit logging to track all Copilot interactions for compliance and security monitoring",
+      "priority": "medium",
+      "category": "monitoring"
+    },
+    {
+      "title": "Implement sensitivity labels",
+      "description": "Deploy Microsoft Purview sensitivity labels with encryption to control which content Copilot can access",
+      "priority": "high",
+      "category": "data_protection"
+    },
+    {
+      "title": "Configure DLP policies",
+      "description": "Set up Data Loss Prevention policies to prevent Copilot from accessing restricted content types",
+      "priority": "high",
+      "category": "data_protection"
+    },
+    {
+      "title": "Review SharePoint permissions",
+      "description": "Audit SharePoint permissions as Copilot respects existing user permissions for content access",
+      "priority": "medium",
+      "category": "access_control"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection",
+      "title": "Enterprise data protection in Microsoft 365 Copilot",
+      "last_updated": "2024-12-15"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+      "title": "Data, Privacy, and Security for Microsoft 365 Copilot",
+      "last_updated": "2024-12-10"
+    },
+    {
+      "url": "https://www.microsoft.com/licensing/docs/view/Microsoft-Products-and-Services-Data-Protection-Addendum-DPA",
+      "title": "Microsoft Data Protection Addendum (DPA)",
+      "last_updated": "2024-10-01"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Microsoft Copilot Enterprise",
+    "final_risk_score": 8,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Microsoft Copilot Enterprise demonstrates exceptional security controls and enterprise-grade protections. The tool provides comprehensive data protection with customer-controlled encryption, no training data usage, full enterprise admin controls, and strong compliance certifications. The only minor concern is limited public transparency regarding some technical implementation details, though this is offset by Microsoft's established enterprise documentation practices. RECOMMENDATION: Approve for general enterprise use including sensitive data processing.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 2,
+        "criteria": {
+          "geographic_control": {
+            "score": 0,
+            "justification": "'On-premises or controlled data residency' - Microsoft provides EU Data Boundary compliance and controlled data residency options through Azure regions with contractual guarantees."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "'Enterprise-Grade Encryption' - Microsoft provides AES-256 encryption at rest and in transit with vendor-managed keys and published encryption specifications, but not customer-controlled encryption keys."
+          },
+          "data_retention": {
+            "score": 0,
+            "justification": "'Customer-Controlled Retention' - Microsoft provides customer-controlled retention through Data Protection Addendum with immediate deletion available on demand and customer controls all retention periods."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "'Contractual guarantee of no training use' - Microsoft explicitly states in DPA and Product Terms that prompts, responses, and data accessed through Microsoft Graph aren't used to train foundation models."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "'No third-party sharing' - Microsoft acts as data processor under DPA with no third-party sharing of customer data."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 0,
+        "criteria": {
+          "admin_management": {
+            "score": 0,
+            "justification": "'Full Enterprise Controls' - Microsoft 365 provides centralized admin dashboard, user provisioning/deprovisioning, role-based permissions, group management, and domain verification through Microsoft 365 admin center."
+          },
+          "audit_capabilities": {
+            "score": 0,
+            "justification": "'Comprehensive Auditing' - Microsoft provides real-time activity logs through Microsoft Purview, exportable reports, user action tracking, data access logs, and compliance reporting features."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "'Full Enterprise Integration' - Microsoft provides native SAML/OIDC SSO, SCIM provisioning, Active Directory integration, and comprehensive API access for enterprise management."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 0,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "'Fully Compliant' - Microsoft maintains published compliance certifications including SOC 2, ISO 27001, GDPR compliance, signed BAAs available, and industry-specific certifications including HIPAA support."
+          },
+          "data_processing_transparency": {
+            "score": 0,
+            "justification": "'Full Transparency' - Microsoft provides published data flow diagrams, specific data processing locations, detailed retention schedules, and clear third-party processor documentation."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 6,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 6,
+            "justification": "'Minimal Documentation' - While Microsoft provides comprehensive DPA and Product Terms, some technical implementation details require private enterprise documentation rather than public security whitepapers, resulting in reduced public transparency."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Enterprise AI Assistant",
+      "data_classification": "All Classifications Supported",
+      "base_score": 8,
+      "final_score_with_multiplier": 8
+    }
+  }
+}

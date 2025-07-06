@@ -1,0 +1,238 @@
+{
+  "name": "GitHub Copilot Free",
+  "vendor": "GitHub (Microsoft)",
+  "license_type": "Free",
+  "total_score": 78,
+  "risk_level": "HIGH RISK",
+  "data_storage_score": 19,
+  "training_usage_score": 20,
+  "access_controls_score": 20,
+  "compliance_score": 15,
+  "vendor_transparency_score": 4,
+  "summary_and_recommendation": "GitHub Copilot Free presents HIGH RISK due to confirmed use of user code for training AI models with limited opt-out mechanisms, lack of enterprise access controls, unclear data retention policies, and insufficient transparency around data handling practices. The free tier lacks administrative oversight capabilities essential for enterprise use. Recommendation: Block for enterprise use - consider upgrading to GitHub Copilot Business for enhanced controls and compliance features.",
+  "confidence": 0.85,
+  "primary_use_case": "Code generation and development assistance",
+  "data_classification": "Source code and development data",
+  "category": "AI-powered development tool",
+  "assessed_by": "AI Security Council",
+  
+  "breakdown": {
+    "scores": {
+      "dataStorage": 19,
+      "trainingUsage": 20,
+      "accessControls": 20,
+      "complianceRisk": 15,
+      "vendorTransparency": 4
+    },
+    "subScores": {
+      "dataStorage": {
+        "geographic": {
+          "score": 6,
+          "note": "GitHub operates globally with servers in multiple jurisdictions including US and EU, but specific data residency controls are not clearly documented for the free tier, creating uncertainty about where code snippets are processed and stored."
+        },
+        "encryption": {
+          "score": 4,
+          "note": "Basic encryption in transit is mentioned but comprehensive encryption specifications are not published. No evidence of customer-controlled encryption or detailed encryption-at-rest documentation for the free tier."
+        },
+        "retention": {
+          "score": 8,
+          "note": "Data retention policies are unclear for the free tier. While some sources mention temporary use of code snippets, there is no clear documented retention period, automatic deletion procedures, or user control over data deletion for free tier users."
+        }
+      },
+      "trainingUsage": {
+        "training": {
+          "score": 15,
+          "note": "GitHub Copilot Free explicitly uses user code for training purposes. While GitHub has implemented some opt-out mechanisms, the default behavior is to use customer code for model training, and the opt-out process is not clearly documented or easily accessible for free tier users."
+        },
+        "sharing": {
+          "score": 5,
+          "note": "Broad sharing practices are unclear, but the tool inherently shares code patterns through its training process. Third-party sharing policies are not clearly documented, creating uncertainty about data handling practices."
+        }
+      },
+      "accessControls": {
+        "admin": {
+          "score": 8,
+          "note": "GitHub Copilot Free provides no enterprise admin controls. Individual accounts only with no organizational visibility, centralized management, user provisioning/deprovisioning, or role-based permissions for administrative oversight."
+        },
+        "audit": {
+          "score": 7,
+          "note": "No audit capabilities are available for the free tier. No activity logs, exportable reports, user action tracking, or compliance reporting features are accessible to administrators since there are no administrative controls."
+        },
+        "integration": {
+          "score": 5,
+          "note": "No enterprise integration capabilities for the free tier. No SSO, SCIM provisioning, Active Directory integration, or API access for enterprise management. Limited to individual username/password authentication."
+        }
+      },
+      "complianceRisk": {
+        "violations": {
+          "score": 10,
+          "note": "While GitHub has some compliance certifications at the corporate level, specific compliance documentation for Copilot Free is limited. No signed Business Associate Agreements (BAAs) available for free tier, no documented GDPR Article 28 compliance specifically for the free service, and no industry-specific certifications readily available."
+        },
+        "transparency": {
+          "score": 5,
+          "note": "Data processing transparency is limited. No published data flow diagrams specific to Copilot Free, vague descriptions of data processing locations, unclear retention schedules, and incomplete disclosure of third-party relationships in the AI training pipeline."
+        }
+      },
+      "vendorTransparency": {
+        "score": {
+          "score": 4,
+          "note": "GitHub provides adequate documentation through their Trust Center and general privacy policies, but lacks comprehensive security whitepapers specific to Copilot Free. Support is available but response times and quality vary. Some transparency reports are available at the corporate level but not specific to the free tier service."
+        }
+      }
+    },
+    "compliance": {
+      "pci": "non-compliant",
+      "sox": "non-compliant",
+      "gdpr": "partially-compliant",
+      "hipaa": "non-compliant"
+    }
+  },
+  
+  "details": {
+    "dataStorage": "Geographic: External servers in multiple jurisdictions with unclear data residency controls for free tier | Encryption: Basic TLS in transit, limited encryption-at-rest documentation | Retention: Unclear retention periods with no documented deletion procedures for free users",
+    "trainingUsage": "Training: Default use of customer code for AI model training with limited opt-out mechanisms | Sharing: Inherent sharing through training process with unclear third-party relationships",
+    "accessControls": "Admin: No enterprise admin controls or organizational visibility | Audit: No audit capabilities or activity logging for free tier | Integration: No enterprise SSO, SCIM, or API access",
+    "complianceRisk": "Violations: Limited compliance documentation specific to free tier, no BAAs available | Transparency: Vague data processing descriptions without detailed flow diagrams or processor lists",
+    "vendorTransparency": "Adequate general documentation available through Trust Center, but lacks service-specific security details and guaranteed support response times"
+  },
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "Not applicable - standalone service"
+    ],
+    "recommended_restrictions": [
+      "Block network access to GitHub Copilot endpoints",
+      "Implement DLP policies to prevent code exfiltration",
+      "Monitor for unauthorized AI tool usage"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Block GitHub Copilot Free for enterprise use",
+      "description": "The free tier lacks essential enterprise controls including admin oversight, audit capabilities, and clear data handling policies. The default training use of customer code presents unacceptable risk for proprietary or sensitive code.",
+      "priority": "high",
+      "category": "security"
+    },
+    {
+      "title": "Evaluate GitHub Copilot Business/Enterprise",
+      "description": "If AI coding assistance is required, evaluate paid tiers that offer enterprise controls, audit capabilities, and the ability to disable training on customer code.",
+      "priority": "medium",
+      "category": "governance"
+    },
+    {
+      "title": "Implement code scanning and DLP",
+      "description": "Deploy data loss prevention solutions to detect and prevent unauthorized sharing of proprietary code through AI tools.",
+      "priority": "high",
+      "category": "data protection"
+    },
+    {
+      "title": "Establish AI tool policy",
+      "description": "Create and communicate clear policies regarding the use of AI coding tools, including approved alternatives and consequences for unauthorized usage.",
+      "priority": "medium",
+      "category": "policy"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://blog.gitguardian.com/github-copilot-security-and-privacy/",
+      "title": "GitHub Copilot Security and Privacy Concerns",
+      "last_updated": "2024-03-28"
+    },
+    {
+      "url": "https://resources.github.com/copilot-trust-center/",
+      "title": "GitHub Copilot Trust Center",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://privacy.commonsense.org/privacy-report/GitHub-Copilot",
+      "title": "Common Sense Privacy Standard Privacy Report",
+      "last_updated": "2024-11-15"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "GitHub Copilot Free",
+    "final_risk_score": 78,
+    "final_risk_category": "HIGH RISK",
+    "summary_and_recommendation": "GitHub Copilot Free presents HIGH RISK due to confirmed use of user code for training AI models with limited opt-out mechanisms, lack of enterprise access controls, unclear data retention policies, and insufficient transparency around data handling practices. The free tier lacks administrative oversight capabilities essential for enterprise use. Recommendation: Block for enterprise use - consider upgrading to GitHub Copilot Business for enhanced controls and compliance features.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 19,
+        "criteria": {
+          "geographic_control": {
+            "score": 6,
+            "justification": "GitHub operates globally with servers in multiple jurisdictions including US and EU regions. However, specific data residency controls and contractual guarantees for where code snippets are processed and stored are not clearly documented for the free tier, creating uncertainty about geographic data control."
+          },
+          "encryption_standards": {
+            "score": 4,
+            "justification": "Basic encryption in transit (TLS) is mentioned in available documentation, but comprehensive encryption specifications are not published. There is no evidence of customer-controlled encryption, detailed encryption-at-rest documentation, or advanced encryption features for the free tier."
+          },
+          "data_retention": {
+            "score": 8,
+            "justification": "Data retention policies are unclear and poorly documented for the free tier. While some sources mention temporary use of code snippets for suggestion generation, there is no clear documented retention period, no automatic deletion procedures, and no user control over data deletion for free tier users."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 20,
+        "criteria": {
+          "model_training": {
+            "score": 15,
+            "justification": "GitHub Copilot Free explicitly uses user code for training AI models by default. While GitHub has implemented some opt-out mechanisms in recent updates, the default behavior remains to use customer code for model training, and the opt-out process is not clearly documented or easily accessible for free tier users."
+          },
+          "data_sharing": {
+            "score": 5,
+            "justification": "The tool inherently shares code patterns through its training process, but specific third-party sharing policies are not clearly documented. The AI training pipeline may involve sharing with Microsoft's AI services, but the full extent of data sharing relationships is unclear."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 20,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "GitHub Copilot Free provides no enterprise admin controls whatsoever. Users operate individual accounts with no organizational visibility, no centralized management capabilities, no user provisioning/deprovisioning, and no role-based permissions for administrative oversight."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "No audit capabilities are available for the free tier. There are no activity logs, exportable reports, user action tracking, or compliance reporting features accessible to administrators, primarily because there are no administrative controls available."
+          },
+          "integration": {
+            "score": 5,
+            "justification": "No enterprise integration capabilities exist for the free tier. There is no SSO support, SCIM provisioning, Active Directory integration, or API access for enterprise management. Authentication is limited to individual username/password credentials."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 15,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 10,
+            "justification": "While GitHub has some compliance certifications at the corporate level, specific compliance documentation for Copilot Free is limited. No signed Business Associate Agreements (BAAs) are available for the free tier, no documented GDPR Article 28 compliance specifically for the free service, and no industry-specific certifications are readily available."
+          },
+          "data_processing_transparency": {
+            "score": 5,
+            "justification": "Data processing transparency is limited with no published data flow diagrams specific to Copilot Free, vague descriptions of data processing locations, unclear retention schedules, and incomplete disclosure of third-party relationships in the AI training pipeline."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 4,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 4,
+            "justification": "GitHub provides adequate documentation through their Trust Center and general privacy policies, but lacks comprehensive security whitepapers specific to Copilot Free. Support is available but response times and quality vary significantly. Some transparency reports are available at the corporate level but not specific to the free tier service."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Internal IT/Development",
+      "data_classification": "Source code and development data",
+      "base_score": 78,
+      "final_score_with_multiplier": 78
+    }
+  }
+}

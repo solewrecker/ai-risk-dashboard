@@ -1,0 +1,167 @@
+{
+  "name": "Fireflies.ai Enterprise",
+  "vendor": "Fireflies.ai Corp.",
+  "license_type": "Enterprise SaaS",
+  "total_score": 27,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 5,
+  "training_usage_score": 0,
+  "access_controls_score": 4,
+  "compliance_score": 8,
+  "vendor_transparency_score": 10,
+  "summary_and_recommendation": "Fireflies.ai Enterprise demonstrates strong data security practices with end-to-end encryption, explicit no-training policies, and enterprise-grade access controls. The vendor provides transparent documentation and maintains SOC 2, GDPR, and HIPAA compliance. However, vendor transparency is limited to public documentation. Approved for general enterprise use with standard monitoring.",
+  "primary_use_case": "Meeting transcription and note-taking",
+  "data_classification": "Business Communications Data",
+  "category": "AI-Powered Productivity Tools",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.7,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Assessment based on comprehensive public documentation including privacy policy, security whitepapers, and admin controls documentation. No private enterprise documentation or vendor engagement conducted.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "calendar.read",
+      "meetings.read",
+      "files.read"
+    ],
+    "recommended_restrictions": [
+      "Require MFA for admin access",
+      "Enable audit logging",
+      "Restrict to approved domains"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Enable Enterprise Admin Controls",
+      "description": "Implement Super Admin role with organization-wide visibility and centralized management capabilities",
+      "priority": "high",
+      "category": "access_control"
+    },
+    {
+      "title": "Configure Data Retention Policies",
+      "description": "Establish custom data retention policies aligned with organizational compliance requirements",
+      "priority": "medium",
+      "category": "data_governance"
+    },
+    {
+      "title": "Implement SSO Integration",
+      "description": "Deploy SAML-based SSO for enhanced security and centralized access management",
+      "priority": "medium",
+      "category": "security"
+    },
+    {
+      "title": "Consider Private Storage Option",
+      "description": "Evaluate private storage solution for highly sensitive meeting content",
+      "priority": "low",
+      "category": "data_security"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://fireflies.ai/privacy",
+      "title": "Fireflies.ai Privacy Policy",
+      "last_updated": "2024-05-03"
+    },
+    {
+      "url": "https://fireflies.ai/security",
+      "title": "Fireflies Security Documentation",
+      "last_updated": "2024-12-04"
+    },
+    {
+      "url": "https://guide.fireflies.ai/articles/7936263105-learn-about-fireflies-admin-controls",
+      "title": "Admin Controls Documentation",
+      "last_updated": "2024-12-04"
+    },
+    {
+      "url": "https://fireflies.ai/blog/security-at-fireflies-ai",
+      "title": "Security at Fireflies.ai Blog Post",
+      "last_updated": "2025-02-20"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Fireflies.ai Enterprise",
+    "final_risk_score": 27,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Fireflies.ai Enterprise demonstrates strong data security practices with end-to-end encryption, explicit no-training policies, and enterprise-grade access controls. The vendor provides transparent documentation and maintains SOC 2, GDPR, and HIPAA compliance. However, vendor transparency is limited to public documentation. Approved for general enterprise use with standard monitoring.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 5,
+        "criteria": {
+          "geographic_control": {
+            "score": 0,
+            "justification": "Framework criteria: '0: On-premises or controlled data residency' - Fireflies.ai offers private cloud services with customer-controlled infrastructure and data residency options. Privacy policy states 'Private cloud customers have greater control over their underlying infrastructure, allowing them to customise it to their own business and regulatory needs.'"
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "Framework criteria: '2: Enterprise-Grade Encryption' - Documentation states 'your data (including audio, transcripts, and related artifacts) is end-to-end encrypted at rest and in transit in AWS S3. We use 256-bit AES encryption in storage and 256-bit SSL/TLS encryption in transit.' This meets the enterprise-grade encryption standard with AES-256 and published specifications."
+          },
+          "data_retention": {
+            "score": 3,
+            "justification": "Framework criteria: '3: Clear Limited Retention' - Privacy policy states 'We will delete your Personal Information when it is no longer needed for the purposes for which it was collected, or when you request us to do so' and 'will delete information accessible to Fireflies.ai within seven business days' upon account cancellation. Admin controls allow custom retention policies to meet compliance needs."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "Framework criteria: '0: Contractual guarantee of no training use' - Multiple sources confirm no training use: '0-day retention policy ensures that your meeting data is never used for AI model training' and 'Zero Data Retention Policy: Vendors cannot store or retain your data' and 'No Training on Your Data: Your data will not be used to train AI models.'"
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "Framework criteria: '0: No third-party sharing' - Privacy policy clearly states data sharing is limited to necessary service providers with 'strict contracts and data processing agreements' and 'only using personal information for the specific purposes outlined by us.'"
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 4,
+        "criteria": {
+          "admin_management": {
+            "score": 2,
+            "justification": "Framework criteria: '2: Advanced User Management' - Admin controls documentation shows 'Centralized Management: Oversee user groups, data retention policies, and integrations in one location' and 'Access Management: Configure permissions for different teams and projects.' Super Admin role provides 'Organization-Wide Visibility: Access all meeting content via the dashboard and API for compliance purposes.'"
+          },
+          "audit_capabilities": {
+            "score": 2,
+            "justification": "Framework criteria: '2: Good Auditing' - Documentation indicates 'follow the principle of least privilege, strictly granting access to sensitive data on a need-to-know basis, with monitoring and auditing.' Super Admin role provides API access for compliance purposes, suggesting audit capabilities are available."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "Framework criteria: '0: Full Enterprise Integration' - Documentation confirms 'SSO is available on the Enterprise tier' with SAML-based SSO support. Admin controls allow management of integrations and enterprise features. Multiple SSO providers supported (OneLogin, etc.)."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 8,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 3,
+            "justification": "Framework criteria: '3: Mostly Compliant' - Documentation states 'continually audit and validate that we comply with comprehensive security policies, including SOC 2 compliance, GDPR adherence, and HIPAA compliance' and 'Fireflies.ai complies with the EU-U.S. Data Privacy Framework (EU-U.S. DPF).' However, specific certification documents or BAAs are not publicly available."
+          },
+          "data_processing_transparency": {
+            "score": 5,
+            "justification": "Framework criteria: '5: Opaque Processing' - While privacy policy provides general data processing information, it lacks detailed data flow diagrams, specific processing locations beyond 'AWS S3', and comprehensive third-party processor lists. Some processing details are vague or missing."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 10,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 10,
+            "justification": "Framework criteria: '10: No Transparency' - While Fireflies.ai provides comprehensive public documentation including privacy policy, security documentation, and admin controls guides, there is no published security whitepaper, detailed incident response procedures, or transparency reports. Assessment relies solely on public documentation without vendor engagement or private enterprise documentation."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Business Communications/Meeting Transcription",
+      "data_classification": "Business Communications Data",
+      "base_score": 27,
+      "final_score_with_multiplier": 27
+    }
+  }
+}

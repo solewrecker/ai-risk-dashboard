@@ -1,0 +1,142 @@
+{
+  "name": "Microsoft Copilot Free",
+  "vendor": "Microsoft Corporation",
+  "license_type": "Freemium",
+  "total_score": 18,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 5,
+  "training_usage_score": 0,
+  "access_controls_score": 8,
+  "compliance_score": 0,
+  "vendor_transparency_score": 2,
+  "summary_and_recommendation": "Microsoft Copilot Free presents low risk with strong data protection, no training data usage, and excellent compliance posture. Main limitations are reduced enterprise controls in free version. Approved for general use with standard monitoring.",
+  "primary_use_case": "General productivity assistance and content creation",
+  "data_classification": "General business data",
+  "category": "AI Assistant/Productivity Tool",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.8,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "High confidence based on comprehensive Microsoft public documentation. Enterprise features require paid licenses.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "No specific Azure permissions required for free version"
+    ],
+    "recommended_restrictions": [
+      "Monitor usage through standard web filtering",
+      "Educate users on data sensitivity"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Consider Enterprise Upgrade",
+      "description": "For sensitive data processing, consider Microsoft 365 Copilot with enterprise data protection features",
+      "priority": "medium",
+      "category": "security"
+    },
+    {
+      "title": "User Training",
+      "description": "Train users on appropriate use cases and data sensitivity awareness",
+      "priority": "low",
+      "category": "governance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+      "title": "Microsoft 365 Copilot Privacy Documentation",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection",
+      "title": "Enterprise Data Protection Documentation",
+      "last_updated": "2024-11-15"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Microsoft Copilot Free",
+    "final_risk_score": 18,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Microsoft Copilot Free demonstrates strong security fundamentals with contractual guarantees against training data usage and comprehensive encryption. The main risk factors are limited enterprise controls in the free version, but these are mitigated by Microsoft's robust security framework. Approved for general use with standard monitoring protocols.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 5,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "'Known secure regions (US, EU) with contracts' - Microsoft documentation states 'EU traffic stays within the EU Data Boundary' and 'data residency commitments as outlined in Microsoft Product Terms.' Clear geographic controls for EU users, US processing for others with established data protection frameworks."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "'Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications' - Microsoft documentation confirms 'service-side technologies that encrypt customer content at rest and in transit, including BitLocker, per-file encryption, Transport Layer Security (TLS)' with detailed encryption specifications published."
+          },
+          "data_retention": {
+            "score": 0,
+            "justification": "'Customer-Controlled Retention - immediate deletion available on demand' - Microsoft documentation states 'Your users can delete their Copilot activity history...by going to the My Account portal' providing user-controlled deletion capabilities."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "'Contractual guarantee of no training use' - Microsoft documentation explicitly states 'Prompts, responses, and data accessed through Microsoft Graph aren't used to train foundation LLMs, including those used by Microsoft 365 Copilot' with this commitment repeated multiple times in official documentation."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "'No third-party sharing' - Microsoft documentation confirms data 'remain within the Microsoft 365 service boundary' and 'Microsoft 365 Copilot uses Azure OpenAI services for processing, not OpenAI's publicly available services. Azure OpenAI doesn't cache customer content.'"
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 8,
+        "criteria": {
+          "admin_management": {
+            "score": 6,
+            "justification": "'Limited Controls - User visibility only + minimal management capabilities' - Free version lacks enterprise admin dashboard. Microsoft documentation shows extensive admin controls available in paid versions but free version has individual account limitations."
+          },
+          "audit_capabilities": {
+            "score": 2,
+            "justification": "'Good Auditing - Activity logs available + basic reporting + some user tracking capabilities' - Microsoft documentation shows 'stored data includes the user's prompt and Copilot's response' with 'Copilot activity history' available to users, though enterprise audit features require paid licenses."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "'Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration' - Microsoft Copilot integrates with Microsoft 365 identity system providing comprehensive SSO and enterprise integration capabilities even in free usage scenarios."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 0,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "'Fully Compliant - Published compliance certifications + signed BAAs available + documented GDPR Article 28 compliance' - Microsoft documentation confirms 'compliant with existing privacy, security, and compliance commitments...including the General Data Protection Regulation (GDPR)' with established Microsoft compliance certifications."
+          },
+          "data_processing_transparency": {
+            "score": 0,
+            "justification": "'Full Transparency - Published data flow diagrams + specific processing locations + detailed retention schedules' - Microsoft provides comprehensive documentation of data processing, including specific technical details of how Copilot processes data through Microsoft Graph and Azure OpenAI services."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 2,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 2,
+            "justification": "'Good Documentation - Clear privacy policy + basic security documentation + responsive support' - Microsoft provides detailed technical documentation, comprehensive privacy policies, and established support channels. Extensive public documentation available through Microsoft Learn platform."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "General productivity assistance",
+      "data_classification": "General business data",
+      "base_score": 18,
+      "final_score_with_multiplier": 18
+    }
+  }
+}

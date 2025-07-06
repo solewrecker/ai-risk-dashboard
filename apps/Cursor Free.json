@@ -1,0 +1,158 @@
+{
+    "title": "HIPAA/PII Compliance Gap",
+    "description": "CRITICAL: No HIPAA BAA available, code with PII/PHI transmitted to multiple AI providers even in privacy mode, unsuitable for healthcare environments",
+    "priority": "critical",
+    "category": "compliance"
+  },{
+"name": "Cursor Free",
+"vendor": "Anysphere (Cursor)",
+"license_type": "Free Tier",
+"total_score": 64,
+"risk_level": "HIGH RISK",
+"data_storage_score": 19,
+"training_usage_score": 5,
+"access_controls_score": 13,
+"compliance_score": 15,
+"vendor_transparency_score": 2,
+"summary_and_recommendation": "CRITICAL HIPAA/PII LIMITATION: Cursor Free presents HIGH RISK for organizations handling protected health information or sensitive PII. Despite Privacy Mode guarantees, the vendor explicitly warns against use in 'highly sensitive environments' and provides NO HIPAA BAA. Code containing PII/PHI is transmitted to multiple third-party AI providers (OpenAI, Anthropic, Google, xAI) even in privacy mode for inference processing, creating compliance gaps. Extended memory retention during background jobs and multi-provider data transmission make it unsuitable for healthcare organizations. Recommendation: BLOCK for healthcare/PII environments; approve only for general development with non-sensitive code.",
+"confidence": 0.85,
+"primary_use_case": "Software Development/Code Editing",
+"data_classification": "Source Code/Intellectual Property",
+"category": "AI-Powered Development Tool",
+"assessed_by": "AI Security Council",
+
+"azure_permissions": {
+"required_permissions": [
+  "application.read",
+  "network.connect.outbound"
+],
+"recommended_restrictions": [
+  "Block access to sensitive repositories without Privacy Mode",
+  "Require Privacy Mode for all enterprise use",
+  "Monitor network traffic to cursor.sh domains"
+]
+},
+
+"recommendations": [
+{
+  "title": "Enable Privacy Mode",
+  "description": "Mandatory activation of Privacy Mode for all users to ensure zero data retention and prevent code training usage",
+  "priority": "high",
+  "category": "security"
+},
+{
+  "title": "Network Traffic Monitoring",
+  "description": "Monitor and log all communications to cursor.sh domains for audit purposes",
+  "priority": "medium",
+  "category": "monitoring"
+},
+{
+  "title": "Repository Access Controls",
+  "description": "Implement additional access controls for sensitive repositories and codebases",
+  "priority": "medium",
+  "category": "access_control"
+}
+],
+
+"sources": [
+{
+  "url": "https://docs.cursor.com/account/privacy",
+  "title": "Cursor Privacy & Security Documentation",
+  "last_updated": "2024-06-18"
+},
+{
+  "url": "https://cursor.com/en/security",
+  "title": "Cursor Security Overview",
+  "last_updated": "2025-06-18"
+},
+{
+  "url": "https://trust.cursor.com",
+  "title": "Cursor Trust Center",
+  "last_updated": "2024"
+}
+],
+
+"detailed_assessment": {
+"tool_name": "Cursor Free",
+"final_risk_score": 64,
+"final_risk_category": "HIGH RISK",
+"summary_and_recommendation": "CRITICAL HIPAA/PII LIMITATION: Cursor Free presents HIGH RISK for organizations handling protected health information or sensitive PII. Despite Privacy Mode guarantees, the vendor explicitly warns against use in 'highly sensitive environments' and provides NO HIPAA BAA. Code containing PII/PHI is transmitted to multiple third-party AI providers (OpenAI, Anthropic, Google, xAI) even in privacy mode for inference processing, creating compliance gaps. Extended memory retention during background jobs and multi-provider data transmission make it unsuitable for healthcare organizations. Recommendation: BLOCK for healthcare/PII environments; approve only for general development with non-sensitive code.",
+"assessment_details": {
+  "data_storage_and_security": {
+    "category_score": 19,
+    "criteria": {
+      "geographic_control": {
+        "score": 6,
+        "justification": "While Cursor infrastructure is primarily in US/EU regions, code data is transmitted to multiple third-party AI providers (OpenAI, Anthropic, Google Vertex, xAI) even in privacy mode for inference processing. This creates external server dependencies with unclear location controls for sensitive data processing. The multi-provider architecture introduces geographic control risks for organizations with strict data residency requirements, particularly for healthcare or financial data."
+      },
+      "encryption_standards": {
+        "score": 4,
+        "justification": "Cursor implements basic encryption with TLS in transit and standard encryption at rest. However, the multi-provider inference architecture means sensitive code data is transmitted across multiple third-party systems (OpenAI, Anthropic, Google, xAI) with varying encryption standards. While transit encryption exists, the complexity of the multi-provider pipeline introduces encryption gaps and inconsistencies in encryption specifications across the inference chain."
+      },
+      "data_retention": {
+        "score": 8,
+        "justification": "CRITICAL LIMITATION: Despite Privacy Mode claims of zero retention, code data is transmitted to multiple AI providers for inference processing, creating extended memory retention during background jobs. The vendor explicitly warns against use in 'highly sensitive environments' indicating inherent retention risks. Multi-provider processing creates retention complexities and potential compliance gaps, particularly problematic for PII/PHI data that may be embedded in code. Extended retention during inference processing contradicts zero-retention claims."
+      }
+    }
+  },
+  "training_data_usage": {
+    "category_score": 5,
+    "criteria": {
+      "model_training": {
+        "score": 5,
+        "justification": "Cursor provides an opt-out mechanism through Privacy Mode with a clear, documented process. When Privacy Mode is enabled, the vendor contractually guarantees that no code data is used for training. However, Privacy Mode is not enabled by default for free users (though it is enforced for business plans). The opt-out process is straightforward and can be configured during onboarding or through settings. The documentation clearly explains the training implications of each mode."
+      },
+      "data_sharing": {
+        "score": 0,
+        "justification": "Cursor has zero data retention agreements with all AI model providers (OpenAI, Anthropic, Google Vertex, xAI) and explicitly states that no third-party sharing occurs when Privacy Mode is enabled. The security documentation provides a comprehensive list of all subprocessors and clearly indicates which ones see code data vs. those that don't. The vendor maintains strict data sharing policies with transparent disclosure of all data processing relationships."
+      }
+    }
+  },
+  "access_controls": {
+    "category_score": 13,
+    "criteria": {
+      "admin_management": {
+        "score": 6,
+        "justification": "Cursor Free tier provides limited admin controls. While team functionality exists for business plans with centralized privacy mode enforcement, the free tier lacks comprehensive enterprise admin dashboards, user provisioning/deprovisioning, and role-based permissions. Business plans offer some organizational visibility and privacy mode enforcement, but free users operate primarily with individual accounts. The documentation indicates that full enterprise controls are available in paid tiers but not in the free version."
+      },
+      "audit_capabilities": {
+        "score": 4,
+        "justification": "Cursor provides basic auditing capabilities with limited logs and manual export options. The documentation mentions that logs are available but doesn't provide comprehensive details about audit log accessibility for free tier users. Activity tracking is primarily focused on usage statistics rather than detailed user action tracking. Export capabilities appear limited compared to enterprise-grade audit systems. Real-time activity logs and comprehensive compliance reporting are not clearly documented for the free tier."
+      },
+      "integration": {
+        "score": 3,
+        "justification": "Cursor offers limited enterprise integration for free tier users. The documentation mentions WorkOS for authentication handling, suggesting some SSO capability, but comprehensive SAML/OIDC SSO, SCIM provisioning, and Active Directory integration appear to be limited or unavailable for free users. API access for enterprise management is not clearly documented for the free tier. Full enterprise integration features appear to be reserved for paid business plans."
+      }
+    }
+  },
+  "compliance_and_legal_risk": {
+    "category_score": 15,
+    "criteria": {
+      "regulatory_violations": {
+        "score": 10,
+        "justification": "CRITICAL COMPLIANCE GAPS: While SOC 2 Type II certified, Cursor explicitly warns users in 'highly sensitive environments' to 'be careful when using Cursor (or any other AI tool)' - indicating inherent compliance limitations. NO HIPAA BAA available, making it non-compliant for healthcare organizations. Code containing PII/PHI is transmitted to multiple third-party AI providers (OpenAI, Anthropic, Google, xAI) even in privacy mode for inference processing, creating regulatory violation risks. The multi-provider architecture and lack of healthcare-specific compliance certifications present significant regulatory gaps for organizations handling protected information."
+      },
+      "data_processing_transparency": {
+        "score": 5,
+        "justification": "While Cursor provides documentation about data processing through multiple subprocessors, the complexity of the multi-provider inference pipeline creates transparency gaps. The vendor acknowledges that requests 'may be sent to OpenAI even if you have an Anthropic model selected' and similar cross-provider routing occurs, making it difficult to track exactly where sensitive data is processed. The opaque nature of inference routing and extended memory retention during background jobs reduces processing transparency, particularly problematic for compliance requirements."
+      }
+    }
+  },
+  "vendor_transparency": {
+    "category_score": 2,
+    "criteria": {
+      "documentation_and_support": {
+        "score": 2,
+        "justification": "Cursor provides good documentation with a clear privacy policy, basic security documentation, and a trust center where SOC 2 Type II certification and penetration testing reports can be requested. The vendor maintains responsive support channels (security@cursor.com) and commits to acknowledging vulnerability reports within 5 business days. While not comprehensive transparency reports, the security documentation provides sufficient detail about data processing, subprocessors, and security practices. The vendor demonstrates reasonable transparency for a development tool, though it falls short of comprehensive enterprise-grade transparency standards."
+      }
+    }
+  }
+},
+"use_case_multiplier_applied": {
+  "use_case": "Software Development/Code Editing",
+  "data_classification": "Source Code/Intellectual Property",
+  "base_score": 64,
+  "final_score_with_multiplier": 64
+}
+}
+}

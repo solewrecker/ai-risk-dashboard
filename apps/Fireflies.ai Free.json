@@ -1,0 +1,242 @@
+{
+  "name": "Fireflies.ai Free",
+  "vendor": "Fireflies.ai Corp.",
+  "license_type": "Free",
+  "total_score": 74,
+  "risk_level": "HIGH RISK",
+  "data_storage_score": 21,
+  "training_usage_score": 20,
+  "access_controls_score": 18,
+  "compliance_score": 10,
+  "vendor_transparency_score": 5,
+  "summary_and_recommendation": "Fireflies.ai Free presents HIGH RISK due to automatic recording of all meetings, indefinite data retention, potential training usage, and minimal enterprise controls. The service automatically captures meeting audio/video without explicit consent mechanisms, stores data indefinitely with unclear deletion procedures, and lacks comprehensive admin controls. While the vendor claims not to train on data 'by default,' the privacy policy contains contradictory statements about AI processing and data usage. Recommendation: BLOCK for enterprise use until enterprise controls are implemented and clear data governance policies are established.",
+  "confidence": 0.85,
+  "primary_use_case": "Meeting Recording and Transcription",
+  "data_classification": "Confidential Business Communications",
+  "category": "Meeting Intelligence/Recording",
+  "assessed_by": "AI Security Council",
+  
+  "breakdown": {
+    "scores": {
+      "dataStorage": 21,
+      "trainingUsage": 20,
+      "accessControls": 18,
+      "complianceRisk": 10,
+      "vendorTransparency": 5
+    },
+    "subScores": {
+      "dataStorage": {
+        "geographic": {
+          "score": 6,
+          "note": "Privacy policy states data may be transferred to US offices and third-party service providers in US and other countries. While they mention Data Privacy Framework compliance, specific data residency controls are not clearly documented for free tier users."
+        },
+        "encryption": {
+          "score": 4,
+          "note": "Security page mentions 'Database Encryption' but provides no specific details about encryption standards, key management, or whether it's AES-256. Privacy policy mentions 'industry-standard security technologies' without specifics."
+        },
+        "retention": {
+          "score": 10,
+          "note": "Privacy policy indicates indefinite data retention with vague deletion procedures. States data will be deleted 'when no longer needed for purposes collected' but provides no specific timeframes. Free tier users have limited control over data retention periods."
+        }
+      },
+      "trainingUsage": {
+        "training": {
+          "score": 15,
+          "note": "Contradictory statements found: Security page claims '0-day retention policy ensures meeting data is never used for AI model training' and 'We don't train on it by default,' but privacy policy contains AI processing disclaimers and mentions using AI technologies with user data. The phrase 'by default' suggests training may occur under certain conditions."
+        },
+        "sharing": {
+          "score": 5,
+          "note": "Privacy policy allows sharing with service providers, subsidiaries, affiliates, and in corporate transactions. While they mention 'strict contracts' with third parties, specific limitations on data sharing are not clearly defined for free tier users."
+        }
+      },
+      "accessControls": {
+        "admin": {
+          "score": 8,
+          "note": "Free tier lacks comprehensive enterprise admin controls. Security page mentions 'Super Admin' and 'Rules Engine' but these appear to be enterprise-only features. Free users have limited organizational visibility and centralized management capabilities."
+        },
+        "audit": {
+          "score": 7,
+          "note": "Privacy policy mentions keeping records of correspondence and usage data collection, but no specific audit logging or exportable reports are documented for free tier users. Enterprise features may include better audit capabilities."
+        },
+        "integration": {
+          "score": 3,
+          "note": "Security page mentions Single Sign-On (SSO) support, but integration capabilities for free tier users are limited. No mention of SCIM provisioning or comprehensive enterprise identity management for free accounts."
+        }
+      },
+      "complianceRisk": {
+        "violations": {
+          "score": 6,
+          "note": "Claims SOC 2 Type II, GDPR, and HIPAA compliance certifications. However, HIPAA compliance appears limited to enterprise tier with Business Associate Agreement. While certifications are claimed, specific compliance documentation and audit reports are not readily accessible."
+        },
+        "transparency": {
+          "score": 4,
+          "note": "Privacy policy provides general data processing descriptions but lacks detailed data flow diagrams or specific processing locations. Third-party relationships are mentioned generally without comprehensive processor lists or data processing agreements."
+        }
+      },
+      "vendorTransparency": {
+        "score": {
+          "score": 5,
+          "note": "Privacy policy is comprehensive but contains contradictory statements about data training usage. Security page provides high-level information but lacks detailed technical specifications. Support contact information is available but response times and quality are not documented."
+        }
+      }
+    },
+    "compliance": {
+      "pci": "non-compliant",
+      "sox": "non-compliant", 
+      "gdpr": "claimed-compliant",
+      "hipaa": "enterprise-only"
+    }
+  },
+  
+  "details": {
+    "dataStorage": "Geographic: Data transferred to US and international service providers without clear residency controls for free tier | Encryption: Generic 'industry-standard' encryption mentioned without specific standards or key management details | Retention: Indefinite retention with vague deletion procedures and no specific timeframes for free users",
+    "trainingUsage": "Training: Contradictory statements - claims no training 'by default' but privacy policy allows AI processing of user data with disclaimers | Sharing: Broad sharing permissions with service providers and corporate affiliates under 'strict contracts' without specific limitations",
+    "accessControls": "Admin: Limited enterprise admin controls for free tier, Super Admin appears enterprise-only | Audit: Basic usage tracking mentioned but no comprehensive audit logging or exportable reports for free users | Integration: SSO mentioned but limited integration capabilities for free accounts",
+    "complianceRisk": "Violations: Claims multiple certifications but HIPAA limited to enterprise tier, specific compliance documentation not readily accessible | Transparency: General data processing descriptions without detailed flow diagrams or comprehensive third-party processor lists",
+    "vendorTransparency": "Comprehensive privacy policy with contradictory statements about training usage, security page lacks technical details, support available but response quality undocumented"
+  },
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "calendars.read",
+      "meetings.read",
+      "audio.record",
+      "files.readwrite"
+    ],
+    "recommended_restrictions": [
+      "Block network access to meeting platforms",
+      "Require explicit consent for recording",
+      "Implement data loss prevention controls",
+      "Monitor for unauthorized recording activities"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Implement Enterprise Controls",
+      "description": "Upgrade to enterprise tier to gain access to admin controls, audit logging, and data governance features before allowing organizational use.",
+      "priority": "critical",
+      "category": "access_control"
+    },
+    {
+      "title": "Clarify Data Training Policies",
+      "description": "Obtain written confirmation from vendor about data training usage policies and resolve contradictory statements in documentation.",
+      "priority": "high",
+      "category": "data_usage"
+    },
+    {
+      "title": "Establish Recording Consent Procedures",
+      "description": "Implement clear procedures for obtaining explicit consent before recording meetings, as service automatically captures audio/video.",
+      "priority": "high",
+      "category": "privacy"
+    },
+    {
+      "title": "Define Data Retention Requirements",
+      "description": "Negotiate specific data retention periods and deletion procedures to replace indefinite retention default.",
+      "priority": "high",
+      "category": "data_governance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://fireflies.ai/privacy",
+      "title": "Fireflies.ai Privacy Policy",
+      "last_updated": "2024-05-03"
+    },
+    {
+      "url": "https://fireflies.ai/security",
+      "title": "Fireflies Security Documentation",
+      "last_updated": "2024-12-04"
+    },
+    {
+      "url": "https://blog.buildbetter.ai/do-they-own-your-data-fireflies-ai-privacy-policy-reviewed/",
+      "title": "Third-Party Privacy Analysis",
+      "last_updated": "2025-03-23"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Fireflies.ai Free",
+    "final_risk_score": 74,
+    "final_risk_category": "HIGH RISK",
+    "summary_and_recommendation": "Fireflies.ai Free presents HIGH RISK due to automatic recording of all meetings, indefinite data retention, potential training usage, and minimal enterprise controls. The service automatically captures meeting audio/video without explicit consent mechanisms, stores data indefinitely with unclear deletion procedures, and lacks comprehensive admin controls. While the vendor claims not to train on data 'by default,' the privacy policy contains contradictory statements about AI processing and data usage. Recommendation: BLOCK for enterprise use until enterprise controls are implemented and clear data governance policies are established.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 21,
+        "criteria": {
+          "geographic_control": {
+            "score": 6,
+            "justification": "Privacy policy explicitly states data may be transferred to US offices and third-party service providers in US and other countries. While they mention Data Privacy Framework compliance, there are no specific data residency controls documented for free tier users, placing data in external servers with unclear jurisdictional protections."
+          },
+          "encryption_standards": {
+            "score": 4,
+            "justification": "Security documentation mentions 'Database Encryption' but provides no specific technical details about encryption standards, key management, or implementation. Privacy policy references 'industry-standard security technologies' without specifying AES-256, encryption at rest/transit details, or customer key management options."
+          },
+          "data_retention": {
+            "score": 10,
+            "justification": "Privacy policy indicates indefinite data retention with vague deletion procedures. States data will be deleted 'when no longer needed for purposes collected' but provides no specific timeframes, automatic deletion procedures, or user-controlled retention periods. Free tier users have minimal control over data lifecycle management."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 20,
+        "criteria": {
+          "model_training": {
+            "score": 15,
+            "justification": "Contradictory statements create significant uncertainty: Security page claims '0-day retention policy ensures meeting data is never used for AI model training' and 'We don't train on it by default,' but privacy policy contains AI processing disclaimers stating 'Fireflies.ai may employ Artificial Intelligence (AI) or other similar technologies, which may include the processing of user data.' The phrase 'by default' suggests training may occur under certain conditions, and no contractual guarantee of no training use is provided."
+          },
+          "data_sharing": {
+            "score": 5,
+            "justification": "Privacy policy allows broad data sharing with service providers, subsidiaries, affiliates, and in corporate transactions. While they mention implementing 'strict contracts and data processing agreements with third parties,' specific limitations on data sharing are not clearly defined, and free tier users have limited control over third-party data access."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 18,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "Free tier lacks comprehensive enterprise admin controls. Security page mentions 'Super Admin' and 'Rules Engine' features but these appear to be enterprise-only capabilities. Free users have no centralized admin dashboard, limited user provisioning/deprovisioning, and minimal organizational visibility into account usage."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "Privacy policy mentions keeping records of correspondence and collecting usage data, but no specific audit logging, exportable reports, or user action tracking are documented for free tier users. Enterprise features may include better audit capabilities, but free tier lacks comprehensive auditing functions."
+          },
+          "integration": {
+            "score": 3,
+            "justification": "Security page mentions Single Sign-On (SSO) support, suggesting some enterprise integration capabilities. However, there is no mention of SCIM provisioning, Active Directory integration, or comprehensive enterprise identity management for free accounts. Integration capabilities appear limited for free tier users."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 10,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 6,
+            "justification": "Claims SOC 2 Type II, GDPR, and HIPAA compliance certifications on security page. However, HIPAA compliance appears limited to enterprise tier with Business Associate Agreement requirement. While certifications are claimed, specific compliance documentation, audit reports, and verification of current certification status are not readily accessible to validate claims."
+          },
+          "data_processing_transparency": {
+            "score": 4,
+            "justification": "Privacy policy provides general data processing descriptions and mentions Data Privacy Framework compliance, but lacks detailed data flow diagrams, specific processing locations, or comprehensive third-party processor lists. Third-party relationships are mentioned generally without detailed data processing agreements or clear data flow documentation."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 5,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 5,
+            "justification": "Privacy policy is comprehensive and recently updated (May 2024), but contains contradictory statements about data training usage that create confusion. Security page provides high-level security information but lacks detailed technical specifications, encryption standards, or incident response procedures. Support contact information is available but response times and quality are not documented."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Meeting Recording and Transcription", 
+      "data_classification": "Confidential Business Communications",
+      "base_score": 74,
+      "final_score_with_multiplier": 74
+    }
+  }
+}
