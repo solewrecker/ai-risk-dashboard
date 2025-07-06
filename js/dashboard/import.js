@@ -101,11 +101,19 @@ export async function processImport() {
         // Prepare multipart/form-data
         const formData = new FormData();
         formData.append('file', file);
-        // Upload to Supabase Edge Function
+        // Get Supabase access token
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) {
+            showError('Authentication error: No access token found. Please log in again.');
+            return;
+        }
+        // Upload to Supabase Edge Function with Authorization header
         const response = await fetch('https://lgybmsziqjdmmxdiyils.functions.supabase.co/upload-assessment', {
             method: 'POST',
-            // If you use Supabase Auth, add the JWT:
-            // headers: { 'Authorization': 'Bearer ' + supabase.auth.getSession().access_token },
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
             body: formData
         });
         const result = await response.json();
