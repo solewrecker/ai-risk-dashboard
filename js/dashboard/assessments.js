@@ -81,13 +81,6 @@ export async function loadAssessments() {
         if (resultsCount) {
             resultsCount.textContent = 'Error loading assessments';
         }
-        if (typeof lucide !== 'undefined') {
-            try {
-                lucide.createIcons();
-            } catch (error) {
-                console.error('Error creating Lucide icons in renderAssessmentList:', error);
-            }
-        }
     }
 }
 
@@ -160,14 +153,6 @@ function renderRecentAssessments() {
             </div>
         `;
     }).join('');
-    
-    if (typeof lucide !== 'undefined') {
-        try {
-            lucide.createIcons();
-        } catch (error) {
-            console.error('Error creating Lucide icons in renderRecentAssessments:', error);
-        }
-    }
 }
 
 function renderAssessmentList() {
@@ -215,11 +200,16 @@ function renderAssessmentList() {
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
                     <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
-                        <i data-lucide="eye"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-eye w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
                     </button>
                     ${getIsAdmin() ? `
                         <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
-                            <i data-lucide="trash-2"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-trash w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     ` : ''}
                 </div>
@@ -231,14 +221,6 @@ function renderAssessmentList() {
     
     if (resultsCount) {
         resultsCount.textContent = `${assessments.length} assessments found`;
-    }
-    
-    if (typeof lucide !== 'undefined') {
-        try {
-            lucide.createIcons();
-        } catch (error) {
-            console.error('Error creating Lucide icons in renderAssessmentList:', error);
-        }
     }
 }
 
@@ -375,25 +357,22 @@ function renderFilteredAssessments(filteredData) {
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
                     <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
-                        <i data-lucide="eye"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-eye w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
                     </button>
                     ${getIsAdmin() ? `
                         <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
-                            <i data-lucide="trash-2"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-trash w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     ` : ''}
                 </div>
             </div>
         `;
     }).join('');
-    
-    if (typeof lucide !== 'undefined') {
-        try {
-            lucide.createIcons();
-        } catch (error) {
-            console.error('Error creating Lucide icons in renderFilteredAssessments:', error);
-        }
-    }
 }
 
 export function clearAllFilters() {

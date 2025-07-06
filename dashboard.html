@@ -9,9 +9,6 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Add Lucide Icons -->
-    <script src="js/vendor/lucide.min.js"></script>
-    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dashboard-page bg-gray-900 text-white min-h-screen">
@@ -418,18 +415,5 @@
     </div>
 
     <script type="module" src="js/dashboard/main.js"></script>
-    <script>
-        // Initialize Lucide icons with error handling
-        try {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-                console.log('Lucide icons initialized successfully');
-            } else {
-                console.error('Lucide library not loaded');
-            }
-        } catch (error) {
-            console.error('Error initializing Lucide icons:', error);
-        }
-    </script>
 </body>
 </html> 
