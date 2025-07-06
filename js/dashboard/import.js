@@ -64,45 +64,42 @@ export async function processImport() {
         if (importOptions) importOptions.style.display = 'none';
 
         const file = fileInput.files[0];
-        const reader = new FileReader();
-
-        reader.onload = async function(e) {
-            try {
-                const assessmentData = JSON.parse(e.target.result);
-                
-                // Validate the assessment data structure
-                if (!assessmentData.tool_name || !assessmentData.risk_score) {
-                    throw new Error('Invalid assessment file format. Missing required fields.');
-                }
-
-                // Upload to Supabase
-                const { data, error } = await supabaseClient
-                    .from('assessments')
-                    .insert([assessmentData]);
-
-                if (error) {
-                    throw new Error(`Upload failed: ${error.message}`);
-                }
-
-                // Success
-                alert('Assessment uploaded successfully!');
-                
-                // Clear the form
-                fileInput.value = '';
-                document.getElementById('file-upload-list').innerHTML = '';
-                
-                // Refresh the assessments list
-                await loadAssessments();
-                updateDashboardStats();
-                updateProgressTracking();
-
-            } catch (error) {
-                showError(`Error processing file: ${error.message}`);
-            }
-        };
-
-        reader.readAsText(file);
-
+        // Validate file is JSON
+        const text = await file.text();
+        let assessmentData;
+        try {
+            assessmentData = JSON.parse(text);
+        } catch (e) {
+            showError('Invalid JSON file.');
+            return;
+        }
+        if (!assessmentData.name) {
+            showError('Invalid assessment file format. Missing required field: name.');
+            return;
+        }
+        // Prepare multipart/form-data
+        const formData = new FormData();
+        formData.append('file', file);
+        // Upload to Supabase Edge Function
+        const response = await fetch('https://lgybmsziqjdmmxdiyils.functions.supabase.co/upload-assessment', {
+            method: 'POST',
+            // If you use Supabase Auth, add the JWT:
+            // headers: { 'Authorization': 'Bearer ' + supabase.auth.getSession().access_token },
+            body: formData
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            showError(result.error || 'Upload failed');
+            return;
+        }
+        alert('Assessment uploaded successfully!');
+        // Clear the form
+        fileInput.value = '';
+        document.getElementById('file-upload-list').innerHTML = '';
+        // Refresh the assessments list
+        await loadAssessments();
+        updateDashboardStats();
+        updateProgressTracking();
     } catch (error) {
         showError(`Upload failed: ${error.message}`);
     }
