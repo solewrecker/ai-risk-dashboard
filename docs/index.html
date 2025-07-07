@@ -9,8 +9,8 @@
     <!-- Add Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Add Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     
     <!-- Add PDF Template System (conditional loading) -->
     <script>
@@ -60,7 +60,7 @@
         <div id="authModal" class="auth-modal-overlay">
             <div class="auth-modal">
                 <div class="auth-modal-header">
-                    <h3><i class="fas fa-lock"></i> Account Access</h3>
+                    <h3><i data-lucide="lock" class="w-5 h-5"></i> Account Access</h3>
                 </div>
                 <div class="auth-modal-content">
                     <div class="auth-tabs">
@@ -78,7 +78,7 @@
                             <input type="password" id="signInPassword" class="auth-input" placeholder="Enter your password">
                         </div>
                         <button id="signInBtn" class="auth-button">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
+                            <i data-lucide="log-in" class="w-4 h-4"></i> Sign In
                         </button>
                     </div>
                     
@@ -99,7 +99,7 @@
                             </select>
                         </div>
                         <button id="signUpBtn" class="auth-button">
-                            <i class="fas fa-user-plus"></i> Create Account
+                            <i data-lucide="user-plus" class="w-4 h-4"></i> Create Account
                         </button>
                     </div>
                     
@@ -308,7 +308,7 @@
                         <div class="btn-group mt-6">
                             <div style="position: relative; display: inline-block;">
                                 <button type="button" class="btn btn-secondary" id="exportMainBtn">
-                                    <i class="fas fa-file-export"></i> Export Options
+                                    <i data-lucide="download" class="w-4 h-4"></i> Export Options
                                 </button>
                                 <div id="exportMenu" style="
                                     display: none;
@@ -336,7 +336,7 @@
                                         border-bottom: 1px solid #e2e8f0;
                                         background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
                                     ">
-                                        <i class="fas fa-file-pdf"></i> <strong>Free Professional PDF</strong><br>
+                                        <i data-lucide="file-text" class="w-4 h-4"></i> <strong>Free Professional PDF</strong><br>
                                         <small style="color: #166534;">Basic template • Risk score • Categories</small>
                                     </button>
 
@@ -351,7 +351,7 @@
                                         border-bottom: 1px solid #e2e8f0;
                                         background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
                                     ">
-                                        <i class="fas fa-star"></i> <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
+                                        <i data-lucide="star" class="w-4 h-4"></i> <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
                                         <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
                                     </button>
 
@@ -365,7 +365,7 @@
                                         cursor: pointer;
                                         border-bottom: 1px solid #e2e8f0;
                                     ">
-                                        <i class="fas fa-globe"></i> <strong>HTML Report</strong><br>
+                                        <i data-lucide="globe" class="w-4 h-4"></i> <strong>HTML Report</strong><br>
                                         <small style="color: #64748b;">Viewable in browser</small>
                                     </button>
                                     <button type="button" class="export-option" id="exportJsonBtn" style="
@@ -377,16 +377,16 @@
                                         text-align: left;
                                         cursor: pointer;
                                     ">
-                                        <i class="fas fa-code"></i> <strong>JSON Data</strong><br>
+                                        <i data-lucide="code" class="w-4 h-4"></i> <strong>JSON Data</strong><br>
                                         <small style="color: #64748b;">Raw assessment data</small>
                                     </button>
                                 </div>
                             </div>
                             <button type="button" class="btn btn-primary" id="newAssessmentBtn">
-                                <i class="fas fa-redo"></i> New Assessment
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> New Assessment
                             </button>
                             <a href="dashboard.html" class="btn btn-secondary">
-                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                                <i data-lucide="gauge" class="w-4 h-4"></i> Go to Dashboard
                             </a>
                         </div>
                     </div>
@@ -397,5 +397,15 @@
 
     <!-- Load template binding before app.js -->
     <script type="module" src="js/assessment/main.js"></script>
+    
+    <!-- Initialize Lucide icons -->
+    <script>
+        // Initialize Lucide icons after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Tool Risk Assessment Report</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -538,7 +539,7 @@
         <div class="header">
             <div class="header-content">
                 <div class="company-logo">
-                    <i class="fas fa-shield-alt"></i>
+                    <i data-lucide="shield" class="w-6 h-6"></i>
                 </div>
                 <h1>AI Tool Risk Assessment Report</h1>
                 <div class="subtitle">Enterprise Security Framework • Comprehensive Analysis</div>
@@ -551,47 +552,47 @@
                     <div class="score-number">{{finalScore}}</div>
                     <div class="score-label">{{riskLevel}} RISK</div>
                     <div class="score-description">
-                        <i class="fas fa-chart-line"></i> Based on comprehensive security analysis
+                        <i data-lucide="trending-up" class="w-4 h-4"></i> Based on comprehensive security analysis
                     </div>
                 </div>
             </div>
             
-            <h2><i class="fas fa-info-circle"></i> Tool Information</h2>
+            <h2><i data-lucide="info" class="w-5 h-5"></i> Tool Information</h2>
             <div class="section grid">
                 <div class="item">
-                    <span class="item-label"><i class="fas fa-tools"></i> Tool Name</span>
+                    <span class="item-label"><i data-lucide="wrench" class="w-4 h-4"></i> Tool Name</span>
                     <div class="item-value">{{toolName}}</div>
                 </div>
                 <div class="item">
-                    <span class="item-label"><i class="fas fa-code-branch"></i> Version</span>
+                    <span class="item-label"><i data-lucide="git-branch" class="w-4 h-4"></i> Version</span>
                     <div class="item-value">{{toolVersion}}</div>
                 </div>
                 <div class="item">
-                    <span class="item-label"><i class="fas fa-tag"></i> Category</span>
+                    <span class="item-label"><i data-lucide="tag" class="w-4 h-4"></i> Category</span>
                     <div class="item-value">{{toolCategory}}</div>
                 </div>
                 <div class="item">
-                    <span class="item-label"><i class="fas fa-tasks"></i> Use Case</span>
+                    <span class="item-label"><i data-lucide="clipboard-list" class="w-4 h-4"></i> Use Case</span>
                     <div class="item-value">{{useCase}}</div>
                 </div>
             </div>
             
-            <h2><i class="fas fa-database"></i> Data Classification</h2>
+            <h2><i data-lucide="database" class="w-5 h-5"></i> Data Classification</h2>
             <div class="section">
                 <div class="item data-classification">
-                    <span class="item-label"><i class="fas fa-shield-alt"></i> Data Type</span>
+                    <span class="item-label"><i data-lucide="shield" class="w-4 h-4"></i> Data Type</span>
                     <div class="item-value">
-                        <i class="fas fa-lock"></i> {{dataClassification}}
+                        <i data-lucide="lock" class="w-4 h-4"></i> {{dataClassification}}
                     </div>
                 </div>
             </div>
             
-            <h2><i class="fas fa-chart-pie"></i> Risk Breakdown</h2>
+            <h2><i data-lucide="pie-chart" class="w-5 h-5"></i> Risk Breakdown</h2>
             <div class="section grid risk-breakdown" id="risk-breakdown-container">
                 <!-- Risk breakdown will be inserted here by JavaScript -->
             </div>
             
-            <h2><i class="fas fa-lightbulb"></i> Key Recommendations</h2>
+            <h2><i data-lucide="lightbulb" class="w-5 h-5"></i> Key Recommendations</h2>
             <div class="section">
                 <ul class="recommendations" id="recommendations-container">
                     <!-- Recommendations will be inserted here by JavaScript -->
@@ -601,27 +602,27 @@
             <div class="legal-section">
                 <div class="legal-grid">
                     <div class="legal-item">
-                        <strong><i class="fas fa-clipboard-check"></i> Assessment Framework</strong>
+                        <strong><i data-lucide="clipboard-check" class="w-4 h-4"></i> Assessment Framework</strong>
                         Framework: Enterprise AI Risk v2.1<br>
                         Report Type: Basic Analysis<br>
                         Analysis Scope: Commercial & Personal Use<br>
                         Compliance: SOC 2 Aligned
                     </div>
                     <div class="legal-item">
-                        <strong><i class="fas fa-exclamation-triangle"></i> Important Disclaimers</strong>
+                        <strong><i data-lucide="alert-triangle" class="w-4 h-4"></i> Important Disclaimers</strong>
                         Assessment based on publicly available information.<br>
                         Results may vary based on implementation.<br>
                         Consult official documentation for details.
                     </div>
                     <div class="legal-item">
-                        <strong><i class="fas fa-gavel"></i> Legal Notice</strong>
+                        <strong><i data-lucide="gavel" class="w-4 h-4"></i> Legal Notice</strong>
                         This assessment is confidential and proprietary.<br>
                         Distribution restricted to authorized personnel only.<br>
                         Unauthorized distribution prohibited.
                     </div>
                 </div>
                 <div class="disclaimer">
-                    <i class="fas fa-copyright"></i> {{year}} Enterprise Security Framework • Generated on {{date}} • AI-Enhanced Security Assessment
+                    <i data-lucide="copyright" class="w-4 h-4"></i> {{year}} Enterprise Security Framework • Generated on {{date}} • AI-Enhanced Security Assessment
                 </div>
             </div>
         </div>
@@ -629,13 +630,13 @@
 
     <!-- Print Button -->
     <button class="save-button" onclick="showPrintDialog()">
-        <i class="fas fa-file-pdf"></i> Save as PDF
+        <i data-lucide="file-text" class="w-4 h-4"></i> Save as PDF
     </button>
     
     <!-- Print Dialog Overlay -->
     <div class="print-overlay" id="printOverlay">
         <div class="print-dialog">
-            <h3><i class="fas fa-print"></i> Save Assessment as PDF</h3>
+            <h3><i data-lucide="printer" class="w-5 h-5"></i> Save Assessment as PDF</h3>
             <ol class="print-steps">
                 <li>Click the <strong>Print</strong> button below to open your browser's print dialog</li>
                 <li>Set <strong>Destination</strong> to "Save as PDF"</li>
@@ -700,9 +701,9 @@
         function populateRecommendations() {
             const container = document.getElementById('recommendations-container');
             const priorityIcons = {
-                high: 'fa-exclamation-circle',
-                medium: 'fa-exclamation-triangle',
-                low: 'fa-info-circle'
+                high: 'alert-circle',
+                medium: 'alert-triangle',
+                low: 'info'
             };
             
             recommendations.forEach(rec => {
@@ -710,23 +711,33 @@
                 li.className = `priority-${rec.priority}`;
                 li.innerHTML = `
                     <div class="recommendation-title">
-                        <i class="fas ${priorityIcons[rec.priority]}"></i>
+                        <i data-lucide="${priorityIcons[rec.priority]}" class="w-4 h-4"></i>
                         ${rec.title}
                     </div>
                     <div class="recommendation-text">${rec.text}</div>
                     <div class="recommendation-meta">
-                        <span><i class="fas fa-clock"></i> Timeline: ${rec.timeline}</span>
-                        <span><i class="fas fa-user"></i> Owner: ${rec.owner}</span>
+                        <span><i data-lucide="clock" class="w-4 h-4"></i> Timeline: ${rec.timeline}</span>
+                        <span><i data-lucide="user" class="w-4 h-4"></i> Owner: ${rec.owner}</span>
                     </div>
                 `;
                 container.appendChild(li);
             });
+            
+            // Reinitialize Lucide icons after dynamic content creation
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         }
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             populateRiskBreakdown();
             populateRecommendations();
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
             
             // Replace template variables with actual data
             const templateData = {

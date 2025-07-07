@@ -225,8 +225,8 @@ class TemplateBindingEngine {
                 </div>
                 <div class="recommendation-text">${rec.description}</div>
                 <div class="recommendation-meta">
-                    <span><i class="fas fa-clock"></i> Timeline: ${rec.timeline}</span>
-                    <span><i class="fas fa-user"></i> Owner: ${rec.owner}</span>
+                                    <span><i data-lucide="clock" class="w-4 h-4"></i> Timeline: ${rec.timeline}</span>
+                <span><i data-lucide="user" class="w-4 h-4"></i> Owner: ${rec.owner}</span>
                 </div>
             </li>
         `).join('');

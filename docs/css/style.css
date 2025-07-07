@@ -1104,7 +1104,7 @@
     opacity: 0.6;
 }
 
-.stat-item.pro-feature .fas.fa-lock {
+.stat-item.pro-feature .lucide-crown {
     position: absolute;
     top: -0.25rem;
     right: -0.25rem;

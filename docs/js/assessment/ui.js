@@ -73,7 +73,7 @@ export function updateUIForAuth() {
         if (resultsBtnGroup && !saveBtn) {
             const saveButtonHTML = `
                 <button type="button" class="btn btn-secondary" id="saveToDbBtn">
-                    <i class="fas fa-save"></i> Save Assessment
+                    <i data-lucide="save" class="w-4 h-4"></i> Save Assessment
                 </button>
             `;
             const newAssessmentBtn = document.getElementById('newAssessmentBtn');
@@ -93,24 +93,29 @@ export function updateUIForAuth() {
             const userTier = currentUser.user_metadata?.tier || 'free';
             const dashClass = getIsAdmin() ? 'btn btn-primary' : 'btn btn-secondary';
             loginSection.innerHTML = `
-                <div class="login-user"><i class="fas fa-check-circle"></i><span>${currentUser.email}</span></div>
+                <div class="login-user"><i data-lucide="check-circle" class="w-4 h-4"></i><span>${currentUser.email}</span></div>
                 <div class="login-badges">
                     ${userTier === 'enterprise' ? '<span class="badge badge-enterprise">ENTERPRISE</span>' : ''}
                     ${getIsAdmin() ? '<span class="badge badge-admin">ADMIN</span>' : ''}
                 </div>
                 <div class="login-actions">
-                    <a href="dashboard.html" class="${dashClass}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                    <button id="signOutBtn" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                    <a href="dashboard.html" class="${dashClass}"><i data-lucide="gauge" class="w-4 h-4"></i> Dashboard</a>
+                    <button id="signOutBtn" class="btn btn-secondary"><i data-lucide="log-out" class="w-4 h-4"></i> Sign Out</button>
                 </div>
             `;
         } else {
             loginSection.innerHTML = `
-                <div class="login-user"><i class="fas fa-lock"></i><span>Sign in to save & export</span></div>
+                <div class="login-user"><i data-lucide="lock" class="w-4 h-4"></i><span>Sign in to save & export</span></div>
                 <div class="login-actions">
-                    <button id="showSignInModalBtn" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-                    <button id="showSignUpModalBtn" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Create Account</button>
+                    <button id="showSignInModalBtn" class="btn btn-primary"><i data-lucide="log-in" class="w-4 h-4"></i> Sign In</button>
+                    <button id="showSignUpModalBtn" class="btn btn-secondary"><i data-lucide="user-plus" class="w-4 h-4"></i> Create Account</button>
                 </div>
             `;
+        }
+        
+        // Reinitialize Lucide icons after dynamic content creation
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
         }
     }
 }
