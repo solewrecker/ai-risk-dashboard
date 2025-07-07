@@ -78,6 +78,11 @@ export async function loadAssessments() {
                 </button>
             </div>
         `;
+        
+        // Reinitialize Lucide icons after dynamic content creation
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
+        }
         if (resultsCount) {
             resultsCount.textContent = 'Error loading assessments';
         }
@@ -102,7 +107,7 @@ function renderRecentAssessments() {
         return;
     }
     
-    container.innerHTML = recentAssessments.map(assessment => {
+    const assessmentHTML = recentAssessments.map(assessment => {
         const date = new Date(assessment.created_at).toLocaleDateString();
         const riskColors = {
             low: 'bg-green-500',
@@ -153,6 +158,13 @@ function renderRecentAssessments() {
             </div>
         `;
     }).join('');
+    
+    container.innerHTML = assessmentHTML;
+    
+    // Reinitialize Lucide icons after dynamic content creation
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
 }
 
 function renderAssessmentList() {
@@ -213,6 +225,11 @@ function renderAssessmentList() {
     }).join('');
     
     container.innerHTML = listContent;
+    
+    // Reinitialize Lucide icons after dynamic content creation
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
     
     if (resultsCount) {
         resultsCount.textContent = `${assessments.length} assessments found`;
@@ -318,6 +335,11 @@ function renderFilteredAssessments(filteredData) {
             const item = renderAssessmentItem(assessment);
             container.insertAdjacentHTML('beforeend', item);
         });
+        
+        // Reinitialize Lucide icons after dynamic content creation
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
+        }
     }
     
     if (resultsCount) {
