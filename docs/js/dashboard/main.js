@@ -16,27 +16,28 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let currentTab = 'dashboard';
 
+// Make functions available globally BEFORE DOMContentLoaded
+// so that inline onclick handlers in the HTML can call them immediately
+window.switchTab = switchTab;
+window.viewAssessment = viewAssessment;
+window.deleteAssessment = async (id) => {
+    await deleteAssessment(id);
+    // Refresh achievements after deletion
+    if (window.achievementsManager) {
+        window.achievementsManager.updateProgress();
+    }
+};
+window.loadAssessments = loadAssessments;
+window.clearAllFilters = clearAllFilters;
+window.closeBanner = closeBanner;
+window.handleFileSelect = handleFileSelect;
+window.processImport = processImport;
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
     
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('Supabase client initialized');
-
-    // Make functions available globally on the window object immediately
-    // so that inline onclick handlers in the HTML can call them.
-    window.switchTab = switchTab;
-    window.viewAssessment = viewAssessment;
-    window.deleteAssessment = async (id) => {
-        await deleteAssessment(id);
-        // Refresh achievements after deletion
-        if (window.achievementsManager) {
-            window.achievementsManager.updateProgress();
-        }
-    };
-    window.clearAllFilters = clearAllFilters;
-    window.closeBanner = closeBanner;
-    window.handleFileSelect = handleFileSelect;
-    window.processImport = processImport;
     
     initAuth(supabaseClient);
     initAssessments(supabaseClient);
