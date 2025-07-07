@@ -83,13 +83,18 @@ function renderInsights(breakdown) {
 
     insightsGrid.innerHTML = insights.map(item => `
         <div class="insight-card risk-${getRiskLevel(item.score ?? 0).toLowerCase()}">
-            <div class="insight-icon"><i class="fas fa-${item.icon}"></i></div>
+            <div class="insight-icon"><i data-lucide="${item.icon}" class="w-5 h-5"></i></div>
             <div class="insight-content">
                 <span class="insight-title">${item.title}</span>
                 <span class="insight-value">${item.score ?? 'N/A'}</span>
             </div>
         </div>
     `).join('');
+    
+    // Reinitialize Lucide icons after dynamic content creation
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function renderRecommendations(recommendations, finalScore, formData) {

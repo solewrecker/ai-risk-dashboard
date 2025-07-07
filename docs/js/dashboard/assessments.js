@@ -200,16 +200,11 @@ function renderAssessmentList() {
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
                     <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-eye w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
+                        <i data-lucide="eye" class="w-5 h-5"></i>
                     </button>
                     ${getIsAdmin() ? `
                         <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-trash w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
                     ` : ''}
                 </div>
@@ -234,43 +229,26 @@ export async function deleteAssessment(id) {
         return;
     }
     
-    if (!confirm('Are you sure you want to delete this assessment?')) {
+    if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
         return;
     }
     
     try {
-        // Get Supabase access token
-        const { data: sessionData } = await supabaseClient.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        
-        if (!accessToken) {
-            throw new Error('Authentication error: No access token found. Please log in again.');
-        }
-        
-        // Call the edge function for secure deletion
-        const response = await fetch('https://lgybmsziqjdmmxdiyils.functions.supabase.co/delete-assessment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({ assessmentId: id })
-        });
-        
-        const result = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(result.error || 'Delete failed');
-        }
-        
-        await loadAssessments();
-        updateDashboardStats();
-        updateProgressTracking();
-        
-        alert(result.message || 'Assessment deleted successfully');
+        const { error } = await supabaseClient
+            .from('assessments')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // Refresh the list after deletion
+        loadAssessments();
+        // Optionally, show a success message
+        // showToast('Assessment deleted successfully.');
+
     } catch (error) {
         console.error('Error deleting assessment:', error);
-        alert('Failed to delete assessment: ' + error.message);
+        // showToast('Error deleting assessment.', 'error');
     }
 }
 
@@ -322,57 +300,31 @@ export function filterAssessments() {
 
 function renderFilteredAssessments(filteredData) {
     const container = document.getElementById('assessment-list');
+    const resultsCount = document.getElementById('resultsCount');
+
     if (!container) return;
-    
+    container.innerHTML = ''; 
+
     if (filteredData.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <h3>No assessments found</h3>
-                <p>No assessments match your current filters.</p>
-                <button onclick="clearAllFilters()" class="btn btn-primary">Clear Filters</button>
+                <h3>No matching assessments found</h3>
+                <p>Try adjusting your filters or search terms.</p>
+                <button onclick="clearAllFilters()" class="btn btn-secondary">Clear Filters</button>
             </div>
         `;
-        return;
+    } else {
+        filteredData.forEach(assessment => {
+            const item = renderAssessmentItem(assessment);
+            container.insertAdjacentHTML('beforeend', item);
+        });
     }
     
-    container.innerHTML = filteredData.map(assessment => {
-        const date = new Date(assessment.created_at).toLocaleDateString();
-        
-        return `
-            <div class="assessments-page__list-item">
-                <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
-                    <div class="assessments-page__tool-info">
-                        <h4>${assessment.name}</h4>
-                        <p>${assessment.category || 'General'}</p>
-                    </div>
-                </div>
-                <div class="assessments-page__col assessments-page__col--score" data-label="Score">
-                    <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
-                </div>
-                <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
-                    <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
-                </div>
-                <div class="assessments-page__col assessments-page__col--date" data-label="Date">
-                    <span>${date}</span>
-                </div>
-                <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-eye w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                    </button>
-                    ${getIsAdmin() ? `
-                        <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-trash w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
+    if (resultsCount) {
+        resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
+    }
+
+     // Re-initialize any dynamic components like tooltips if needed
 }
 
 export function clearAllFilters() {

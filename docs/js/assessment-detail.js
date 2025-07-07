@@ -90,7 +90,7 @@ function renderResults(assessment) {
         </div>
 
         <div class="results-body">
-            <h3><i class="fas fa-clipboard-check"></i> Assessment Breakdown</h3>
+                            <h3><i data-lucide="clipboard-check" class="w-5 h-5"></i> Assessment Breakdown</h3>
             <div class="breakdown-grid">
                 ${Object.entries(results.breakdown).map(([category, details]) => `
                     <div class="breakdown-item">
@@ -101,7 +101,7 @@ function renderResults(assessment) {
                 `).join('')}
             </div>
 
-            <h3><i class="fas fa-lightbulb"></i> Key Recommendations</h3>
+                          <h3><i data-lucide="lightbulb" class="w-5 h-5"></i> Key Recommendations</h3>
             <ul class="recommendations-list">
                 ${results.recommendations.map(rec => `
                     <li class="priority-${rec.priority}">
@@ -111,7 +111,7 @@ function renderResults(assessment) {
                 `).join('')}
             </ul>
 
-            <h3><i class="fas fa-info-circle"></i> Original Inputs</h3>
+                          <h3><i data-lucide="info" class="w-5 h-5"></i> Original Inputs</h3>
             <div class="input-summary">
                 <p><strong>Tool Version:</strong> ${formData.toolVersion}</p>
                 <p><strong>Category:</strong> ${formData.toolCategory}</p>
@@ -120,6 +120,11 @@ function renderResults(assessment) {
             </div>
         </div>
     `;
+    
+    // Reinitialize Lucide icons after dynamic content creation
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
 }
 
 function getRiskSummary(riskLevel) {
