@@ -97,9 +97,9 @@ function renderRecentAssessments() {
     
     if (recentAssessments.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-8 text-gray-400">
+            <div class="recent-assessments-empty">
                 <p>No assessments yet</p>
-                <button onclick="window.location.href='index.html'" class="mt-2 text-blue-400 hover:text-blue-300">
+                <button class="btn btn-primary mt-2" onclick="window.location.href='index.html'">
                     Create your first assessment →
                 </button>
             </div>
