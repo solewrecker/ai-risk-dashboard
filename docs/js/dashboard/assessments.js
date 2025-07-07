@@ -144,7 +144,7 @@ function renderRecentAssessments() {
                         <div class="score-label">Risk Score</div>
                     </div>
                     <div class="dashboard-assessment-actions">
-                        <button onclick="viewAssessment(${assessment.id})" class="action-button" title="View Details">
+                        <button onclick="viewAssessment('${assessment.id}')" class="action-button" title="View Details">
                             <i data-lucide="chevron-right" class="w-5 h-5"></i>
                         </button>
                         <button class="action-button" title="Export PDF">
@@ -211,11 +211,11 @@ function renderAssessmentList() {
                     <span>${date}</span>
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" onclick="viewAssessment(${assessment.id})">
+                    <button class="btn-icon" title="View Details" onclick="viewAssessment('${assessment.id}')">
                         <i data-lucide="eye" class="w-5 h-5"></i>
                     </button>
                     ${getIsAdmin() ? `
-                        <button class="btn-icon" title="Delete" onclick="deleteAssessment(${assessment.id})">
+                        <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
                     ` : ''}
@@ -382,7 +382,7 @@ function renderAssessmentItem(assessment) {
                 <span class="dashboard-summary-assessments__item-risk risk-${riskLevelClass.toLowerCase()}">${riskLevelText}</span>
                 <span class="dashboard-summary-assessments__item-score">${assessment.total_score}/100</span>
                 <span class="dashboard-summary-assessments__item-date">${formatDate(assessment.created_at)}</span>
-                <button class="dashboard-summary-assessments__item-action" onclick="viewAssessment(${assessment.id})" aria-label="View Details">
+                <button class="dashboard-summary-assessments__item-action" onclick="viewAssessment('${assessment.id}')" aria-label="View Details">
                     <i data-lucide="eye" class="w-4 h-4"></i>
                 </button>
             </div>
