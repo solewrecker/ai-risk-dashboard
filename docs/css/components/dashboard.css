@@ -57,7 +57,7 @@
     color: var(--color-white);
 }
 
-/* Dashboard Controls styles have been moved to components/dashboard/controls.css for BEM refactor. Please update styles there. */
+/* Dashboard Controls styles have been fully migrated to components/dashboard/controls.css (BEM). Old styles removed. */
 
 /* Progress Overview */
 .progress-overview {
