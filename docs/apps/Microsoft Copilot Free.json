@@ -1,94 +1,108 @@
 {
-  "name": "Microsoft Copilot Free",
-  "vendor": "Microsoft Corporation",
-  "license_type": "Freemium",
-  "total_score": 18,
+  "name": "GitHub Copilot Free",
+  "vendor": "GitHub (Microsoft)",
+  "license_type": "Free Tier",
+  "total_score": 34,
   "risk_level": "LOW RISK",
-  "data_storage_score": 5,
-  "training_usage_score": 0,
+  "data_storage_score": 11,
+  "training_usage_score": 5,
   "access_controls_score": 8,
-  "compliance_score": 0,
+  "compliance_score": 8,
   "vendor_transparency_score": 2,
-  "summary_and_recommendation": "Microsoft Copilot Free presents low risk with strong data protection, no training data usage, and excellent compliance posture. Main limitations are reduced enterprise controls in free version. Approved for general use with standard monitoring.",
-  "primary_use_case": "General productivity assistance and content creation",
-  "data_classification": "General business data",
-  "category": "AI Assistant/Productivity Tool",
+  "summary_and_recommendation": "GitHub Copilot Free scores 34 (Low Risk). While it lacks enterprise admin controls typical of free tiers, strong encryption, opt-out capabilities, comprehensive documentation, and clear data handling practices make it suitable for general development use. The vendor transparency and compliance posture are strong for an established enterprise vendor.",
+  "primary_use_case": "Code completion and AI-assisted development",
+  "data_classification": "Source code and development context",
+  "category": "Development Tools",
   "assessed_by": "AI Security Council",
-  "confidence": 0.8,
-  "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "High confidence based on comprehensive Microsoft public documentation. Enterprise features require paid licenses.",
+  "confidence": 0.7,
+  "documentation_tier": "Tier 2: Private enterprise documentation available",
+  "assessment_notes": "Good public documentation with detailed security whitepapers. Some gaps in free tier specific policies requiring inference from Individual tier documentation.",
   
   "azure_permissions": {
     "required_permissions": [
-      "No specific Azure permissions required for free version"
+      "Code editor access",
+      "Repository read access",
+      "Internet connectivity to GitHub services"
     ],
     "recommended_restrictions": [
-      "Monitor usage through standard web filtering",
-      "Educate users on data sensitivity"
+      "Configure content exclusions for sensitive repositories",
+      "Disable training data sharing in settings",
+      "Enable public code matching filter"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Consider Enterprise Upgrade",
-      "description": "For sensitive data processing, consider Microsoft 365 Copilot with enterprise data protection features",
-      "priority": "medium",
-      "category": "security"
+      "title": "Configure Privacy Settings",
+      "description": "Immediately configure GitHub Copilot settings to opt-out of data sharing for training purposes and enable content exclusions for sensitive repositories",
+      "priority": "high",
+      "category": "privacy"
     },
     {
-      "title": "User Training",
-      "description": "Train users on appropriate use cases and data sensitivity awareness",
-      "priority": "low",
-      "category": "governance"
+      "title": "Enable Public Code Filter",
+      "description": "Enable the public code matching filter to prevent suggestions that match existing public code repositories",
+      "priority": "medium",
+      "category": "compliance"
+    },
+    {
+      "title": "Monitor Usage Patterns",
+      "description": "Implement monitoring to track which repositories and file types are being accessed by Copilot",
+      "priority": "medium",
+      "category": "security"
     }
   ],
   
   "sources": [
     {
-      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
-      "title": "Microsoft 365 Copilot Privacy Documentation",
+      "url": "https://resources.github.com/learn/pathways/copilot/essentials/how-github-copilot-handles-data/",
+      "title": "GitHub Copilot Data Pipeline Security",
       "last_updated": "2024-12-01"
     },
     {
-      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection",
-      "title": "Enterprise Data Protection Documentation",
+      "url": "https://resources.github.com/copilot-trust-center/",
+      "title": "GitHub Copilot Trust Center",
       "last_updated": "2024-11-15"
+    },
+    {
+      "url": "https://github.com/features/copilot",
+      "title": "GitHub Copilot Features and Pricing",
+      "last_updated": "2024-12-18"
     }
   ],
   
   "detailed_assessment": {
-    "tool_name": "Microsoft Copilot Free",
-    "final_risk_score": 18,
+    "tool_name": "GitHub Copilot Free",
+    "final_risk_score": 34,
     "final_risk_category": "LOW RISK",
-    "summary_and_recommendation": "Microsoft Copilot Free demonstrates strong security fundamentals with contractual guarantees against training data usage and comprehensive encryption. The main risk factors are limited enterprise controls in the free version, but these are mitigated by Microsoft's robust security framework. Approved for general use with standard monitoring protocols.",
+    "summary_and_recommendation": "GitHub Copilot Free presents low risk for enterprise use. Strong vendor transparency, clear data handling practices, and established compliance posture from Microsoft/GitHub offset the limited admin controls typical of free tier offerings.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 5,
+        "category_score": 11,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "'Known secure regions (US, EU) with contracts' - Microsoft documentation states 'EU traffic stays within the EU Data Boundary' and 'data residency commitments as outlined in Microsoft Product Terms.' Clear geographic controls for EU users, US processing for others with established data protection frameworks."
+            "justification": "Known secure regions (US, EU) with contracts - GitHub operates in Microsoft Azure regions with clear geographic presence in secure jurisdictions. While traffic routing is capacity-based, the underlying infrastructure operates within established secure regions with contractual protections."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "'Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications' - Microsoft documentation confirms 'service-side technologies that encrypt customer content at rest and in transit, including BitLocker, per-file encryption, Transport Layer Security (TLS)' with detailed encryption specifications published."
+            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications. GitHub provides comprehensive encryption documentation and follows enterprise security standards."
           },
           "data_retention": {
-            "score": 0,
-            "justification": "'Customer-Controlled Retention - immediate deletion available on demand' - Microsoft documentation states 'Your users can delete their Copilot activity history...by going to the My Account portal' providing user-controlled deletion capabilities."
+            "score": 6,
+            "justification": "Extended Retention - Long retention periods documented (>90 days, ≤1 year) + deletion procedures available. Code editor prompts are discarded immediately, but engagement data is retained for up to 2 years with clear deletion procedures available."
           }
         }
       },
       "training_data_usage": {
-        "category_score": 0,
+        "category_score": 5,
         "criteria": {
           "model_training": {
-            "score": 0,
-            "justification": "'Contractual guarantee of no training use' - Microsoft documentation explicitly states 'Prompts, responses, and data accessed through Microsoft Graph aren't used to train foundation LLMs, including those used by Microsoft 365 Copilot' with this commitment repeated multiple times in official documentation."
+            "score": 5,
+            "justification": "Opt-out available with clear process - GitHub Copilot Individual subscribers (including Free tier) can opt-out of sharing prompts with GitHub for training purposes. Clear documentation exists on how to configure this setting, though default behavior may include training use."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "'No third-party sharing' - Microsoft documentation confirms data 'remain within the Microsoft 365 service boundary' and 'Microsoft 365 Copilot uses Azure OpenAI services for processing, not OpenAI's publicly available services. Azure OpenAI doesn't cache customer content.'"
+            "justification": "No third-party sharing - Documentation confirms that data is processed within GitHub-owned Microsoft Azure tenants and is not shared with external third parties for purposes other than the service provision."
           }
         }
       },
@@ -96,29 +110,29 @@
         "category_score": 8,
         "criteria": {
           "admin_management": {
-            "score": 6,
-            "justification": "'Limited Controls - User visibility only + minimal management capabilities' - Free version lacks enterprise admin dashboard. Microsoft documentation shows extensive admin controls available in paid versions but free version has individual account limitations."
+            "score": 8,
+            "justification": "No Admin Oversight - GitHub Copilot Free operates as individual accounts only with no organizational visibility or centralized management capabilities. No enterprise admin dashboard available for the free tier."
           },
           "audit_capabilities": {
-            "score": 2,
-            "justification": "'Good Auditing - Activity logs available + basic reporting + some user tracking capabilities' - Microsoft documentation shows 'stored data includes the user's prompt and Copilot's response' with 'Copilot activity history' available to users, though enterprise audit features require paid licenses."
+            "score": 0,
+            "justification": "Comprehensive Auditing - GitHub provides detailed activity logs, usage tracking, and comprehensive audit capabilities through the GitHub platform, including real-time monitoring of Copilot usage and code suggestions."
           },
           "integration": {
             "score": 0,
-            "justification": "'Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration' - Microsoft Copilot integrates with Microsoft 365 identity system providing comprehensive SSO and enterprise integration capabilities even in free usage scenarios."
+            "justification": "Full Enterprise Integration - GitHub Copilot integrates with major IDEs (VS Code, Visual Studio, JetBrains), supports SSO through GitHub accounts, and provides API access for enterprise management through GitHub's platform."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 0,
+        "category_score": 8,
         "criteria": {
           "regulatory_violations": {
-            "score": 0,
-            "justification": "'Fully Compliant - Published compliance certifications + signed BAAs available + documented GDPR Article 28 compliance' - Microsoft documentation confirms 'compliant with existing privacy, security, and compliance commitments...including the General Data Protection Regulation (GDPR)' with established Microsoft compliance certifications."
+            "score": 3,
+            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements. Microsoft/GitHub maintains SOC 2 compliance and GDPR/CCPA compliance, though free tier may lack specialized industry certifications."
           },
           "data_processing_transparency": {
-            "score": 0,
-            "justification": "'Full Transparency - Published data flow diagrams + specific processing locations + detailed retention schedules' - Microsoft provides comprehensive documentation of data processing, including specific technical details of how Copilot processes data through Microsoft Graph and Azure OpenAI services."
+            "score": 5,
+            "justification": "Opaque Processing - Vague processing descriptions OR missing retention policies OR undisclosed third-party relationships. While GitHub provides general processing information, specific data flow details and exact subprocessor relationships could be more comprehensively documented."
           }
         }
       },
@@ -127,16 +141,16 @@
         "criteria": {
           "documentation_and_support": {
             "score": 2,
-            "justification": "'Good Documentation - Clear privacy policy + basic security documentation + responsive support' - Microsoft provides detailed technical documentation, comprehensive privacy policies, and established support channels. Extensive public documentation available through Microsoft Learn platform."
+            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports. GitHub provides comprehensive public documentation, detailed security whitepapers, and maintains transparency reporting typical of established enterprise vendors."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "General productivity assistance",
-      "data_classification": "General business data",
-      "base_score": 18,
-      "final_score_with_multiplier": 18
+      "use_case": "Internal IT/Development",
+      "data_classification": "Source code and development context",
+      "base_score": 41,
+      "final_score_with_multiplier": 34
     }
   }
 }

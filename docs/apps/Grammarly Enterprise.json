@@ -1,0 +1,161 @@
+{
+  "name": "Grammarly Enterprise",
+  "vendor": "Grammarly Inc.",
+  "license_type": "Enterprise SaaS",
+  "total_score": 28,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 6,
+  "training_usage_score": 5,
+  "access_controls_score": 2,
+  "compliance_score": 3,
+  "vendor_transparency_score": 2,
+  "summary_and_recommendation": "Grammarly Enterprise demonstrates strong security posture with comprehensive enterprise features, SOC 2 compliance, and user-controlled data training opt-out. Minor risks include extended retention periods and generative AI partner data sharing. Recommended for general enterprise use with standard monitoring.",
+  "primary_use_case": "Writing assistance and communication enhancement",
+  "data_classification": "Business communications, documents, emails",
+  "category": "Productivity Tools",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.8,
+  "documentation_tier": "Tier 2: Public + Private Enterprise Documentation",
+  "assessment_notes": "High confidence assessment based on comprehensive public documentation, published security whitepapers, compliance certifications, and enterprise feature documentation. Minor gaps in specific retention period details.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "browser.extension.install",
+      "office365.integration.read",
+      "office365.integration.write"
+    ],
+    "recommended_restrictions": [
+      "Monitor for sensitive document processing",
+      "Require training opt-out for all users",
+      "Enable audit logging"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Enable Training Opt-Out",
+      "description": "Ensure all enterprise users are opted out of data training to eliminate any training data risk",
+      "priority": "medium",
+      "category": "data_governance"
+    },
+    {
+      "title": "Configure SCIM Provisioning",
+      "description": "Implement automated user provisioning and deprovisioning through SCIM integration",
+      "priority": "medium",
+      "category": "access_management"
+    },
+    {
+      "title": "Review Data Retention Policy",
+      "description": "Establish clear data retention requirements and deletion procedures with Grammarly",
+      "priority": "low",
+      "category": "data_governance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://www.grammarly.com/trust",
+      "title": "Grammarly Trust Center",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://www.grammarly.com/security",
+      "title": "Security at Grammarly",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://www.grammarly.com/compliance",
+      "title": "Security Compliances and Certifications",
+      "last_updated": "2024-12-01"
+    },
+    {
+      "url": "https://support.grammarly.com/hc/en-us/articles/4403054674829-Configure-SCIM-provisioning",
+      "title": "SCIM Provisioning Documentation",
+      "last_updated": "2024-12-01"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Grammarly Enterprise",
+    "final_risk_score": 28,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Grammarly Enterprise demonstrates strong security posture with comprehensive enterprise features, SOC 2 compliance, and user-controlled data training opt-out. Minor risks include extended retention periods and generative AI partner data sharing. Recommended for general enterprise use with standard monitoring.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 6,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "Known secure regions (US, EU) with contracts - Uses Amazon Web Services for data processing and storage, with documented data residency in secure regions. Enterprise customers can request specific data residency requirements."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Documentation clearly states AES-256 server-side encryption for data at rest and TLS 1.2 for data in transit. Encryption specifications are published in security documentation."
+          },
+          "data_retention": {
+            "score": 6,
+            "justification": "Extended Retention - Long retention periods documented (>90 days, ≤1 year) + deletion procedures available - Privacy policy states retention 'as long as necessary to provide services' without specific timeframes. Deletion procedures are available but not clearly automated or time-limited."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 5,
+        "criteria": {
+          "model_training": {
+            "score": 5,
+            "justification": "Opt-out available with clear process - Users can opt out of allowing Grammarly to use their content to improve products or train models. EU/UK users and certain business users are automatically opted out. Clear process documented in trust center."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "No third-party sharing - Grammarly explicitly states they do not sell user content and do not allow partners to use data for training their models. While generative AI features share prompt data with vetted partners, this is for service provision only, not training."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 2,
+        "criteria": {
+          "admin_management": {
+            "score": 0,
+            "justification": "Full Enterprise Controls - Centralized admin dashboard + user provisioning/deprovisioning + role-based permissions + group management + domain verification - Enterprise plans include comprehensive admin dashboards with full user management capabilities, role-based access controls, and domain verification features."
+          },
+          "audit_capabilities": {
+            "score": 2,
+            "justification": "Good Auditing - Activity logs available + basic reporting + some user tracking capabilities - Enterprise plans include audit logs and usage reporting. Comprehensive activity tracking available but not at the most detailed level of real-time monitoring."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration + API access for enterprise management - Documentation shows support for SCIM provisioning, SSO integration, and enterprise identity management systems."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 3,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "Fully Compliant - Published compliance certifications (SOC 2, ISO 27001, etc.) + signed BAAs available + documented GDPR Article 28 compliance - Grammarly has SOC 2 Type 1 and Type 2 reports, ISO certifications, and maintains GDPR compliance documentation. BAAs available for enterprise customers."
+          },
+          "data_processing_transparency": {
+            "score": 2,
+            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Trust center provides good transparency about data processing, though detailed data flow diagrams are not publicly available. Third-party relationships are disclosed but not comprehensively detailed."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 2,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 2,
+            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports - Comprehensive trust center with security documentation, privacy policies, and compliance information. Support is responsive with dedicated enterprise support channels."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Internal IT/Development (writing assistance)",
+      "data_classification": "Business communications",
+      "base_score": 28,
+      "final_score_with_multiplier": 27
+    }
+  }
+}

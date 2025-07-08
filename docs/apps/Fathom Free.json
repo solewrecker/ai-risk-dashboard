@@ -1,0 +1,151 @@
+{
+  "name": "Fathom Free",
+  "vendor": "Fathom Video Inc.",
+  "license_type": "Free",
+  "total_score": 44,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 15,
+  "training_usage_score": 0,
+  "access_controls_score": 20,
+  "compliance_score": 2,
+  "vendor_transparency_score": 4,
+  "summary_and_recommendation": "Fathom Free scores 44 points (Medium Risk). While the tool has strong training data protections and compliance certifications, it lacks enterprise admin controls and has indefinite data retention policies. Recommended for general use with standard enterprise controls, but not suitable for PHI or highly sensitive data without enterprise features.",
+  "primary_use_case": "Meeting transcription and note-taking",
+  "data_classification": "Business Communications",
+  "category": "AI Meeting Assistant",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.7,
+  "documentation_tier": "Tier 2: Public + Private Documentation",
+  "assessment_notes": "Good public documentation available including privacy policy and security certifications. Some enterprise features unclear for free version.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "meetings.read",
+      "calendar.read",
+      "audio.record"
+    ],
+    "recommended_restrictions": [
+      "Block for PHI processing",
+      "Require approval for sensitive meetings",
+      "Monitor usage patterns"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Upgrade to Enterprise Version",
+      "description": "For organizations needing admin controls, consider Fathom Team Edition which may provide enhanced enterprise features",
+      "priority": "medium",
+      "category": "access_control"
+    },
+    {
+      "title": "Data Retention Clarification",
+      "description": "Contact vendor to clarify specific data retention periods and deletion procedures",
+      "priority": "high",
+      "category": "data_storage"
+    },
+    {
+      "title": "Usage Monitoring",
+      "description": "Implement usage monitoring to track what meetings are being recorded and by whom",
+      "priority": "medium",
+      "category": "governance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://fathom.video/privacy",
+      "title": "Fathom Privacy Policy",
+      "last_updated": "2024-11-12"
+    },
+    {
+      "url": "https://help.fathom.video/en/articles/296512",
+      "title": "Fathom Security Documentation",
+      "last_updated": "2024"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Fathom Free",
+    "final_risk_score": 44,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "Fathom Free scores 44 points (Medium Risk). While the tool has strong training data protections and compliance certifications, it lacks enterprise admin controls and has indefinite data retention policies. Recommended for general use with standard enterprise controls, but not suitable for PHI or highly sensitive data without enterprise features.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 15,
+        "criteria": {
+          "geographic_control": {
+            "score": 3,
+            "justification": "Known secure regions (US, EU) with contracts - Privacy policy indicates US-based processing with standard data protection measures, but no specific data residency controls mentioned."
+          },
+          "encryption_standards": {
+            "score": 2,
+            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Documentation indicates reasonable physical, technical, and electronic safeguards, though specific encryption details not fully published."
+          },
+          "data_retention": {
+            "score": 10,
+            "justification": "Indefinite/Unclear Retention - Indefinite retention stated OR no retention policy OR contradictory retention statements - Privacy policy states data stored 'as long as necessary to fulfill purposes' without specific timeframes, which constitutes unclear retention policy."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "Contractual guarantee of no training use - Multiple sources confirm that neither Fathom nor their AI sub-processors (OpenAI, Anthropic) use customer data for training purposes."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "No third-party sharing - Privacy policy explicitly states they do not sell Meeting Content Information or attendee information to anyone, sharing only occurs with meeting participants and essential service providers."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 20,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "No Admin Oversight - Individual accounts only + no organizational visibility + no centralized management - Free version appears to lack enterprise admin dashboard and centralized user management capabilities."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "No Audit Capabilities - No activity logs OR logs not accessible to administrators OR no usage tracking - No evidence of enterprise-grade audit capabilities in free version."
+          },
+          "integration": {
+            "score": 5,
+            "justification": "No Enterprise Integration - Username/password only + no SSO + no enterprise identity management - Free version lacks enterprise SSO and identity management features."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 2,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "Fully Compliant - Published compliance certifications (SOC 2, ISO 27001, etc.) + signed BAAs available + documented GDPR Article 28 compliance + industry-specific certifications (HIPAA, PCI-DSS, FedRAMP as applicable) - Fathom has SOC 2 Type II, HIPAA compliance, and GDPR compliance documentation."
+          },
+          "data_processing_transparency": {
+            "score": 2,
+            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Privacy policy provides reasonable transparency about data processing, though some details could be clearer."
+          }
+        }
+      },
+                "vendor_transparency": {
+        "category_score": 4,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 4,
+            "justification": "Adequate Documentation - Standard privacy policy + limited security information + support available but slower response times - Privacy policy is comprehensive and recent (Nov 2024), security certifications mentioned, but detailed security whitepaper not publicly available."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Meeting transcription and note-taking",
+      "data_classification": "Business Communications",
+      "base_score": 42,
+      "final_score_with_multiplier": 42
+    }
+  }
+}

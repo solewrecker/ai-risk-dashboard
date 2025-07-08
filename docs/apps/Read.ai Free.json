@@ -1,241 +1,162 @@
 {
-    "name": "Read.ai Free",
-    "vendor": "Read.ai",
-    "license_type": "Free",
-    "total_score": 42,
-    "risk_level": "MEDIUM RISK",
-    "data_storage_score": 11,
-    "training_usage_score": 5,
-    "access_controls_score": 13,
-    "compliance_score": 8,
-    "vendor_transparency_score": 5,
-    "summary_and_recommendation": "Read.ai Free presents medium risk primarily due to limited enterprise controls in the free tier and automatic meeting attendance capabilities. While the vendor demonstrates good transparency with SOC 2 Type 2 certification and opt-out-by-default training policies, the free version lacks comprehensive admin controls and audit capabilities. The tool's automatic meeting joining feature raises privacy concerns for sensitive discussions. Recommendation: Requires review and implementation of usage policies before deployment. Consider upgrade to Enterprise+ plan for sensitive use cases.",
-    "confidence": 0.85,
-    "primary_use_case": "Meeting transcription and analysis",
-    "data_classification": "Meeting content and audio/video recordings",
-    "category": "AI Meeting Assistant",
-    "assessed_by": "AI Security Council",
-    
-    "breakdown": {
-      "scores": {
-        "dataStorage": 11,
-        "trainingUsage": 5,
-        "accessControls": 13,
-        "complianceRisk": 8,
-        "vendorTransparency": 5
-      },
-      "subScores": {
-        "dataStorage": {
-          "geographic": {
-            "score": 6,
-            "note": "External servers with unclear specific geographic location. Documentation mentions encryption and SOC 2 compliance but does not specify data residency requirements or geographic controls for the free tier."
-          },
-          "encryption": {
-            "score": 2,
-            "note": "Enterprise-grade encryption documented with SOC 2 Type 2 certification mentioning appropriate encryption algorithms. Every measured meeting is encrypted with permissions on who can access reports, indicating strong encryption practices."
-          },
-          "retention": {
+  "name": "Read.ai Free",
+  "vendor": "Read.ai",
+  "license_type": "Freemium",
+  "total_score": 47,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 11,
+  "training_usage_score": 5,
+  "access_controls_score": 13,
+  "compliance_score": 8,
+  "vendor_transparency_score": 10,
+  "summary_and_recommendation": "Read.ai Free presents medium risk due to significant limitations in enterprise controls and audit capabilities. While the vendor shows good transparency and has opt-out training policies, the free tier lacks essential enterprise features like comprehensive admin controls and audit logging. Recommend upgrading to Enterprise+ plan for organizational use or implementing additional monitoring controls.",
+  "primary_use_case": "Meeting transcription and analysis",
+  "data_classification": "Business Communications",
+  "category": "AI-Powered Meeting Assistant",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.7,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Assessment based on publicly available documentation. Higher confidence requires enterprise sales engagement for detailed security documentation.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "calendar.read",
+      "meetings.join",
+      "files.read.all"
+    ],
+    "recommended_restrictions": [
+      "Restrict to specific meeting types",
+      "Require meeting host approval",
+      "Block sensitive meeting categories"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Upgrade to Enterprise+ Plan",
+      "description": "The free tier lacks essential enterprise controls. Enterprise+ provides advanced admin controls, audit logging, and enhanced security features required for organizational use.",
+      "priority": "high",
+      "category": "access_control"
+    },
+    {
+      "title": "Implement Meeting Classification Policy",
+      "description": "Establish clear policies on which meeting types can use Read.ai. Exclude confidential, legal, HR, and strategic meetings from AI transcription.",
+      "priority": "high",
+      "category": "data_governance"
+    },
+    {
+      "title": "Enable HIPAA Compliance if Required",
+      "description": "For healthcare organizations, contact Read.ai to enable HIPAA compliance features and obtain Business Associates Agreement.",
+      "priority": "medium",
+      "category": "compliance"
+    },
+    {
+      "title": "Regular Access Review",
+      "description": "Without comprehensive audit logs in free tier, implement manual quarterly reviews of who has access to meeting reports and shared content.",
+      "priority": "medium",
+      "category": "governance"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://www.read.ai/privacy",
+      "title": "Read.ai Privacy Policy and Security Overview",
+      "last_updated": "2024-12-15"
+    },
+    {
+      "url": "https://support.read.ai/hc/en-us/articles/20053798660499-How-to-Setup-SAML-Authentication-with-Read-AI",
+      "title": "SAML Authentication Setup Guide",
+      "last_updated": "2024-11-20"
+    },
+    {
+      "url": "https://support.read.ai/hc/en-us/articles/7962819152659-What-are-all-of-the-settings-and-permissions-available-with-Workspaces",
+      "title": "Workspace Settings and Permissions",
+      "last_updated": "2024-10-15"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Read.ai Free",
+    "final_risk_score": 47,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "Read.ai Free presents medium risk due to significant limitations in enterprise controls and audit capabilities. While the vendor shows good transparency and has opt-out training policies, the free tier lacks essential enterprise features like comprehensive admin controls and audit logging. Recommend upgrading to Enterprise+ plan for organizational use or implementing additional monitoring controls.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 11,
+        "criteria": {
+          "geographic_control": {
             "score": 3,
-            "note": "Clear limited retention with user-controlled deletion capabilities. Documentation states users can delete audio, video, data, reports, and even entire accounts with immediate effect. Post-call settings allow granular deletion control."
-          }
-        },
-        "trainingUsage": {
-          "training": {
-            "score": 5,
-            "note": "Opt-out available with clear process. Documentation explicitly states 'Contributing to our model is completely optional, and opt-out by default.' This indicates no training use unless users actively opt-in, which significantly reduces risk."
+            "justification": "Known secure regions (US, EU) with contracts - Documentation states 'majority of data is stored in the U.S.' with option for HIPAA compliance requiring all data in US. Secure regions with some contractual control available."
           },
-          "sharing": {
-            "score": 0,
-            "note": "No third-party sharing. Documentation explicitly states 'we don't sell your data to anyone - period' and 'Your data is kept private and only used to provide the service to you.' No indication of third-party data sharing."
-          }
-        },
-        "accessControls": {
-          "admin": {
+          "encryption_standards": {
+            "score": 2,
+            "justification": "Enterprise-Grade Encryption - Documentation confirms 'Every measured meeting is encrypted with permissions' and mentions 'appropriate encryption algorithms' in SOC 2 context. AES-256 encryption standards implied but not explicitly detailed."
+          },
+          "data_retention": {
             "score": 6,
-            "note": "Limited controls for free tier. While Enterprise+ plan offers additional security features, the free version appears to have minimal organizational visibility and centralized management capabilities. Individual account-based with limited admin oversight."
+            "justification": "Extended Retention - Documentation mentions 'automatically delete data after a certain number of days as specified by the organization' but this appears to be a custom enterprise feature. No specific retention periods documented for free tier, suggesting extended retention periods."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 5,
+        "criteria": {
+          "model_training": {
+            "score": 5,
+            "justification": "Opt-out available with clear process - Documentation explicitly states 'Contributing to our model is completely optional, and opt-out by default' indicating clear opt-out process is available."
           },
-          "audit": {
-            "score": 4,
-            "note": "Basic auditing capabilities. Users can see who invited Read to meetings and have access to meeting reports with permission controls, but comprehensive audit logs and exportable reports are not clearly documented for the free tier."
+          "data_sharing": {
+            "score": 0,
+            "justification": "No third-party sharing - Documentation clearly states 'we don't sell your data to anyone - period' and 'Read does not publish data to the open internet' with user-controlled sharing permissions."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 13,
+        "criteria": {
+          "admin_management": {
+            "score": 6,
+            "justification": "Limited Controls - Free tier provides basic user management through individual accounts. Enterprise Workspace features mentioned but not available in free tier. Limited organizational visibility and centralized management for free users."
+          },
+          "audit_capabilities": {
+            "score": 7,
+            "justification": "No Audit Capabilities - Documentation does not mention activity logs, audit trails, or usage tracking capabilities accessible to administrators in the free tier. Enterprise+ plan may include these features but not confirmed."
           },
           "integration": {
-            "score": 3,
-            "note": "Limited integration available. Supports SSO login (Microsoft, Google) and calendar integration, but lacks comprehensive enterprise identity management features like SCIM provisioning and advanced API access for the free tier."
+            "score": 0,
+            "justification": "Full Enterprise Integration - Documentation confirms SAML/OIDC SSO support, Microsoft/Google integration, and calendar connectivity. Strong enterprise integration capabilities even in free tier."
           }
-        },
-        "complianceRisk": {
-          "violations": {
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 8,
+        "criteria": {
+          "regulatory_violations": {
             "score": 3,
-            "note": "Mostly compliant with published SOC 2 Type 2 certification and HIPAA compliance capabilities. Documentation mentions ability to provide Business Associates Agreement for HIPAA compliance, indicating strong regulatory compliance foundation."
+            "justification": "Mostly Compliant - SOC 2 Type 2 certification confirmed, HIPAA compliance available upon request with BAA. Privacy policy present but lacks detailed regulatory compliance specifics for all major regulations."
           },
-          "transparency": {
+          "data_processing_transparency": {
             "score": 5,
-            "note": "Opaque processing for some aspects. While general data processing is described and retention policies are clear, specific data flow diagrams and detailed third-party processor lists are not publicly available, requiring contact with support for detailed audit reports."
-          }
-        },
-        "vendorTransparency": {
-          "score": {
-            "score": 5,
-            "note": "Adequate documentation with clear privacy policy and basic security information. SOC 2 Type 2 certification available upon request through support. Responsive support email provided but response times not specified. Some security details require contacting support rather than being publicly available."
+            "justification": "Opaque Processing - While privacy policy exists, documentation lacks specific data flow diagrams, detailed processing locations, and comprehensive third-party processor lists. Some transparency provided but missing key technical details."
           }
         }
       },
-      "compliance": {
-        "pci": "non-compliant",
-        "sox": "non-compliant", 
-        "gdpr": "compliant",
-        "hipaa": "compliant"
-      }
-    },
-    
-    "details": {
-      "dataStorage": "Geographic: External servers with unclear specific location but SOC 2 certified infrastructure | Encryption: Enterprise-grade encryption with SOC 2 Type 2 certification and per-meeting encryption controls | Retention: User-controlled deletion with immediate effect for all data types including audio, video, and reports",
-      "trainingUsage": "Training: Opt-out by default with clear opt-in process - no training use unless explicitly consented | Sharing: Explicit no-sale policy with data used only for service provision",
-      "accessControls": "Admin: Limited controls in free tier with individual account management and minimal organizational oversight | Audit: Basic meeting tracking and permission controls but limited comprehensive audit capabilities | Integration: SSO support for major providers but limited enterprise management features",
-      "complianceRisk": "Violations: SOC 2 Type 2 certified with HIPAA compliance capabilities and BAA availability | Transparency: General processing described but detailed audit reports require support contact",
-      "vendorTransparency": "Clear privacy documentation with SOC 2 certification, but some security details require support contact for access"
-    },
-    
-    "azure_permissions": {
-      "required_permissions": [
-        "calendar.read",
-        "meetings.read",
-        "meetings.join"
-      ],
-      "recommended_restrictions": [
-        "Block access to confidential meetings",
-        "Require explicit approval for each meeting",
-        "Implement meeting classification system",
-        "Monitor usage patterns"
-      ]
-    },
-    
-    "recommendations": [
-      {
-        "title": "Implement Meeting Classification",
-        "description": "Establish clear policies for which meeting types Read.ai is permitted to join, with explicit blocking for confidential, legal, or sensitive business discussions",
-        "priority": "high",
-        "category": "security"
-      },
-      {
-        "title": "User Training Program",
-        "description": "Conduct comprehensive training on Read.ai's opt-out mechanisms and data handling practices, ensuring users understand how to remove the bot from sensitive meetings",
-        "priority": "high",
-        "category": "training"
-      },
-      {
-        "title": "Consider Enterprise Upgrade",
-        "description": "For organizations handling sensitive data, evaluate Read.ai's Enterprise+ plan which offers additional security features and administrative controls",
-        "priority": "medium",
-        "category": "procurement"
-      },
-      {
-        "title": "Regular Access Review",
-        "description": "Implement quarterly reviews of which users have Read.ai access and establish procedures for immediate revocation when needed",
-        "priority": "medium",
-        "category": "access_management"
-      }
-    ],
-    
-    "sources": [
-      {
-        "url": "https://www.read.ai/privacy",
-        "title": "Read.ai Privacy Policy",
-        "last_updated": "2024-12-01"
-      },
-      {
-        "url": "https://www.read.ai/termsofservice",
-        "title": "Read.ai Terms of Service", 
-        "last_updated": "2024-12-01"
-      },
-      {
-        "url": "https://support.read.ai/hc/en-us/articles/25702259763091-Security-Privacy-Overview",
-        "title": "Security & Privacy Overview",
-        "last_updated": "2024-11-15"
-      }
-    ],
-    
-    "detailed_assessment": {
-      "tool_name": "Read.ai Free",
-      "final_risk_score": 42,
-      "final_risk_category": "MEDIUM RISK",
-      "summary_and_recommendation": "Read.ai Free presents medium risk primarily due to limited enterprise controls in the free tier and automatic meeting attendance capabilities. While the vendor demonstrates good transparency with SOC 2 Type 2 certification and opt-out-by-default training policies, the free version lacks comprehensive admin controls and audit capabilities. The tool's automatic meeting joining feature raises privacy concerns for sensitive discussions. Recommendation: Requires review and implementation of usage policies before deployment. Consider upgrade to Enterprise+ plan for sensitive use cases.",
-      "assessment_details": {
-        "data_storage_and_security": {
-          "category_score": 11,
-          "criteria": {
-            "geographic_control": {
-              "score": 6,
-              "justification": "External servers with unclear specific geographic location. While Read.ai maintains SOC 2 Type 2 certification indicating professional infrastructure management, the specific geographic location of data storage is not clearly documented in publicly available materials. This creates uncertainty about data residency requirements and potential jurisdictional issues."
-            },
-            "encryption_standards": {
-              "score": 2,
-              "justification": "Enterprise-grade encryption documented through SOC 2 Type 2 certification. Documentation explicitly states that 'every measured meeting is encrypted with permissions on who can access what reports' and mentions use of 'appropriate encryption algorithms.' The SOC 2 certification provides third-party verification of encryption standards."
-            },
-            "data_retention": {
-              "score": 3,
-              "justification": "Clear limited retention with comprehensive user control. Documentation provides detailed deletion capabilities including immediate account deletion, selective deletion of audio/video/data/reports, and participant-level opt-out with immediate data deletion. Users maintain full control over retention periods."
-            }
-          }
-        },
-        "training_data_usage": {
-          "category_score": 5,
-          "criteria": {
-            "model_training": {
-              "score": 5,
-              "justification": "Opt-out available with clear process and default opt-out policy. Documentation explicitly states 'Contributing to our model is completely optional, and opt-out by default' and 'the default is to opt-out, but users have a choice to opt-in.' This represents best practice for AI training data usage with clear user consent mechanisms."
-            },
-            "data_sharing": {
-              "score": 0,
-              "justification": "No third-party sharing with explicit policy statements. Documentation clearly states 'we don't sell your data to anyone - period' and 'Your data is kept private and only used to provide the service to you.' No indication of any third-party data sharing arrangements."
-            }
-          }
-        },
-        "access_controls": {
-          "category_score": 13,
-          "criteria": {
-            "admin_management": {
-              "score": 6,
-              "justification": "Limited controls for free tier with individual account focus. While Enterprise+ plan offers additional security features, the free version appears to operate primarily on individual account basis with minimal organizational visibility. Users can control meeting access but lack comprehensive admin dashboard for organizational oversight."
-            },
-            "audit_capabilities": {
-              "score": 4,
-              "justification": "Basic auditing with meeting tracking and permission controls. Users can see who invited Read to meetings and control report sharing permissions. However, comprehensive audit logs, exportable reports, and detailed user activity tracking are not clearly documented for the free tier."
-            },
-            "integration": {
-              "score": 3,
-              "justification": "Limited integration with SSO support but minimal enterprise features. Supports authentication via Microsoft and Google SSO, plus calendar integration for meeting scheduling. However, lacks comprehensive enterprise identity management features like SCIM provisioning and advanced API access for organizational management."
-            }
-          }
-        },
-        "compliance_and_legal_risk": {
-          "category_score": 8,
-          "criteria": {
-            "regulatory_violations": {
-              "score": 3,
-              "justification": "Mostly compliant with strong certification foundation. Maintains SOC 2 Type 2 certification and offers HIPAA compliance with Business Associates Agreement availability. Documentation indicates professional compliance approach with third-party verification, though some specialized industry certifications may not be available."
-            },
-            "data_processing_transparency": {
-              "score": 5,
-              "justification": "Opaque processing for detailed technical specifications. While general data processing is clearly described and retention policies are transparent, specific data flow diagrams, detailed processing location information, and comprehensive third-party processor lists require contacting support rather than being publicly available."
-            }
-          }
-        },
-        "vendor_transparency": {
-          "category_score": 5,
-          "criteria": {
-            "documentation_and_support": {
-              "score": 5,
-              "justification": "Adequate documentation with clear privacy policy and security information. SOC 2 Type 2 certification available upon request, responsive support email provided, and clear policy documentation. However, some security details require contacting support rather than being publicly available, and response times are not specified."
-            }
+      "vendor_transparency": {
+        "category_score": 10,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 10,
+            "justification": "No Transparency - Assessment limited to public documentation only. No security whitepaper available publicly, limited detailed security documentation, and no transparency reports identified. Privacy policy basic without comprehensive technical details."
           }
         }
-      },
-      "use_case_multiplier_applied": {
-        "use_case": "Meeting transcription and analysis",
-        "data_classification": "Meeting content and audio/video recordings",
-        "base_score": 42,
-        "final_score_with_multiplier": 42
       }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Meeting transcription and analysis",
+      "data_classification": "Business Communications",
+      "base_score": 47,
+      "final_score_with_multiplier": 47
     }
   }
+}
