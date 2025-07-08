@@ -43,19 +43,21 @@ export async function loadAssessments() {
     }
 
     try {
-        // Query the ai_tools table which contains the detailed assessment data
         const query = supabaseClient
-            .from('ai_tools')
+            .from('assessments')
             .select('*')
             .order('created_at', { ascending: false });
+
+        if (!getIsAdmin()) {
+            query.eq('user_id', user.id);
+        }
 
         const { data, error } = await query;
 
         if (error) throw error;
 
         assessments = data || [];
-        console.log(`Loaded ${assessments.length} AI tools`);
-        console.log('Sample assessment data:', assessments[0]); // Debug: check data structure
+        console.log(`Loaded ${assessments.length} assessments`);
         
         renderAssessmentList();
         renderRecentAssessments();
@@ -209,19 +211,15 @@ function renderAssessmentList() {
                     <span>${date}</span>
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" onclick="toggleAssessmentDetails('${assessment.id}')">
-                        <i data-lucide="chevron-down" class="w-5 h-5 assessments-page__expand-icon" id="expand-icon-${assessment.id}"></i>
+                    <button class="btn-icon" title="View Details" onclick="viewAssessment('${assessment.id}')">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
                     </button>
-                    <button class="btn-icon" title="Full Report" onclick="viewAssessment('${assessment.id}')">
-                        <i data-lucide="external-link" class="w-5 h-5"></i>
-                    </button>
-                    <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
+                    ${getIsAdmin() ? `
+                        <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    ` : ''}
                 </div>
-            </div>
-            <div class="assessments-page__details" id="details-${assessment.id}" style="display: none;">
-                ${renderAssessmentDetails(assessment)}
             </div>
         `;
     }).join('');
@@ -242,163 +240,16 @@ export function viewAssessment(id) {
     window.location.href = `assessment-detail.html?id=${id}`;
 }
 
-// Make functions available globally for onclick handlers
-window.toggleAssessmentDetails = toggleAssessmentDetails;
-window.viewAssessment = viewAssessment;
-window.deleteAssessment = deleteAssessment;
-
-export function toggleAssessmentDetails(id) {
-    const detailsElement = document.getElementById(`details-${id}`);
-    const expandIcon = document.getElementById(`expand-icon-${id}`);
-    
-    if (!detailsElement || !expandIcon) return;
-    
-    const isVisible = detailsElement.style.display !== 'none';
-    
-    if (isVisible) {
-        // Hide details
-        detailsElement.style.display = 'none';
-        expandIcon.style.transform = 'rotate(0deg)';
-        detailsElement.classList.remove('assessments-page__details--expanded');
-    } else {
-        // Show details
-        detailsElement.style.display = 'block';
-        expandIcon.style.transform = 'rotate(180deg)';
-        detailsElement.classList.add('assessments-page__details--expanded');
-        
-        // Close other expanded details
-        document.querySelectorAll('.assessments-page__details').forEach(el => {
-            if (el.id !== `details-${id}`) {
-                el.style.display = 'none';
-                el.classList.remove('assessments-page__details--expanded');
-            }
-        });
-        document.querySelectorAll('.assessments-page__expand-icon').forEach(icon => {
-            if (icon.id !== `expand-icon-${id}`) {
-                icon.style.transform = 'rotate(0deg)';
-            }
-        });
-    }
-    
-    // Reinitialize Lucide icons
-    if (typeof lucide !== 'undefined') {
-        setTimeout(() => lucide.createIcons(), 100);
-    }
-}
-
-function renderAssessmentDetails(assessment) {
-    // Handle ai_tools table structure
-    const detailedAssessment = assessment.detailed_assessment || assessment;
-    const recommendations = assessment.recommendations || [];
-    
-    console.log('Rendering details for:', assessment.name, detailedAssessment); // Debug
-    
-    if (!detailedAssessment || !detailedAssessment.assessment_details) {
-        return `
-            <div class="assessments-page__details-content">
-                <div class="assessments-page__details-section">
-                    <p class="assessments-page__details-error">Assessment details not available for this item.</p>
-                    <p class="assessments-page__details-error">Data structure: ${JSON.stringify(Object.keys(assessment), null, 2)}</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    const assessmentDetails = detailedAssessment.assessment_details || {};
-    
-    return `
-        <div class="assessments-page__details-content">
-            ${Object.entries(assessmentDetails).map(([categoryKey, categoryData]) => {
-                const categoryName = formatCategoryName(categoryKey);
-                const score = categoryData.category_score || 0;
-                const riskLevel = getRiskLevelFromScore(score);
-                
-                return `
-                    <div class="assessments-page__details-section">
-                        <div class="assessments-page__details-header">
-                            <h4 class="assessments-page__details-title">${categoryName}</h4>
-                            <div class="assessments-page__details-meta">
-                                <span class="assessments-page__details-score assessments-page__details-score--${riskLevel}">${score}</span>
-                                <span class="assessments-page__details-max">/25</span>
-                            </div>
-                        </div>
-                        <div class="assessments-page__details-body">
-                            ${Object.entries(categoryData.criteria || {}).map(([criteriaKey, criteriaData]) => `
-                                <div class="assessments-page__details-criteria">
-                                    <div class="assessments-page__details-criteria-header">
-                                        <span class="assessments-page__details-criteria-name">${formatCriteriaName(criteriaKey)}</span>
-                                        <span class="assessments-page__details-criteria-score">${criteriaData.score || 0}</span>
-                                    </div>
-                                    <p class="assessments-page__details-criteria-desc">${criteriaData.justification || 'No description available'}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('')}
-            
-            ${recommendations.length > 0 ? `
-                <div class="assessments-page__details-section">
-                    <div class="assessments-page__details-header">
-                        <h4 class="assessments-page__details-title">
-                            <i data-lucide="lightbulb" class="w-4 h-4"></i>
-                            Key Recommendations
-                        </h4>
-                    </div>
-                    <div class="assessments-page__details-body">
-                        ${recommendations.slice(0, 3).map(rec => `
-                            <div class="assessments-page__details-recommendation assessments-page__details-recommendation--${rec.priority}">
-                                <div class="assessments-page__details-recommendation-header">
-                                    <span class="assessments-page__details-recommendation-title">${rec.title}</span>
-                                    <span class="assessments-page__details-recommendation-priority">${rec.priority?.toUpperCase()}</span>
-                                </div>
-                                <p class="assessments-page__details-recommendation-desc">${rec.description}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-}
-
-function formatCategoryName(categoryKey) {
-    const nameMap = {
-        'data_storage_and_security': 'Data Storage & Security',
-        'training_data_usage': 'Training Data Usage',
-        'access_controls': 'Access Controls',
-        'compliance_and_legal_risk': 'Compliance & Legal Risk',
-        'vendor_transparency': 'Vendor Transparency'
-    };
-    return nameMap[categoryKey] || categoryKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function formatCriteriaName(criteriaKey) {
-    const nameMap = {
-        'geographic_control': 'Geographic Control',
-        'encryption_standards': 'Encryption Standards', 
-        'data_retention': 'Data Retention',
-        'model_training': 'Model Training',
-        'data_sharing': 'Data Sharing',
-        'admin_management': 'Admin Management',
-        'audit_capabilities': 'Audit Capabilities',
-        'integration': 'Enterprise Integration',
-        'regulatory_violations': 'Regulatory Compliance',
-        'data_processing_transparency': 'Data Processing Transparency',
-        'documentation_and_support': 'Documentation & Support'
-    };
-    return nameMap[criteriaKey] || criteriaKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function getRiskLevelFromScore(score) {
-    if (score >= 20) return 'low';
-    if (score >= 15) return 'medium';
-    if (score >= 10) return 'high';
-    return 'critical';
-}
-
 export async function deleteAssessment(id) {
-    // Allow any authenticated user to delete their own assessment from the assessments table
+    if (!getIsAdmin()) {
+        alert('Access denied. Admin privileges required.');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
+        return;
+    }
+    
     try {
         const { error } = await supabaseClient
             .from('assessments')
