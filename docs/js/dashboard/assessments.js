@@ -110,6 +110,7 @@ function renderRecentAssessments() {
     
     const assessmentHTML = recentAssessments.map(assessment => {
         const date = new Date(assessment.created_at).toLocaleDateString();
+        const formData = assessment.assessment_data?.formData || {};
         const riskColors = {
             low: 'bg-green-500',
             medium: 'bg-yellow-500',
@@ -120,7 +121,6 @@ function renderRecentAssessments() {
         const scoreColorClass = assessment.total_score >= 75 ? 'risk-critical' : 
                               assessment.total_score >= 50 ? 'risk-high' : 
                               assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
-        
         return `
             <div class="dashboard-summary-assessments__item">
                 <div class="dashboard-summary-assessments__content">
@@ -129,13 +129,13 @@ function renderRecentAssessments() {
                         <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
                     </div>
                     <div class="dashboard-summary-assessments__info">
-                        <div class="dashboard-summary-assessments__name">${assessment.name}</div>
+                        <div class="dashboard-summary-assessments__name">${assessment.name}${formData.toolVersion ? ` <span style='font-weight:normal;color:#aaa;'>(${formData.toolVersion})</span>` : ''}</div>
                         <div class="dashboard-summary-assessments__meta">
                             <span>${date}</span>
                             <span class="dashboard-assessment-meta-divider">•</span>
                             <span>by ${assessment.created_by || 'Anonymous'}</span>
                             <span class="dashboard-assessment-meta-divider">•</span>
-                            <span>${assessment.category || 'General'}</span>
+                            <span>${formData.toolCategory || assessment.category || 'General'}</span>
                         </div>
                     </div>
                 </div>
@@ -191,12 +191,13 @@ function renderAssessmentList() {
         const date = new Date(assessment.created_at).toLocaleDateString();
         const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
         const isExpanded = expandedAssessmentId === assessment.id;
+        const formData = assessment.assessment_data?.formData || {};
         return `
             <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                     <div class="assessments-page__tool-info">
-                        <h4>${assessment.name}</h4>
-                        <p>${assessment.category || 'General'}</p>
+                        <h4>${assessment.name}${formData.toolVersion ? ` <span style='font-weight:normal;color:#aaa;'>(${formData.toolVersion})</span>` : ''}</h4>
+                        <p>${formData.toolCategory || assessment.category || 'General'}</p>
                     </div>
                 </div>
                 <div class="assessments-page__col assessments-page__col--score" data-label="Score">
@@ -383,12 +384,13 @@ function renderFilteredAssessments(filteredData) {
             const date = new Date(assessment.created_at).toLocaleDateString();
             const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
             const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
+            const formData = assessment.assessment_data?.formData || {};
             return `
                 <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                     <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                         <div class="assessments-page__tool-info">
-                            <h4>${assessment.name}</h4>
-                            <p>${assessment.category || 'General'}</p>
+                            <h4>${assessment.name}${formData.toolVersion ? ` <span style='font-weight:normal;color:#aaa;'>(${formData.toolVersion})</span>` : ''}</h4>
+                            <p>${formData.toolCategory || assessment.category || 'General'}</p>
                         </div>
                     </div>
                     <div class="assessments-page__col assessments-page__col--score" data-label="Score">
