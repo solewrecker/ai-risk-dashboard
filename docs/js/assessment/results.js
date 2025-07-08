@@ -18,11 +18,14 @@ export function displayResults(results) {
 
     const { formData, finalScore, riskLevel, source, recommendations, breakdown, detailedAssessment } = results;
     const toolName = formData.toolName || 'Unknown Tool';
+    const toolVersion = formData.toolVersion || '';
+    const fullToolName = toolVersion ? `${toolName} (${toolVersion})` : toolName;
 
     // Build the results HTML
     const resultsHTML = `
         <!-- Main Score Card -->
         <div class="main-score-card risk-${riskLevel.toLowerCase()}">
+            <div class="tool-title" style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">${fullToolName}</div>
             <div class="score-section">
                 <div id="mainScore" class="score-number">${finalScore}</div>
                 <div id="riskLevel" class="score-label">${riskLevel}</div>
