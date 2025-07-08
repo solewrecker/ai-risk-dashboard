@@ -288,24 +288,24 @@
 
             <!-- Assessments Tab Content -->
             <div id="assessments-content" class="tab-content assessments-page">
-                <div class="dashboard-controls">
-                    <div class="search-container">
+                <div class="dashboard-controls dashboard-controls--bem">
+                    <div class="search-container dashboard-controls__search">
                         <i data-lucide="search" class="w-5 h-5 absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search by tool name...">
+                        <input type="text" id="searchInput" class="search-input dashboard-controls__input" placeholder="Search by tool name...">
                     </div>
-                    <div class="filter-container">
-                        <select id="riskFilter" class="filter-select">
+                    <div class="filter-container dashboard-controls__filter">
+                        <select id="riskFilter" class="filter-select dashboard-controls__select">
                             <option value="all">All Risk Levels</option>
                             <option value="critical">Critical</option>
                             <option value="high">High</option>
                             <option value="medium">Medium</option>
                             <option value="low">Low</option>
                         </select>
-                        <select id="categoryFilter" class="filter-select">
+                        <select id="categoryFilter" class="filter-select dashboard-controls__select">
                             <option value="all">All Categories</option>
                             <!-- Options populated by JS -->
                         </select>
-                        <select id="sortControl" class="filter-select">
+                        <select id="sortControl" class="filter-select dashboard-controls__select">
                             <option value="newest">Sort: Newest</option>
                             <option value="oldest">Sort: Oldest</option>
                             <option value="score_desc">Score: High to Low</option>
