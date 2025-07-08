@@ -239,11 +239,11 @@ window.toggleAssessmentDetails = function(id) {
 };
 
 function renderAssessmentDetails(assessment) {
-    // Use new assessment_data structure if present
+    // Always use the formData from assessment_data
+    const formData = assessment.assessment_data?.formData || {};
     const data = assessment.assessment_data || {};
     const breakdown = data.breakdown || data.results?.breakdown || assessment.breakdown || assessment.results?.breakdown || {};
     const recommendations = data.recommendations || data.results?.recommendations || assessment.recommendations || assessment.results?.recommendations || [];
-    const formData = data.formData || data.results?.formData || assessment.formData || assessment.results?.formData || {};
     return `
         <div class="assessments-page__details-content">
             <div class="assessments-page__details-header">
@@ -253,8 +253,8 @@ function renderAssessmentDetails(assessment) {
                 ${Object.entries(breakdown).map(([cat, details]) => `
                     <div class="assessments-page__details-breakdown-item">
                         <h5>${cat}</h5>
-                        <div class="assessments-page__details-breakdown-score">${details.score}</div>
-                        <p>${details.description}</p>
+                        <div class="assessments-page__details-breakdown-score">${details && details.score !== undefined ? details.score : 'N/A'}</div>
+                        <p>${details && details.description ? details.description : ''}</p>
                     </div>
                 `).join('')}
             </div>
@@ -267,10 +267,10 @@ function renderAssessmentDetails(assessment) {
                 </ul>
             </div>
             <div class="assessments-page__details-meta">
-                <p><strong>Tool Version:</strong> ${formData.toolVersion || ''}</p>
-                <p><strong>Category:</strong> ${formData.toolCategory || ''}</p>
-                <p><strong>Use Case:</strong> ${formData.useCase || ''}</p>
-                <p><strong>Data Classification:</strong> ${formData.dataClassification || ''}</p>
+                <p><strong>Tool Version:</strong> ${formData.toolVersion || 'Unknown'}</p>
+                <p><strong>Category:</strong> ${formData.toolCategory || 'Unknown'}</p>
+                <p><strong>Use Case:</strong> ${formData.useCase || 'Unknown'}</p>
+                <p><strong>Data Classification:</strong> ${formData.dataClassification || 'Unknown'}</p>
             </div>
             <div class="assessments-page__details-footer">
                 <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-secondary">Full Report</a>
