@@ -319,128 +319,147 @@ export async function deleteAssessment(id) {
     }
 }
 
-export function filterAssessments() {
-    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const riskFilter = document.getElementById('riskFilter')?.value || 'all';
-    const categoryFilter = document.getElementById('categoryFilter')?.value || 'all';
-    const sortBy = document.getElementById('sortSelect')?.value || 'date_desc';
-    
+// Update filterAssessments to work with new multi-select filter
+export function filterAssessments(selectedFilters) {
     let filteredAssessments = [...assessments];
-    
+
+    // Search term filtering
+    const searchTerm = document.querySelector('.dashboard-controls__input')?.value.toLowerCase() || '';
     if (searchTerm) {
-        filteredAssessments = filteredAssessments.filter(a => a.name.toLowerCase().includes(searchTerm));
+        filteredAssessments = filteredAssessments.filter(a => 
+            a.name.toLowerCase().includes(searchTerm)
+        );
     }
-    
-    if (riskFilter !== 'all') {
-        filteredAssessments = filteredAssessments.filter(a => a.risk_level === riskFilter);
+
+    // Risk level filtering
+    if (selectedFilters?.risk && selectedFilters.risk.length > 0) {
+        filteredAssessments = filteredAssessments.filter(a => 
+            selectedFilters.risk.includes(a.risk_level)
+        );
     }
-    
-    if (categoryFilter !== 'all') {
-        filteredAssessments = filteredAssessments.filter(a => a.category === categoryFilter);
+
+    // Category filtering
+    if (selectedFilters?.category && selectedFilters.category.length > 0) {
+        filteredAssessments = filteredAssessments.filter(a => 
+            selectedFilters.category.includes(a.category)
+        );
     }
-    
-    filteredAssessments.sort((a, b) => {
-        switch (sortBy) {
-            case 'date_asc': return new Date(a.created_at) - new Date(b.created_at);
-            case 'date_desc': return new Date(b.created_at) - new Date(a.created_at);
-            case 'score_asc': return (a.total_score || 0) - (b.total_score || 0);
-            case 'score_desc': return (b.total_score || 0) - (a.total_score || 0);
-            case 'name_asc': return a.name.localeCompare(b.name);
-            case 'name_desc': return b.name.localeCompare(a.name);
-            default: return 0;
+
+    // Date range filtering
+    if (selectedFilters?.date && selectedFilters.date.length > 0) {
+        filteredAssessments = filteredAssessments.filter(a => {
+            const assessmentDate = new Date(a.created_at); // Changed from 'date' to 'created_at'
+            const now = new Date();
+
+            return selectedFilters.date.some(range => {
+                switch(range) {
+                    case 'today': 
+                        return assessmentDate.toDateString() === now.toDateString();
+                    case 'week':
+                        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= oneWeekAgo;
+                    case 'month':
+                        return assessmentDate.getMonth() === now.getMonth() && 
+                               assessmentDate.getFullYear() === now.getFullYear();
+                    case 'quarter':
+                        const currentQuarter = Math.floor(now.getMonth() / 3);
+                        const assessmentQuarter = Math.floor(assessmentDate.getMonth() / 3);
+                        return currentQuarter === assessmentQuarter && 
+                               assessmentDate.getFullYear() === now.getFullYear();
+                    case 'year':
+                        return assessmentDate.getFullYear() === now.getFullYear();
+                    default:
+                        return true;
+                }
+            });
+        });
+    }
+
+    // Sorting
+    const sortSelect = document.querySelector('.dashboard-controls__select');
+    if (sortSelect) {
+        const sortValue = sortSelect.value;
+        switch(sortValue) {
+            case 'newest':
+                filteredAssessments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Changed from 'date' to 'created_at'
+                break;
+            case 'oldest':
+                filteredAssessments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)); // Changed from 'date' to 'created_at'
+                break;
+            case 'risk-high':
+                filteredAssessments.sort((a, b) => {
+                    const riskOrder = ['critical', 'high', 'medium', 'low'];
+                    return riskOrder.indexOf(a.risk_level) - riskOrder.indexOf(b.risk_level);
+                });
+                break;
+            case 'risk-low':
+                filteredAssessments.sort((a, b) => {
+                    const riskOrder = ['critical', 'high', 'medium', 'low'];
+                    return riskOrder.indexOf(b.risk_level) - riskOrder.indexOf(a.risk_level);
+                });
+                break;
+            case 'name-az':
+                filteredAssessments.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-za':
+                filteredAssessments.sort((a, b) => b.name.localeCompare(a.name));
+                break;
         }
-    });
-    
-    renderFilteredAssessments(filteredAssessments);
-    
-    const resultsCount = document.getElementById('resultsCount');
-    if (resultsCount) {
-        resultsCount.textContent = `${filteredAssessments.length} assessments found`;
     }
-    
-    const clearFiltersBtn = document.getElementById('clearFilters');
-    if (clearFiltersBtn) {
-        const hasFilters = searchTerm || riskFilter !== 'all' || categoryFilter !== 'all' || sortBy !== 'date_desc';
-        clearFiltersBtn.style.display = hasFilters ? 'inline-block' : 'none';
+
+    renderFilteredAssessments(filteredAssessments);
+    updateResultsCount(filteredAssessments);
+}
+
+function updateResultsCount(filteredData) {
+    const resultsCount = document.querySelector('.multi-select__results-count');
+    if (resultsCount) {
+        resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
     }
 }
 
 function renderFilteredAssessments(filteredData) {
-    const container = document.getElementById('assessment-list');
-    const resultsCount = document.getElementById('resultsCount');
-    if (!container) return;
-    container.innerHTML = '';
+    const assessmentContainer = document.querySelector('.assessments-container');
+    const noResultsMessage = document.querySelector('.no-results-message');
+
     if (filteredData.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <h3>No matching assessments found</h3>
+        if (assessmentContainer) assessmentContainer.innerHTML = '';
+        if (noResultsMessage) {
+            noResultsMessage.innerHTML = `
+                <p>No assessments found.</p>
                 <p>Try adjusting your filters or search terms.</p>
                 <button onclick="clearAllFilters()" class="btn btn-secondary">Clear Filters</button>
-            </div>
-        `;
-    } else {
-        const user = getCurrentUser && getCurrentUser();
-        const listContent = filteredData.map(assessment => {
-            const date = new Date(assessment.created_at).toLocaleDateString();
-            const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
-            const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
-            const formData = assessment.assessment_data?.formData || {};
-            return `
-                <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
-                    <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
-                        <div class="assessments-page__tool-info">
-                            <h4>${assessment.name}</h4>
-                            <p>${formData.toolCategory || assessment.category || 'General'}</p>
-                        </div>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--score" data-label="Score">
-                        <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
-                        <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--date" data-label="Date">
-                        <span>${date}</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                        <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
-                            <i data-lucide="eye" class="w-5 h-5"></i>
-                        </button>
-                        ${canDelete ? `
-                            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
-                    ${isExpanded ? renderAssessmentDetails(assessment) : ''}
-                </div>
             `;
-        }).join('');
-        container.innerHTML = listContent;
-        if (typeof lucide !== 'undefined') {
-            setTimeout(() => lucide.createIcons(), 100);
+            noResultsMessage.style.display = 'block';
+        }
+    } else {
+        if (noResultsMessage) noResultsMessage.style.display = 'none';
+        if (assessmentContainer) {
+            assessmentContainer.innerHTML = filteredData.map(assessment => `
+                <!-- Render assessment card HTML -->
+                <div class="assessment-card">
+                    <h3>${assessment.name}</h3>
+                    <p>Risk Level: ${assessment.risk_level}</p>
+                    <p>Category: ${assessment.category}</p>
+                    <p>Date: ${new Date(assessment.created_at).toLocaleDateString()}</p> {/* Changed from 'date' to 'created_at' */}
+                </div>
+            `).join('');
         }
     }
-    if (resultsCount) {
-        resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
-    }
-    // Re-initialize any dynamic components like tooltips if needed
 }
 
 export function clearAllFilters() {
-    const searchInput = document.getElementById('searchInput');
-    const riskFilter = document.getElementById('riskFilter');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const sortSelect = document.getElementById('sortSelect');
-    
+    // Clear search input
+    const searchInput = document.querySelector('.dashboard-controls__input');
     if (searchInput) searchInput.value = '';
-    if (riskFilter) riskFilter.value = 'all';
-    if (categoryFilter) categoryFilter.value = 'all';
-    if (sortSelect) sortSelect.value = 'date_desc';
-    
-    filterAssessments();
+
+    // Reset multi-select filters
+    const multiSelect = new MultiSelectFilter('.dashboard-controls');
+    multiSelect.setupClearButton();
+
+    // Render all assessments
+    renderFilteredAssessments(assessments);
+    updateResultsCount(assessments);
 }
 
 function renderAssessmentItem(assessment) {
