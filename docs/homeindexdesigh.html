@@ -1,389 +1,735 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  Plus, 
-  Search, 
-  Filter, 
-  Download, 
-  Users, 
-  Trophy, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  Star,
-  BarChart3,
-  FileText,
-  Settings,
-  Bell,
-  ChevronDown,
-  Zap,
-  Target,
-  Award,
-  Eye,
-  Edit,
-  MoreHorizontal,
-  Calendar,
-  Gift,
-  Crown
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Select Search and Filters</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const Dashboard = () => {
-  const [selectedTab, setSelectedTab] = useState('dashboard');
-  const [showPromoBanner, setShowPromoBanner] = useState(true);
-  const [assessmentProgress] = useState(18); // Out of 25 free assessments
-  const [currentTheme, setCurrentTheme] = useState('dark-coder');
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1d29;
+            color: #ffffff;
+            padding: 20px;
+        }
 
-  // Mock data
-  const recentAssessments = [
-    { id: 1, tool: 'ChatGPT-4', category: 'Content Generation', risk: 'Medium', score: 72, date: '2025-07-01', status: 'complete' },
-    { id: 2, tool: 'Claude 3', category: 'Code Analysis', risk: 'Low', score: 85, date: '2025-06-30', status: 'complete' },
-    { id: 3, tool: 'GitHub Copilot', category: 'Development', risk: 'Medium', score: 68, date: '2025-06-29', status: 'complete' },
-    { id: 4, tool: 'Midjourney', category: 'Image Generation', risk: 'High', score: 45, date: '2025-06-28', status: 'review' },
-    { id: 5, tool: 'Notion AI', category: 'Productivity', risk: 'Low', score: 88, date: '2025-06-27', status: 'complete' }
-  ];
+        .search-filter-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-  const achievements = [
-    { id: 1, title: 'Risk Assessment Rookie', desc: 'Complete your first assessment', unlocked: true, icon: Target },
-    { id: 2, title: 'Risk Detective', desc: 'Complete 10 assessments', unlocked: true, icon: Search },
-    { id: 3, title: 'Power User', desc: 'Complete 25 assessments', unlocked: false, progress: 72, icon: Zap },
-    { id: 4, title: 'Theme Collector', desc: 'Unlock all free themes', unlocked: false, progress: 66, icon: Star }
-  ];
+        .search-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
 
-  const riskStats = {
-    totalAssessments: 18,
-    highRisk: 3,
-    mediumRisk: 8,
-    lowRisk: 7,
-    avgScore: 74
-  };
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 320px;
+        }
 
-  const getRiskColor = (risk) => {
-    switch(risk) {
-      case 'High': return 'text-red-400 bg-red-900/20';
-      case 'Medium': return 'text-yellow-400 bg-yellow-900/20';
-      case 'Low': return 'text-green-400 bg-green-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
-    }
-  };
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
 
-  const getStatusIcon = (status) => {
-    switch(status) {
-      case 'complete': return <CheckCircle className="w-4 h-4 text-green-400" />;
-      case 'review': return <Clock className="w-4 h-4 text-yellow-400" />;
-      default: return <AlertTriangle className="w-4 h-4 text-red-400" />;
-    }
-  };
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Promotional Banner */}
-      {showPromoBanner && (
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 relative">
-          <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <div className="flex items-center space-x-3">
-              <Gift className="w-5 h-5 text-yellow-300" />
-              <span className="font-medium">🎉 Limited Time: Double your assessment limit to 50 this week!</span>
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Ends in 3 days</span>
+        .search-input:focus {
+            border-color: #4f46e5;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .filter-group {
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .multi-select-wrapper {
+            position: relative;
+        }
+
+        .multi-select-trigger {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 44px;
+        }
+
+        .multi-select-trigger:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .multi-select-trigger.active {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .multi-select-trigger .placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .multi-select-trigger .arrow {
+            transition: transform 0.3s ease;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .multi-select-trigger.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2a2d3a;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            margin-top: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .multi-select-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .multi-select-option {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .multi-select-option:last-child {
+            border-bottom: none;
+        }
+
+        .multi-select-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .multi-select-option.selected {
+            background: rgba(79, 70, 229, 0.2);
+        }
+
+        .multi-select-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4f46e5;
+            cursor: pointer;
+        }
+
+        .multi-select-option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .selected-tag {
+            background: rgba(79, 70, 229, 0.3);
+            border: 1px solid rgba(79, 70, 229, 0.5);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .selected-tag.risk-critical {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .selected-tag.risk-high {
+            background: rgba(245, 101, 101, 0.3);
+            border-color: rgba(245, 101, 101, 0.5);
+        }
+
+        .selected-tag.risk-medium {
+            background: rgba(251, 191, 36, 0.3);
+            border-color: rgba(251, 191, 36, 0.5);
+        }
+
+        .selected-tag.risk-low {
+            background: rgba(34, 197, 94, 0.3);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .tag-remove:hover {
+            color: #ffffff;
+        }
+
+        .sort-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-select {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .sort-select:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sort-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .sort-select option {
+            background: #2a2d3a;
+            color: #ffffff;
+        }
+
+        .clear-filters-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            align-self: flex-end;
+        }
+
+        .clear-filters-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: #4f46e5;
+            color: #ffffff;
+        }
+
+        .active-filters-summary {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .active-filters-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .all-selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .search-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: auto;
+            }
+
+            .results-info {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="search-filter-container">
+        <div class="search-section">
+            <div class="search-input-wrapper">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-input" placeholder="Search by tool name, description, or category...">
             </div>
-            <div className="flex items-center space-x-3">
-              <button className="bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
-                Claim Bonus
-              </button>
-              <button 
-                onClick={() => setShowPromoBanner(false)}
-                className="text-white/80 hover:text-white"
-              >
-                ×
-              </button>
-            </div>
-          </div>
         </div>
-      )}
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-gray-800 min-h-screen p-4">
-          <div className="flex items-center space-x-3 mb-8">
-            <Shield className="w-8 h-8 text-blue-400" />
-            <div>
-              <h1 className="text-xl font-bold">AI Risk Pro</h1>
-              <span className="text-xs bg-green-600 px-2 py-0.5 rounded-full">FREE</span>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-6 p-3 bg-gray-700 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Assessments Used</span>
-              <span className="text-xs text-gray-400">{assessmentProgress}/25</span>
-            </div>
-            <div className="w-full bg-gray-600 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(assessmentProgress / 25) * 100}%` }}
-              ></div>
-            </div>
-            <p className="text-xs text-gray-400 mt-2">7 assessments remaining</p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            {[
-              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'assessments', label: 'Assessments', icon: FileText, badge: assessmentProgress },
-              { id: 'compare', label: 'Compare Tools', icon: TrendingUp, locked: false },
-              { id: 'team', label: 'Team', icon: Users, locked: true },
-              { id: 'themes', label: 'Themes', icon: Star, badge: '1/3' },
-              { id: 'templates', label: 'Templates', icon: FileText, locked: true },
-              { id: 'achievements', label: 'Achievements', icon: Trophy, badge: '1/8' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setSelectedTab(item.id)}
-                className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
-                  selectedTab === item.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-300 hover:bg-gray-700'
-                } ${item.locked ? 'opacity-50' : ''}`}
-                disabled={item.locked}
-              >
-                <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                  {item.locked && <Crown className="w-4 h-4 text-yellow-400" />}
+        <div class="filter-section">
+            <div class="filter-group">
+                <span class="filter-label">Risk Level</span>
+                <div class="multi-select-wrapper">
+                    <div class="multi-select-trigger" data-filter="risk">
+                        <span class="placeholder">Select risk levels...</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown">
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="risk-critical" value="critical">
+                            <label for="risk-critical">Critical</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="risk-high" value="high">
+                            <label for="risk-high">High</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="risk-medium" value="medium">
+                            <label for="risk-medium">Medium</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="risk-low" value="low">
+                            <label for="risk-low">Low</label>
+                        </div>
+                    </div>
                 </div>
-                {item.badge && (
-                  <span className="bg-gray-600 px-2 py-0.5 rounded-full text-xs">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </nav>
-
-          {/* Upgrade CTA */}
-          <div className="mt-8 p-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30">
-            <div className="flex items-center space-x-2 mb-2">
-              <Crown className="w-5 h-5 text-yellow-400" />
-              <span className="font-medium">Ready to Scale?</span>
             </div>
-            <p className="text-sm text-gray-300 mb-3">
-              Unlock team collaboration and unlimited assessments
-            </p>
-            <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all">
-              Upgrade to Pro - $29/mo
-            </button>
-          </div>
+
+            <div class="filter-group">
+                <span class="filter-label">Category</span>
+                <div class="multi-select-wrapper">
+                    <div class="multi-select-trigger" data-filter="category">
+                        <span class="placeholder">Select categories...</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown">
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="cat-conversational" value="conversational-ai">
+                            <label for="cat-conversational">Conversational AI</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="cat-image" value="image-generation">
+                            <label for="cat-image">Image Generation</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="cat-code" value="code-generation">
+                            <label for="cat-code">Code Generation</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="cat-data" value="data-analysis">
+                            <label for="cat-data">Data Analysis</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="cat-automation" value="automation">
+                            <label for="cat-automation">Automation</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label">Date Range</span>
+                <div class="multi-select-wrapper">
+                    <div class="multi-select-trigger" data-filter="date">
+                        <span class="placeholder">Select date range...</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown">
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="date-today" value="today">
+                            <label for="date-today">Today</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="date-week" value="week">
+                            <label for="date-week">This Week</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="date-month" value="month">
+                            <label for="date-month">This Month</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="date-quarter" value="quarter">
+                            <label for="date-quarter">This Quarter</label>
+                        </div>
+                        <div class="multi-select-option">
+                            <input type="checkbox" id="date-year" value="year">
+                            <label for="date-year">This Year</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sort-group">
+                <span class="filter-label">Sort</span>
+                <select class="sort-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="risk-high">Highest Risk</option>
+                    <option value="risk-low">Lowest Risk</option>
+                    <option value="name-az">Name A-Z</option>
+                    <option value="name-za">Name Z-A</option>
+                </select>
+            </div>
+
+            <button class="clear-filters-btn">Clear All</button>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Dashboard</h2>
-              <p className="text-gray-400">Manage your AI risk assessment program</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center space-x-2 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                <Plus className="w-4 h-4" />
-                <span>New Assessment</span>
-              </button>
-              <button className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-blue-600/20 rounded-lg">
-                  <FileText className="w-6 h-6 text-blue-400" />
-                </div>
-                <span className="text-2xl font-bold text-blue-400">{riskStats.totalAssessments}</span>
-              </div>
-              <h3 className="font-medium mb-1">Total Assessments</h3>
-              <p className="text-sm text-gray-400">7 remaining in free tier</p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-red-600/20 rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-red-400" />
-                </div>
-                <span className="text-2xl font-bold text-red-400">{riskStats.highRisk}</span>
-              </div>
-              <h3 className="font-medium mb-1">High Risk Tools</h3>
-              <p className="text-sm text-gray-400">Require immediate attention</p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-green-600/20 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-400" />
-                </div>
-                <span className="text-2xl font-bold text-green-400">{riskStats.lowRisk}</span>
-              </div>
-              <h3 className="font-medium mb-1">Low Risk Tools</h3>
-              <p className="text-sm text-gray-400">Safe for deployment</p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-purple-600/20 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-purple-400" />
-                </div>
-                <span className="text-2xl font-bold text-purple-400">{riskStats.avgScore}</span>
-              </div>
-              <h3 className="font-medium mb-1">Average Score</h3>
-              <p className="text-sm text-gray-400">Across all assessments</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Recent Assessments */}
-            <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold">Recent Assessments</h3>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                    <Search className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                    <Filter className="w-4 h-4" />
-                  </button>
-                  <button className="flex items-center space-x-2 bg-blue-600 px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <Download className="w-4 h-4" />
-                    <span className="text-sm">Export PDF</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {recentAssessments.map((assessment) => (
-                  <div key={assessment.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-650 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      {getStatusIcon(assessment.status)}
-                      <div>
-                        <h4 className="font-medium">{assessment.tool}</h4>
-                        <p className="text-sm text-gray-400">{assessment.category}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getRiskColor(assessment.risk)}`}>
-                        {assessment.risk} Risk
-                      </span>
-                      <span className="text-lg font-bold text-blue-400">{assessment.score}</span>
-                      <span className="text-sm text-gray-400">{assessment.date}</span>
-                      <button className="p-2 hover:bg-gray-600 rounded transition-colors">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 text-center">
-                <button className="text-blue-400 hover:text-blue-300 transition-colors">
-                  View All Assessments →
-                </button>
-              </div>
-            </div>
-
-            {/* Achievements Panel */}
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold">Achievements</h3>
-                <Trophy className="w-6 h-6 text-yellow-400" />
-              </div>
-
-              <div className="space-y-4">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className={`p-4 rounded-lg border ${
-                    achievement.unlocked 
-                      ? 'bg-green-900/20 border-green-600/30' 
-                      : 'bg-gray-700 border-gray-600'
-                  }`}>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <achievement.icon className={`w-5 h-5 ${
-                        achievement.unlocked ? 'text-green-400' : 'text-gray-400'
-                      }`} />
-                      <h4 className={`font-medium ${
-                        achievement.unlocked ? 'text-green-400' : 'text-gray-300'
-                      }`}>
-                        {achievement.title}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-2">{achievement.desc}</p>
-                    {!achievement.unlocked && achievement.progress && (
-                      <div className="w-full bg-gray-600 rounded-full h-2 mb-2">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${achievement.progress}%` }}
-                        ></div>
-                      </div>
-                    )}
-                    {achievement.unlocked && (
-                      <div className="flex items-center space-x-2 text-green-400">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-sm">Unlocked!</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Award className="w-5 h-5 text-yellow-400" />
-                  <span className="font-medium">Almost There!</span>
-                </div>
-                <p className="text-sm text-gray-300">
-                  Complete 7 more assessments to unlock the "Power User" achievement and earn the exclusive Neon theme!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-8 bg-gray-800 rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <Plus className="w-6 h-6 text-blue-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Start New Assessment</h4>
-                  <p className="text-sm text-gray-400">Evaluate an AI tool's risk profile</p>
-                </div>
-              </button>
-              
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <TrendingUp className="w-6 h-6 text-green-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Compare Tools</h4>
-                  <p className="text-sm text-gray-400">Side-by-side risk analysis</p>
-                </div>
-              </button>
-              
-              <button className="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <Download className="w-6 h-6 text-purple-400" />
-                <div className="text-left">
-                  <h4 className="font-medium">Export Report</h4>
-                  <p className="text-sm text-gray-400">Generate PDF summary</p>
-                </div>
-              </button>
-            </div>
-          </div>
+        <div class="active-filters-summary" id="active-filters" style="display: none;">
+            <div class="active-filters-title">Active Filters:</div>
+            <div class="all-selected-tags" id="all-tags"></div>
         </div>
-      </div>
+
+        <div class="results-info">
+            <div class="results-count">
+                <span id="results-count">2 assessments found</span>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active">Grid</button>
+                <button class="view-btn">List</button>
+            </div>
+        </div>
     </div>
-  );
-};
 
-export default Dashboard;
+    <script>
+        class MultiSelectFilter {
+            constructor() {
+                this.selectedFilters = {
+                    risk: [],
+                    category: [],
+                    date: []
+                };
+                this.init();
+            }
+
+            init() {
+                this.setupMultiSelects();
+                this.setupClearButton();
+                this.setupViewToggle();
+                this.setupSearch();
+            }
+
+            setupMultiSelects() {
+                const triggers = document.querySelectorAll('.multi-select-trigger');
+                const dropdowns = document.querySelectorAll('.multi-select-dropdown');
+                
+                triggers.forEach(trigger => {
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const dropdown = trigger.nextElementSibling;
+                        const isActive = trigger.classList.contains('active');
+                        
+                        // Close all dropdowns
+                        triggers.forEach(t => t.classList.remove('active'));
+                        dropdowns.forEach(d => d.classList.remove('active'));
+                        
+                        // Toggle current dropdown
+                        if (!isActive) {
+                            trigger.classList.add('active');
+                            dropdown.classList.add('active');
+                        }
+                    });
+                });
+
+                // Handle checkbox changes
+                const checkboxes = document.querySelectorAll('.multi-select-option input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const filterType = e.target.closest('.multi-select-wrapper').querySelector('.multi-select-trigger').dataset.filter;
+                        this.updateSelectedFilters(filterType, e.target.value, e.target.checked);
+                        this.updateTriggerText(filterType);
+                        this.updateActiveFilters();
+                        this.updateResultsCount();
+                    });
+                });
+
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', () => {
+                    triggers.forEach(t => t.classList.remove('active'));
+                    dropdowns.forEach(d => d.classList.remove('active'));
+                });
+            }
+
+            updateSelectedFilters(filterType, value, isChecked) {
+                if (isChecked) {
+                    if (!this.selectedFilters[filterType].includes(value)) {
+                        this.selectedFilters[filterType].push(value);
+                    }
+                } else {
+                    this.selectedFilters[filterType] = this.selectedFilters[filterType].filter(v => v !== value);
+                }
+            }
+
+            updateTriggerText(filterType) {
+                const trigger = document.querySelector(`[data-filter="${filterType}"]`);
+                const placeholder = trigger.querySelector('.placeholder');
+                const selected = this.selectedFilters[filterType];
+                
+                if (selected.length === 0) {
+                    placeholder.textContent = `Select ${filterType === 'risk' ? 'risk levels' : filterType === 'category' ? 'categories' : 'date range'}...`;
+                } else if (selected.length === 1) {
+                    placeholder.textContent = this.formatFilterValue(selected[0]);
+                } else {
+                    placeholder.textContent = `${selected.length} selected`;
+                }
+            }
+
+            formatFilterValue(value) {
+                const formatMap = {
+                    'critical': 'Critical',
+                    'high': 'High',
+                    'medium': 'Medium',
+                    'low': 'Low',
+                    'conversational-ai': 'Conversational AI',
+                    'image-generation': 'Image Generation',
+                    'code-generation': 'Code Generation',
+                    'data-analysis': 'Data Analysis',
+                    'automation': 'Automation',
+                    'today': 'Today',
+                    'week': 'This Week',
+                    'month': 'This Month',
+                    'quarter': 'This Quarter',
+                    'year': 'This Year'
+                };
+                return formatMap[value] || value;
+            }
+
+            updateActiveFilters() {
+                const activeFiltersContainer = document.getElementById('active-filters');
+                const allTagsContainer = document.getElementById('all-tags');
+                
+                let allTags = [];
+                
+                // Collect all selected filters
+                Object.entries(this.selectedFilters).forEach(([filterType, values]) => {
+                    values.forEach(value => {
+                        allTags.push({
+                            type: filterType,
+                            value: value,
+                            display: this.formatFilterValue(value)
+                        });
+                    });
+                });
+                
+                if (allTags.length > 0) {
+                    activeFiltersContainer.style.display = 'block';
+                    allTagsContainer.innerHTML = allTags.map(tag => 
+                        `<span class="selected-tag ${tag.type}-${tag.value}" data-type="${tag.type}" data-value="${tag.value}">
+                            ${tag.display}
+                            <span class="tag-remove" onclick="multiSelect.removeTag('${tag.type}', '${tag.value}')">×</span>
+                        </span>`
+                    ).join('');
+                } else {
+                    activeFiltersContainer.style.display = 'none';
+                }
+            }
+
+            removeTag(filterType, value) {
+                // Uncheck the corresponding checkbox
+                const checkbox = document.querySelector(`input[value="${value}"]`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                
+                // Update selected filters
+                this.selectedFilters[filterType] = this.selectedFilters[filterType].filter(v => v !== value);
+                
+                // Update UI
+                this.updateTriggerText(filterType);
+                this.updateActiveFilters();
+                this.updateResultsCount();
+            }
+
+            setupClearButton() {
+                const clearBtn = document.querySelector('.clear-filters-btn');
+                clearBtn.addEventListener('click', () => {
+                    // Clear all selections
+                    Object.keys(this.selectedFilters).forEach(key => {
+                        this.selectedFilters[key] = [];
+                    });
+                    
+                    // Uncheck all checkboxes
+                    document.querySelectorAll('.multi-select-option input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    // Clear search
+                    document.querySelector('.search-input').value = '';
+                    
+                    // Reset sort
+                    document.querySelector('.sort-select').selectedIndex = 0;
+                    
+                    // Update UI
+                    Object.keys(this.selectedFilters).forEach(filterType => {
+                        this.updateTriggerText(filterType);
+                    });
+                    this.updateActiveFilters();
+                    this.updateResultsCount();
+                });
+            }
+
+            setupViewToggle() {
+                const viewBtns = document.querySelectorAll('.view-btn');
+                viewBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        viewBtns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                });
+            }
+
+            setupSearch() {
+                const searchInput = document.querySelector('.search-input');
+                searchInput.addEventListener('input', () => {
+                    this.updateResultsCount();
+                });
+            }
+
+            updateResultsCount() {
+                const resultsCount = document.getElementById('results-count');
+                const hasSearch = document.querySelector('.search-input').value.length > 0;
+                const hasFilters = Object.values(this.selectedFilters).some(arr => arr.length > 0);
+                
+                if (hasSearch || hasFilters) {
+                    const randomCount = Math.floor(Math.random() * 25) + 1;
+                    resultsCount.textContent = `${randomCount} assessment${randomCount !== 1 ? 's' : ''} found`;
+                } else {
+                    resultsCount.textContent = '2 assessments found';
+                }
+            }
+        }
+
+        // Initialize the multi-select filter system
+        const multiSelect = new MultiSelectFilter();
+    </script>
+</body>
+</html>
