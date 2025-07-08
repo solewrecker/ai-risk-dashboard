@@ -15,6 +15,7 @@
 @import 'components/buttons.css';
 @import 'components/dashboard.css';
 @import 'components/dashboard/navigation.css';
+@import 'components/dashboard/controls.css';
 @import 'components/dashboard/summary-assessments.css';
 @import 'components/dashboard/stats.css';
 @import 'components/assessments/list.css';
@@ -878,95 +879,7 @@
     border-top: 1px solid #e2e8f0;
 }
 
-/* Dashboard Controls */
-.dashboard-controls {
-    display: flex;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: #fdfdff;
-    border-bottom: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-    align-items: center;
-}
 
-.search-container {
-    position: relative;
-    flex: 2 1 300px;
-}
-
-.search-container i {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 0.875rem;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    background: white;
-}
-
-.search-input::placeholder {
-    color: #9ca3af;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.filter-container,
-.sort-container {
-    display: flex;
-    gap: 0.75rem;
-    flex: 1 1 auto;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.filter-select {
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex: 1;
-    min-width: 140px;
-    color: #374151;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.results-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem 1.5rem 0;
-    color: #64748b;
-    font-size: 0.875rem;
-}
-
-@media (max-width: 768px) {
-    .dashboard-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
 
 .nav-brand {
     padding: 2rem 1.5rem;
