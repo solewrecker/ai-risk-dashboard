@@ -240,41 +240,83 @@ window.toggleAssessmentDetails = function(id) {
 };
 
 function renderAssessmentDetails(assessment) {
-    // Always use the formData from assessment_data
-    const formData = assessment.assessment_data?.formData || {};
     const data = assessment.assessment_data || {};
-    const breakdown = data.breakdown || data.results?.breakdown || assessment.breakdown || assessment.results?.breakdown || {};
-    const recommendations = data.recommendations || data.results?.recommendations || assessment.recommendations || assessment.results?.recommendations || [];
-    return `
-        <div class="assessments-page__details-content">
-            <div class="assessments-page__details-header">
-                <strong>Assessment Breakdown</strong>
-            </div>
-            <div class="assessments-page__details-breakdown">
-                ${Object.entries(breakdown).map(([cat, details]) => `
-                    <div class="assessments-page__details-breakdown-item">
-                        <h5>${cat}</h5>
-                        <div class="assessments-page__details-breakdown-score">${details && details.score !== undefined ? details.score : 'N/A'}</div>
-                        <p>${details && details.description ? details.description : ''}</p>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="assessments-page__details-recommendations">
-                <strong>Key Recommendations</strong>
-                <ul>
-                    ${recommendations.map(rec => `
-                        <li><strong>${rec.title}</strong>: ${rec.description}</li>
+    const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
+    const recommendations = data.recommendations || data.results?.recommendations || [];
+    const formData = data.formData || {};
+
+    const renderCategory = (category) => {
+        const title = category.category || 'Unknown Category';
+        const score = category.score;
+        const metrics = category.metrics || [];
+        
+        return `
+            <div class="assessment-details__category">
+                <div class="assessment-details__category-header">
+                    <h4 class="assessment-details__category-title">${title}</h4>
+                    <span class="assessment-details__category-score score--${getRiskLevelClass(score)}">${score}/100</span>
+                </div>
+                <div class="assessment-details__metrics-grid">
+                    ${metrics.map(metric => `
+                        <div class="assessment-details__metric">
+                            <div class="assessment-details__metric-name">${metric.name}</div>
+                            <div class="assessment-details__metric-value">${metric.value}</div>
+                            <div class="assessment-details__metric-note">${metric.note}</div>
+                        </div>
                     `).join('')}
-                </ul>
+                </div>
             </div>
-            <div class="assessments-page__details-meta">
-                <p><strong>Tool Version:</strong> ${formData.toolVersion || 'Unknown'}</p>
-                <p><strong>Category:</strong> ${formData.toolCategory || 'Unknown'}</p>
-                <p><strong>Use Case:</strong> ${formData.useCase || 'Unknown'}</p>
-                <p><strong>Data Classification:</strong> ${formData.dataClassification || 'Unknown'}</p>
+        `;
+    };
+
+    return `
+        <div class="assessment-details__container">
+            <div class="assessment-details__sidebar">
+                <div class="assessment-details__meta">
+                    <h3 class="assessment-details__meta-title">Assessment Info</h3>
+                    <div class="assessment-details__meta-item">
+                        <i data-lucide="tag" class="assessment-details__meta-icon"></i>
+                        <span><strong>Tool Version:</strong> ${formData.toolVersion || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__meta-item">
+                        <i data-lucide="layout-grid" class="assessment-details__meta-icon"></i>
+                        <span><strong>Category:</strong> ${formData.toolCategory || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__meta-item">
+                        <i data-lucide="briefcase" class="assessment-details__meta-icon"></i>
+                        <span><strong>Use Case:</strong> ${formData.useCase || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__meta-item">
+                        <i data-lucide="shield" class="assessment-details__meta-icon"></i>
+                        <span><strong>Data Classification:</strong> ${formData.dataClassification || 'N/A'}</span>
+                    </div>
+                </div>
+                 <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-primary assessment-details__full-report-btn">
+                    View Full Report
+                    <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </a>
             </div>
-            <div class="assessments-page__details-footer">
-                <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-secondary">Full Report</a>
+            <div class="assessment-details__main">
+                <div class="assessment-details__tabs">
+                    <button class="assessment-details__tab active" data-tab="breakdown">Detailed Breakdown</button>
+                    <button class="assessment-details__tab" data-tab="recommendations">Recommendations</button>
+                </div>
+                <div class="assessment-details__tab-content active" id="tab-breakdown">
+                    ${(detailedAssessment.categories || []).map(renderCategory).join('')}
+                </div>
+                <div class="assessment-details__tab-content" id="tab-recommendations">
+                    <ul class="assessment-details__recommendations-list">
+                        ${recommendations.map(rec => `
+                            <li class="assessment-details__recommendation-item">
+                                <i data-lucide="check-circle" class="assessment-details__rec-icon"></i>
+                                <div>
+                                    <h5 class="assessment-details__rec-title">${rec.title}</h5>
+                                    <p class="assessment-details__rec-desc">${rec.description}</p>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
             </div>
         </div>
     `;
