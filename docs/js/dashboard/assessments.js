@@ -187,45 +187,104 @@ function renderAssessmentList() {
         return;
     }
     const user = getCurrentUser();
-    const listContent = assessments.map(assessment => {
-        const date = new Date(assessment.created_at).toLocaleDateString();
-        const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
-        const isExpanded = expandedAssessmentId === assessment.id;
-        const formData = assessment.assessment_data?.formData || {};
-        return `
-            <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
-                <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
-                    <div class="assessments-page__tool-info">
-                        <h4>${assessment.name}</h4>
-                        <p>${formData.toolCategory || assessment.category || 'General'}</p>
-                    </div>
+    const tableContent = `
+        <div class="assessment-table-wrapper">
+            <table class="assessment-table">
+                <thead class="assessment-table__header">
+                    <tr>
+                        <th class="assessment-table__cell assessment-table__cell--tool">Tool</th>
+                        <th class="assessment-table__cell assessment-table__cell--risk">Risk Level</th>
+                        <th class="assessment-table__cell assessment-table__cell--score">Total Score</th>
+                        <th class="assessment-table__cell assessment-table__cell--category">Category</th>
+                        <th class="assessment-table__cell assessment-table__cell--date">Date</th>
+                        <th class="assessment-table__cell assessment-table__cell--actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="assessment-table__body">
+                    ${assessments.map(assessment => {
+                        const date = new Date(assessment.created_at).toLocaleDateString();
+                        const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
+                        const isExpanded = expandedAssessmentId === assessment.id;
+                        const formData = assessment.assessment_data?.formData || {};
+                        
+                        return `
+                            <tr class="assessment-table__row ${isExpanded ? 'assessment-table__row--expanded' : ''}" data-assessment-id="${assessment.id}">
+                                <td class="assessment-table__cell assessment-table__cell--tool">
+                                    <div class="assessment-table__tool-info">
+                                        <button class="assessment-table__expand-btn" onclick="toggleAssessmentDetails('${assessment.id}')" title="View Details">
+                                            <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+                                        </button>
+                                        <div class="assessment-table__tool-details">
+                                            <div class="assessment-table__tool-name">${assessment.name}</div>
+                                            <div class="assessment-table__tool-category">${formData.toolCategory || assessment.category || 'General'}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="assessment-table__cell assessment-table__cell--risk">
+                                    <span class="assessment-table__risk-badge assessment-table__risk-badge--${(assessment.risk_level || 'medium').toLowerCase().replace(' ', '-')}">${(assessment.risk_level || 'MEDIUM RISK').toUpperCase()}</span>
+                                </td>
+                                <td class="assessment-table__cell assessment-table__cell--score">
+                                    <div class="assessment-table__score-wrapper">
+                                        <span class="assessment-table__score score--${getRiskLevelClass(assessment.total_score)}">${assessment.total_score}</span>
+                                        <span class="assessment-table__score-max">/100</span>
+                                    </div>
+                                </td>
+                                <td class="assessment-table__cell assessment-table__cell--category">
+                                    <span class="assessment-table__category">${formData.toolCategory || assessment.category || 'General'}</span>
+                                </td>
+                                <td class="assessment-table__cell assessment-table__cell--date">
+                                    <span class="assessment-table__date">${date}</span>
+                                </td>
+                                <td class="assessment-table__cell assessment-table__cell--actions">
+                                    <div class="assessment-table__actions">
+                                        <button class="assessment-table__action-btn" title="Export PDF">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        ${canDelete ? `
+                                            <button class="assessment-table__action-btn assessment-table__action-btn--delete" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                            ${isExpanded ? `
+                                <tr class="assessment-table__details-row" data-assessment-id="${assessment.id}">
+                                    <td colspan="6" class="assessment-table__details-cell">
+                                        ${renderAssessmentDetails(assessment)}
+                                    </td>
+                                </tr>
+                            ` : ''}
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Scoring Legend -->
+        <div class="assessment-legend">
+            <h3 class="assessment-legend__title">Scoring Legend</h3>
+            <div class="assessment-legend__grid">
+                <div class="assessment-legend__item">
+                    <div class="assessment-legend__indicator assessment-legend__indicator--low"></div>
+                    <span class="assessment-legend__text">Low Risk (0-25)</span>
                 </div>
-                <div class="assessments-page__col assessments-page__col--score" data-label="Score">
-                    <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
+                <div class="assessment-legend__item">
+                    <div class="assessment-legend__indicator assessment-legend__indicator--medium"></div>
+                    <span class="assessment-legend__text">Medium Risk (26-50)</span>
                 </div>
-                <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
-                    <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                <div class="assessment-legend__item">
+                    <div class="assessment-legend__indicator assessment-legend__indicator--high"></div>
+                    <span class="assessment-legend__text">High Risk (51-75)</span>
                 </div>
-                <div class="assessments-page__col assessments-page__col--date" data-label="Date">
-                    <span>${date}</span>
-                </div>
-                <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
-                        <i data-lucide="eye" class="w-5 h-5"></i>
-                    </button>
-                    ${canDelete ? `
-                        <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </button>
-                    ` : ''}
+                <div class="assessment-legend__item">
+                    <div class="assessment-legend__indicator assessment-legend__indicator--critical"></div>
+                    <span class="assessment-legend__text">Critical Risk (76+)</span>
                 </div>
             </div>
-            <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
-                ${isExpanded ? renderAssessmentDetails(assessment) : ''}
-            </div>
-        `;
-    }).join('');
-    container.innerHTML = listContent;
+        </div>
+    `;
+    container.innerHTML = tableContent;
     if (typeof lucide !== 'undefined') {
         setTimeout(() => lucide.createIcons(), 100);
     }
@@ -244,78 +303,114 @@ function renderAssessmentDetails(assessment) {
     const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
     const recommendations = data.recommendations || data.results?.recommendations || [];
     const formData = data.formData || {};
+    
+    // Parse categories from detailed assessment or create from breakdown data
+    const categories = detailedAssessment.categories || [];
+    const breakdown = data.breakdown || data.results?.breakdown || {};
+    
+    // If no categories but we have breakdown data, convert it
+    if (categories.length === 0 && Object.keys(breakdown).length > 0) {
+        Object.entries(breakdown).forEach(([key, value]) => {
+            categories.push({
+                category: key,
+                score: value.score || 0,
+                description: value.description || '',
+                metrics: value.metrics || []
+            });
+        });
+    }
 
-    const renderCategory = (category) => {
-        const title = category.category || 'Unknown Category';
-        const score = category.score;
-        const metrics = category.metrics || [];
-        
-        return `
-            <div class="assessment-details__category">
-                <div class="assessment-details__category-header">
-                    <h4 class="assessment-details__category-title">${title}</h4>
-                    <span class="assessment-details__category-score score--${getRiskLevelClass(score)}">${score}/100</span>
-                </div>
-                <div class="assessment-details__metrics-grid">
-                    ${metrics.map(metric => `
-                        <div class="assessment-details__metric">
-                            <div class="assessment-details__metric-name">${metric.name}</div>
-                            <div class="assessment-details__metric-value">${metric.value}</div>
-                            <div class="assessment-details__metric-note">${metric.note}</div>
+    return `
+        <div class="assessment-details__expanded-content">
+            <!-- Risk Assessment Details Section -->
+            <div class="assessment-details__section">
+                <h4 class="assessment-details__section-title">Risk Assessment Details</h4>
+                <div class="assessment-details__categories-grid">
+                    ${categories.map(category => `
+                        <div class="assessment-details__category-card">
+                            <div class="assessment-details__category-header">
+                                <h5 class="assessment-details__category-name">${category.category || 'Unknown Category'}</h5>
+                                <div class="assessment-details__category-score-wrapper">
+                                    <span class="assessment-details__category-score score--${getRiskLevelClass(category.score || 0)}">${category.score || 0}</span>
+                                    <span class="assessment-details__category-max">/25</span>
+                                </div>
+                            </div>
+                            <p class="assessment-details__category-description">${category.description || 'No description available'}</p>
+                            ${category.metrics && category.metrics.length > 0 ? `
+                                <div class="assessment-details__metrics">
+                                    ${category.metrics.map(metric => `
+                                        <div class="assessment-details__metric">
+                                            <span class="assessment-details__metric-label">${metric.name}:</span>
+                                            <span class="assessment-details__metric-value">${metric.value}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                     `).join('')}
                 </div>
             </div>
-        `;
-    };
 
-    return `
-        <div class="assessment-details__container">
-            <div class="assessment-details__sidebar">
-                <div class="assessment-details__meta">
-                    <h3 class="assessment-details__meta-title">Assessment Info</h3>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="tag" class="assessment-details__meta-icon"></i>
-                        <span><strong>Tool Version:</strong> ${formData.toolVersion || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="layout-grid" class="assessment-details__meta-icon"></i>
-                        <span><strong>Category:</strong> ${formData.toolCategory || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="briefcase" class="assessment-details__meta-icon"></i>
-                        <span><strong>Use Case:</strong> ${formData.useCase || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="shield" class="assessment-details__meta-icon"></i>
-                        <span><strong>Data Classification:</strong> ${formData.dataClassification || 'N/A'}</span>
-                    </div>
-                </div>
-                 <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-primary assessment-details__full-report-btn">
-                    View Full Report
-                    <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
-                </a>
-            </div>
-            <div class="assessment-details__main">
-                <div class="assessment-details__tabs">
-                    <button class="assessment-details__tab active" data-tab="breakdown">Detailed Breakdown</button>
-                    <button class="assessment-details__tab" data-tab="recommendations">Recommendations</button>
-                </div>
-                <div class="assessment-details__tab-content active" id="tab-breakdown">
-                    ${(detailedAssessment.categories || []).map(renderCategory).join('')}
-                </div>
-                <div class="assessment-details__tab-content" id="tab-recommendations">
-                    <ul class="assessment-details__recommendations-list">
+            <!-- Recommendations Section -->
+            ${recommendations.length > 0 ? `
+                <div class="assessment-details__section">
+                    <h4 class="assessment-details__section-title">Recommendations</h4>
+                    <div class="assessment-details__recommendations">
                         ${recommendations.map(rec => `
-                            <li class="assessment-details__recommendation-item">
-                                <i data-lucide="check-circle" class="assessment-details__rec-icon"></i>
-                                <div>
+                            <div class="assessment-details__recommendation">
+                                <div class="assessment-details__rec-priority assessment-details__rec-priority--${rec.priority || 'medium'}"></div>
+                                <div class="assessment-details__rec-content">
                                     <h5 class="assessment-details__rec-title">${rec.title}</h5>
-                                    <p class="assessment-details__rec-desc">${rec.description}</p>
+                                    <p class="assessment-details__rec-description">${rec.description}</p>
+                                    <div class="assessment-details__rec-meta">
+                                        <span class="assessment-details__rec-priority-text">Priority: ${(rec.priority || 'medium').charAt(0).toUpperCase() + (rec.priority || 'medium').slice(1)}</span>
+                                        ${rec.category ? `<span class="assessment-details__rec-category">Category: ${rec.category}</span>` : ''}
+                                    </div>
                                 </div>
-                            </li>
+                            </div>
                         `).join('')}
-                    </ul>
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Assessment Metadata -->
+            <div class="assessment-details__section">
+                <h4 class="assessment-details__section-title">Assessment Metadata</h4>
+                <div class="assessment-details__metadata-grid">
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Tool Version:</span>
+                        <span class="assessment-details__metadata-value">${formData.toolVersion || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Category:</span>
+                        <span class="assessment-details__metadata-value">${formData.toolCategory || assessment.category || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Use Case:</span>
+                        <span class="assessment-details__metadata-value">${formData.useCase || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Data Classification:</span>
+                        <span class="assessment-details__metadata-value">${formData.dataClassification || 'N/A'}</span>
+                    </div>
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Assessment Date:</span>
+                        <span class="assessment-details__metadata-value">${new Date(assessment.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="assessment-details__metadata-item">
+                        <span class="assessment-details__metadata-label">Framework Version:</span>
+                        <span class="assessment-details__metadata-value">Enterprise AI Risk v2.1</span>
+                    </div>
+                </div>
+                <div class="assessment-details__actions">
+                    <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-primary assessment-details__full-report-btn">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        View Full Report
+                    </a>
+                    <button class="btn btn-secondary assessment-details__export-btn" onclick="exportAssessment('${assessment.id}')">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Export PDF
+                    </button>
                 </div>
             </div>
         </div>
