@@ -142,22 +142,7 @@
         padding: 0.5rem;
     }
     
-    .dashboard-controls {
-        flex-direction: column;
-    }
-    
-    .search-container {
-        width: 100%;
-    }
-    
-    .filter-container {
-        width: 100%;
-        flex-wrap: wrap;
-    }
-    
-    .filter-select {
-        flex: 1;
-    }
+
     
     .list-header {
         display: none;
@@ -194,14 +179,7 @@
     margin: 0 auto;
 }
 
-/* Search and filters section */
-.dashboard-controls {
-    background: var(--color-gray-800);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    margin-bottom: 2rem;
-    border: 1px solid var(--color-gray-700);
-}
+/* Dashboard Controls styles have been migrated to components/dashboard/controls.css (BEM) */
 
 /* Table header */
 .dashboard-table-header {
@@ -225,9 +203,7 @@
         padding: 1rem;
     }
     
-    .dashboard-controls {
-        padding: 1rem;
-    }
+
     
     .dashboard-table-header {
         display: none; /* Hide headers on mobile, use data attributes instead */
