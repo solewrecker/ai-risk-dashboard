@@ -6,6 +6,7 @@ import { updateDashboardStats, updateProgressTracking } from './gamification.js'
 
 let supabaseClient = null;
 let assessments = [];
+let expandedAssessmentId = null;
 
 export function initAssessments(client) {
     supabaseClient = client;
@@ -170,12 +171,8 @@ function renderRecentAssessments() {
 function renderAssessmentList() {
     const container = document.getElementById('assessment-list');
     const resultsCount = document.getElementById('resultsCount');
-
     if (!container) return;
-
-    // Clear loading state
     container.innerHTML = '';
-
     if (assessments.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -189,13 +186,13 @@ function renderAssessmentList() {
         }
         return;
     }
-
+    const user = getCurrentUser();
     const listContent = assessments.map(assessment => {
         const date = new Date(assessment.created_at).toLocaleDateString();
-        const user = getCurrentUser();
         const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
+        const isExpanded = expandedAssessmentId === assessment.id;
         return `
-            <div class="assessments-page__list-item">
+            <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                     <div class="assessments-page__tool-info">
                         <h4>${assessment.name}</h4>
@@ -212,7 +209,7 @@ function renderAssessmentList() {
                     <span>${date}</span>
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" onclick="viewAssessment('${assessment.id}')">
+                    <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
                         <i data-lucide="eye" class="w-5 h-5"></i>
                     </button>
                     ${canDelete ? `
@@ -222,19 +219,63 @@ function renderAssessmentList() {
                     ` : ''}
                 </div>
             </div>
+            <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
+                ${isExpanded ? renderAssessmentDetails(assessment) : ''}
+            </div>
         `;
     }).join('');
-    
     container.innerHTML = listContent;
-    
-    // Reinitialize Lucide icons after dynamic content creation
     if (typeof lucide !== 'undefined') {
         setTimeout(() => lucide.createIcons(), 100);
     }
-    
     if (resultsCount) {
         resultsCount.textContent = `${assessments.length} assessments found`;
     }
+}
+
+window.toggleAssessmentDetails = function(id) {
+    expandedAssessmentId = expandedAssessmentId === id ? null : id;
+    renderAssessmentList();
+};
+
+function renderAssessmentDetails(assessment) {
+    // Example: You can expand this to match your detail page structure
+    const breakdown = assessment.breakdown || assessment.results?.breakdown || {};
+    const recommendations = assessment.recommendations || assessment.results?.recommendations || [];
+    const formData = assessment.formData || assessment.results?.formData || {};
+    return `
+        <div class="assessments-page__details-content">
+            <div class="assessments-page__details-header">
+                <strong>Assessment Breakdown</strong>
+            </div>
+            <div class="assessments-page__details-breakdown">
+                ${Object.entries(breakdown).map(([cat, details]) => `
+                    <div class="assessments-page__details-breakdown-item">
+                        <h5>${cat}</h5>
+                        <div class="assessments-page__details-breakdown-score">${details.score}</div>
+                        <p>${details.description}</p>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="assessments-page__details-recommendations">
+                <strong>Key Recommendations</strong>
+                <ul>
+                    ${recommendations.map(rec => `
+                        <li><strong>${rec.title}</strong>: ${rec.description}</li>
+                    `).join('')}
+                </ul>
+            </div>
+            <div class="assessments-page__details-meta">
+                <p><strong>Tool Version:</strong> ${formData.toolVersion || ''}</p>
+                <p><strong>Category:</strong> ${formData.toolCategory || ''}</p>
+                <p><strong>Use Case:</strong> ${formData.useCase || ''}</p>
+                <p><strong>Data Classification:</strong> ${formData.dataClassification || ''}</p>
+            </div>
+            <div class="assessments-page__details-footer">
+                <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-secondary">Full Report</a>
+            </div>
+        </div>
+    `;
 }
 
 export function viewAssessment(id) {
