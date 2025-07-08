@@ -129,7 +129,7 @@ function renderRecentAssessments() {
                         <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
                     </div>
                     <div class="dashboard-summary-assessments__info">
-                        <div class="dashboard-summary-assessments__name">${getToolDisplayName(assessment)}</div>
+                        <div class="dashboard-summary-assessments__name">${assessment.name}</div>
                         <div class="dashboard-summary-assessments__meta">
                             <span>${date}</span>
                             <span class="dashboard-assessment-meta-divider">•</span>
@@ -196,7 +196,7 @@ function renderAssessmentList() {
             <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                     <div class="assessments-page__tool-info">
-                        <h4>${getToolDisplayName(assessment)}</h4>
+                        <h4>${assessment.name}</h4>
                         <p>${formData.toolCategory || assessment.category || 'General'}</p>
                     </div>
                 </div>
@@ -389,7 +389,7 @@ function renderFilteredAssessments(filteredData) {
                 <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                     <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                         <div class="assessments-page__tool-info">
-                            <h4>${getToolDisplayName(assessment)}</h4>
+                            <h4>${assessment.name}</h4>
                             <p>${formData.toolCategory || assessment.category || 'General'}</p>
                         </div>
                     </div>
@@ -454,7 +454,7 @@ function renderAssessmentItem(assessment) {
                     <i data-lucide="${getToolIcon(assessment.category)}" class="w-5 h-5"></i>
                 </div>
                 <div class="dashboard-summary-assessments__item-info">
-                    <h3 class="dashboard-summary-assessments__item-name">${getToolDisplayName(assessment)}</h3>
+                    <h3 class="dashboard-summary-assessments__item-name">${assessment.name}</h3>
                     <p class="dashboard-summary-assessments__item-category">${assessment.category || 'General'}</p>
                 </div>
             </div>
@@ -533,10 +533,4 @@ document.addEventListener('DOMContentLoaded', () => {
             // Implement filter functionality
         });
     }
-});
-
-// Helper function to get display name with version
-function getToolDisplayName(assessment) {
-    const formData = assessment.assessment_data?.formData || {};
-    return formData.toolVersion ? `${assessment.name} (${formData.toolVersion})` : assessment.name;
-} 
+}); 

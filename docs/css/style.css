@@ -1570,13 +1570,4 @@
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Dashboard Controls */
-.dashboard-controls {
-    display: flex;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: #fdfdff;
-    border-bottom: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-    align-items: center;
-} 
+/* Dashboard Controls removed */ 
