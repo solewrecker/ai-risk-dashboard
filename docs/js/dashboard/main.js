@@ -32,7 +32,6 @@ window.clearAllFilters = clearAllFilters;
 window.closeBanner = closeBanner;
 window.handleFileSelect = handleFileSelect;
 window.processImport = processImport;
-window.filterAssessments = filterAssessments;
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
