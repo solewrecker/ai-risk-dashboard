@@ -34,29 +34,6 @@
         </div>
     </div>
 
-    <style>
-        /* Ensure dropdowns are visible */
-        .multi-select__dropdown--active {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            z-index: 9999 !important;
-        }
-        
-        /* Fix positioning */
-        .multi-select {
-            position: relative !important;
-        }
-        
-        .multi-select__wrapper {
-            position: relative !important;
-        }
-        
-        .multi-select__trigger {
-            cursor: pointer !important;
-        }
-    </style>
-
     <div class="flex">
         <!-- Sidebar -->
         <div class="w-64 bg-gray-800 min-h-screen p-4">
@@ -317,110 +294,28 @@
                         <input type="text" id="searchInput" class="dashboard-controls__input" placeholder="Search by tool name...">
                     </div>
                     <div class="dashboard-controls__filter">
-                        <div class="multi-select">
-                            <div class="multi-select__wrapper">
-                                <!-- Update the first multi-select trigger to use onclick -->
-                                <div class="multi-select__trigger" data-filter="risk" onclick="toggleDropdown(this)">
-                                    <span class="multi-select__placeholder">Risk Level</span>
-                                    <span class="multi-select__arrow">▼</span>
-                                </div>
-                                <div class="multi-select__dropdown">
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="risk-critical" value="critical">
-                                        <label for="risk-critical">Critical</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="risk-high" value="high">
-                                        <label for="risk-high">High</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="risk-medium" value="medium">
-                                        <label for="risk-medium">Medium</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="risk-low" value="low">
-                                        <label for="risk-low">Low</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="multi-select">
-                            <div class="multi-select__wrapper">
-                                <!-- Update all multi-select triggers to use onclick -->
-                                <div class="multi-select__trigger" data-filter="category" onclick="toggleDropdown(this)">
-                                    <span class="multi-select__placeholder">Category</span>
-                                    <span class="multi-select__arrow">▼</span>
-                                </div>
-                                <div class="multi-select__dropdown">
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="cat-conversational" value="conversational-ai">
-                                        <label for="cat-conversational">Conversational AI</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="cat-image" value="image-generation">
-                                        <label for="cat-image">Image Generation</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="cat-code" value="code-generation">
-                                        <label for="cat-code">Code Generation</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="cat-data" value="data-analysis">
-                                        <label for="cat-data">Data Analysis</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="cat-automation" value="automation">
-                                        <label for="cat-automation">Automation</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="multi-select">
-                            <div class="multi-select__wrapper">
-                                <!-- Update all multi-select triggers to use onclick -->
-                                <div class="multi-select__trigger" data-filter="date" onclick="toggleDropdown(this)">
-                                    <span class="multi-select__placeholder">Date Range</span>
-                                    <span class="multi-select__arrow">▼</span>
-                                </div>
-                                <div class="multi-select__dropdown">
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="date-today" value="today">
-                                        <label for="date-today">Today</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="date-week" value="week">
-                                        <label for="date-week">This Week</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="date-month" value="month">
-                                        <label for="date-month">This Month</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="date-quarter" value="quarter">
-                                        <label for="date-quarter">This Quarter</label>
-                                    </div>
-                                    <div class="multi-select__option">
-                                        <input type="checkbox" id="date-year" value="year">
-                                        <label for="date-year">This Year</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <select id="riskFilter" class="dashboard-controls__select">
+                            <option value="all">All Risk Levels</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select id="categoryFilter" class="dashboard-controls__select">
+                            <option value="all">All Categories</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <select id="sortControl" class="dashboard-controls__select">
+                            <option value="newest">Sort: Newest</option>
+                            <option value="oldest">Sort: Oldest</option>
+                            <option value="score_desc">Score: High to Low</option>
+                            <option value="score_asc">Score: Low to High</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="dashboard-controls__results">
-                    <div class="dashboard-controls__results-count" id="resultsCount">0 assessments found</div>
-                    <div class="multi-select__active-filters">
-                        <div class="multi-select__all-tags"></div>
-                        <button class="multi-select__clear-btn">Clear Filters</button>
-                    </div>
-                </div>
-
-                <div class="no-results-message" style="display: none;">
-                    <!-- No results message will be populated by JS -->
+                <div class="results-summary">
+                    <span id="resultsCount"></span>
                 </div>
                 
                 <div class="list-header assessments-page__header">
@@ -532,94 +427,6 @@
                 lucide.createIcons();
             }
         });
-    </script>
-    <script src="js/dashboard/multi-select-filter.js"></script>
-
-    <div style="margin-top: 20px; display: none;" id="debug-section">
-        <button onclick="debugMultiSelect()" class="btn btn-secondary">Debug Multi-Select</button>
-        <div id="debug-output" style="margin-top: 10px; padding: 10px; background: #1a1a1a; border-radius: 5px; max-height: 200px; overflow: auto;"></div>
-    </div>
-
-    <script>
-        function debugMultiSelect() {
-            const debugOutput = document.getElementById('debug-output');
-            const container = document.querySelector('.dashboard-controls');
-            const triggers = container.querySelectorAll('.multi-select__trigger');
-            const dropdowns = container.querySelectorAll('.multi-select__dropdown');
-            
-            let output = '';
-            output += `<p>Container found: ${container !== null}</p>`;
-            output += `<p>Triggers found: ${triggers.length}</p>`;
-            output += `<p>Dropdowns found: ${dropdowns.length}</p>`;
-            
-            // Check CSS properties
-            if (triggers.length > 0) {
-                const firstTrigger = triggers[0];
-                const computedStyle = window.getComputedStyle(firstTrigger);
-                output += `<p>Trigger display: ${computedStyle.display}</p>`;
-                output += `<p>Trigger position: ${computedStyle.position}</p>`;
-                output += `<p>Trigger z-index: ${computedStyle.zIndex}</p>`;
-            }
-            
-            if (dropdowns.length > 0) {
-                const firstDropdown = dropdowns[0];
-                const computedStyle = window.getComputedStyle(firstDropdown);
-                output += `<p>Dropdown display: ${computedStyle.display}</p>`;
-                output += `<p>Dropdown position: ${computedStyle.position}</p>`;
-                output += `<p>Dropdown z-index: ${computedStyle.zIndex}</p>`;
-                output += `<p>Dropdown visibility: ${computedStyle.visibility}</p>`;
-            }
-            
-            // Try to toggle the first dropdown
-            if (triggers.length > 0) {
-                const firstTrigger = triggers[0];
-                const firstDropdown = dropdowns[0];
-                
-                const isActive = firstTrigger.classList.contains('multi-select__trigger--active');
-                if (isActive) {
-                    firstTrigger.classList.remove('multi-select__trigger--active');
-                    firstDropdown.classList.remove('multi-select__dropdown--active');
-                    output += `<p>Dropdown deactivated</p>`;
-                } else {
-                    firstTrigger.classList.add('multi-select__trigger--active');
-                    firstDropdown.classList.add('multi-select__dropdown--active');
-                    output += `<p>Dropdown activated</p>`;
-                }
-            }
-            
-            debugOutput.innerHTML = output;
-        }
-        
-        // Show debug section in development
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('debug-section').style.display = 'block';
-        });
-    </script>
-    <script>
-        function toggleDropdown(triggerElement) {
-            // Get all triggers and dropdowns
-            const container = document.querySelector('.dashboard-controls');
-            const triggers = container.querySelectorAll('.multi-select__trigger');
-            const dropdowns = container.querySelectorAll('.multi-select__dropdown');
-            
-            // Get the dropdown for this trigger
-            const dropdown = triggerElement.nextElementSibling;
-            const isActive = triggerElement.classList.contains('multi-select__trigger--active');
-            
-            // Close all dropdowns
-            triggers.forEach(t => t.classList.remove('multi-select__trigger--active'));
-            dropdowns.forEach(d => d.classList.remove('multi-select__dropdown--active'));
-            
-            // Toggle current dropdown
-            if (!isActive) {
-                triggerElement.classList.add('multi-select__trigger--active');
-                dropdown.classList.add('multi-select__dropdown--active');
-                console.log('Dropdown toggled via direct function');
-            }
-            
-            // Stop event propagation
-            event.stopPropagation();
-        }
     </script>
 </body>
 </html> 

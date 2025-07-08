@@ -3,7 +3,8 @@
 // notifications, and dynamic component updates. 
 
 import { getCurrentUser } from './auth.js';
-import MultiSelectFilter from './multi-select-filter.js';
+import { filterAssessments } from './assessments.js';
+import { handleFileSelect } from './import.js';
 
 let currentTab = 'dashboard';
 
@@ -67,34 +68,34 @@ export function setupEventListeners() {
             dropzone.classList.remove('active');
             if (e.dataTransfer.files.length) {
                 fileInput.files = e.dataTransfer.files;
-                // handleFileSelect({ target: fileInput }); // This line was removed from imports
+                handleFileSelect({ target: fileInput });
             }
         });
     }
 
     if(fileInput) {
-        // fileInput.addEventListener('change', handleFileSelect); // This line was removed from imports
+        fileInput.addEventListener('change', handleFileSelect);
     }
     
-    // const searchInput = document.getElementById('searchInput'); // This line was removed from imports
-    // if (searchInput) {
-    //     searchInput.addEventListener('input', filterAssessments); // This line was removed from imports
-    // }
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAssessments);
+    }
     
-    // const riskFilter = document.getElementById('riskFilter'); // This line was removed from imports
-    // if (riskFilter) {
-    //     riskFilter.addEventListener('change', filterAssessments); // This line was removed from imports
-    // }
+    const riskFilter = document.getElementById('riskFilter');
+    if (riskFilter) {
+        riskFilter.addEventListener('change', filterAssessments);
+    }
     
-    // const categoryFilter = document.getElementById('categoryFilter'); // This line was removed from imports
-    // if (categoryFilter) {
-    //     categoryFilter.addEventListener('change', filterAssessments); // This line was removed from imports
-    // }
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', filterAssessments);
+    }
     
-    // const sortSelect = document.getElementById('sortSelect'); // This line was removed from imports
-    // if (sortSelect) {
-    //     sortSelect.addEventListener('change', filterAssessments); // This line was removed from imports
-    // }
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', filterAssessments);
+    }
 }
 
 export function closeBanner() {
@@ -103,14 +104,3 @@ export function closeBanner() {
         banner.style.display = 'none';
     }
 } 
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize multi-select filter
-    const multiSelect = new MultiSelectFilter('.dashboard-controls');
-
-    // Remove old filtering event listeners
-    const searchInput = document.querySelector('.dashboard-controls__input');
-    const sortSelect = document.getElementById('sortControl');
-
-    // Any remaining UI initialization can stay here
-}); 
