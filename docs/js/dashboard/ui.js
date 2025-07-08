@@ -3,7 +3,7 @@
 // notifications, and dynamic component updates. 
 
 import { getCurrentUser } from './auth.js';
-import { filterAssessments } from './assessments.js';
+import { filterAssessmentsLegacy as filterAssessments } from './assessments.js';
 import { handleFileSelect } from './import.js';
 
 let currentTab = 'dashboard';

@@ -480,6 +480,9 @@ export function clearAllFiltersLegacy() {
     filterAssessmentsLegacy();
 }
 
+// Export for backward compatibility
+export const clearAllFilters = clearAllFiltersLegacy;
+
 function renderAssessmentItem(assessment) {
     const riskLevelClass = getRiskLevelClass(assessment.total_score);
     const riskLevelText = getRiskLevelText(assessment.total_score);

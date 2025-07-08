@@ -3,11 +3,11 @@
 // Initializes the app, loads modules, and coordinates everything.
 
 import { initAuth, checkAuth, getIsAdmin, getCurrentUser } from './auth.js';
-import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessments, clearAllFilters } from './assessments.js';
+import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessmentsLegacy, clearAllFiltersLegacy } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 import { AchievementsManager } from './achievements.js';
-import { updateTierBadge, setupEventListeners, closeBanner } from './ui.js';
+import { updateTierBadge, setupEventListeners, closeBanner, switchTab } from './ui.js';
 import { injectDashboardAdminUI } from './admin-ui.js';
 import { initCompareTools } from './compare.js';
 
@@ -28,7 +28,8 @@ window.deleteAssessment = async (id) => {
     }
 };
 window.loadAssessments = loadAssessments;
-window.clearAllFilters = clearAllFilters;
+window.clearAllFilters = clearAllFiltersLegacy; // Use the legacy function
+window.clearAllFiltersLegacy = clearAllFiltersLegacy; // Also export with the new name
 window.closeBanner = closeBanner;
 window.handleFileSelect = handleFileSelect;
 window.processImport = processImport;
@@ -97,45 +98,4 @@ async function initializeDashboard() {
     } catch (error) {
         console.error('Failed to initialize dashboard:', error);
     }
-}
-
-export function switchTab(tabName) {
-    currentTab = tabName;
-
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
-    // Update nav button styles
-    document.querySelectorAll('.dashboard-nav').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Show the selected tab content
-    const activeContent = document.getElementById(`${tabName}-content`);
-    if (activeContent) {
-        activeContent.classList.add('active');
-    }
-
-    // Highlight the selected nav button
-    const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
-
-    if (!activeContent && tabName !== 'dashboard') {
-        switchTab('dashboard');
-    }
-
-    // Initialize Compare Tools tab when activated
-    if (tabName === 'compare') {
-        // Use getAssessments() or similar to get the data
-        if (typeof getAssessments === 'function') {
-            initCompareTools(getAssessments());
-        } else {
-            initCompareTools([]);
-        }
-    }
-}
-window.switchTab = switchTab; 
+} 
