@@ -297,7 +297,7 @@
                         <div class="multi-select">
                             <div class="multi-select__wrapper">
                                 <div class="multi-select__trigger" data-filter="risk">
-                                    <span class="multi-select__placeholder">Select risk levels...</span>
+                                    <span class="multi-select__placeholder">Risk Level</span>
                                     <span class="multi-select__arrow">▼</span>
                                 </div>
                                 <div class="multi-select__dropdown">
@@ -324,7 +324,7 @@
                         <div class="multi-select">
                             <div class="multi-select__wrapper">
                                 <div class="multi-select__trigger" data-filter="category">
-                                    <span class="multi-select__placeholder">Select categories...</span>
+                                    <span class="multi-select__placeholder">Category</span>
                                     <span class="multi-select__arrow">▼</span>
                                 </div>
                                 <div class="multi-select__dropdown">
@@ -355,7 +355,7 @@
                         <div class="multi-select">
                             <div class="multi-select__wrapper">
                                 <div class="multi-select__trigger" data-filter="date">
-                                    <span class="multi-select__placeholder">Select date range...</span>
+                                    <span class="multi-select__placeholder">Date Range</span>
                                     <span class="multi-select__arrow">▼</span>
                                 </div>
                                 <div class="multi-select__dropdown">
@@ -382,16 +382,19 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="multi-select__active-filters">
-                            <div class="multi-select__all-tags"></div>
-                            <button class="multi-select__clear-btn">Clear Filters</button>
-                        </div>
                     </div>
                 </div>
 
-                <div class="results-summary">
-                    <span id="resultsCount"></span>
+                <div class="dashboard-controls__results">
+                    <div class="dashboard-controls__results-count" id="resultsCount">0 assessments found</div>
+                    <div class="multi-select__active-filters">
+                        <div class="multi-select__all-tags"></div>
+                        <button class="multi-select__clear-btn">Clear Filters</button>
+                    </div>
+                </div>
+
+                <div class="no-results-message" style="display: none;">
+                    <!-- No results message will be populated by JS -->
                 </div>
                 
                 <div class="list-header assessments-page__header">

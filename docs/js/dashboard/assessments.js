@@ -412,38 +412,79 @@ export function filterAssessments(selectedFilters) {
 }
 
 function updateResultsCount(filteredData) {
-    const resultsCount = document.querySelector('.multi-select__results-count');
+    const resultsCount = document.getElementById('resultsCount');
     if (resultsCount) {
         resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
     }
 }
 
 function renderFilteredAssessments(filteredData) {
-    const assessmentContainer = document.querySelector('.assessments-container');
+    const assessmentContainer = document.getElementById('assessment-list');
     const noResultsMessage = document.querySelector('.no-results-message');
 
+    if (!assessmentContainer) return;
+
     if (filteredData.length === 0) {
-        if (assessmentContainer) assessmentContainer.innerHTML = '';
+        assessmentContainer.innerHTML = '';
         if (noResultsMessage) {
             noResultsMessage.innerHTML = `
-                <p>No assessments found.</p>
-                <p>Try adjusting your filters or search terms.</p>
-                <button onclick="clearAllFilters()" class="btn btn-secondary">Clear Filters</button>
+                <p>No assessments found</p>
+                <p>Try adjusting your filters or search terms</p>
+                <button onclick="window.multiSelect.setupClearButton()" class="btn btn-secondary">
+                    <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                    Clear Filters
+                </button>
             `;
             noResultsMessage.style.display = 'block';
         }
     } else {
         if (noResultsMessage) noResultsMessage.style.display = 'none';
-        if (assessmentContainer) {
-            assessmentContainer.innerHTML = filteredData.map(assessment => `
-                <!-- Render assessment card HTML -->
-                <div class="assessment-card">
-                    <h3>${assessment.name}</h3>
-                    <p>Risk Level: ${assessment.risk_level}</p>
-                    <p>Category: ${assessment.category}</p>
-                    <p>Date: ${new Date(assessment.created_at).toLocaleDateString()}</p> {/* Changed from 'date' to 'created_at' */}
+        
+        const user = getCurrentUser();
+        const listContent = filteredData.map(assessment => {
+            const date = new Date(assessment.created_at).toLocaleDateString();
+            const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
+            const isExpanded = expandedAssessmentId === assessment.id;
+            const formData = assessment.assessment_data?.formData || {};
+            return `
+                <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
+                    <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                        <div class="assessments-page__tool-info">
+                            <h4>${assessment.name}</h4>
+                            <p>${formData.toolCategory || assessment.category || 'General'}</p>
+                        </div>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--score" data-label="Score">
+                        <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
+                        <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--date" data-label="Date">
+                        <span>${date}</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
+                        <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                        ${canDelete ? `
+                            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
-            `).join('');
+                <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
+                    ${isExpanded ? renderAssessmentDetails(assessment) : ''}
+                </div>
+            `;
+        }).join('');
+        
+        assessmentContainer.innerHTML = listContent;
+        
+        // Reinitialize Lucide icons after dynamic content creation
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
         }
     }
 }
