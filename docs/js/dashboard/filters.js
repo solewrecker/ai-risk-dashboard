@@ -16,6 +16,8 @@ class DashboardFilters {
         this.setupMultiSelects();
         this.setupClearButton();
         this.setupSearch();
+        this.setupSortSelect();
+        this.setupViewToggle();
         this.updateResultsCount();
     }
 
@@ -49,7 +51,7 @@ class DashboardFilters {
                 this.updateSelectedFilters(filterType, e.target.value, e.target.checked);
                 this.updateTriggerText(filterType);
                 this.updateActiveFilters();
-                this.updateResultsCount();
+                this.applyFilters();
             });
         });
 
@@ -150,7 +152,7 @@ class DashboardFilters {
         // Update UI
         this.updateTriggerText(filterType);
         this.updateActiveFilters();
-        this.updateResultsCount();
+        this.applyFilters();
     }
 
     setupClearButton() {
@@ -181,7 +183,7 @@ class DashboardFilters {
                 this.updateTriggerText(filterType);
             });
             this.updateActiveFilters();
-            this.updateResultsCount();
+            this.applyFilters();
         });
     }
 
@@ -190,8 +192,50 @@ class DashboardFilters {
         if (!searchInput) return;
         
         searchInput.addEventListener('input', () => {
-            this.updateResultsCount();
+            this.applyFilters();
         });
+    }
+
+    setupSortSelect() {
+        const sortSelect = document.querySelector('.dashboard-controls__select');
+        if (!sortSelect) return;
+        
+        sortSelect.addEventListener('change', () => {
+            this.applyFilters();
+        });
+    }
+
+    setupViewToggle() {
+        const viewBtns = document.querySelectorAll('.dashboard-controls__view-btn');
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                viewBtns.forEach(b => b.classList.remove('is-active'));
+                this.classList.add('is-active');
+                // Add view toggle logic here if needed
+            });
+        });
+    }
+
+    applyFilters() {
+        // Get current filter values
+        const searchInput = document.querySelector('.dashboard-controls__input');
+        const sortSelect = document.querySelector('.dashboard-controls__select');
+        
+        const filters = {
+            searchTerm: searchInput ? searchInput.value : '',
+            riskLevels: this.selectedFilters.risk,
+            categories: this.selectedFilters.category,
+            dateRanges: this.selectedFilters.date,
+            sortBy: sortSelect ? sortSelect.value : 'newest'
+        };
+
+        // Apply filters using the assessments.js function if available
+        if (typeof window.filterAssessments === 'function') {
+            window.filterAssessments(filters);
+        } else {
+            // Fallback for when assessments.js is not loaded
+            this.updateResultsCount();
+        }
     }
 
     updateResultsCount() {
@@ -218,4 +262,17 @@ class DashboardFilters {
 // Initialize the dashboard filters when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboardFilters = new DashboardFilters();
+    
+    // Export filterAssessments function for integration with assessments.js
+    if (typeof window.filterAssessments !== 'function') {
+        // Import and setup the assessment filtering if available
+        if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+            try {
+                const { filterAssessments } = require('./assessments.js');
+                window.filterAssessments = filterAssessments;
+            } catch (e) {
+                console.log('assessments.js not available as module');
+            }
+        }
+    }
 }); 

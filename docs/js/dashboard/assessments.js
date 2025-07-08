@@ -319,7 +319,9 @@ export async function deleteAssessment(id) {
     }
 }
 
-export function filterAssessments() {
+export function filterAssessmentsLegacy() {
+    // Legacy filter function - kept for backward compatibility
+    // This uses old element IDs like searchInput, riskFilter, categoryFilter
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const riskFilter = document.getElementById('riskFilter')?.value || 'all';
     const categoryFilter = document.getElementById('categoryFilter')?.value || 'all';
@@ -365,71 +367,106 @@ export function filterAssessments() {
     }
 }
 
-function renderFilteredAssessments(filteredData) {
-    const container = document.getElementById('assessment-list');
-    const resultsCount = document.getElementById('resultsCount');
-    if (!container) return;
-    container.innerHTML = '';
-    if (filteredData.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <h3>No matching assessments found</h3>
-                <p>Try adjusting your filters or search terms.</p>
-                <button onclick="clearAllFilters()" class="btn btn-secondary">Clear Filters</button>
-            </div>
-        `;
-    } else {
-        const user = getCurrentUser && getCurrentUser();
-        const listContent = filteredData.map(assessment => {
-            const date = new Date(assessment.created_at).toLocaleDateString();
-            const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
-            const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
-            const formData = assessment.assessment_data?.formData || {};
-            return `
-                <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
-                    <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
-                        <div class="assessments-page__tool-info">
-                            <h4>${assessment.name}</h4>
-                            <p>${formData.toolCategory || assessment.category || 'General'}</p>
-                        </div>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--score" data-label="Score">
-                        <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
-                        <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--date" data-label="Date">
-                        <span>${date}</span>
-                    </div>
-                    <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                        <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
-                            <i data-lucide="eye" class="w-5 h-5"></i>
-                        </button>
-                        ${canDelete ? `
-                            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
-                    ${isExpanded ? renderAssessmentDetails(assessment) : ''}
-                </div>
-            `;
-        }).join('');
-        container.innerHTML = listContent;
-        if (typeof lucide !== 'undefined') {
-            setTimeout(() => lucide.createIcons(), 100);
+// New filter function that works with the BEM-based multi-select filters
+export function filterAssessments(filters = {}) {
+    const { 
+        searchTerm = '', 
+        riskLevels = [], 
+        categories = [], 
+        dateRanges = [],
+        sortBy = 'date_desc'
+    } = filters;
+    
+    let filteredAssessments = [...assessments];
+    
+    // Apply search filter
+    if (searchTerm) {
+        filteredAssessments = filteredAssessments.filter(a => 
+            a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (a.category && a.category.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    }
+    
+    // Apply risk level filter
+    if (riskLevels.length > 0) {
+        filteredAssessments = filteredAssessments.filter(a => 
+            riskLevels.includes(a.risk_level)
+        );
+    }
+    
+    // Apply category filter
+    if (categories.length > 0) {
+        filteredAssessments = filteredAssessments.filter(a => {
+            const category = a.category?.toLowerCase() || '';
+            return categories.some(cat => {
+                switch (cat) {
+                    case 'conversational': return category.includes('conversational') || category.includes('chat');
+                    case 'image': return category.includes('image') || category.includes('visual');
+                    case 'code': return category.includes('code') || category.includes('development');
+                    case 'data': return category.includes('data') || category.includes('analysis');
+                    default: return category.includes(cat);
+                }
+            });
+        });
+    }
+    
+    // Apply date range filter
+    if (dateRanges.length > 0) {
+        const now = new Date();
+        filteredAssessments = filteredAssessments.filter(a => {
+            const assessmentDate = new Date(a.created_at);
+            return dateRanges.some(range => {
+                switch (range) {
+                    case 'today':
+                        return assessmentDate.toDateString() === now.toDateString();
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= weekAgo;
+                    case 'month':
+                        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= monthAgo;
+                    case 'year':
+                        const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= yearAgo;
+                    default:
+                        return true;
+                }
+            });
+        });
+    }
+    
+    // Apply sorting
+    filteredAssessments.sort((a, b) => {
+        switch (sortBy) {
+            case 'newest':
+            case 'date_desc': 
+                return new Date(b.created_at) - new Date(a.created_at);
+            case 'oldest':
+            case 'date_asc': 
+                return new Date(a.created_at) - new Date(b.created_at);
+            case 'risk-high':
+            case 'score_desc': 
+                return (b.total_score || 0) - (a.total_score || 0);
+            case 'risk-low':
+            case 'score_asc': 
+                return (a.total_score || 0) - (b.total_score || 0);
+            case 'name-az':
+            case 'name_asc': 
+                return a.name.localeCompare(b.name);
+            case 'name-za':
+            case 'name_desc': 
+                return b.name.localeCompare(a.name);
+            default: 
+                return new Date(b.created_at) - new Date(a.created_at);
         }
-    }
-    if (resultsCount) {
-        resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
-    }
-    // Re-initialize any dynamic components like tooltips if needed
+    });
+    
+    renderFilteredAssessments(filteredAssessments);
+    return filteredAssessments;
 }
 
-export function clearAllFilters() {
+export function clearAllFiltersLegacy() {
+    // Legacy clear function - kept for backward compatibility
     const searchInput = document.getElementById('searchInput');
     const riskFilter = document.getElementById('riskFilter');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -440,7 +477,7 @@ export function clearAllFilters() {
     if (categoryFilter) categoryFilter.value = 'all';
     if (sortSelect) sortSelect.value = 'date_desc';
     
-    filterAssessments();
+    filterAssessmentsLegacy();
 }
 
 function renderAssessmentItem(assessment) {
@@ -514,6 +551,103 @@ function updateAssessmentsList(assessments) {
     container.innerHTML = recentAssessments
         .map(assessment => renderAssessmentItem(assessment))
         .join('');
+}
+
+function renderFilteredAssessments(filteredData) {
+    const container = document.getElementById('assessment-list') || document.querySelector('.assessment-grid');
+    const resultsCount = document.getElementById('resultsCount') || document.querySelector('.dashboard-controls__results-count');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (filteredData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>No matching assessments found</h3>
+                <p>Try adjusting your filters or search terms.</p>
+                <button onclick="clearAllFiltersLegacy()" class="btn btn-secondary">Clear Filters</button>
+            </div>
+        `;
+    } else {
+        const user = getCurrentUser && getCurrentUser();
+        const listContent = filteredData.map(assessment => {
+            const date = new Date(assessment.created_at).toLocaleDateString();
+            const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
+            const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
+            const formData = assessment.assessment_data?.formData || {};
+            
+            // Check if we're rendering for the new dashboard grid or old list
+            if (container.classList.contains('assessment-grid')) {
+                // New dashboard grid format
+                return `
+                    <div class="assessment-item" data-risk="${assessment.risk_level}" data-category="${(assessment.category || '').toLowerCase()}" data-assessment-id="${assessment.id}">
+                        <div class="assessment-item__header">
+                            <h3 class="assessment-item__title">${assessment.name}</h3>
+                            <span class="assessment-item__risk risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                        </div>
+                        <div class="assessment-item__content">
+                            <p class="assessment-item__description">${formData.toolDescription || assessment.description || 'AI risk assessment tool.'}</p>
+                            <div class="assessment-item__meta">
+                                <span class="assessment-item__date">${date}</span>
+                                <span class="assessment-item__category">${formData.toolCategory || assessment.category || 'General'}</span>
+                            </div>
+                        </div>
+                        <div class="assessment-item__actions">
+                            <button class="btn btn-sm" onclick="viewAssessment('${assessment.id}')">View Details</button>
+                            <button class="btn btn-sm btn-outline">Export</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Legacy list format
+                return `
+                    <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
+                        <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                            <div class="assessments-page__tool-info">
+                                <h4>${assessment.name}</h4>
+                                <p>${formData.toolCategory || assessment.category || 'General'}</p>
+                            </div>
+                        </div>
+                        <div class="assessments-page__col assessments-page__col--score" data-label="Score">
+                            <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
+                        </div>
+                        <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
+                            <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                        </div>
+                        <div class="assessments-page__col assessments-page__col--date" data-label="Date">
+                            <span>${date}</span>
+                        </div>
+                        <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
+                            <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                            ${canDelete ? `
+                                <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
+                        ${isExpanded ? renderAssessmentDetails(assessment) : ''}
+                    </div>
+                `;
+            }
+        }).join('');
+        
+        container.innerHTML = listContent;
+        
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
+        }
+    }
+    
+    if (resultsCount) {
+        resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
+    }
+    
+    // Re-initialize any dynamic components like tooltips if needed
 }
 
 // Initialize event listeners
