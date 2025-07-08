@@ -90,6 +90,14 @@ export function getIsAdmin() {
     return isAdmin;
 }
 
+export function getIsEnterprise() {
+    return currentUser?.user_metadata?.tier === 'enterprise';
+}
+
+export function getIsFree() {
+    return !currentUser?.user_metadata?.tier || currentUser.user_metadata.tier === 'free';
+}
+
 // --- Auth Modal Logic ---
 export function showAuthModal(tab = 'signin') {
     const modal = document.getElementById('authModal');
