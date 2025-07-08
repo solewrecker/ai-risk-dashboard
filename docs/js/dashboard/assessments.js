@@ -43,21 +43,19 @@ export async function loadAssessments() {
     }
 
     try {
+        // Query the ai_tools table which contains the detailed assessment data
         const query = supabaseClient
-            .from('assessments')
+            .from('ai_tools')
             .select('*')
             .order('created_at', { ascending: false });
-
-        if (!getIsAdmin()) {
-            query.eq('user_id', user.id);
-        }
 
         const { data, error } = await query;
 
         if (error) throw error;
 
         assessments = data || [];
-        console.log(`Loaded ${assessments.length} assessments`);
+        console.log(`Loaded ${assessments.length} AI tools`);
+        console.log('Sample assessment data:', assessments[0]); // Debug: check data structure
         
         renderAssessmentList();
         renderRecentAssessments();
@@ -291,15 +289,18 @@ export function toggleAssessmentDetails(id) {
 }
 
 function renderAssessmentDetails(assessment) {
-    // Handle both old and new data structures
-    const detailedAssessment = assessment.assessment_data?.detailed_assessment || assessment.detailed_assessment || assessment;
-    const recommendations = assessment.assessment_data?.recommendations || assessment.recommendations || [];
+    // Handle ai_tools table structure
+    const detailedAssessment = assessment.detailed_assessment || assessment;
+    const recommendations = assessment.recommendations || [];
     
-    if (!detailedAssessment) {
+    console.log('Rendering details for:', assessment.name, detailedAssessment); // Debug
+    
+    if (!detailedAssessment || !detailedAssessment.assessment_details) {
         return `
             <div class="assessments-page__details-content">
                 <div class="assessments-page__details-section">
                     <p class="assessments-page__details-error">Assessment details not available for this item.</p>
+                    <p class="assessments-page__details-error">Data structure: ${JSON.stringify(Object.keys(assessment), null, 2)}</p>
                 </div>
             </div>
         `;
@@ -400,7 +401,7 @@ function getRiskLevelFromScore(score) {
 
 export async function deleteAssessment(id) {
     if (!getIsAdmin()) {
-        alert('Access denied. Admin privileges required.');
+        alert('Access denied. Only admins can delete AI tools from the master database.');
         return;
     }
     
@@ -410,7 +411,7 @@ export async function deleteAssessment(id) {
     
     try {
         const { error } = await supabaseClient
-            .from('assessments')
+            .from('ai_tools')
             .delete()
             .eq('id', id);
 
