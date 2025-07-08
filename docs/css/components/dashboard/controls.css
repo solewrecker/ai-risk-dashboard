@@ -132,10 +132,10 @@
     top: calc(100% + 0.5rem);
     left: 0;
     right: 0;
-    background: var(--color-gray-800);
-    border: 1.5px solid var(--color-gray-700);
+    background: var(--color-gray-800, #1f2937);
+    border: 1.5px solid var(--color-gray-700, #374151);
     border-radius: 0.75rem;
-    z-index: 50;
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -149,6 +149,7 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    display: block !important;
 }
 
 .multi-select__option {

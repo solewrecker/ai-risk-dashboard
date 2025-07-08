@@ -1,6 +1,8 @@
-import { filterAssessments } from './assessments.js';
+// Remove the import statement
+// import { filterAssessments } from './assessments.js';
 
-class MultiSelectFilter {
+// Make MultiSelectFilter globally available
+window.MultiSelectFilter = class MultiSelectFilter {
     constructor(containerSelector) {
         this.container = document.querySelector(containerSelector);
         this.selectedFilters = {
@@ -12,8 +14,12 @@ class MultiSelectFilter {
     }
 
     init() {
-        if (!this.container) return;
+        if (!this.container) {
+            console.error('MultiSelectFilter: Container not found', this.container);
+            return;
+        }
 
+        console.log('MultiSelectFilter: Initializing with container', this.container);
         this.setupMultiSelects();
         this.setupClearButton();
         this.setupSearch();
@@ -26,9 +32,13 @@ class MultiSelectFilter {
         const triggers = this.container.querySelectorAll('.multi-select__trigger');
         const dropdowns = this.container.querySelectorAll('.multi-select__dropdown');
         
+        console.log('MultiSelectFilter: Found triggers', triggers.length);
+        console.log('MultiSelectFilter: Found dropdowns', dropdowns.length);
+        
         triggers.forEach(trigger => {
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
+                console.log('MultiSelectFilter: Trigger clicked', trigger);
                 const dropdown = trigger.nextElementSibling;
                 const isActive = trigger.classList.contains('multi-select__trigger--active');
                 
@@ -40,6 +50,7 @@ class MultiSelectFilter {
                 if (!isActive) {
                     trigger.classList.add('multi-select__trigger--active');
                     dropdown.classList.add('multi-select__dropdown--active');
+                    console.log('MultiSelectFilter: Dropdown activated');
                 }
             });
         });
@@ -54,7 +65,9 @@ class MultiSelectFilter {
                 this.updateActiveFilters();
                 
                 // Apply filters to assessments
-                filterAssessments(this.selectedFilters);
+                if (typeof window.filterAssessments === 'function') {
+                    window.filterAssessments(this.selectedFilters);
+                }
             });
         });
 
@@ -91,9 +104,9 @@ class MultiSelectFilter {
 
     getPlaceholderText(filterType) {
         switch(filterType) {
-            case 'risk': return 'Select risk levels...';
-            case 'category': return 'Select categories...';
-            case 'date': return 'Select date range...';
+            case 'risk': return 'Risk Level';
+            case 'category': return 'Category';
+            case 'date': return 'Date Range';
             default: return 'Select...';
         }
     }
@@ -168,7 +181,9 @@ class MultiSelectFilter {
         this.updateActiveFilters();
         
         // Apply filters to assessments
-        filterAssessments(this.selectedFilters);
+        if (typeof window.filterAssessments === 'function') {
+            window.filterAssessments(this.selectedFilters);
+        }
     }
 
     setupClearButton() {
@@ -197,7 +212,9 @@ class MultiSelectFilter {
             this.updateActiveFilters();
             
             // Apply filters to assessments
-            filterAssessments(this.selectedFilters);
+            if (typeof window.filterAssessments === 'function') {
+                window.filterAssessments(this.selectedFilters);
+            }
         });
     }
 
@@ -207,10 +224,15 @@ class MultiSelectFilter {
 
         searchInput.addEventListener('input', () => {
             // Apply filters to assessments
-            filterAssessments(this.selectedFilters);
+            if (typeof window.filterAssessments === 'function') {
+                window.filterAssessments(this.selectedFilters);
+            }
         });
     }
 }
 
-// Export for potential use in other modules
-export default MultiSelectFilter; 
+// Initialize when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('MultiSelectFilter: DOM ready, initializing');
+    const multiSelect = new window.MultiSelectFilter('.dashboard-controls');
+}); 
