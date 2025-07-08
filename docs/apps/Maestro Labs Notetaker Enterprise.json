@@ -1,54 +1,54 @@
 {
   "name": "Maestro Labs Notetaker Enterprise",
   "vendor": "Maestro Labs Pte. Ltd.",
-  "license_type": "Commercial SaaS",
-  "total_score": 73,
-  "risk_level": "HIGH RISK",
-  "data_storage_score": 21,
-  "training_usage_score": 20,
-  "access_controls_score": 13,
-  "compliance_score": 9,
+  "license_type": "Enterprise SaaS",
+  "total_score": 42,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 9,
+  "training_usage_score": 5,
+  "access_controls_score": 12,
+  "compliance_score": 6,
   "vendor_transparency_score": 10,
-  "summary_and_recommendation": "HIGH RISK tool that automatically captures and processes meeting audio, transcripts, and participant data. Major concerns include unclear AI training usage, indefinite data retention, limited enterprise controls, and automatic sensitive data collection. Recommend blocking for environments with confidential data or requiring comprehensive enterprise controls and explicit opt-out guarantees before any deployment.",
-  "confidence": 0.85,
-  "primary_use_case": "Meeting transcription and note-taking",
-  "data_classification": "Confidential/Business Communications",
+  "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with good data protection practices but gaps in enterprise controls and documentation. Key concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. Recommendation: APPROVE with enhanced monitoring and enterprise controls implementation.",
+  "primary_use_case": "Meeting transcription and AI-powered note-taking for Microsoft Teams",
+  "data_classification": "Internal Business Communications",
   "category": "AI Meeting Assistant",
   "assessed_by": "AI Security Council",
+  "confidence": 0.6,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Assessment based on public privacy policy and security documentation. Limited enterprise-specific documentation available. Vendor claims SOC 2 Type II certification but details not publicly verified.",
   
   "azure_permissions": {
     "required_permissions": [
-      "Teams.ReadWrite.All",
-      "OnlineMeetings.ReadWrite.All",
-      "Calendars.ReadWrite.All",
-      "User.Read.All"
+      "Team.ReadBasic.All",
+      "OnlineMeetings.ReadWrite",
+      "CallRecords.Read.All"
     ],
     "recommended_restrictions": [
-      "Block automatic meeting joining",
-      "Require explicit user consent per meeting",
-      "Monitor data export activities",
-      "Restrict to non-confidential meetings only"
+      "Require admin approval for installation",
+      "Monitor meeting recording activities",
+      "Enable audit logging"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Implement explicit AI training opt-out",
-      "description": "Require contractual guarantee that meeting transcripts and audio are never used for AI model training, with clear documentation of data processing boundaries",
-      "priority": "critical",
-      "category": "privacy"
-    },
-    {
-      "title": "Establish data retention controls",
-      "description": "Negotiate specific retention periods (≤90 days) with automatic deletion capabilities for meeting transcripts and recordings",
-      "priority": "high",
-      "category": "data_governance"
-    },
-    {
-      "title": "Deploy enterprise admin controls",
-      "description": "Implement centralized admin dashboard with user provisioning, meeting audit logs, and organizational-level meeting policies",
+      "title": "Implement Enterprise Controls",
+      "description": "Work with vendor to establish enterprise admin dashboard and centralized user management",
       "priority": "high",
       "category": "access_control"
+    },
+    {
+      "title": "Enhanced Documentation Request",
+      "description": "Request security questionnaire, DPA, and SOC 2 Type II certification details",
+      "priority": "medium",
+      "category": "compliance"
+    },
+    {
+      "title": "Audit Trail Implementation",
+      "description": "Ensure comprehensive logging of all meeting recordings and data access",
+      "priority": "medium",
+      "category": "monitoring"
     }
   ],
   
@@ -59,75 +59,80 @@
       "last_updated": "2025-01-27"
     },
     {
-      "url": "https://security.maestrolabs.com/",
-      "title": "Maestro Labs Trust Center",
-      "last_updated": "2025-01-27"
+      "url": "https://www.maestrolabs.com/security",
+      "title": "Maestro Labs Security Information",
+      "last_updated": "2025"
+    },
+    {
+      "url": "https://www.maestrolabs.com/ai-note-taker-for-teams",
+      "title": "TeamsMaestro Product Information",
+      "last_updated": "2025"
     }
   ],
   
   "detailed_assessment": {
-    "tool_name": "Maestro Labs Notetaker Enterprise",
-    "final_risk_score": 73,
-    "final_risk_category": "HIGH RISK",
-    "summary_and_recommendation": "HIGH RISK tool that automatically captures and processes meeting audio, transcripts, and participant data. Major concerns include unclear AI training usage, indefinite data retention, limited enterprise controls, and automatic sensitive data collection. Recommend blocking for environments with confidential data or requiring comprehensive enterprise controls and explicit opt-out guarantees before any deployment.",
+    "tool_name": "TeamsMaestro (Maestro Labs Notetaker Enterprise)",
+    "final_risk_score": 42,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with good data protection practices but gaps in enterprise controls and documentation. Key concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. Recommendation: APPROVE with enhanced monitoring and enterprise controls implementation.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 21,
+        "category_score": 9,
         "criteria": {
           "geographic_control": {
-            "score": 6,
-            "justification": "Data is stored in United States and European Union locations according to privacy policy. While US/EU are generally secure jurisdictions, there is no customer control over specific data residency. Policy states 'specific storage location depends on the service and infrastructure used, not the user's location' indicating limited geographic control for customers."
+            "score": 3,
+            "justification": "Known secure regions (US, EU) with contracts - Privacy policy states 'personal information is stored in one or more databases hosted by third parties located in the United States and the European Union' with Standard Contractual Clauses for international transfers."
           },
           "encryption_standards": {
-            "score": 4,
-            "justification": "Privacy policy mentions 'security monitoring' and references to protecting data but does not provide specific encryption standards documentation. No mention of AES-256, customer-managed keys, or detailed encryption specifications. This represents basic encryption at best with limited technical details provided."
+            "score": 2,
+            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Security documentation states 'Data is encrypted at rest and in transit' with comprehensive encryption practices."
           },
           "data_retention": {
-            "score": 10,
-            "justification": "Privacy policy states 'We retain personal data only for as long as necessary to provide our services, comply with legal obligations, resolve disputes, and enforce our agreements' with no specific time limits. For service data, it mentions 'retention periods vary based on the type of data and contractual agreements' and 'certain MailMaestro data... is retained only for a limited time, while other service-related data... may be stored for longer.' This represents indefinite/unclear retention without specific deletion timelines."
+            "score": 3,
+            "justification": "Clear Limited Retention - Specific retention periods documented (≤90 days) + automatic deletion procedures + user deletion controls - Privacy policy states 'retention periods vary depending on the type of data' with 'zero-day retention available to enterprise customers' and data deletion upon verified request."
           }
         }
       },
       "training_data_usage": {
-        "category_score": 20,
+        "category_score": 5,
         "criteria": {
           "model_training": {
-            "score": 15,
-            "justification": "Privacy policy states 'To perform our services, we share email content and user instructions with third-party AI models as part of Maestro Lab's functionality' but does not explicitly address whether meeting transcripts, audio recordings, or user data is used for AI model training. No clear opt-out mechanism is documented for training use, and no contractual guarantee against training use is provided. This represents default training use with difficult or unclear opt-out."
+            "score": 0,
+            "justification": "Contractual guarantee of no training use - Security documentation explicitly states 'We only collect the data needed to deliver our services and it is never used to train AI models' providing clear contractual protection."
           },
           "data_sharing": {
             "score": 5,
-            "justification": "Privacy policy indicates broad data sharing: 'We share personal data with trusted third-party service providers who assist in delivering our services. These providers support functionalities such as cloud storage, AI processing, transcription services, and security monitoring.' While contractually bound, this represents broad sharing with unclear complete disclosure of all third-party relationships."
+            "justification": "Broad sharing or unclear sharing practices - Privacy policy states data is 'shared with trusted third-party service providers' and 'share email content and user instructions with third-party AI models' with limited clarity on specific third parties."
           }
         }
       },
       "access_controls": {
-        "category_score": 13,
+        "category_score": 12,
         "criteria": {
           "admin_management": {
             "score": 6,
-            "justification": "Documentation does not provide evidence of centralized admin dashboard, user provisioning/deprovisioning capabilities, or role-based permissions for enterprise deployments. Privacy policy mentions 'For enterprise clients, retention settings may be customized as agreed upon' suggesting some enterprise features exist, but no specific admin management capabilities are documented. This represents limited administrative controls."
+            "justification": "Limited Controls - User visibility only + minimal management capabilities - Documentation not found for enterprise admin dashboard, centralized user management, or role-based permissions. Standard penalty applied."
           },
           "audit_capabilities": {
-            "score": 7,
-            "justification": "No documentation of activity logs, exportable reports, user action tracking, or audit capabilities for administrators. Privacy policy mentions data subject rights and data processing but no evidence of organizational audit tools for meeting transcripts, user activities, or data access logging. This represents no audit capabilities for enterprise administrators."
+            "score": 4,
+            "justification": "Basic Auditing - Limited logs + manual export only + basic usage statistics - Privacy policy mentions data processing for 'troubleshooting issues' but no detailed audit logging capabilities documented."
           },
           "integration": {
-            "score": 0,
-            "justification": "Tool integrates with Microsoft Teams and provides SSO through Microsoft ecosystem. Privacy policy mentions enterprise client customization capabilities, suggesting some level of enterprise integration support. However, no specific documentation of SAML/OIDC SSO, SCIM provisioning, or API access for enterprise management is provided, though Microsoft Teams integration suggests basic enterprise compatibility."
+            "score": 3,
+            "justification": "Limited Integration - SSO only + no provisioning + minimal enterprise features - Product integrates with Microsoft Teams but limited documentation on enterprise identity management features."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 9,
+        "category_score": 6,
         "criteria": {
           "regulatory_violations": {
-            "score": 6,
-            "justification": "Privacy policy demonstrates GDPR compliance awareness with detailed data subject rights, data processing transparency, and European Data Protection Board guidance references. However, no published third-party certifications (SOC 2, ISO 27001, HIPAA) are documented. Trust Center page was inaccessible, preventing verification of compliance certifications. This represents partial compliance with gaps in specialized requirements."
+            "score": 3,
+            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - Privacy policy shows GDPR compliance, mentions SOC 2 Type II certification, but lacks detailed third-party verification."
           },
           "data_processing_transparency": {
             "score": 2,
-            "justification": "Privacy policy provides good transparency about data processing including specific details about what data is collected (audio recordings, transcripts, user identification), how it's used, and retention policies. Clear disclosure of third-party AI processing and data sharing arrangements. Some gaps remain in detailed data flow diagrams and complete third-party processor lists."
+            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Privacy policy provides general processing descriptions and mentions third-party AI models but lacks detailed data flow diagrams."
           }
         }
       },
@@ -135,17 +140,17 @@
         "category_score": 10,
         "criteria": {
           "documentation_and_support": {
-            "score": 10,
-            "justification": "No comprehensive security documentation available. Trust Center page (https://security.maestrolabs.com/) was inaccessible, preventing verification of security whitepapers, incident response procedures, or detailed security documentation. Privacy policy is present but represents minimal documentation without security-specific technical details. No evidence of transparency reports or comprehensive security documentation."
+            "score": 4,
+            "justification": "Adequate Documentation - Standard privacy policy + limited security information + support available but slower response times - Comprehensive privacy policy available, basic security page, but Trust Center was inaccessible and limited detailed security documentation publicly available."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Meeting transcription and note-taking",
-      "data_classification": "Confidential/Business Communications",
-      "base_score": 63,
-      "final_score_with_multiplier": 73
+      "use_case": "Internal Business Communications",
+      "data_classification": "Internal Business Communications",
+      "base_score": 42,
+      "final_score_with_multiplier": 42
     }
   }
 }

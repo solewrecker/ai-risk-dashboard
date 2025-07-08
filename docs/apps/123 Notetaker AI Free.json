@@ -2,227 +2,145 @@
   "name": "123 Notetaker AI Free",
   "vendor": "BlueSky Apps",
   "license_type": "Free",
-  "total_score": 85,
-  "risk_level": "CRITICAL RISK",
-  "data_storage_score": 21,
-  "training_usage_score": 0,
-  "access_controls_score": 20,
-  "compliance_score": 20,
-  "vendor_transparency_score": 1,
-  "summary_and_recommendation": "Assessment based on Microsoft 365 App Certification documentation. Tool lacks enterprise-grade security controls and compliance certifications despite handling sensitive meeting data.",
-  "confidence": 0.9,
-  "primary_use_case": "Meeting Transcription and Summarization",
-  "data_classification": "Internal",
-  "category": "Enterprise Productivity AI",
+  "total_score": 58,
+  "risk_level": "MEDIUM RISK",
+  "data_storage_score": 11,
+  "training_usage_score": 20,
+  "access_controls_score": 13,
+  "compliance_score": 12,
+  "vendor_transparency_score": 2,
+  "summary_and_recommendation": "123 Notetaker AI Free scores 58 points (Medium Risk) primarily due to unclear training data policies, lack of enterprise controls, and absence of compliance certifications. The tool processes sensitive meeting data including audio/video and stores it in the US with data retention under 30 days. While it has basic security practices, it lacks enterprise-grade controls and major compliance certifications. Recommend: Approve with restrictions for low-sensitivity meetings only, require explicit consent from all participants, and prohibit use with confidential/PHI data.",
+  "primary_use_case": "Meeting transcription and note-taking for Microsoft Teams",
+  "data_classification": "Meeting content, audio/video recordings, user identifiers",
+  "category": "AI Meeting Assistant",
   "assessed_by": "AI Security Council",
-  
-  "breakdown": {
-    "scores": {
-      "dataStorage": 21,
-      "trainingUsage": 0,
-      "accessControls": 20,
-      "complianceRisk": 20,
-      "vendorTransparency": 1
-    },
-    "subScores": {
-      "dataStorage": {
-        "geographic": {
-          "score": 3,
-          "note": "Data stored in USA with contractual documentation, which is a known secure region but external to organization control."
-        },
-        "encryption": {
-          "score": 4,
-          "note": "Basic encryption mentioned (TLS 1.1+ support confirmed) but no detailed encryption specifications published regarding at-rest encryption or key management."
-        },
-        "retention": {
-          "score": 3,
-          "note": "Clear limited retention documented as 'less than 30 days' after account termination with established data retention and disposal process."
-        }
-      },
-      "trainingUsage": {
-        "training": {
-          "score": 0,
-          "note": "No indication that customer data is used for AI model training based on available documentation."
-        },
-        "sharing": {
-          "score": 0,
-          "note": "Documentation explicitly states 'No' for transferring customer data to third parties or subprocessors."
-        }
-      },
-      "accessControls": {
-        "admin": {
-          "score": 8,
-          "note": "No enterprise admin controls documented. App integration is not with Microsoft Identity Platform, indicating individual account management only."
-        },
-        "audit": {
-          "score": 7,
-          "note": "No audit capabilities mentioned in documentation. No activity logs or user tracking capabilities documented for administrators."
-        },
-        "integration": {
-          "score": 5,
-          "note": "No enterprise integration capabilities. Documentation confirms no Microsoft Identity Platform integration and no SSO support."
-        }
-      },
-      "complianceRisk": {
-        "violations": {
-          "score": 15,
-          "note": "No major compliance certifications. Documentation explicitly states 'No' for SOC 2, ISO 27001, HIPAA, FedRAMP, and other major enterprise compliance standards."
-        },
-        "transparency": {
-          "score": 5,
-          "note": "Basic transparency with some data processing details provided but lacks comprehensive data flow diagrams and detailed third-party processor documentation."
-        }
-      },
-      "vendorTransparency": {
-        "score": {
-          "score": 1,
-          "note": "Limited security documentation and no published security whitepapers or transparency reports."
-        }
-      }
-    },
-    "compliance": {
-      "pci": "non-compliant",
-      "sox": "non-compliant",
-      "gdpr": "compliant",
-      "hipaa": "non-compliant"
-    }
-  },
-  
-  "details": {
-    "dataStorage": "Geographic: Data stored in USA with contractual documentation, secure region but external control | Encryption: Basic TLS 1.1+ confirmed but limited at-rest encryption details | Retention: Clear 30-day deletion policy with established disposal process",
-    "trainingUsage": "Training: No customer data used for AI model training | Sharing: Explicitly states no third-party data sharing or subprocessors",
-    "accessControls": "Admin: No enterprise admin controls, individual accounts only | Audit: No audit logs or user tracking for administrators | Integration: No SSO or enterprise identity integration",
-    "complianceRisk": "Violations: No SOC 2, ISO 27001, HIPAA, or other major enterprise certifications | Transparency: Basic data processing transparency but lacks detailed flow diagrams",
-    "vendorTransparency": "Limited security whitepapers or transparency reports"
-  },
+  "confidence": 0.8,
+  "documentation_tier": "Tier 2: Private enterprise documentation via Microsoft certification",
+  "assessment_notes": "Good confidence level due to detailed Microsoft certification documentation. Some gaps in specific privacy policy details as direct policy URL was not accessible.",
   
   "azure_permissions": {
     "required_permissions": [
-      "teams.meeting.read",
-      "user.read"
+      "Microsoft Teams meeting access",
+      "Audio/video recording permissions",
+      "User profile access"
     ],
     "recommended_restrictions": [
-      "Block network access",
-      "Require conditional access policies",
-      "Block installation at tenant level"
+      "Block for confidential meetings",
+      "Require explicit participant consent",
+      "Limit to public/marketing use cases"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Block enterprise deployment",
-      "description": "Prevent installation of 123 Notetaker AI at the tenant level due to lack of enterprise security controls and compliance certifications",
+      "title": "Restrict to low-sensitivity meetings only",
+      "description": "Due to unclear training data policies and lack of enterprise controls, limit usage to meetings with public or marketing content only",
       "priority": "high",
-      "category": "security"
+      "category": "access_control"
     },
     {
-      "title": "Evaluate enterprise alternatives",
-      "description": "Consider Microsoft native solutions or enterprise-grade meeting transcription tools with proper compliance certifications",
+      "title": "Require explicit participant consent",
+      "description": "Implement process requiring all meeting participants to explicitly consent before 123 Notetaker AI is activated",
+      "priority": "high",
+      "category": "privacy"
+    },
+    {
+      "title": "Monitor for enterprise alternatives",
+      "description": "Evaluate enterprise-grade alternatives with stronger compliance certifications and data governance controls",
       "priority": "medium",
-      "category": "alternatives"
-    },
-    {
-      "title": "User education",
-      "description": "Educate users about risks of using unauthorized meeting recording tools that may capture sensitive information",
-      "priority": "high",
-      "category": "training"
+      "category": "vendor_management"
     }
   ],
   
   "sources": [
     {
-      "url": "https://learn.microsoft.com/de-de/microsoft-365-app-certification/teams/bluesky-apps-123-notetaker-ai",
+      "url": "https://learn.microsoft.com/en-us/microsoft-365-app-certification/teams/bluesky-apps-123-notetaker-ai",
       "title": "Microsoft 365 App Certification - 123 Notetaker AI",
       "last_updated": "2025-06-04"
-    },
-    {
-      "url": "https://blueskyapps.org/terms",
-      "title": "BlueSky Apps Terms of Service",
-      "last_updated": "Unknown"
     }
   ],
   
   "detailed_assessment": {
     "tool_name": "123 Notetaker AI Free",
-    "final_risk_score": 85,
-    "final_risk_category": "CRITICAL RISK",
-    "summary_and_recommendation": "Assessment based on Microsoft 365 App Certification documentation. Tool lacks enterprise-grade security controls and compliance certifications despite handling sensitive meeting data.",
+    "final_risk_score": 58,
+    "final_risk_category": "MEDIUM RISK",
+    "summary_and_recommendation": "123 Notetaker AI Free scores 58 points (Medium Risk) primarily due to unclear training data policies, lack of enterprise controls, and absence of compliance certifications. The tool processes sensitive meeting data including audio/video and stores it in the US with data retention under 30 days. While it has basic security practices, it lacks enterprise-grade controls and major compliance certifications. Recommend: Approve with restrictions for low-sensitivity meetings only, require explicit consent from all participants, and prohibit use with confidential/PHI data.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 21,
+        "category_score": 11,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Data stored in USA with contractual documentation, which is a known secure region but external to organization control."
+            "justification": "'Known secure regions (US, EU) with contracts'. Microsoft documentation confirms data is stored in 'United States of America' with established data management processes, representing a known secure region with contractual protections."
           },
           "encryption_standards": {
             "score": 4,
-            "justification": "Basic encryption mentioned (TLS 1.1+ support confirmed) but no detailed encryption specifications published regarding at-rest encryption or key management."
+            "justification": "'Basic Encryption - TLS encryption in transit + standard encryption at rest + limited encryption details published'. Microsoft documentation confirms 'TLS 1.1 or higher' support but provides limited details on encryption specifications."
           },
           "data_retention": {
             "score": 3,
-            "justification": "Clear limited retention documented as 'less than 30 days' after account termination with established data retention and disposal process."
+            "justification": "'Clear Limited Retention - Specific retention periods documented (≤90 days) + automatic deletion procedures + user deletion controls'. Microsoft documentation states 'Less than 30days' retention after account termination with established data retention and disposal processes."
           }
         }
       },
       "training_data_usage": {
-        "category_score": 0,
+        "category_score": 20,
         "criteria": {
           "model_training": {
-            "score": 0,
-            "justification": "No indication that customer data is used for AI model training based on available documentation."
+            "score": 15,
+            "justification": "' Default training use with difficult opt-out'. Microsoft documentation does not specify whether customer data is used for AI model training or if opt-out mechanisms exist. For AI-powered transcription tools, this typically indicates default training use."
           },
           "data_sharing": {
-            "score": 0,
-            "justification": "Documentation explicitly states 'No' for transferring customer data to third parties or subprocessors."
+            "score": 5,
+            "justification": "'Broad sharing or unclear sharing practices'. Microsoft documentation states 'No' to third-party transfers but lacks detailed disclosure of data sharing practices, creating uncertainty about sharing scope."
           }
         }
       },
       "access_controls": {
-        "category_score": 20,
+        "category_score": 13,
         "criteria": {
           "admin_management": {
-            "score": 8,
-            "justification": "No enterprise admin controls documented. App integration is not with Microsoft Identity Platform, indicating individual account management only."
+            "score": 6,
+            "justification": "'Limited Controls - User visibility only + minimal management capabilities'. Microsoft documentation shows no enterprise admin controls or centralized management capabilities for the free version."
           },
           "audit_capabilities": {
-            "score": 7,
-            "justification": "No audit capabilities mentioned in documentation. No activity logs or user tracking capabilities documented for administrators."
+            "score": 4,
+            "justification": "'Basic Auditing - Limited logs + manual export only + basic usage statistics'. Microsoft documentation confirms event logging but limited organizational audit capabilities for the free version."
           },
           "integration": {
-            "score": 5,
-            "justification": "No enterprise integration capabilities. Documentation confirms no Microsoft Identity Platform integration and no SSO support."
+            "score": 3,
+            "justification": "'Limited Integration - SSO only + no provisioning + minimal enterprise features'. Microsoft documentation shows no SSO integration ('No' to Microsoft identity platform) and limited enterprise features for the free version."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 20,
+        "category_score": 12,
         "criteria": {
           "regulatory_violations": {
-            "score": 15,
-            "justification": "No major compliance certifications. Documentation explicitly states 'No' for SOC 2, ISO 27001, HIPAA, FedRAMP, and other major enterprise compliance standards."
+            "score": 10,
+            "justification": "'Compliance Gaps - Generic privacy policy + no compliance certifications + documented violations or regulatory warnings in past 2 years'. Microsoft documentation shows 'No' to all major compliance certifications (SOC 2, ISO 27001, HIPAA, FedRAMP)."
           },
           "data_processing_transparency": {
-            "score": 5,
-            "justification": "Basic transparency with some data processing details provided but lacks comprehensive data flow diagrams and detailed third-party processor documentation."
+            "score": 2,
+            "justification": "'Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed'. Microsoft documentation provides clear data processing descriptions and retention periods."
           }
         }
       },
       "vendor_transparency": {
-        "category_score": 1,
+        "category_score": 2,
         "criteria": {
           "documentation_and_support": {
-            "score": 1,
-            "justification": "Limited security documentation and no published security whitepapers or transparency reports."
+            "score": 2,
+            "justification": "'Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports'. Microsoft certification provides comprehensive security documentation with detailed self-assessment responses."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
       "use_case": "Meeting transcription and note-taking",
-      "data_classification": "Business Communications",
-      "base_score": 65,
-      "final_score_with_multiplier": 85
+      "data_classification": "Meeting content, audio/video recordings",
+      "base_score": 58,
+      "final_score_with_multiplier": 58
     }
   }
 }

@@ -1,0 +1,149 @@
+{
+  "name": "Ollama (Self-Hosted)",
+  "vendor": "Ollama (Open Source)",
+  "license_type": "MIT License (Open Source)",
+  "total_score": 8,
+  "risk_level": "LOW RISK",
+  "data_storage_score": 0,
+  "training_usage_score": 0,
+  "access_controls_score": 8,
+  "compliance_score": 0,
+  "vendor_transparency_score": 0,
+  "summary_and_recommendation": "Self-hosted Ollama presents minimal risk due to complete local data control and no external data transmission. Primary concerns are around lack of built-in enterprise access controls and authentication, requiring proper deployment practices. Recommendation: Approve for general use with proper infrastructure security controls.",
+  "primary_use_case": "Local AI model inference and chat",
+  "data_classification": "Varies by use case",
+  "category": "AI/ML Infrastructure",
+  "assessed_by": "AI Security Council",
+  "confidence": 0.8,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "High confidence based on open-source nature, extensive community documentation, and transparent architecture. Limited by lack of formal enterprise documentation.",
+  
+  "azure_permissions": {
+    "required_permissions": [
+      "No Azure permissions required (self-hosted)"
+    ],
+    "recommended_restrictions": [
+      "Deploy on isolated network segment",
+      "Implement reverse proxy with authentication",
+      "Regular security updates and monitoring"
+    ]
+  },
+  
+  "recommendations": [
+    {
+      "title": "Implement Authentication Layer",
+      "description": "Deploy behind reverse proxy with enterprise authentication (SSO) as Ollama has no built-in authentication",
+      "priority": "high",
+      "category": "security"
+    },
+    {
+      "title": "Network Security",
+      "description": "Ensure Ollama is not exposed to public internet without proper controls",
+      "priority": "high",
+      "category": "security"
+    },
+    {
+      "title": "Regular Updates",
+      "description": "Maintain current versions to address security vulnerabilities like CVE-2024-37032",
+      "priority": "medium",
+      "category": "security"
+    }
+  ],
+  
+  "sources": [
+    {
+      "url": "https://www.wiz.io/blog/probllama-ollama-vulnerability-cve-2024-37032",
+      "title": "Ollama Security Vulnerability Analysis",
+      "last_updated": "2024-06-24"
+    },
+    {
+      "url": "https://www.arsturn.com/blog/exploring-ollamas-data-security-features",
+      "title": "Ollama Data Security Features Review",
+      "last_updated": "2024"
+    }
+  ],
+  
+  "detailed_assessment": {
+    "tool_name": "Ollama (Self-Hosted)",
+    "final_risk_score": 8,
+    "final_risk_category": "LOW RISK",
+    "summary_and_recommendation": "Self-hosted Ollama presents minimal risk due to complete local data control and no external data transmission. Primary concerns are around lack of built-in enterprise access controls and authentication, requiring proper deployment practices. Recommendation: Approve for general use with proper infrastructure security controls.",
+    "assessment_details": {
+      "data_storage_and_security": {
+        "category_score": 0,
+        "criteria": {
+          "geographic_control": {
+            "score": 0,
+            "justification": "On-premises or controlled data residency - Self-hosted deployment provides complete control over data location and residency, with all data remaining on organization's infrastructure."
+          },
+          "encryption_standards": {
+            "score": 0,
+            "justification": "Customer-Controlled Encryption - Self-hosted deployment allows organization to implement their own encryption standards for data at rest and in transit, with complete control over encryption keys and methods."
+          },
+          "data_retention": {
+            "score": 0,
+            "justification": "Customer-Controlled Retention - Self-hosted deployment means organization has complete control over data retention policies, with ability to implement immediate deletion and custom retention schedules."
+          }
+        }
+      },
+      "training_data_usage": {
+        "category_score": 0,
+        "criteria": {
+          "model_training": {
+            "score": 0,
+            "justification": "Contractual guarantee of no training use - Self-hosted models do not use customer data for training. All processing is local with no data transmission to external services."
+          },
+          "data_sharing": {
+            "score": 0,
+            "justification": "No third-party sharing - Self-hosted deployment ensures no data sharing with third parties as all processing occurs locally."
+          }
+        }
+      },
+      "access_controls": {
+        "category_score": 8,
+        "criteria": {
+          "admin_management": {
+            "score": 8,
+            "justification": "No Admin Oversight - Ollama lacks built-in enterprise admin controls, user management, or organizational visibility. Individual deployment with minimal management capabilities."
+          },
+          "audit_capabilities": {
+            "score": 0,
+            "justification": "Basic Auditing - Self-hosted deployment allows implementation of custom logging and monitoring solutions at the infrastructure level."
+          },
+          "integration": {
+            "score": 0,
+            "justification": "Full Enterprise Integration - Self-hosted deployment can be integrated with existing enterprise identity management, SSO, and API management solutions through reverse proxy configuration."
+          }
+        }
+      },
+      "compliance_and_legal_risk": {
+        "category_score": 0,
+        "criteria": {
+          "regulatory_violations": {
+            "score": 0,
+            "justification": "Fully Compliant - Self-hosted deployment allows organization to implement all necessary compliance controls and certifications as required by their industry standards."
+          },
+          "data_processing_transparency": {
+            "score": 0,
+            "justification": "Full Transparency - Open-source nature provides complete visibility into data processing, with all code available for audit and review."
+          }
+        }
+      },
+      "vendor_transparency": {
+        "category_score": 0,
+        "criteria": {
+          "documentation_and_support": {
+            "score": 0,
+            "justification": "Comprehensive Documentation - Open-source project with extensive public documentation, GitHub repository, community support, and transparent development process."
+          }
+        }
+      }
+    },
+    "use_case_multiplier_applied": {
+      "use_case": "Internal IT/Development",
+      "data_classification": "Varies by Implementation",
+      "base_score": 8,
+      "final_score_with_multiplier": 8
+    }
+  }
+}
