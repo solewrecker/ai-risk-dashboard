@@ -84,19 +84,20 @@ export async function saveToDatabase(assessment) {
     // Defensively re-calculate risk level to ensure it's always valid for the DB.
     const validRiskLevel = getRiskLevel(finalScore);
 
+    // Store all details in assessment_data
     const record = {
         user_id: user.id,
         name: formData.toolName,
         category: formData.toolCategory,
         total_score: finalScore,
-        risk_level: validRiskLevel, // Use the guaranteed valid risk level
+        risk_level: validRiskLevel,
         data_storage_score: breakdown?.scores?.dataStorage ?? 0,
         training_usage_score: breakdown?.scores?.trainingUsage ?? 0,
         access_controls_score: breakdown?.scores?.accessControls ?? 0,
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
-        breakdown: breakdown,
-        summary_and_recommendation: (recommendations || []).join(' ')
+        data_classification: formData.dataClassification,
+        assessment_data: assessment // Store the full assessment object
     };
     
     try {
