@@ -241,28 +241,34 @@ export function viewAssessment(id) {
 }
 
 export async function deleteAssessment(id) {
-    if (!getIsAdmin()) {
-        alert('Access denied. Admin privileges required.');
+    const user = getCurrentUser();
+    if (!user) {
+        alert('You must be logged in to delete assessments.');
         return;
     }
-    
+    // Find the assessment to check ownership
+    const assessment = assessments.find(a => a.id === id);
+    if (!assessment) {
+        alert('Assessment not found.');
+        return;
+    }
+    // Allow if admin or owner
+    if (!getIsAdmin() && assessment.user_id !== user.id) {
+        alert('Access denied. You can only delete your own assessments.');
+        return;
+    }
     if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
         return;
     }
-    
     try {
         const { error } = await supabaseClient
             .from('assessments')
             .delete()
             .eq('id', id);
-
         if (error) throw error;
-
-        // Refresh the list after deletion
         loadAssessments();
         // Optionally, show a success message
         // showToast('Assessment deleted successfully.');
-
     } catch (error) {
         console.error('Error deleting assessment:', error);
         // showToast('Error deleting assessment.', 'error');
