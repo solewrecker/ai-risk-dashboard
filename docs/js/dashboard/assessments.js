@@ -400,18 +400,10 @@ function getRiskLevelFromScore(score) {
 }
 
 export async function deleteAssessment(id) {
-    if (!getIsAdmin()) {
-        alert('Access denied. Only admins can delete AI tools from the master database.');
-        return;
-    }
-    
-    if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
-        return;
-    }
-    
+    // Allow any authenticated user to delete their own assessment from the assessments table
     try {
         const { error } = await supabaseClient
-            .from('ai_tools')
+            .from('assessments')
             .delete()
             .eq('id', id);
 
