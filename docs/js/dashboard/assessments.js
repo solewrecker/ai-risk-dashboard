@@ -215,11 +215,9 @@ function renderAssessmentList() {
                     <button class="btn-icon" title="Full Report" onclick="viewAssessment('${assessment.id}')">
                         <i data-lucide="external-link" class="w-5 h-5"></i>
                     </button>
-                    ${getIsAdmin() ? `
-                        <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </button>
-                    ` : ''}
+                    <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
             <div class="assessments-page__details" id="details-${assessment.id}" style="display: none;">
