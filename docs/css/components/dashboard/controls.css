@@ -1,0 +1,64 @@
+/* Dashboard Controls (BEM Refactor) */
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--color-gray-800);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-gray-700);
+}
+
+.dashboard-controls__search {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.dashboard-controls__input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 0.5rem;
+    color: var(--color-white);
+}
+
+.dashboard-controls__input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.dashboard-controls__filter {
+    display: flex;
+    gap: 1rem;
+}
+
+.dashboard-controls__select {
+    padding: 0.75rem 1rem;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 0.5rem;
+    color: var(--color-white);
+    min-width: 150px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-controls {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    .dashboard-controls__search {
+        width: 100%;
+    }
+    .dashboard-controls__filter {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .dashboard-controls__select {
+        flex: 1;
+    }
+} 

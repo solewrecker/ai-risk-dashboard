@@ -57,49 +57,7 @@
     color: var(--color-white);
 }
 
-/* Dashboard Controls */
-.dashboard-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.search-container {
-    flex: 1;
-    min-width: 300px;
-    position: relative;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    background: var(--color-gray-800);
-    border: 1px solid var(--color-gray-700);
-    border-radius: 0.5rem;
-    color: var(--color-white);
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
-.filter-container {
-    display: flex;
-    gap: 1rem;
-}
-
-.filter-select {
-    padding: 0.75rem 1rem;
-    background: var(--color-gray-800);
-    border: 1px solid var(--color-gray-700);
-    border-radius: 0.5rem;
-    color: var(--color-white);
-    min-width: 150px;
-}
+/* Dashboard Controls styles have been moved to components/dashboard/controls.css for BEM refactor. Please update styles there. */
 
 /* Progress Overview */
 .progress-overview {
