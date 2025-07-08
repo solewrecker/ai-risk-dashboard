@@ -367,10 +367,8 @@ export function filterAssessments() {
 function renderFilteredAssessments(filteredData) {
     const container = document.getElementById('assessment-list');
     const resultsCount = document.getElementById('resultsCount');
-
     if (!container) return;
-    container.innerHTML = ''; 
-
+    container.innerHTML = '';
     if (filteredData.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -380,22 +378,53 @@ function renderFilteredAssessments(filteredData) {
             </div>
         `;
     } else {
-        filteredData.forEach(assessment => {
-            const item = renderAssessmentItem(assessment);
-            container.insertAdjacentHTML('beforeend', item);
-        });
-        
-        // Reinitialize Lucide icons after dynamic content creation
+        const user = getCurrentUser && getCurrentUser();
+        const listContent = filteredData.map(assessment => {
+            const date = new Date(assessment.created_at).toLocaleDateString();
+            const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
+            const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
+            return `
+                <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
+                    <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                        <div class="assessments-page__tool-info">
+                            <h4>${assessment.name}</h4>
+                            <p>${assessment.category || 'General'}</p>
+                        </div>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--score" data-label="Score">
+                        <span class="assessments-page__score-badge">${assessment.total_score}/100</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--level" data-label="Risk Level">
+                        <span class="risk-badge risk-${assessment.risk_level}">${assessment.risk_level?.toUpperCase()}</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--date" data-label="Date">
+                        <span>${date}</span>
+                    </div>
+                    <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
+                        <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                        ${canDelete ? `
+                            <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
+                    ${isExpanded ? renderAssessmentDetails(assessment) : ''}
+                </div>
+            `;
+        }).join('');
+        container.innerHTML = listContent;
         if (typeof lucide !== 'undefined') {
             setTimeout(() => lucide.createIcons(), 100);
         }
     }
-    
     if (resultsCount) {
         resultsCount.textContent = `${filteredData.length} of ${assessments.length} assessments shown`;
     }
-
-     // Re-initialize any dynamic components like tooltips if needed
+    // Re-initialize any dynamic components like tooltips if needed
 }
 
 export function clearAllFilters() {
