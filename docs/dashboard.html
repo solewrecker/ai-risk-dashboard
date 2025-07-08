@@ -294,23 +294,99 @@
                         <input type="text" id="searchInput" class="dashboard-controls__input" placeholder="Search by tool name...">
                     </div>
                     <div class="dashboard-controls__filter">
-                        <select id="riskFilter" class="dashboard-controls__select">
-                            <option value="all">All Risk Levels</option>
-                            <option value="critical">Critical</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                        <select id="categoryFilter" class="dashboard-controls__select">
-                            <option value="all">All Categories</option>
-                            <!-- Options populated by JS -->
-                        </select>
-                        <select id="sortControl" class="dashboard-controls__select">
-                            <option value="newest">Sort: Newest</option>
-                            <option value="oldest">Sort: Oldest</option>
-                            <option value="score_desc">Score: High to Low</option>
-                            <option value="score_asc">Score: Low to High</option>
-                        </select>
+                        <div class="multi-select">
+                            <div class="multi-select__wrapper">
+                                <div class="multi-select__trigger" data-filter="risk">
+                                    <span class="multi-select__placeholder">Select risk levels...</span>
+                                    <span class="multi-select__arrow">▼</span>
+                                </div>
+                                <div class="multi-select__dropdown">
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="risk-critical" value="critical">
+                                        <label for="risk-critical">Critical</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="risk-high" value="high">
+                                        <label for="risk-high">High</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="risk-medium" value="medium">
+                                        <label for="risk-medium">Medium</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="risk-low" value="low">
+                                        <label for="risk-low">Low</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="multi-select">
+                            <div class="multi-select__wrapper">
+                                <div class="multi-select__trigger" data-filter="category">
+                                    <span class="multi-select__placeholder">Select categories...</span>
+                                    <span class="multi-select__arrow">▼</span>
+                                </div>
+                                <div class="multi-select__dropdown">
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="cat-conversational" value="conversational-ai">
+                                        <label for="cat-conversational">Conversational AI</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="cat-image" value="image-generation">
+                                        <label for="cat-image">Image Generation</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="cat-code" value="code-generation">
+                                        <label for="cat-code">Code Generation</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="cat-data" value="data-analysis">
+                                        <label for="cat-data">Data Analysis</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="cat-automation" value="automation">
+                                        <label for="cat-automation">Automation</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="multi-select">
+                            <div class="multi-select__wrapper">
+                                <div class="multi-select__trigger" data-filter="date">
+                                    <span class="multi-select__placeholder">Select date range...</span>
+                                    <span class="multi-select__arrow">▼</span>
+                                </div>
+                                <div class="multi-select__dropdown">
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="date-today" value="today">
+                                        <label for="date-today">Today</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="date-week" value="week">
+                                        <label for="date-week">This Week</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="date-month" value="month">
+                                        <label for="date-month">This Month</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="date-quarter" value="quarter">
+                                        <label for="date-quarter">This Quarter</label>
+                                    </div>
+                                    <div class="multi-select__option">
+                                        <input type="checkbox" id="date-year" value="year">
+                                        <label for="date-year">This Year</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="multi-select__active-filters">
+                            <div class="multi-select__all-tags"></div>
+                            <button class="multi-select__clear-btn">Clear Filters</button>
+                        </div>
                     </div>
                 </div>
 
@@ -426,6 +502,13 @@
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+        });
+    </script>
+    <script type="module">
+        import MultiSelectFilter from './js/dashboard/multi-select-filter.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const multiSelect = new MultiSelectFilter('.dashboard-controls');
         });
     </script>
 </body>
