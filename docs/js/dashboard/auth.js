@@ -63,4 +63,12 @@ export function getIsAdmin() {
 
 export function getUserTier() {
     return userTier;
+}
+
+export function getIsEnterprise() {
+    return userTier === 'enterprise';
+}
+
+export function getIsFree() {
+    return userTier === 'free';
 } 

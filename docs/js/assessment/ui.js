@@ -1,6 +1,6 @@
 // js/assessment/ui.js
 // Handles UI updates, step navigation, and general DOM manipulation.
-import { getCurrentUser, getIsAdmin } from './auth.js';
+import { getCurrentUser, getIsAdmin, getIsEnterprise } from './auth.js';
 
 let currentStep = 1;
 
@@ -95,7 +95,7 @@ export function updateUIForAuth() {
             loginSection.innerHTML = `
                 <div class="login-user"><i data-lucide="check-circle" class="w-4 h-4"></i><span>${currentUser.email}</span></div>
                 <div class="login-badges">
-                    ${userTier === 'enterprise' ? '<span class="badge badge-enterprise">ENTERPRISE</span>' : ''}
+                    ${getIsEnterprise() ? '<span class="badge badge-enterprise">ENTERPRISE</span>' : ''}
                     ${getIsAdmin() ? '<span class="badge badge-admin">ADMIN</span>' : ''}
                 </div>
                 <div class="login-actions">

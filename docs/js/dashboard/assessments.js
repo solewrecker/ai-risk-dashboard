@@ -192,7 +192,8 @@ function renderAssessmentList() {
 
     const listContent = assessments.map(assessment => {
         const date = new Date(assessment.created_at).toLocaleDateString();
-        
+        const user = getCurrentUser();
+        const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
         return `
             <div class="assessments-page__list-item">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
@@ -214,7 +215,7 @@ function renderAssessmentList() {
                     <button class="btn-icon" title="View Details" onclick="viewAssessment('${assessment.id}')">
                         <i data-lucide="eye" class="w-5 h-5"></i>
                     </button>
-                    ${getIsAdmin() ? `
+                    ${canDelete ? `
                         <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
