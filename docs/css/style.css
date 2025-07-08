@@ -27,6 +27,8 @@
 @import 'components/dashboard/achievements.css';
 @import 'components/compare/compare-tools.css';
 @import 'components/admin/upload-tool.css';
+@import 'components/forms.css';
+@import 'components/auth.css';
 
 /* Theme Variations */
 [data-theme="default"] {
@@ -78,124 +80,6 @@
 .risk-badge.risk-critical { 
     background-color: rgba(147, 51, 234, 0.2);
     color: var(--color-purple-400);
-}
-
-/* Form Components */
-.form-card {
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-}
-
-.form-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem;
-    text-align: center;
-}
-
-.form-content {
-    padding: 2rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #1e293b;
-}
-
-.form-input,
-.form-select,
-.form-textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    background: white;
-    color: #1e293b;
-    transition: all 150ms;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Auth Components */
-.auth-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-}
-
-.auth-modal {
-    background: white;
-    border-radius: 1rem;
-    width: 100%;
-    max-width: 32rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.auth-modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.auth-modal-content {
-    padding: 1.5rem;
-}
-
-.auth-input-group {
-    margin-bottom: 1.5rem;
-}
-
-.auth-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    transition: all 150ms;
-}
-
-.auth-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.auth-button {
-    width: 100%;
-    padding: 0.75rem 1.5rem;
-    background: #3b82f6;
-    color: white;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: all 150ms;
-}
-
-.auth-button:hover {
-    background: #2563eb;
 }
 
 /* Messages and Alerts */
