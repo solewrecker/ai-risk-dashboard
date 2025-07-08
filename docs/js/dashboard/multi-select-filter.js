@@ -1,3 +1,5 @@
+import { filterAssessments } from './assessments.js';
+
 class MultiSelectFilter {
     constructor(containerSelector) {
         this.container = document.querySelector(containerSelector);
@@ -15,6 +17,9 @@ class MultiSelectFilter {
         this.setupMultiSelects();
         this.setupClearButton();
         this.setupSearch();
+        
+        // Make the instance globally accessible for tag removal
+        window.multiSelect = this;
     }
 
     setupMultiSelects() {
@@ -47,7 +52,9 @@ class MultiSelectFilter {
                 this.updateSelectedFilters(filterType, e.target.value, e.target.checked);
                 this.updateTriggerText(filterType);
                 this.updateActiveFilters();
-                this.updateResultsCount();
+                
+                // Apply filters to assessments
+                filterAssessments(this.selectedFilters);
             });
         });
 
@@ -115,6 +122,8 @@ class MultiSelectFilter {
         const activeFiltersContainer = this.container.querySelector('.multi-select__active-filters');
         const allTagsContainer = this.container.querySelector('.multi-select__all-tags');
         
+        if (!activeFiltersContainer || !allTagsContainer) return;
+        
         let allTags = [];
         
         // Collect all selected filters
@@ -136,7 +145,7 @@ class MultiSelectFilter {
                        data-value="${tag.value}">
                     ${tag.display}
                     <span class="multi-select__tag-remove" 
-                          onclick="multiSelect.removeTag('${tag.type}', '${tag.value}')">×</span>
+                          onclick="window.multiSelect.removeTag('${tag.type}', '${tag.value}')">×</span>
                 </span>`
             ).join('');
         } else {
@@ -157,7 +166,9 @@ class MultiSelectFilter {
         // Update UI
         this.updateTriggerText(filterType);
         this.updateActiveFilters();
-        this.updateResultsCount();
+        
+        // Apply filters to assessments
+        filterAssessments(this.selectedFilters);
     }
 
     setupClearButton() {
@@ -176,44 +187,28 @@ class MultiSelectFilter {
             });
             
             // Clear search
-            const searchInput = this.container.querySelector('.multi-select__search-input');
+            const searchInput = this.container.querySelector('.dashboard-controls__input');
             if (searchInput) searchInput.value = '';
-            
-            // Reset sort
-            const sortSelect = this.container.querySelector('.multi-select__sort-select');
-            if (sortSelect) sortSelect.selectedIndex = 0;
             
             // Update UI
             Object.keys(this.selectedFilters).forEach(filterType => {
                 this.updateTriggerText(filterType);
             });
             this.updateActiveFilters();
-            this.updateResultsCount();
+            
+            // Apply filters to assessments
+            filterAssessments(this.selectedFilters);
         });
     }
 
     setupSearch() {
-        const searchInput = this.container.querySelector('.multi-select__search-input');
+        const searchInput = this.container.querySelector('.dashboard-controls__input');
         if (!searchInput) return;
 
         searchInput.addEventListener('input', () => {
-            this.updateResultsCount();
+            // Apply filters to assessments
+            filterAssessments(this.selectedFilters);
         });
-    }
-
-    updateResultsCount() {
-        const resultsCount = this.container.querySelector('.multi-select__results-count');
-        if (!resultsCount) return;
-
-        const hasSearch = this.container.querySelector('.multi-select__search-input')?.value.length > 0;
-        const hasFilters = Object.values(this.selectedFilters).some(arr => arr.length > 0);
-        
-        if (hasSearch || hasFilters) {
-            const randomCount = Math.floor(Math.random() * 25) + 1;
-            resultsCount.textContent = `${randomCount} assessment${randomCount !== 1 ? 's' : ''} found`;
-        } else {
-            resultsCount.textContent = '2 assessments found';
-        }
     }
 }
 
