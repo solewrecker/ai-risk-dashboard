@@ -239,10 +239,11 @@ window.toggleAssessmentDetails = function(id) {
 };
 
 function renderAssessmentDetails(assessment) {
-    // Example: You can expand this to match your detail page structure
-    const breakdown = assessment.breakdown || assessment.results?.breakdown || {};
-    const recommendations = assessment.recommendations || assessment.results?.recommendations || [];
-    const formData = assessment.formData || assessment.results?.formData || {};
+    // Use new assessment_data structure if present
+    const data = assessment.assessment_data || {};
+    const breakdown = data.breakdown || data.results?.breakdown || assessment.breakdown || assessment.results?.breakdown || {};
+    const recommendations = data.recommendations || data.results?.recommendations || assessment.recommendations || assessment.results?.recommendations || [];
+    const formData = data.formData || data.results?.formData || assessment.formData || assessment.results?.formData || {};
     return `
         <div class="assessments-page__details-content">
             <div class="assessments-page__details-header">
