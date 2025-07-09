@@ -244,86 +244,105 @@ function renderAssessmentDetails(assessment) {
     const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
     const recommendations = data.recommendations || data.results?.recommendations || [];
     const formData = data.formData || {};
+    const summary = data.summary || {};
 
-    const renderCategory = (category) => {
-        const title = category.category || 'Unknown Category';
-        const score = category.score;
-        const metrics = category.metrics || [];
-        
-        return `
-            <div class="assessment-details__category">
-                <div class="assessment-details__category-header">
-                    <h4 class="assessment-details__category-title">${title}</h4>
-                    <span class="assessment-details__category-score score--${getRiskLevelClass(score)}">${score}/100</span>
-                </div>
-                <div class="assessment-details__metrics-grid">
-                    ${metrics.map(metric => `
-                        <div class="assessment-details__metric">
-                            <div class="assessment-details__metric-name">${metric.name}</div>
-                            <div class="assessment-details__metric-value">${metric.value}</div>
-                            <div class="assessment-details__metric-note">${metric.note}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
+    const getIcon = (key) => {
+        const icons = {
+            toolVersion: 'git-branch',
+            category: 'layout-grid',
+            dataClassification: 'shield'
+        };
+        return icons[key] || 'info';
     };
 
     return `
-        <div class="assessment-details__container">
-            <div class="assessment-details__sidebar">
-                <div class="assessment-details__meta">
-                    <h3 class="assessment-details__meta-title">Assessment Info</h3>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="tag" class="assessment-details__meta-icon"></i>
-                        <span><strong>Tool Version:</strong> ${formData.toolVersion || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="layout-grid" class="assessment-details__meta-icon"></i>
-                        <span><strong>Category:</strong> ${formData.toolCategory || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="briefcase" class="assessment-details__meta-icon"></i>
-                        <span><strong>Use Case:</strong> ${formData.useCase || 'N/A'}</span>
-                    </div>
-                    <div class="assessment-details__meta-item">
-                        <i data-lucide="shield" class="assessment-details__meta-icon"></i>
-                        <span><strong>Data Classification:</strong> ${formData.dataClassification || 'N/A'}</span>
-                    </div>
-                </div>
-                 <a href="assessment-detail.html?id=${assessment.id}" class="btn btn-primary assessment-details__full-report-btn">
-                    View Full Report
-                    <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
-                </a>
-            </div>
-            <div class="assessment-details__main">
-                <div class="assessment-details__tabs">
-                    <button class="assessment-details__tab active" data-tab="breakdown">Detailed Breakdown</button>
-                    <button class="assessment-details__tab" data-tab="recommendations">Recommendations</button>
-                </div>
-                <div class="assessment-details__tab-content active" id="tab-breakdown">
-                    ${(detailedAssessment.categories || []).map(renderCategory).join('')}
-                </div>
-                <div class="assessment-details__tab-content" id="tab-recommendations">
-                    <ul class="assessment-details__recommendations-list">
-                        ${recommendations.map(rec => `
-                            <li class="assessment-details__recommendation-item">
-                                <i data-lucide="check-circle" class="assessment-details__rec-icon"></i>
-                                <div>
-                                    <h5 class="assessment-details__rec-title">${rec.title}</h5>
-                                    <p class="assessment-details__rec-desc">${rec.description}</p>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            </div>
+    <div class="assessment-details">
+      <nav class="assessment-details__tabs">
+        <button class="assessment-details__tab assessment-details__tab--active" onclick="switchAssessmentTab(this, '${assessment.id}', 'overview')">Overview</button>
+        <button class="assessment-details__tab" onclick="switchAssessmentTab(this, '${assessment.id}', 'breakdown')">Detailed Breakdown</button>
+        <button class="assessment-details__tab" onclick="switchAssessmentTab(this, '${assessment.id}', 'recommendations')">Recommendations</button>
+      </nav>
+
+      <div id="overview-${assessment.id}" class="assessment-details__panel assessment-details__panel--active">
+        <div class="assessment-details__overview-grid">
+          <div class="assessment-details__card">
+              <div class="assessment-details__card-header">
+                  <i data-lucide="${getIcon('toolVersion')}" class="assessment-details__card-icon"></i>
+                  <h4 class="assessment-details__card-title">Tool Version</h4>
+              </div>
+              <p class="assessment-details__card-content">${formData.toolVersion || 'N/A'}</p>
+          </div>
+          <div class="assessment-details__card">
+              <div class="assessment-details__card-header">
+                  <i data-lucide="${getIcon('category')}" class="assessment-details__card-icon"></i>
+                  <h4 class="assessment-details__card-title">Category</h4>
+              </div>
+              <p class="assessment-details__card-content">${formData.toolCategory || 'General'}</p>
+          </div>
+          <div class="assessment-details__card">
+              <div class="assessment-details__card-header">
+                  <i data-lucide="${getIcon('dataClassification')}" class="assessment-details__card-icon"></i>
+                  <h4 class="assessment-details__card-title">Data Classification</h4>
+              </div>
+              <p class="assessment-details__card-content">${formData.dataClassification ? formData.dataClassification.join(', ') : 'N/A'}</p>
+          </div>
         </div>
+      </div>
+
+      <div id="breakdown-${assessment.id}" class="assessment-details__panel">
+        <div class="assessment-details__breakdown-grid">
+          ${Object.entries(detailedAssessment).map(([key, category]) => `
+            <div class="assessment-details__breakdown-item">
+              <h5 class="assessment-details__breakdown-title">${category.category || key}</h5>
+              <p class="assessment-details__breakdown-description">${category.details}</p>
+              <div class="assessment-details__breakdown-score">
+                <span>Score: ${category.score}/${category.max_score}</span>
+                <progress value="${category.score}" max="${category.max_score}" class="assessment-details__progress"></progress>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div id="recommendations-${assessment.id}" class="assessment-details__panel">
+        <ul class="assessment-details__recommendations-list">
+          ${recommendations.map(rec => `
+            <li class="assessment-details__recommendation-item">
+                <i data-lucide="alert-triangle" class="assessment-details__recommendation-icon risk-${(rec.priority || 'low').toLowerCase()}"></i>
+                <div class="assessment-details__recommendation-content">
+                    <h5 class="assessment-details__recommendation-title">${rec.recommendation}</h5>
+                    <p class="assessment-details__recommendation-description">${rec.details}</p>
+                </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
     `;
 }
 
+window.switchAssessmentTab = function(btn, assessmentId, tabName) {
+    const detailsContainer = btn.closest('.assessment-details');
+    
+    // Deactivate all tabs and panels
+    detailsContainer.querySelectorAll('.assessment-details__tab').forEach(tab => tab.classList.remove('assessment-details__tab--active'));
+    detailsContainer.querySelectorAll('.assessment-details__panel').forEach(panel => panel.classList.remove('assessment-details__panel--active'));
+
+    // Activate the clicked tab and corresponding panel
+    btn.classList.add('assessment-details__tab--active');
+    document.getElementById(`${tabName}-${assessmentId}`).classList.add('assessment-details__panel--active');
+}
+
 export function viewAssessment(id) {
-    window.location.href = `assessment-detail.html?id=${id}`;
+    // If we're on the dashboard, navigate to the specific assessment page
+    if (window.location.pathname.includes('dashboard.html')) {
+        window.location.href = `assessment-detail.html?id=${id}`;
+    } else {
+        // This case should ideally not happen if the user is on the dashboard
+        // but as a fallback, we can reload the current page or show an error.
+        // For now, we'll just reload the current page.
+        window.location.reload();
+    }
 }
 
 export async function deleteAssessment(id) {
