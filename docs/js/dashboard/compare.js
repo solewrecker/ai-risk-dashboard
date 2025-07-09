@@ -49,21 +49,32 @@ function renderSelectedTags() {
 
 function renderTable(assessments) {
     const tableBody = document.querySelector('.compare-tools__table-body');
-    tableBody.innerHTML = ''; // Clear existing rows
+    
+    // Add error logging if table body is not found
+    if (!tableBody) {
+        console.error('Table body element not found. Check your HTML selector.');
+        return;
+    }
+
+    // Clear existing rows
+    tableBody.innerHTML = ''; 
+
+    // Log the number of assessments being rendered
+    console.log(`Rendering ${assessments.length} assessments`);
 
     assessments.forEach(assessment => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${assessment.name}</td>
-            <td>${assessment.risk_level}</td>
-            <td>${assessment.total_score}</td>
-            <td>${assessment.assessment_data.formData.dataClassification || '-'}</td>
-            <td>${assessment.assessment_data.formData.toolVersion || '-'}</td>
-            <td>${assessment.assessment_data.breakdown.scores.dataStorage || '-'}</td>
-            <td>${assessment.assessment_data.breakdown.scores.trainingUsage || '-'}</td>
-            <td>${assessment.assessment_data.breakdown.scores.accessControls || '-'}</td>
-            <td>${assessment.assessment_data.breakdown.scores.complianceRisk || '-'}</td>
-            <td>${assessment.assessment_data.breakdown.scores.vendorTransparency || '-'}</td>
+            <td>${assessment.name || '-'}</td>
+            <td>${assessment.risk_level || '-'}</td>
+            <td>${assessment.total_score || '-'}</td>
+            <td>${assessment.assessment_data?.formData?.dataClassification || '-'}</td>
+            <td>${assessment.assessment_data?.formData?.toolVersion || '-'}</td>
+            <td>${assessment.assessment_data?.breakdown?.scores?.dataStorage || '-'}</td>
+            <td>${assessment.assessment_data?.breakdown?.scores?.trainingUsage || '-'}</td>
+            <td>${assessment.assessment_data?.breakdown?.scores?.accessControls || '-'}</td>
+            <td>${assessment.assessment_data?.breakdown?.scores?.complianceRisk || '-'}</td>
+            <td>${assessment.assessment_data?.breakdown?.scores?.vendorTransparency || '-'}</td>
             <td>-</td>
         `;
         tableBody.appendChild(row);
