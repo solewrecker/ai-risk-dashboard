@@ -48,11 +48,29 @@ function renderSelectedTags() {
 }
 
 function renderTable(assessments) {
-    const tableBody = document.querySelector('.compare-tools__table-body');
+    // Log all available elements to help diagnose the issue
+    console.log('All elements with compare-tools-table-body:', 
+        document.querySelectorAll('#compare-tools-table-body'));
     
-    // Add error logging if table body is not found
+    // Check if the compare-content is loaded
+    const compareContent = document.getElementById('compare-content');
+    console.log('Compare content element:', compareContent);
+    
+    // Check if the tab is active
+    if (compareContent && !compareContent.classList.contains('active')) {
+        console.warn('Compare tools tab is not active');
+    }
+
+    const tableBody = document.getElementById('compare-tools-table-body');
+    
+    // Add detailed error logging if table body is not found
     if (!tableBody) {
-        console.error('Table body element not found. Check your HTML selector.');
+        console.error('Table body element not found. Details:', {
+            documentReadyState: document.readyState,
+            compareContentExists: !!compareContent,
+            compareContentClasses: compareContent ? Array.from(compareContent.classList) : 'N/A',
+            allBodyElements: document.body.innerHTML.includes('compare-tools-table-body')
+        });
         return;
     }
 
