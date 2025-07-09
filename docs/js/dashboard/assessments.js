@@ -284,7 +284,7 @@ function renderAssessmentDetails(assessment) {
                   <i data-lucide="${getIcon('dataClassification')}" class="assessment-details__card-icon"></i>
                   <h4 class="assessment-details__card-title">Data Classification</h4>
               </div>
-              <p class="assessment-details__card-content">${formData.dataClassification ? formData.dataClassification.join(', ') : 'N/A'}</p>
+              <p class="assessment-details__card-content">${formData.dataClassification ? (Array.isArray(formData.dataClassification) ? formData.dataClassification.join(', ') : formData.dataClassification) : 'N/A'}</p>
           </div>
         </div>
       </div>
