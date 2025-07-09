@@ -56,26 +56,33 @@ function renderTable() {
         const formData = ad.formData || {};
         const breakdown = ad.breakdown || {};
         const scores = breakdown.scores || {};
+        // Helper for fallback logic
+        const getVal = (...args) => {
+            for (const arg of args) {
+                if (arg !== undefined && arg !== null && arg !== '') return arg;
+            }
+            return '-';
+        };
         return `
         <tr>
             <td>
-                <div class="font-semibold text-white">${tool.name || formData.toolName || 'Unknown Tool'}</div>
-                <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
+                <div class="font-semibold text-white">${getVal(tool.name, formData.toolName, 'Unknown Tool')}</div>
+                <div class="text-gray-400 text-sm">${getVal(tool.vendor, formData.toolCategory, tool.category)}</div>
             </td>
             <td>
                 <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
                     ${capitalize(getRiskLevel(tool))}
                 </span>
             </td>
-            <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-red-400 font-semibold">${tool.data_storage_score ?? scores.dataStorage ?? '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.training_usage_score ?? scores.trainingUsage ?? '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.access_controls_score ?? scores.accessControls ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance_score ?? scores.complianceRisk ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance ?? '-'}</span></td>
-            <td><span class="text-blue-400 font-semibold">${tool.category || formData.toolCategory || '-'}</span></td>
-            <td><span class="text-purple-400 font-semibold">${tool.data_classification || formData.dataClassification || '-'}</span></td>
+            <td><span class="font-bold">${getVal(tool.total_score, ad.finalScore, 0)}</span><span class="text-gray-400 text-sm">/100</span></td>
+            <td><span class="text-red-400 font-semibold">${getVal(tool.data_storage_score, scores.dataStorage)}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${getVal(tool.training_usage_score, scores.trainingUsage)}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${getVal(tool.access_controls_score, scores.accessControls)}</span></td>
+            <td><span class="text-green-400 font-semibold">${getVal(tool.compliance_score, scores.complianceRisk)}</span></td>
+            <td><span class="text-green-400 font-semibold">${getVal(tool.vendor_transparency_score, scores.vendorTransparency)}</span></td>
+            <td><span class="text-green-400 font-semibold">${getVal(tool.compliance, ad.compliance)}</span></td>
+            <td><span class="text-blue-400 font-semibold">${getVal(tool.category, formData.toolCategory)}</span></td>
+            <td><span class="text-purple-400 font-semibold">${getVal(tool.data_classification, formData.dataClassification)}</span></td>
         </tr>
         `;
     }).join('');
