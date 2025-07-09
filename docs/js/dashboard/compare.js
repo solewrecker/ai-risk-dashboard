@@ -50,27 +50,35 @@ function renderSelectedTags() {
 function renderTable() {
     const tbody = document.getElementById('compare-tools-table-body');
     if (!tbody) return;
-    tbody.innerHTML = selectedTools.map(tool => `
+    tbody.innerHTML = selectedTools.map(tool => {
+        // Extract nested fields safely
+        const ad = tool.assessment_data || {};
+        const formData = ad.formData || {};
+        const breakdown = ad.breakdown || {};
+        const scores = breakdown.scores || {};
+        return `
         <tr>
             <td>
-                <div class="font-semibold text-white">${tool.name}</div>
-                <div class="text-gray-400 text-sm">${tool.vendor || ''}</div>
+                <div class="font-semibold text-white">${tool.name || formData.toolName || 'Unknown Tool'}</div>
+                <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
             </td>
             <td>
                 <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
                     ${capitalize(getRiskLevel(tool))}
                 </span>
             </td>
-            <td><span class="font-bold">${tool.total_score || tool.totalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-red-400 font-semibold">${tool.data_storage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.training_usage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.access_controls || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance_risk || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance || '-'}</span></td>
-            <td><!-- Actions (e.g., export) --></td>
+            <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
+            <td><span class="text-red-400 font-semibold">${tool.data_storage_score ?? scores.dataStorage ?? '-'}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${tool.training_usage_score ?? scores.trainingUsage ?? '-'}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${tool.access_controls_score ?? scores.accessControls ?? '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.compliance_score ?? scores.complianceRisk ?? '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.compliance ?? '-'}</span></td>
+            <td><span class="text-blue-400 font-semibold">${tool.category || formData.toolCategory || '-'}</span></td>
+            <td><span class="text-purple-400 font-semibold">${tool.data_classification || formData.dataClassification || '-'}</span></td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderLegend() {
