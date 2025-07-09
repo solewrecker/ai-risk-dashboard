@@ -159,7 +159,9 @@ function renderModal() {
     // --- Filtering ---
     const availableTools = allTools.filter(tool => {
         const matchesSearch = tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()));
-        const matchesRisk = riskFilter === 'ALL' || (tool.risk_level || tool.riskLevel || '').toUpperCase() === riskFilter;
+        const score = tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0;
+        const calculatedRisk = getRiskLevel(score);
+        const matchesRisk = riskFilter === 'ALL' || calculatedRisk.toUpperCase() === riskFilter;
         const matchesVendor = vendorFilter === 'ALL' || tool.vendor === vendorFilter;
         return matchesSearch && matchesRisk && matchesVendor;
     });
@@ -375,7 +377,9 @@ function updateModalToolList() {
     const modalSelectedTools = window._modalSelectedTools || [];
     const availableTools = allTools.filter(tool => {
         const matchesSearch = tool.name.toLowerCase().includes(modalSearchTerm.toLowerCase()) || (tool.vendor && tool.vendor.toLowerCase().includes(modalSearchTerm.toLowerCase()));
-        const matchesRisk = riskFilter === 'ALL' || (tool.risk_level || tool.riskLevel || '').toUpperCase() === riskFilter;
+        const score = tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0;
+        const calculatedRisk = getRiskLevel(score);
+        const matchesRisk = riskFilter === 'ALL' || calculatedRisk.toUpperCase() === riskFilter;
         const matchesVendor = vendorFilter === 'ALL' || tool.vendor === vendorFilter;
         return matchesSearch && matchesRisk && matchesVendor;
     });
