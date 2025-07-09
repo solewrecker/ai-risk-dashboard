@@ -164,39 +164,41 @@ function renderModal() {
 export function setupEventListeners() {
     if (window._compareEventListenersAttached) return;
     window._compareEventListenersAttached = true;
-    // Remove tool tag
-    document.getElementById('compare-selected-tags').addEventListener('click', (e) => {
-        if (e.target.classList.contains('compare-tools__tag-remove')) {
-            const toolId = e.target.getAttribute('data-tool-id');
+
+    document.body.addEventListener('click', async (e) => {
+        const addBtn = e.target.closest('.compare-tools__add-btn');
+        if (addBtn) {
+            if (addBtn.disabled) return;
+            addBtn.disabled = true;
+            addBtn.classList.add('loading');
+            try {
+                await loadAssessments();
+                initCompareTools(normalizeAssessments(getAssessments()));
+                window._modalSelectedTools = [...selectedTools];
+                showModal = true;
+                modalSearchTerm = '';
+                renderModal();
+                setupModalListeners();
+            } finally {
+                addBtn.disabled = false;
+                addBtn.classList.remove('loading');
+            }
+        }
+
+        const tagRemoveBtn = e.target.closest('.compare-tools__tag-remove');
+        if (tagRemoveBtn) {
+            const toolId = tagRemoveBtn.getAttribute('data-tool-id');
             selectedTools = selectedTools.filter(t => String(t.id) !== String(toolId));
             renderSummaryCards();
             renderSelectedTags();
             renderTable();
         }
-        if (e.target.classList.contains('compare-tools__clear-all-btn')) {
+
+        if (e.target.closest('.compare-tools__clear-all-btn')) {
             selectedTools = [];
             renderSummaryCards();
             renderSelectedTags();
             renderTable();
-        }
-    });
-    // Add Tool button
-    const addBtn = document.querySelector('.compare-tools__add-btn');
-    addBtn.addEventListener('click', async () => {
-        if (addBtn.disabled) return;
-        addBtn.disabled = true;
-        addBtn.classList.add('loading');
-        try {
-            await loadAssessments();
-            initCompareTools(normalizeAssessments(getAssessments()));
-            window._modalSelectedTools = [...selectedTools];
-            showModal = true;
-            modalSearchTerm = '';
-            renderModal();
-            setupModalListeners();
-        } finally {
-            addBtn.disabled = false;
-            addBtn.classList.remove('loading');
         }
     });
 }
