@@ -54,11 +54,14 @@ function renderTable() {
     // Helper to safely get nested properties
     const getProp = (obj, path, fallback = '-') => {
         const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
-        return value || fallback;
+        // Check for null/undefined, but allow 0
+        return value !== null && value !== undefined ? value : fallback;
     };
 
     tbody.innerHTML = selectedTools.map(tool => {
         const details = tool.assessment_data?.detailed_assessment || {};
+        const assessmentDetails = details.assessment_details || {};
+        
         return `
             <tr>
                 <td>
@@ -71,12 +74,12 @@ function renderTable() {
                     </span>
                 </td>
                 <td><span class="font-bold">${tool.total_score || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-                <td><span class="text-red-400 font-semibold">${getProp(details, 'data_storage.value')}</span></td>
-                <td><span class="text-yellow-400 font-semibold">${getProp(details, 'training_data.value')}</span></td>
-                <td><span class="text-yellow-400 font-semibold">${getProp(details, 'access_controls.value')}</span></td>
-                <td><span class="text-green-400 font-semibold">${getProp(details, 'compliance.value')}</span></td>
-                <td><span class="text-green-400 font-semibold">${getProp(details, 'transparency.value')}</span></td>
-                <td><span class="text-green-400 font-semibold">${getProp(details, 'third_party_integration.value')}</span></td>
+                <td><span class="text-red-400 font-semibold">${getProp(assessmentDetails, 'data_storage_and_security.category_score')}</span></td>
+                <td><span class="text-yellow-400 font-semibold">${getProp(assessmentDetails, 'training_data_usage.category_score')}</span></td>
+                <td><span class="text-yellow-400 font-semibold">${getProp(assessmentDetails, 'access_controls.category_score')}</span></td>
+                <td><span class="text-green-400 font-semibold">${getProp(assessmentDetails, 'compliance_and_legal_risk.category_score')}</span></td>
+                <td><span class="text-green-400 font-semibold">${getProp(assessmentDetails, 'vendor_transparency.category_score')}</span></td>
+                <td>-</td>
                 <td><!-- Actions (e.g., export) --></td>
             </tr>
         `;
