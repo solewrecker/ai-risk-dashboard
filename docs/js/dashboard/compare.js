@@ -48,18 +48,19 @@ function renderSelectedTags() {
 }
 
 function renderTable(assessments) {
-    // Log all available elements to help diagnose the issue
-    console.log('All elements with compare-tools-table-body:', 
-        document.querySelectorAll('#compare-tools-table-body'));
-    
-    // Check if the compare-content is loaded
-    const compareContent = document.getElementById('compare-content');
-    console.log('Compare content element:', compareContent);
-    
-    // Check if the tab is active
-    if (compareContent && !compareContent.classList.contains('active')) {
-        console.warn('Compare tools tab is not active');
+    // Check if assessments is undefined or not an array
+    if (!assessments) {
+        console.error('Assessments is undefined or null');
+        return;
     }
+
+    if (!Array.isArray(assessments)) {
+        console.error('Assessments is not an array', typeof assessments, assessments);
+        return;
+    }
+
+    // Log the number of assessments being rendered
+    console.log(`Rendering ${assessments.length} assessments`);
 
     const tableBody = document.getElementById('compare-tools-table-body');
     
@@ -67,8 +68,7 @@ function renderTable(assessments) {
     if (!tableBody) {
         console.error('Table body element not found. Details:', {
             documentReadyState: document.readyState,
-            compareContentExists: !!compareContent,
-            compareContentClasses: compareContent ? Array.from(compareContent.classList) : 'N/A',
+            compareContentExists: !!document.getElementById('compare-content'),
             allBodyElements: document.body.innerHTML.includes('compare-tools-table-body')
         });
         return;
@@ -76,9 +76,6 @@ function renderTable(assessments) {
 
     // Clear existing rows
     tableBody.innerHTML = ''; 
-
-    // Log the number of assessments being rendered
-    console.log(`Rendering ${assessments.length} assessments`);
 
     assessments.forEach(assessment => {
         const row = document.createElement('tr');
@@ -412,13 +409,18 @@ function updateModalToolList() {
 // Function to load and render compare tools table
 async function loadCompareToolsTable() {
     try {
-        // Fetch assessments from the database
-        const { data: assessments, error } = await supabase
+        // Use window.supabase instead of supabase
+        const { data: assessments, error } = await window.supabase
             .from('assessments')
             .select('*');
 
         if (error) {
             console.error('Error fetching assessments:', error);
+            return;
+        }
+
+        if (!assessments || assessments.length === 0) {
+            console.warn('No assessments found');
             return;
         }
 
@@ -429,5 +431,10 @@ async function loadCompareToolsTable() {
     }
 }
 
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', loadCompareToolsTable); 
+// Ensure this function is called when the page loads or the compare tab is activated
+document.addEventListener('DOMContentLoaded', () => {
+    const compareTab = document.querySelector('button[onclick="switchTab(\'compare\')"]');
+    if (compareTab) {
+        compareTab.addEventListener('click', loadCompareToolsTable);
+    }
+}); 
