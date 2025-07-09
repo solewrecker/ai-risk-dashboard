@@ -9,6 +9,7 @@ let allTools = [];
 let selectedTools = [];
 let showModal = false;
 let modalSearchTerm = '';
+let expandedToolId = null;
 
 export function initCompareTools(toolData) {
     // Use only the user's real assessments as the source of truth
@@ -56,16 +57,25 @@ function renderTable() {
         const formData = ad.formData || {};
         const breakdown = ad.breakdown || {};
         const scores = breakdown.scores || {};
+        const isExpanded = expandedToolId === tool.id;
+        // Compliance info
+        const complianceCerts = (tool.compliance_certifications || []).join(', ') || '-';
+        const complianceSummary = ad.compliance_summary || (ad.detailedAssessment && ad.detailedAssessment.compliance_summary) || '-';
+        // Recommendations
+        const recs = (ad.recommendations || []).map(r => `<li><strong>${r.title}</strong> <span class="compare-tools__rec-priority">[${r.priority}]</span></li>`).join('') || '<li>-</li>';
         return `
-        <tr>
+        <tr class="compare-tools__row">
             <td>
+                <button class="compare-tools__expand-btn" data-tool-id="${tool.id}" aria-expanded="${isExpanded}">
+                    <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
+                </button>
                 <div class="font-semibold text-white">${tool.name || formData.toolName || 'Unknown Tool'}</div>
                 <div class="text-gray-400 text-xs">${formData.toolVersion ? formData.toolVersion : ''}</div>
                 <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
             </td>
             <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
-                    ${capitalize(getRiskLevel(tool))}
+                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool.total_score || ad.finalScore || 0)}">
+                    ${capitalize(getRiskLevel(tool.total_score || ad.finalScore || 0))}
                 </span>
             </td>
             <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
@@ -76,8 +86,27 @@ function renderTable() {
             <td><span class="text-green-400 font-semibold">${tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-'}</span></td>
             <td><span class="text-green-400 font-semibold">${tool.compliance ?? '-'}</span></td>
         </tr>
+        <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
+            <td colspan="9">
+                <div class="compare-tools__details">
+                    <div><strong>Category:</strong> ${tool.category || formData.toolCategory || '-'}</div>
+                    <div><strong>Data Classification:</strong> ${tool.data_classification || formData.dataClassification || '-'}</div>
+                    <div><strong>Compliance Certifications:</strong> ${complianceCerts}</div>
+                    <div><strong>Compliance Summary:</strong> ${complianceSummary}</div>
+                    <div><strong>Recommendations:</strong><ul>${recs}</ul></div>
+                </div>
+            </td>
+        </tr>
         `;
     }).join('');
+    // Attach expand/collapse listeners
+    tbody.querySelectorAll('.compare-tools__expand-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const toolId = btn.getAttribute('data-tool-id');
+            expandedToolId = expandedToolId === toolId ? null : toolId;
+            renderTable();
+        });
+    });
 }
 
 function renderLegend() {
