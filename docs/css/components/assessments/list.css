@@ -108,15 +108,3 @@
 }
 
 /* Dashboard Controls styles have been migrated to components/dashboard/controls.css (BEM) */
-
-/* Styles for Recent Assessments summary card score values (migrated from assessment-list.css) */
-.score-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-}
-.score-value.risk-low { color: var(--color-green-400); }
-.score-value.risk-medium { color: var(--color-yellow-400); }
-.score-value.risk-high { color: var(--color-red-400); }
-.score-value.risk-critical { color: var(--color-purple-400); }
