@@ -229,3 +229,171 @@
     padding: 0.7rem 0.5rem;
   }
 } 
+
+.compare-tools-table__row--selected {
+  background-color: var(--color-background-light);
+}
+
+.compare-tools-table__expand-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-right: 0.75rem;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.compare-tools-table__expand-btn:hover {
+    color: var(--color-text-primary);
+}
+
+.compare-tools-table__row[aria-expanded="true"] .compare-tools-table__expand-btn {
+    transform: rotate(180deg);
+}
+
+.compare-tools-table__cell-content {
+    display: flex;
+    align-items: center;
+}
+
+.compare-tools-table__expanded-content-row td {
+    background-color: var(--color-background-dark);
+    padding: 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.compare-tools-table__expanded-content {
+    padding: 1.5rem;
+}
+
+.compare-tools-table__tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border-light);
+    margin-bottom: 1.5rem;
+}
+
+.compare-tools-table__tab-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; /* Overlap with container border */
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.compare-tools-table__tab-btn:hover {
+    color: var(--color-text-primary);
+}
+
+.compare-tools-table__tab-btn.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+/* Tab Content Styling */
+.compare-tools-table__overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.compare-tools-table__card {
+    background-color: var(--color-background-light);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+    border: 1px solid var(--color-border-light);
+}
+
+.compare-tools-table__card-title {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.compare-tools-table__card-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.compare-tools-table__card-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.compare-tools-table__detailed-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.compare-tools-table__breakdown-item {
+    background-color: var(--color-background-light);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+}
+
+.compare-tools-table__breakdown-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.compare-tools-table__breakdown-text {
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.compare-tools-table__recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.compare-tools-table__recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background-color: var(--color-background-light);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+}
+
+.compare-tools-table__rec-indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-top: 0.5rem; /* Align with text */
+    flex-shrink: 0;
+}
+
+.compare-tools-table__rec-indicator--high { background-color: var(--color-risk-high); }
+.compare-tools-table__rec-indicator--medium { background-color: var(--color-risk-medium); }
+.compare-tols-table__rec-indicator--low { background-color: var(--color-risk-low); }
+
+.compare-tools-table__rec-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.compare-tools-table__rec-text {
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.compare-tools-table__rec-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    text-transform: capitalize;
+} 
