@@ -186,8 +186,8 @@ function renderModal() {
             ${availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
               availableTools.map(tool => {
                 const isSelected = modalSelectedTools.some(t => String(t.id) === String(tool.id));
-                const risk = (tool.risk_level || '').toLowerCase();
-                const score = tool.total_score || 0;
+                const score = tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0;
+                const risk = getRiskLevel(score);
                 return `
                   <div class="compare-tools__modal-item${isSelected ? ' compare-tools__modal-item--selected' : ''}" data-tool-id="${tool.id}">
                     <div class="compare-tools__modal-item-check">${isSelected ? '&#10003;' : ''}</div>
@@ -196,7 +196,7 @@ function renderModal() {
                       <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
                     </div>
                     <div class="compare-tools__modal-item-score-group">
-                      <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk}">${score}</span>
+                      <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk} text-risk-${risk}">${score}</span>
                       ${getRiskBadge(risk, score)}
                     </div>
                   </div>
@@ -391,7 +391,7 @@ function updateModalToolList() {
                   <div class="compare-tools__modal-item-vendor">${tool.vendor || ''}</div>
                 </div>
                 <div class="compare-tools__modal-item-score-group">
-                  <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk}">${score}</span>
+                  <span class="compare-tools__modal-item-score compare-tools__modal-item-score--${risk} text-risk-${risk}">${score}</span>
                   ${getRiskBadge(risk, score)}
                 </div>
               </div>

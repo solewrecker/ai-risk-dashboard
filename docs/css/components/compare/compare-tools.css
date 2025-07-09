@@ -782,3 +782,9 @@
   margin-bottom: 0.25em;
   font-size: 0.97em;
 } 
+
+/* --- Risk Level Text Colors --- */
+.text-risk-low { color: var(--color-green-400, #4ade80); }
+.text-risk-medium { color: var(--color-yellow-400, #facc15); }
+.text-risk-high { color: var(--color-red-400, #f87171); }
+.text-risk-critical { color: var(--color-purple-400, #a78bfa); } 
