@@ -2,6 +2,7 @@
 // Logic for the Compare Tools tab: dynamic rendering, tool selection, and interactivity
 
 import { loadAssessments, getAssessments } from './assessments.js';
+import { getRiskLevel } from '../assessment/scoring.js';
 
 // Placeholder for tool data (to be replaced with real data integration)
 let allTools = [];
@@ -288,20 +289,6 @@ function setupModalListeners() {
     });
 }
 
-function getRiskLevel(tool) {
-    // Try to infer risk level from tool data
-    if (tool.risk_level) return tool.risk_level.toLowerCase();
-    if (tool.riskLevel) return tool.riskLevel.toLowerCase();
-    if (tool.total_score || tool.totalScore) {
-        const score = tool.total_score || tool.totalScore;
-        if (score >= 80) return 'critical';
-        if (score >= 60) return 'high';
-        if (score >= 35) return 'medium';
-        return 'low';
-    }
-    return 'low';
-}
-
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -310,11 +297,6 @@ function capitalize(str) {
 function getRiskBadge(risk, score) {
     let color = '', icon = '', label = '';
     switch ((risk || '').toLowerCase()) {
-        case 'critical':
-            color = 'compare-tools__risk-badge--critical';
-            icon = '⛔';
-            label = 'CRITICAL';
-            break;
         case 'high':
             color = 'compare-tools__risk-badge--high';
             icon = '⚠️';
