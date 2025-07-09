@@ -9,7 +9,7 @@ import { updateDashboardStats, updateProgressTracking } from './gamification.js'
 import { AchievementsManager } from './achievements.js';
 import { updateTierBadge, setupEventListeners, closeBanner, switchTab } from './ui.js';
 import { injectDashboardAdminUI } from './admin-ui.js';
-import { initCompareTools } from './compare.js';
+import { initCompareTools, setupEventListeners as setupCompareEventListeners } from './compare.js';
 
 const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     setupEventListeners();
+    setupCompareEventListeners();
     
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();

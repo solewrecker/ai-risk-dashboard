@@ -161,7 +161,7 @@ function renderModal() {
     `;
 }
 
-function setupEventListeners() {
+export function setupEventListeners() {
     if (window._compareEventListenersAttached) return;
     window._compareEventListenersAttached = true;
     // Remove tool tag
