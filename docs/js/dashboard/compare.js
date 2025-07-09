@@ -6,6 +6,7 @@ import { loadAssessments, getAssessments } from './assessments.js';
 // Placeholder for tool data (to be replaced with real data integration)
 let allTools = [];
 let selectedTools = [];
+let expandedRows = {};
 let showModal = false;
 let modalSearchTerm = '';
 
@@ -45,33 +46,132 @@ function renderSelectedTags() {
     if (selectedTools.length > 0) {
         container.innerHTML += `<button class="compare-tools__clear-all-btn" title="Clear All">Clear All</button>`;
     }
+    renderTable(); // Re-render table when tags change
 }
 
 function renderTable() {
     const tbody = document.getElementById('compare-tools-table-body');
     if (!tbody) return;
-    tbody.innerHTML = selectedTools.map(tool => `
-        <tr>
-            <td>
-                <div class="font-semibold text-white">${tool.name}</div>
-                <div class="text-gray-400 text-sm">${tool.vendor || ''}</div>
-            </td>
-            <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
-                    ${capitalize(getRiskLevel(tool))}
-                </span>
-            </td>
-            <td><span class="font-bold">${tool.total_score || tool.totalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-red-400 font-semibold">${tool.data_storage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.training_usage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.access_controls || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance_risk || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance || '-'}</span></td>
-            <td><!-- Actions (e.g., export) --></td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = selectedTools.map(tool => {
+        const isExpanded = !!expandedRows[tool.id];
+        return `
+            <tr class="compare-tools-table__row" data-tool-id="${tool.id}">
+                <td>
+                    <div class="compare-tools-table__cell-content">
+                        <button class="compare-tools-table__expand-btn">
+                            <svg class="lucide lucide-chevron-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div>
+                            <div class="font-semibold text-white">${tool.name}</div>
+                            <div class="text-gray-400 text-sm">${tool.vendor || ''}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
+                        ${capitalize(getRiskLevel(tool))}
+                    </span>
+                </td>
+                <td><span class="font-bold">${tool.total_score || tool.totalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
+                <td>${(tool.scores && tool.scores.dataStorage) || '-'}</td>
+                <td>${(tool.scores && tool.scores.trainingUsage) || '-'}</td>
+                <td>${(tool.scores && tool.scores.accessControls) || '-'}</td>
+                <td>${(tool.scores && tool.scores.complianceRisk) || '-'}</td>
+                <td>${(tool.scores && tool.scores.vendorTransparency) || '-'}</td>
+                <td>${(tool.compliance && Object.keys(tool.compliance).join(', ')) || '-'}</td>
+                <td><!-- Actions (e.g., export) --></td>
+            </tr>
+            ${isExpanded ? `
+                <tr class="compare-tools-table__expanded-content-row">
+                    <td colspan="10">
+                        ${renderExpandedContent(tool)}
+                    </td>
+                </tr>
+            ` : ''}
+        `;
+    }).join('');
 }
+
+function renderExpandedContent(tool) {
+    // Default to 'overview' tab
+    const activeTab = expandedRows[tool.id]?.activeTab || 'overview';
+
+    return `
+        <div class="compare-tools-table__expanded-content">
+            <div class="compare-tools-table__tabs">
+                <button class="compare-tools-table__tab-btn${activeTab === 'overview' ? ' active' : ''}" data-tool-id="${tool.id}" data-tab="overview">Overview</button>
+                <button class="compare-tools-table__tab-btn${activeTab === 'detailed' ? ' active' : ''}" data-tool-id="${tool.id}" data-tab="detailed">Detailed Breakdown</button>
+                <button class="compare-tools-table__tab-btn${activeTab === 'recommendations' ? ' active' : ''}" data-tool-id="${tool.id}" data-tab="recommendations">Recommendations</button>
+            </div>
+            <div class="compare-tools-table__tab-content">
+                ${activeTab === 'overview' ? renderOverviewTab(tool) : ''}
+                ${activeTab === 'detailed' ? renderDetailedBreakdownTab(tool) : ''}
+                ${activeTab === 'recommendations' ? renderRecommendationsTab(tool) : ''}
+            </div>
+        </div>
+    `;
+}
+
+function renderOverviewTab(tool) {
+    const assessment = tool.assessment_data || tool.assessmentData || {};
+    const toolInfo = assessment.tool_info || assessment.toolInfo || {};
+    return `
+        <div class="compare-tools-table__overview">
+            <div class="compare-tools-table__card">
+                <div class="compare-tools-table__card-title">Tool Version</div>
+                <div class="compare-tools-table__card-value">${toolInfo.version || 'N/A'}</div>
+                <div class="compare-tools-table__card-desc">${toolInfo.version_description || 'No description'}</div>
+            </div>
+            <div class="compare-tools-table__card">
+                <div class="compare-tools-table__card-title">Category</div>
+                <div class="compare-tools-table__card-value">${toolInfo.category || 'N/A'}</div>
+                <div class="compare-tools-table__card-desc">${toolInfo.category_description || 'No description'}</div>
+            </div>
+            <div class="compare-tools-table__card">
+                <div class="compare-tools-table__card-title">Data Classification</div>
+                <div class="compare-tools-table__card-value">${toolInfo.data_classification || 'N/A'}</div>
+                <div class="compare-tools-table__card-desc">${toolInfo.data_classification_description || 'No description'}</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderDetailedBreakdownTab(tool) {
+    const breakdown = tool.assessment_data?.detailed_breakdown || tool.assessmentData?.detailedBreakdown || {};
+    if (Object.keys(breakdown).length === 0) return '<div class="p-4">No detailed breakdown available.</div>';
+    return `
+        <div class="compare-tools-table__detailed-breakdown">
+            ${Object.entries(breakdown).map(([key, value]) => `
+                <div class="compare-tools-table__breakdown-item">
+                    <div class="compare-tools-table__breakdown-title">${value.title || key}</div>
+                    <p class="compare-tools-table__breakdown-text">${value.description || 'No details provided.'}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderRecommendationsTab(tool) {
+    const recommendations = tool.assessment_data?.recommendations || tool.assessmentData?.recommendations || [];
+    if (recommendations.length === 0) return '<div class="p-4">No recommendations available.</div>';
+    return `
+        <div class="compare-tools-table__recommendations">
+            ${recommendations.map(rec => `
+                <div class="compare-tools-table__recommendation-item">
+                     <div class="compare-tools-table__rec-indicator compare-tools-table__rec-indicator--${rec.priority || 'medium'}"></div>
+                    <div>
+                        <div class="compare-tools-table__rec-title">${rec.title}</div>
+                        <p class="compare-tools-table__rec-text">${rec.description}</p>
+                        <span class="compare-tools-table__rec-meta">
+                          Priority: ${rec.priority || 'N/A'} | Category: ${rec.category || 'N/A'}
+                        </span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
 
 function renderLegend() {
     document.getElementById('compare-tools-legend').innerHTML = `
@@ -196,9 +296,33 @@ export function setupEventListeners() {
 
         if (e.target.closest('.compare-tools__clear-all-btn')) {
             selectedTools = [];
+            expandedRows = {};
             renderSummaryCards();
             renderSelectedTags();
             renderTable();
+        }
+
+        // Handle row expansion
+        const row = e.target.closest('.compare-tools-table__row');
+        if (row && !e.target.closest('a, button:not(.compare-tools-table__expand-btn)')) {
+            const toolId = row.dataset.toolId;
+            if (expandedRows[toolId]) {
+                delete expandedRows[toolId];
+            } else {
+                expandedRows[toolId] = { activeTab: 'overview' }; // Default to overview
+            }
+            renderTable();
+        }
+        
+        // Handle tab switching in expanded row
+        const tabBtn = e.target.closest('.compare-tools-table__tab-btn');
+        if (tabBtn) {
+            const toolId = tabBtn.dataset.toolId;
+            const tab = tabBtn.dataset.tab;
+            if (expandedRows[toolId]) {
+                expandedRows[toolId].activeTab = tab;
+                renderTable();
+            }
         }
     });
 }
@@ -300,14 +424,29 @@ function capitalize(str) {
 }
 
 function normalizeAssessments(raw) {
-    return raw.map(a => ({
-        id: a.id,
-        name: a.name || 'Unknown Tool',
-        vendor: a.category || '', // Use category as vendor for the modal
-        risk_level: a.risk_level || '',
-        total_score: a.total_score || 0,
-        // Add more fields if needed
-    }));
+    if (!raw) return [];
+    // Ensure this function can handle the nested structure from Supabase
+    return raw.map(item => {
+        const assessmentData = item.assessment_data || {};
+        const toolInfo = assessmentData.tool_info || {};
+        const scores = assessmentData.scores || {};
+        return {
+            id: item.id,
+            name: toolInfo.name || item.name,
+            vendor: toolInfo.vendor || item.vendor,
+            risk_level: assessmentData.risk_level || 'N/A',
+            total_score: assessmentData.total_score || 0,
+            scores: {
+                dataStorage: scores.data_storage?.score,
+                trainingUsage: scores.training_usage?.score,
+                accessControls: scores.access_controls?.score,
+                complianceRisk: scores.compliance?.score,
+                vendorTransparency: scores.vendor_transparency?.score,
+            },
+            compliance: assessmentData.compliance_certifications,
+            assessmentData: assessmentData, // Keep full data for detailed view
+        };
+    });
 }
 
 // Add helper for risk badge
