@@ -47,43 +47,27 @@ function renderSelectedTags() {
     }
 }
 
-function renderTable() {
-    const tbody = document.getElementById('compare-tools-table-body');
-    if (!tbody) return;
+function renderTable(assessments) {
+    const tableBody = document.querySelector('.compare-tools__table-body');
+    tableBody.innerHTML = ''; // Clear existing rows
 
-    // Helper to safely get nested properties
-    const getProp = (obj, path, fallback = '-') => {
-        const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
-        // Check for null/undefined, but allow 0
-        return value !== null && value !== undefined ? value : fallback;
-    };
-
-    tbody.innerHTML = selectedTools.map(tool => {
-        const details = tool.assessment_data?.detailed_assessment || {};
-        const assessmentDetails = details.assessment_details || {};
-        
-        return `
-            <tr>
-                <td>
-                    <div class="font-semibold text-white">${tool.name}</div>
-                    <div class="text-gray-400 text-sm">${tool.category || ''}</div>
-                </td>
-                <td>
-                    <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
-                        ${capitalize(getRiskLevel(tool))}
-                    </span>
-                </td>
-                <td><span class="font-bold">${tool.total_score || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-                <td><span class="text-red-400 font-semibold">${getProp(assessmentDetails, 'data_storage_and_security.category_score')}</span></td>
-                <td><span class="text-yellow-400 font-semibold">${getProp(assessmentDetails, 'training_data_usage.category_score')}</span></td>
-                <td><span class="text-yellow-400 font-semibold">${getProp(assessmentDetails, 'access_controls.category_score')}</span></td>
-                <td><span class="text-green-400 font-semibold">${getProp(assessmentDetails, 'compliance_and_legal_risk.category_score')}</span></td>
-                <td><span class="text-green-400 font-semibold">${getProp(assessmentDetails, 'vendor_transparency.category_score')}</span></td>
-                <td>-</td>
-                <td><!-- Actions (e.g., export) --></td>
-            </tr>
+    assessments.forEach(assessment => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${assessment.name}</td>
+            <td>${assessment.risk_level}</td>
+            <td>${assessment.total_score}</td>
+            <td>${assessment.assessment_data.formData.dataClassification || '-'}</td>
+            <td>${assessment.assessment_data.formData.toolVersion || '-'}</td>
+            <td>${assessment.assessment_data.breakdown.scores.dataStorage || '-'}</td>
+            <td>${assessment.assessment_data.breakdown.scores.trainingUsage || '-'}</td>
+            <td>${assessment.assessment_data.breakdown.scores.accessControls || '-'}</td>
+            <td>${assessment.assessment_data.breakdown.scores.complianceRisk || '-'}</td>
+            <td>${assessment.assessment_data.breakdown.scores.vendorTransparency || '-'}</td>
+            <td>-</td>
         `;
-    }).join('');
+        tableBody.appendChild(row);
+    });
 }
 
 function renderLegend() {
@@ -394,4 +378,27 @@ function updateModalToolList() {
             updateModalToolList();
         });
     });
-} 
+}
+
+// Function to load and render compare tools table
+async function loadCompareToolsTable() {
+    try {
+        // Fetch assessments from the database
+        const { data: assessments, error } = await supabase
+            .from('assessments')
+            .select('*');
+
+        if (error) {
+            console.error('Error fetching assessments:', error);
+            return;
+        }
+
+        // Render the table with fetched assessments
+        renderTable(assessments);
+    } catch (err) {
+        console.error('Unexpected error loading compare tools:', err);
+    }
+}
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', loadCompareToolsTable); 
