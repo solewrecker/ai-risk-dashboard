@@ -78,6 +78,7 @@ function renderTable() {
         const complianceRisk = tool.compliance_score ?? scores.complianceRisk ?? '-';
         const vendorTransparency = tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-';
         const compliance = tool.compliance ?? '-';
+        const totalScore = tool.total_score || ad.finalScore || 0;
         return `
         <tr class="compare-tools__row">
             <td>
@@ -89,17 +90,17 @@ function renderTable() {
                 <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
             </td>
             <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0)}">
-                    ${capitalize(getRiskLevel(tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0))}
+                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(totalScore)}">
+                    ${capitalize(getRiskLevel(totalScore))}
                 </span>
             </td>
-            <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="${getRiskColorClass(dataStorage)} font-semibold">${dataStorage}</span></td>
-            <td><span class="${getRiskColorClass(trainingUsage)} font-semibold">${trainingUsage}</span></td>
-            <td><span class="${getRiskColorClass(accessControls)} font-semibold">${accessControls}</span></td>
-            <td><span class="${getRiskColorClass(complianceRisk)} font-semibold">${complianceRisk}</span></td>
-            <td><span class="${getRiskColorClass(vendorTransparency)} font-semibold">${vendorTransparency}</span></td>
-            <td><span class="${getRiskColorClass(compliance)} font-semibold">${compliance}</span></td>
+            <td><span class="font-bold ${getRiskColorClass(totalScore)}">${totalScore}</span><span class="text-gray-400 text-sm">/100</span></td>
+            <td><span class="text-white font-semibold">${dataStorage}</span></td>
+            <td><span class="text-white font-semibold">${trainingUsage}</span></td>
+            <td><span class="text-white font-semibold">${accessControls}</span></td>
+            <td><span class="text-white font-semibold">${complianceRisk}</span></td>
+            <td><span class="text-white font-semibold">${vendorTransparency}</span></td>
+            <td><span class="text-white font-semibold">${compliance}</span></td>
         </tr>
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
             <td colspan="9">
@@ -341,6 +342,11 @@ function capitalize(str) {
 function getRiskBadge(risk, score) {
     let color = '', icon = '', label = '';
     switch ((risk || '').toLowerCase()) {
+        case 'critical':
+            color = 'compare-tools__risk-badge--critical';
+            icon = '⛔';
+            label = 'CRITICAL';
+            break;
         case 'high':
             color = 'compare-tools__risk-badge--high';
             icon = '⚠️';
