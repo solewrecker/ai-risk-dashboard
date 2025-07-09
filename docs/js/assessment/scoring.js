@@ -73,7 +73,7 @@ export function applyClientSideMultipliers(dbData, formData) {
 }
 
 export function getRiskLevel(score) {
-    if (score >= 75) return 'critical';
+    if (score >= 80) return 'critical';
     if (score >= 60) return 'high';
     if (score >= 35) return 'medium';
     return 'low';
