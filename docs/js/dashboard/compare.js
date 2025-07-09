@@ -52,6 +52,11 @@ function renderSelectedTags() {
     }
 }
 
+function getRiskColorClass(score) {
+    const risk = getRiskLevel(score);
+    return `text-risk-${risk}`;
+}
+
 function renderTable() {
     const tbody = document.getElementById('compare-tools-table-body');
     if (!tbody) return;
@@ -66,6 +71,13 @@ function renderTable() {
         const complianceSummary = ad.compliance_summary || (ad.detailedAssessment && ad.detailedAssessment.compliance_summary) || '-';
         // Recommendations
         const recs = (ad.recommendations || []).map(r => `<li><strong>${r.title}</strong> <span class="compare-tools__rec-priority">[${r.priority}]</span></li>`).join('') || '<li>-</li>';
+        // Score values
+        const dataStorage = tool.data_storage_score ?? scores.dataStorage ?? '-';
+        const trainingUsage = tool.training_usage_score ?? scores.trainingUsage ?? '-';
+        const accessControls = tool.access_controls_score ?? scores.accessControls ?? '-';
+        const complianceRisk = tool.compliance_score ?? scores.complianceRisk ?? '-';
+        const vendorTransparency = tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-';
+        const compliance = tool.compliance ?? '-';
         return `
         <tr class="compare-tools__row">
             <td>
@@ -82,12 +94,12 @@ function renderTable() {
                 </span>
             </td>
             <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-red-400 font-semibold">${tool.data_storage_score ?? scores.dataStorage ?? '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.training_usage_score ?? scores.trainingUsage ?? '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.access_controls_score ?? scores.accessControls ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance_score ?? scores.complianceRisk ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance ?? '-'}</span></td>
+            <td><span class="${getRiskColorClass(dataStorage)} font-semibold">${dataStorage}</span></td>
+            <td><span class="${getRiskColorClass(trainingUsage)} font-semibold">${trainingUsage}</span></td>
+            <td><span class="${getRiskColorClass(accessControls)} font-semibold">${accessControls}</span></td>
+            <td><span class="${getRiskColorClass(complianceRisk)} font-semibold">${complianceRisk}</span></td>
+            <td><span class="${getRiskColorClass(vendorTransparency)} font-semibold">${vendorTransparency}</span></td>
+            <td><span class="${getRiskColorClass(compliance)} font-semibold">${compliance}</span></td>
         </tr>
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
             <td colspan="9">
@@ -369,8 +381,8 @@ function updateModalToolList() {
     listGrid.innerHTML = availableTools.length === 0 ? '<div class="compare-tools__modal-empty">No tools found</div>' :
         availableTools.map(tool => {
             const isSelected = modalSelectedTools.some(t => String(t.id) === String(tool.id));
-            const risk = (tool.risk_level || '').toLowerCase();
-            const score = tool.total_score || 0;
+            const score = tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0;
+            const risk = getRiskLevel(score);
             return `
               <div class="compare-tools__modal-item${isSelected ? ' compare-tools__modal-item--selected' : ''}" data-tool-id="${tool.id}">
                 <div class="compare-tools__modal-item-check">${isSelected ? '&#10003;' : ''}</div>
