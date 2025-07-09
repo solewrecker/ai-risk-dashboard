@@ -26,13 +26,16 @@ export function initCompareTools(toolData) {
 
 function renderSummaryCards() {
     const total = selectedTools.length;
-    const high = selectedTools.filter(t => getRiskLevel(t) === 'high').length;
-    const medium = selectedTools.filter(t => getRiskLevel(t) === 'medium').length;
-    const low = selectedTools.filter(t => getRiskLevel(t) === 'low').length;
+    const high = selectedTools.filter(t => getRiskLevel(t.total_score || (t.assessment_data && t.assessment_data.finalScore) || 0) === 'high').length;
+    const medium = selectedTools.filter(t => getRiskLevel(t.total_score || (t.assessment_data && t.assessment_data.finalScore) || 0) === 'medium').length;
+    const low = selectedTools.filter(t => getRiskLevel(t.total_score || (t.assessment_data && t.assessment_data.finalScore) || 0) === 'low').length;
+    const critical = selectedTools.filter(t => getRiskLevel(t.total_score || (t.assessment_data && t.assessment_data.finalScore) || 0) === 'critical').length;
     document.getElementById('compare-summary-total').innerHTML = `<div class="compare-tools__summary-label">Total Tools</div><div class="compare-tools__summary-value">${total}</div>`;
     document.getElementById('compare-summary-high').innerHTML = `<div class="compare-tools__summary-label">High Risk</div><div class="compare-tools__summary-value">${high}</div>`;
     document.getElementById('compare-summary-medium').innerHTML = `<div class="compare-tools__summary-label">Medium Risk</div><div class="compare-tools__summary-value">${medium}</div>`;
     document.getElementById('compare-summary-low').innerHTML = `<div class="compare-tools__summary-label">Low Risk</div><div class="compare-tools__summary-value">${low}</div>`;
+    // Optionally add critical if you want to display it
+    // document.getElementById('compare-summary-critical').innerHTML = `<div class="compare-tools__summary-label">Critical Risk</div><div class="compare-tools__summary-value">${critical}</div>`;
 }
 
 function renderSelectedTags() {
@@ -74,8 +77,8 @@ function renderTable() {
                 <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
             </td>
             <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool.total_score || ad.finalScore || 0)}">
-                    ${capitalize(getRiskLevel(tool.total_score || ad.finalScore || 0))}
+                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0)}">
+                    ${capitalize(getRiskLevel(tool.total_score || (tool.assessment_data && tool.assessment_data.finalScore) || 0))}
                 </span>
             </td>
             <td><span class="font-bold">${tool.total_score || ad.finalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
