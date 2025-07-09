@@ -1,454 +1,357 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Shield, AlertTriangle, CheckCircle, XCircle, Eye, Download, Plus } from 'lucide-react';
-
-const AIToolComparison = () => {
-  const [expandedRows, setExpandedRows] = useState({});
-  const [selectedTools, setSelectedTools] = useState(['chatgpt-free']);
-
-  // Sample data - you can expand this with more tools
-  const toolsData = {
-    'chatgpt-free': {
-      name: "ChatGPT Free",
-      vendor: "OpenAI",
-      license_type: "Free tier",
-      total_score: 72,
-      risk_level: "HIGH RISK",
-      category: "Generative AI",
-      scores: {
-        dataStorage: 21,
-        trainingUsage: 20,
-        accessControls: 20,
-        complianceRisk: 6,
-        vendorTransparency: 4
-      },
-      compliance: {
-        pci: "non-compliant",
-        sox: "compliant",
-        gdpr: "compliant",
-        hipaa: "non-compliant"
-      },
-      details: {
-        dataStorage: "Geographic: US-based with some international infrastructure but good contractual protections | Encryption: Standard TLS and AES encryption documented but not customer-controlled | Retention: Indefinite retention by default, user can delete but recent court order may override deletions",
-        trainingUsage: "Training: Used by default for model training but opt-out available through settings or privacy portal | Sharing: Limited third-party sharing primarily for safety/compliance with clear disclosure",
-        accessControls: "Admin: No organizational controls for free tier - individual accounts only | Audit: No audit logs or activity tracking available | Integration: Basic username/password only, no enterprise identity integration",
-        complianceRisk: "Violations: Basic certifications present, generally compliant privacy policy | Transparency: Good general documentation though some processing details could be clearer",
-        vendorTransparency: "Clear privacy policy and basic security documentation available, support responsive but prioritizes paid users"
-      },
-      recommendations: [
-        {
-          title: "Block free tier for business use",
-          description: "Free tier lacks necessary enterprise controls and retains data indefinitely. Consider blocking at network level for business users.",
-          priority: "high",
-          category: "security"
-        },
-        {
-          title: "Upgrade to enterprise tier if needed",
-          description: "ChatGPT Enterprise provides better data controls, admin oversight, and compliance features necessary for business use.",
-          priority: "medium",
-          category: "governance"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment List Component</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Base: variables.css */
+        :root {
+          --primary-color: #3b82f6;
+          --secondary-color: #8b5cf6;
+          --color-white: #ffffff;
+          --color-black: #000000;
+          --color-gray-50: #f9fafb;
+          --color-gray-100: #f3f4f6;
+          --color-gray-200: #e5e7eb;
+          --color-gray-300: #d1d5db;
+          --color-gray-400: #9ca3af;
+          --color-gray-500: #6b7280;
+          --color-gray-600: #4b5563;
+          --color-gray-700: #374151;
+          --color-gray-800: #1f2937;
+          --color-gray-900: #111827;
+          --color-blue-400: #60a5fa;
+          --color-blue-500: #3b82f6;
+          --color-blue-600: #2563eb;
+          --color-blue-700: #1d4ed8;
+          --color-red-400: #f87171;
+          --color-red-500: #ef4444;
+          --color-red-600: #dc2626;
+          --color-green-400: #4ade80;
+          --color-green-500: #22c55e;
+          --color-green-600: #16a34a;
+          --color-yellow-400: #facc15;
+          --color-yellow-500: #eab308;
+          --color-yellow-600: #ca8a04;
+          --color-purple-400: #a78bfa;
+          --color-purple-500: #8b5cf6;
+          --color-purple-600: #7c3aed;
+          --color-risk-low-bg: rgba(22, 163, 74, 0.2);
+          --color-risk-low-text: var(--color-green-400);
+          --color-risk-medium-bg: rgba(202, 138, 4, 0.2);
+          --color-risk-medium-text: var(--color-yellow-400);
+          --color-risk-high-bg: rgba(220, 38, 38, 0.2);
+          --color-risk-high-text: var(--color-red-400);
+          --color-risk-critical-bg: rgba(147, 51, 234, 0.2);
+          --color-risk-critical-text: var(--color-purple-400);
         }
-      ]
-    },
-    'claude-pro': {
-      name: "Claude Pro",
-      vendor: "Anthropic",
-      license_type: "Paid subscription",
-      total_score: 45,
-      risk_level: "MEDIUM RISK",
-      category: "Generative AI",
-      scores: {
-        dataStorage: 15,
-        trainingUsage: 8,
-        accessControls: 12,
-        complianceRisk: 7,
-        vendorTransparency: 3
-      },
-      compliance: {
-        pci: "non-compliant",
-        sox: "compliant",
-        gdpr: "compliant",
-        hipaa: "non-compliant"
-      },
-      details: {
-        dataStorage: "Geographic: US-based with clear data residency | Encryption: Strong encryption standards | Retention: 90-day retention policy with user deletion options",
-        trainingUsage: "Training: Does not use conversations for training by default | Sharing: Minimal third-party sharing with clear disclosure",
-        accessControls: "Admin: Individual accounts with some team features | Audit: Basic activity tracking | Integration: Standard authentication with some enterprise options",
-        complianceRisk: "Violations: Good compliance posture with regular audits | Transparency: Clear documentation of data processing practices",
-        vendorTransparency: "Comprehensive privacy policy and security documentation, responsive support"
-      },
-      recommendations: [
-        {
-          title: "Suitable for business use with monitoring",
-          description: "Better privacy controls than free alternatives, but still requires monitoring for sensitive data.",
-          priority: "medium",
-          category: "governance"
+
+        /* Base: reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      ]
-    },
-    'github-copilot': {
-      name: "GitHub Copilot",
-      vendor: "GitHub/Microsoft",
-      license_type: "Paid subscription",
-      total_score: 38,
-      risk_level: "MEDIUM RISK",
-      category: "Code Generation",
-      scores: {
-        dataStorage: 12,
-        trainingUsage: 10,
-        accessControls: 8,
-        complianceRisk: 5,
-        vendorTransparency: 3
-      },
-      compliance: {
-        pci: "compliant",
-        sox: "compliant",
-        gdpr: "compliant",
-        hipaa: "non-compliant"
-      },
-      details: {
-        dataStorage: "Geographic: Microsoft Azure global infrastructure | Encryption: Enterprise-grade encryption | Retention: Code snippets processed temporarily",
-        trainingUsage: "Training: Uses public code repositories for training | Sharing: Integration with Microsoft ecosystem",
-        accessControls: "Admin: GitHub organization controls available | Audit: Activity logs through GitHub | Integration: Full GitHub and Microsoft ecosystem integration",
-        complianceRisk: "Violations: Strong compliance framework through Microsoft | Transparency: Clear documentation of code processing",
-        vendorTransparency: "Comprehensive documentation and enterprise support available"
-      },
-      recommendations: [
-        {
-          title: "Approved for development use",
-          description: "Good security posture for code generation with proper organizational controls.",
-          priority: "low",
-          category: "approved"
+
+        /* Base: typography.css */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--color-gray-900);
+            color: var(--color-gray-300);
+            padding: 2rem;
         }
-      ]
-    }
-  };
 
-  const getRiskColor = (riskLevel) => {
-    switch (riskLevel) {
-      case 'HIGH RISK': return 'text-red-400 bg-red-900/20';
-      case 'MEDIUM RISK': return 'text-yellow-400 bg-yellow-900/20';
-      case 'LOW RISK': return 'text-green-400 bg-green-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
-    }
-  };
+        /* Component: assessments/list.css */
+        .assessments-page__list-item {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping for the details section */
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: var(--color-gray-800);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background-color 150ms ease;
+            border: 1px solid var(--color-gray-700);
+        }
+        .assessments-page__list-item:hover {
+            background: var(--color-gray-700);
+        }
+        .assessments-page__list-item > .assessments-page__col {
+            display: flex;
+            align-items: center;
+        }
+        .assessments-page__col--tool { flex: 3; gap: 1rem; font-weight: 500; min-width: 200px; }
+        .assessments-page__col--score { flex: 1; justify-content: center; }
+        .assessments-page__col--level { flex: 1; gap: 0.5rem; }
+        .assessments-page__col--date { flex: 1.5; color: var(--color-gray-400); }
+        .assessments-page__col--actions { flex: 1; justify-content: flex-end; }
+        .assessments-page__tool-info h4 {
+            font-weight: 500;
+            color: var(--color-white);
+            margin: 0 0 0.25rem;
+        }
+        .assessments-page__tool-info p {
+            font-size: 0.875rem;
+            color: var(--color-gray-400);
+            margin: 0;
+        }
+        .assessments-page__score-badge {
+            color: white;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            background-color: var(--color-gray-600);
+        }
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .risk-badge.risk-low { background-color: var(--color-risk-low-bg); color: var(--color-risk-low-text); }
+        .risk-badge.risk-medium { background-color: var(--color-risk-medium-bg); color: var(--color-risk-medium-text); }
+        .risk-badge.risk-high { background-color: var(--color-risk-high-bg); color: var(--color-risk-high-text); }
+        .risk-badge.risk-critical { background-color: var(--color-risk-critical-bg); color: var(--color-risk-critical-text); }
+        
+        /* Details Section */
+        .assessments-page__details {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            background: var(--color-gray-900);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .assessments-page__details.assessments-page__details--expanded {
+            display: block;
+        }
 
-  const getScoreColor = (score) => {
-    if (score >= 15) return 'text-red-400';
-    if (score >= 10) return 'text-yellow-400';
-    return 'text-green-400';
-  };
+        /* New assessment-page.css styles */
+        .assessment-details__container {
+            display: flex;
+            background-color: var(--color-gray-800, #1f2937);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            gap: 2rem;
+            border: 1px solid var(--color-gray-700);
+        }
+        .assessment-details__sidebar {
+            flex: 0 0 280px;
+            border-right: 1px solid var(--color-gray-700, #374151);
+            padding-right: 2rem;
+        }
+        .assessment-details__main { flex: 1; }
+        .assessment-details__meta-title { font-size: 1.125rem; font-weight: 600; color: var(--color-white, #ffffff); margin-bottom: 1.5rem; }
+        .assessment-details__meta-item { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--color-gray-300, #d1d5db); }
+        .assessment-details__meta-icon { width: 20px; height: 20px; color: var(--color-gray-400, #9ca3af); }
+        .assessment-details__full-report-btn { width: 100%; margin-top: 2rem; }
+        .assessment-details__tabs { display: flex; border-bottom: 1px solid var(--color-gray-700, #374151); margin-bottom: 1.5rem; }
+        .assessment-details__tab { padding: 0.75rem 1.25rem; background: none; border: none; color: var(--color-gray-400, #9ca3af); cursor: pointer; font-size: 0.9375rem; font-weight: 500; transition: all 0.2s ease; border-bottom: 2px solid transparent; }
+        .assessment-details__tab:hover { color: var(--color-white, #ffffff); }
+        .assessment-details__tab.active { color: var(--primary-color, #3b82f6); border-bottom-color: var(--primary-color, #3b82f6); }
+        .assessment-details__tab-content { display: none; }
+        .assessment-details__tab-content.active { display: block; }
+        .assessment-details__category { margin-bottom: 2rem; }
+        .assessment-details__category-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-gray-700, #374151); margin-bottom: 1rem; }
+        .assessment-details__category-title { font-size: 1rem; font-weight: 600; color: var(--color-gray-200, #e5e7eb); }
+        .assessment-details__category-score { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8125rem; font-weight: 600; }
+        .assessment-details__metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+        .assessment-details__metric { background: var(--color-gray-900, #111827); padding: 1rem; border-radius: 0.5rem; }
+        .assessment-details__metric-name { font-weight: 500; color: var(--color-gray-300, #d1d5db); margin-bottom: 0.25rem; }
+        .assessment-details__metric-value { font-size: 1.125rem; font-weight: 600; color: var(--color-white, #ffffff); margin-bottom: 0.5rem; }
+        .assessment-details__metric-note { font-size: 0.8125rem; color: var(--color-gray-400, #9ca3af); line-height: 1.4; }
+        .assessment-details__recommendations-list { list-style: none; padding: 0; }
+        .assessment-details__recommendation-item { display: flex; gap: 1rem; padding: 1rem; border-radius: 0.5rem; transition: background 0.2s ease; }
+        .assessment-details__recommendation-item:hover { background: var(--color-gray-700, #374151); }
+        .assessment-details__rec-icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--color-green-400, #4ade80); margin-top: 0.125rem; }
+        .assessment-details__rec-title { font-size: 0.9375rem; font-weight: 600; color: var(--color-white, #ffffff); margin-bottom: 0.25rem; }
+        .assessment-details__rec-desc { font-size: 0.875rem; color: var(--color-gray-300, #d1d5db); line-height: 1.5; }
 
-  const getComplianceIcon = (status) => {
-    return status === 'compliant' ? 
-      <CheckCircle className="w-4 h-4 text-green-400" /> : 
-      <XCircle className="w-4 h-4 text-red-400" />;
-  };
+        /* Helper classes */
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--color-gray-400);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon:hover {
+            background-color: var(--color-gray-600);
+            color: var(--color-white);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--color-white);
+        }
+        .w-4 { width: 1rem; }
+        .h-4 { height: 1rem; }
+        .w-5 { width: 1.25rem; }
+        .h-5 { height: 1.25rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .score--low { color: var(--color-risk-low-text); }
+        .score--medium { color: var(--color-risk-medium-text); }
+        .score--high { color: var(--color-risk-high-text); }
+        .score--critical { color: var(--color-risk-critical-text); }
 
-  const toggleRow = (rowId) => {
-    setExpandedRows(prev => ({
-      ...prev,
-      [rowId]: !prev[rowId]
-    }));
-  };
+    </style>
+</head>
+<body>
 
-  const addTool = () => {
-    // In a real app, this would open a modal or navigate to add tool page
-    console.log('Add new tool assessment');
-  };
-
-  const categories = [
-    { key: 'dataStorage', label: 'Data Storage', maxScore: 25 },
-    { key: 'trainingUsage', label: 'Training Usage', maxScore: 25 },
-    { key: 'accessControls', label: 'Access Controls', maxScore: 25 },
-    { key: 'complianceRisk', label: 'Compliance Risk', maxScore: 15 },
-    { key: 'vendorTransparency', label: 'Vendor Transparency', maxScore: 10 }
-  ];
-
-  return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">AI Tool Risk Assessment Comparison</h1>
-            <p className="text-slate-400">Compare risk assessments across multiple AI tools</p>
-          </div>
-          <button
-            onClick={addTool}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add Tool
-          </button>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-5 h-5 text-blue-400" />
-              <span className="text-sm text-slate-400">Total Tools</span>
+    <div id="assessment-list-container">
+        <!-- Assessment Item 1 (Expanded) -->
+        <div class="assessments-page__list-item" data-assessment-id="1">
+            <div class="assessments-page__col assessments-page__col--tool">
+                <div class="assessments-page__tool-info">
+                    <h4>ChatGPT</h4>
+                    <p>Conversational AI</p>
+                </div>
             </div>
-            <div className="text-2xl font-bold text-white">{Object.keys(toolsData).length}</div>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
-              <span className="text-sm text-slate-400">High Risk</span>
+            <div class="assessments-page__col assessments-page__col--score">
+                <span class="assessments-page__score-badge">72/100</span>
             </div>
-            <div className="text-2xl font-bold text-red-400">
-              {Object.values(toolsData).filter(tool => tool.risk_level === 'HIGH RISK').length}
+            <div class="assessments-page__col assessments-page__col--level">
+                <span class="risk-badge risk-high">HIGH</span>
             </div>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm text-slate-400">Medium Risk</span>
+            <div class="assessments-page__col assessments-page__col--date">
+                <span>10/26/2023</span>
             </div>
-            <div className="text-2xl font-bold text-yellow-400">
-              {Object.values(toolsData).filter(tool => tool.risk_level === 'MEDIUM RISK').length}
+            <div class="assessments-page__col assessments-page__col--actions">
+                <button class="btn-icon" title="View Details" onclick="toggleAssessmentDetails('1')">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+                <button class="btn-icon" title="Delete">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
             </div>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-5 h-5 text-green-400" />
-              <span className="text-sm text-slate-400">Low Risk</span>
-            </div>
-            <div className="text-2xl font-bold text-green-400">
-              {Object.values(toolsData).filter(tool => tool.risk_level === 'LOW RISK').length}
-            </div>
-          </div>
-        </div>
-
-        {/* Comparison Table */}
-        <div className="bg-slate-800 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-700">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Tool</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Risk Level</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Total Score</th>
-                  {categories.map(cat => (
-                    <th key={cat.key} className="px-6 py-4 text-left text-sm font-medium text-slate-300">
-                      {cat.label}
-                    </th>
-                  ))}
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Compliance</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-700">
-                {Object.entries(toolsData).map(([toolId, tool]) => (
-                  <React.Fragment key={toolId}>
-                    <tr className="hover:bg-slate-750 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => toggleRow(toolId)}
-                            className="text-slate-400 hover:text-white transition-colors"
-                          >
-                            {expandedRows[toolId] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          </button>
-                          <div>
-                            <div className="font-medium text-white">{tool.name}</div>
-                            <div className="text-sm text-slate-400">{tool.vendor}</div>
-                          </div>
+            <div class="assessments-page__details assessments-page__details--expanded" id="details-1" role="region">
+                <div class="assessment-details__container">
+                    <div class="assessment-details__sidebar">
+                        <div class="assessment-details__meta">
+                            <h3 class="assessment-details__meta-title">Assessment Info</h3>
+                            <div class="assessment-details__meta-item"><i data-lucide="tag" class="assessment-details__meta-icon"></i><span><strong>Tool Version:</strong> 4.0</span></div>
+                            <div class="assessment-details__meta-item"><i data-lucide="layout-grid" class="assessment-details__meta-icon"></i><span><strong>Category:</strong> Conversational AI</span></div>
+                            <div class="assessment-details__meta-item"><i data-lucide="briefcase" class="assessment-details__meta-icon"></i><span><strong>Use Case:</strong> General content creation and summarization.</span></div>
+                            <div class="assessment-details__meta-item"><i data-lucide="shield" class="assessment-details__meta-icon"></i><span><strong>Data Classification:</strong> Public, Internal</span></div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(tool.risk_level)}`}>
-                          {tool.risk_level}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-bold ${getScoreColor(tool.total_score)}`}>
-                            {tool.total_score}
-                          </span>
-                          <span className="text-slate-400 text-sm">/100</span>
+                        <a href="#" class="btn btn-primary assessment-details__full-report-btn">View Full Report<i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i></a>
+                    </div>
+                    <div class="assessment-details__main">
+                        <div class="assessment-details__tabs">
+                            <button class="assessment-details__tab active" data-tab="breakdown" onclick="switchDetailTab(this, '1', 'breakdown')">Detailed Breakdown</button>
+                            <button class="assessment-details__tab" data-tab="recommendations" onclick="switchDetailTab(this, '1', 'recommendations')">Recommendations</button>
                         </div>
-                      </td>
-                      {categories.map(cat => (
-                        <td key={cat.key} className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${getScoreColor(tool.scores[cat.key])}`}>
-                              {tool.scores[cat.key]}
-                            </span>
-                            <span className="text-slate-400 text-sm">/{cat.maxScore}</span>
-                          </div>
-                        </td>
-                      ))}
-                      <td className="px-6 py-4">
-                        <div className="flex gap-1">
-                          {Object.entries(tool.compliance).map(([key, status]) => (
-                            <div key={key} className="flex items-center gap-1">
-                              {getComplianceIcon(status)}
-                              <span className="text-xs text-slate-400 uppercase">{key}</span>
+                        <div class="assessment-details__tab-content active" id="details-1-tab-breakdown">
+                            <div class="assessment-details__category">
+                                <div class="assessment-details__category-header">
+                                    <h4 class="assessment-details__category-title">Data Storage</h4><span class="assessment-details__category-score score--high">75/100</span>
+                                </div>
+                                <div class="assessment-details__metrics-grid">
+                                    <div class="assessment-details__metric"><div class="assessment-details__metric-name">Geographic</div><div class="assessment-details__metric-value">US-based</div><div class="assessment-details__metric-note">Some international infrastructure but good contractual protections.</div></div>
+                                    <div class="assessment-details__metric"><div class="assessment-details__metric-name">Encryption</div><div class="assessment-details__metric-value">TLS &amp; AES</div><div class="assessment-details__metric-note">Standard encryption but not customer-controlled.</div></div>
+                                    <div class="assessment-details__metric"><div class="assessment-details__metric-name">Retention</div><div class="assessment-details__metric-value">Indefinite</div><div class="assessment-details__metric-note">User can delete but recent court order may override deletions.</div></div>
+                                </div>
                             </div>
-                          ))}
+                            <div class="assessment-details__category">
+                                <div class="assessment-details__category-header">
+                                    <h4 class="assessment-details__category-title">Training Usage</h4><span class="assessment-details__category-score score--critical">80/100</span>
+                                </div>
+                                <div class="assessment-details__metrics-grid">
+                                    <div class="assessment-details__metric"><div class="assessment-details__metric-name">Training</div><div class="assessment-details__metric-value">Default Opt-in</div><div class="assessment-details__metric-note">Used for model training but opt-out available.</div></div>
+                                    <div class="assessment-details__metric"><div class="assessment-details__metric-name">Sharing</div><div class="assessment-details__metric-value">Limited</div><div class="assessment-details__metric-note">Third-party sharing primarily for safety/compliance.</div></div>
+                                </div>
+                            </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button className="text-blue-400 hover:text-blue-300 text-sm">
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                    {expandedRows[toolId] && (
-                      <tr>
-                        <td colSpan="9" className="px-6 py-4 bg-slate-900">
-                          <div className="space-y-6">
-                            {/* Detailed Breakdown */}
-                            <div>
-                              <h4 className="text-sm font-medium text-slate-300 mb-3">Risk Assessment Details</h4>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {Object.entries(tool.details).map(([key, detail]) => (
-                                  <div key={key} className="bg-slate-800 rounded-lg p-4">
-                                    <h5 className="text-sm font-medium text-white mb-2 capitalize">
-                                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                                    </h5>
-                                    <p className="text-sm text-slate-300 leading-relaxed">{detail}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Recommendations */}
-                            <div>
-                              <h4 className="text-sm font-medium text-slate-300 mb-3">Recommendations</h4>
-                              <div className="space-y-2">
-                                {tool.recommendations.map((rec, idx) => (
-                                  <div key={idx} className="bg-slate-800 rounded-lg p-4">
-                                    <div className="flex items-start gap-3">
-                                      <div className={`w-2 h-2 rounded-full mt-2 ${
-                                        rec.priority === 'high' ? 'bg-red-400' : 
-                                        rec.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
-                                      }`} />
-                                      <div>
-                                        <h5 className="text-sm font-medium text-white mb-1">{rec.title}</h5>
-                                        <p className="text-sm text-slate-300">{rec.description}</p>
-                                        <span className="text-xs text-slate-400 mt-1 inline-block">
-                                          Priority: {rec.priority} | Category: {rec.category}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <div class="assessment-details__tab-content" id="details-1-tab-recommendations">
+                            <ul class="assessment-details__recommendations-list">
+                                <li class="assessment-details__recommendation-item"><i data-lucide="check-circle" class="assessment-details__rec-icon"></i><div><h5 class="assessment-details__rec-title">Block free tier for business use</h5><p class="assessment-details__rec-desc">Free tier lacks necessary enterprise controls and retains data indefinitely.</p></div></li>
+                                <li class="assessment-details__recommendation-item"><i data-lucide="check-circle" class="assessment-details__rec-icon"></i><div><h5 class="assessment-details__rec-title">Upgrade to enterprise tier if needed</h5><p class="assessment-details__rec-desc">Enterprise provides better data controls and admin oversight.</p></div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {/* Legend */}
-        <div className="mt-6 bg-slate-800 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-slate-300 mb-3">Scoring Legend</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              <span className="text-slate-300">Low Risk (0-10)</span>
+        <!-- Assessment Item 2 (Collapsed) -->
+        <div class="assessments-page__list-item" data-assessment-id="2">
+            <div class="assessments-page__col assessments-page__col--tool">
+                <div class="assessments-page__tool-info">
+                    <h4>Midjourney</h4>
+                    <p>Image Generation</p>
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <span className="text-slate-300">Medium Risk (11-15)</span>
+            <div class="assessments-page__col assessments-page__col--score">
+                <span class="assessments-page__score-badge">55/100</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <span className="text-slate-300">High Risk (16+)</span>
+            <div class="assessments-page__col assessments-page__col--level">
+                <span class="risk-badge risk-medium">MEDIUM</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-3 h-3 text-green-400" />
-              <span className="text-slate-300">Compliant</span>
+            <div class="assessments-page__col assessments-page__col--date">
+                <span>10/25/2023</span>
             </div>
-          </div>
+            <div class="assessments-page__col assessments-page__col--actions">
+                <button class="btn-icon" title="View Details" onclick="toggleAssessmentDetails('2')">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+                 <button class="btn-icon" title="Delete">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="assessments-page__details" id="details-2" role="region">
+                <!-- Details for item 2 would be injected here by the JS when expanded -->
+                 <p style="padding: 2rem; text-align: center;">Details would load here.</p>
+            </div>
         </div>
-
-        {/* Legal Footer */}
-        <div className="mt-8 border-t border-slate-700 pt-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Assessment Details */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-400" />
-                <h3 className="text-sm font-medium text-blue-400">Assessment Details</h3>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span className="text-slate-300">Analysis Complete</span>
-                </div>
-                <div className="text-slate-400">
-                  <span className="font-medium">Generated:</span> {new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-                <div className="text-slate-400">
-                  <span className="font-medium">Framework:</span> Enterprise AI Risk Assessment v2.1
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                  <span className="text-sm text-green-400">Premium Analysis</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Important Disclaimers */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                <h3 className="text-sm font-medium text-yellow-400">Important Disclaimers</h3>
-              </div>
-              <div className="text-sm text-slate-300 space-y-2">
-                <p>This assessment analyzes publicly available information and provides general security insights.</p>
-                <p>Results should be supplemented with comprehensive vendor-specific security reviews and official documentation.</p>
-                <p className="font-medium text-slate-200">
-                  <span className="text-yellow-400">Note:</span> This analysis does not constitute professional security advice.
-                </p>
-              </div>
-            </div>
-
-            {/* Legal & Security */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Eye className="w-5 h-5 text-purple-400" />
-                <h3 className="text-sm font-medium text-purple-400">Legal & Security</h3>
-              </div>
-              <div className="text-sm text-slate-300 space-y-2">
-                <p>This assessment is confidential and proprietary. Distribution restricted to authorized personnel only.</p>
-                <p>Users are advised to consult official AI tool security documentation for comprehensive details.</p>
-                <p className="text-xs text-slate-400">© 2024 Enterprise AI Security Framework</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Links */}
-          <div className="mt-8 pt-6 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-slate-400">
-              Powered by AI Security Assessment Engine | Report ID: #ESF-2025-{String(Math.floor(Math.random() * 10000)).padStart(4, '0')}
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <button className="hover:text-slate-300 transition-colors">Privacy Policy</button>
-              <button className="hover:text-slate-300 transition-colors">Terms of Service</button>
-              <button className="hover:text-slate-300 transition-colors">Support</button>
-              <button className="hover:text-slate-300 transition-colors">Documentation</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  );
-};
 
-export default AIToolComparison;
+    <script>
+        lucide.createIcons();
+
+        function toggleAssessmentDetails(id) {
+            const detailsElement = document.getElementById(`details-${id}`);
+            if (detailsElement) {
+                detailsElement.classList.toggle('assessments-page__details--expanded');
+            }
+        }
+        
+        function switchDetailTab(tabElement, assessmentId, tabName) {
+            const detailsContainer = document.getElementById(`details-${assessmentId}`);
+            
+            // Deactivate all tabs and content panes within this details section
+            const tabs = detailsContainer.querySelectorAll('.assessment-details__tab');
+            const contents = detailsContainer.querySelectorAll('.assessment-details__tab-content');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            // Activate the clicked tab and its corresponding content pane
+            tabElement.classList.add('active');
+            const contentElement = document.getElementById(`details-${assessmentId}-tab-${tabName}`);
+            if (contentElement) {
+                contentElement.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
