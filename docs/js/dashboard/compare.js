@@ -188,7 +188,7 @@ export function setupEventListeners() {
             addBtn.classList.add('loading');
             try {
                 await loadAssessments();
-                initCompareTools(normalizeAssessments(getAssessments()));
+                initCompareTools(getAssessments());
                 window._modalSelectedTools = [...selectedTools];
                 showModal = true;
                 modalSearchTerm = '';
@@ -312,17 +312,6 @@ function getRiskLevel(tool) {
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function normalizeAssessments(raw) {
-    return raw.map(a => ({
-        id: a.id,
-        name: a.name || 'Unknown Tool',
-        vendor: a.category || '', // Use category as vendor for the modal
-        risk_level: a.risk_level || '',
-        total_score: a.total_score || 0,
-        // Add more fields if needed
-    }));
 }
 
 // Add helper for risk badge
