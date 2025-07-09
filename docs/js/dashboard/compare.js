@@ -50,27 +50,37 @@ function renderSelectedTags() {
 function renderTable() {
     const tbody = document.getElementById('compare-tools-table-body');
     if (!tbody) return;
-    tbody.innerHTML = selectedTools.map(tool => `
-        <tr>
-            <td>
-                <div class="font-semibold text-white">${tool.name}</div>
-                <div class="text-gray-400 text-sm">${tool.vendor || ''}</div>
-            </td>
-            <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
-                    ${capitalize(getRiskLevel(tool))}
-                </span>
-            </td>
-            <td><span class="font-bold">${tool.total_score || tool.totalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-red-400 font-semibold">${tool.data_storage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.training_usage || '-'}</span></td>
-            <td><span class="text-yellow-400 font-semibold">${tool.access_controls || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance_risk || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency || '-'}</span></td>
-            <td><span class="text-green-400 font-semibold">${tool.compliance || '-'}</span></td>
-            <td><!-- Actions (e.g., export) --></td>
-        </tr>
-    `).join('');
+
+    // Helper to safely get nested properties
+    const getProp = (obj, path, fallback = '-') => {
+        const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
+        return value || fallback;
+    };
+
+    tbody.innerHTML = selectedTools.map(tool => {
+        const details = tool.assessment_data?.detailed_assessment || {};
+        return `
+            <tr>
+                <td>
+                    <div class="font-semibold text-white">${tool.name}</div>
+                    <div class="text-gray-400 text-sm">${tool.category || ''}</div>
+                </td>
+                <td>
+                    <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
+                        ${capitalize(getRiskLevel(tool))}
+                    </span>
+                </td>
+                <td><span class="font-bold">${tool.total_score || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
+                <td><span class="text-red-400 font-semibold">${getProp(details, 'data_storage.value')}</span></td>
+                <td><span class="text-yellow-400 font-semibold">${getProp(details, 'training_data.value')}</span></td>
+                <td><span class="text-yellow-400 font-semibold">${getProp(details, 'access_controls.value')}</span></td>
+                <td><span class="text-green-400 font-semibold">${getProp(details, 'compliance.value')}</span></td>
+                <td><span class="text-green-400 font-semibold">${getProp(details, 'transparency.value')}</span></td>
+                <td><span class="text-green-400 font-semibold">${getProp(details, 'third_party_integration.value')}</span></td>
+                <td><!-- Actions (e.g., export) --></td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderLegend() {
@@ -300,14 +310,8 @@ function capitalize(str) {
 }
 
 function normalizeAssessments(raw) {
-    return raw.map(a => ({
-        id: a.id,
-        name: a.name || 'Unknown Tool',
-        vendor: a.category || '', // Use category as vendor for the modal
-        risk_level: a.risk_level || '',
-        total_score: a.total_score || 0,
-        // Add more fields if needed
-    }));
+    // Pass through the full assessment object
+    return raw;
 }
 
 // Add helper for risk badge
