@@ -105,6 +105,32 @@
 - **8: Poor Documentation** - Vague or contradictory policies + no security documentation + unresponsive support (>5 business days)
 - **10: No Transparency** - No privacy policy OR refused to provide documentation OR contradictory statements in different documents
 
+## Compliance Certifications (New Requirement)
+
+For each tool, explicitly list the following compliance certifications as a yes/no array:
+- HIPAA
+- GDPR
+- SOC 2
+- PII
+- CCPA
+- (add others as needed)
+
+Example:
+
+"compliance_certifications": {
+  "HIPAA": "Yes",
+  "GDPR": "No",
+  "SOC 2": "Yes",
+  "PII": "Yes",
+  "CCPA": "No"
+}
+
+If a certification is not present, mark it as 'No'.
+
+Also provide a short compliance summary (1-2 sentences) explaining the compliance status and any gaps or notable strengths.
+
+This information should be included in both the main assessment output and in the detailed_assessment section for clarity and filtering.
+
 ## Risk Categories
 - **CRITICAL RISK (80-100 points):** Immediate blocking required
 - **HIGH RISK (60-79 points):** Significant controls needed before use

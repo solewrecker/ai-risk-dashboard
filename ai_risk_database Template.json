@@ -9,6 +9,13 @@
   "access_controls_score": 0,
   "compliance_score": 0,
   "vendor_transparency_score": 0,
+  "compliance_certifications": [
+    "HIPAA",
+    "GDPR",
+    "SOC 2",
+    "PII",
+    "CCPA"
+  ],
   "summary_and_recommendation": "A summary of key risks and a final recommendation (e.g., Approve for general use, Block, Requires review).",
   "primary_use_case": "",
   "data_classification": "",
@@ -50,6 +57,7 @@
     "tool_name": "",
     "final_risk_score": 0,
     "final_risk_category": "LOW RISK | MEDIUM RISK | HIGH RISK | CRITICAL RISK",
+    "compliance_summary": "This tool is HIPAA and SOC 2 compliant, but lacks explicit GDPR documentation.",
     "summary_and_recommendation": "A summary of key risks and a final recommendation (e.g., Approve for general use, Block, Requires review).",
     "assessment_details": {
       "data_storage_and_security": {
