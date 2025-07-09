@@ -562,6 +562,12 @@
     border-color: rgba(52, 211, 153, 0.25);
 }
 
+.compare-tools__risk-badge--critical {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.12);
+    border-color: rgba(220, 53, 69, 0.25);
+}
+
 .compare-tools__modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -783,8 +789,22 @@
   font-size: 0.97em;
 } 
 
+/* --- Risk Level Color Variables (Global) --- */
+:root {
+  --risk-low: #28a745;
+  --risk-medium: #ffc107;
+  --risk-high: #fd7e14;
+  --risk-critical: #dc3545;
+}
+
 /* --- Risk Level Text Colors --- */
-.text-risk-low { color: var(--color-green-400, #4ade80); }
-.text-risk-medium { color: var(--color-yellow-400, #facc15); }
-.text-risk-high { color: var(--color-red-400, #f87171); }
-.text-risk-critical { color: var(--color-purple-400, #a78bfa); } 
+.text-risk-low { color: var(--risk-low) !important; }
+.text-risk-medium { color: var(--risk-medium) !important; }
+.text-risk-high { color: var(--risk-high) !important; }
+.text-risk-critical { color: var(--risk-critical) !important; }
+
+/* --- Risk Badge Colors --- */
+.compare-tools__risk-badge--low { background: rgba(40, 167, 69, 0.12); color: var(--risk-low); border: 1px solid var(--risk-low); }
+.compare-tools__risk-badge--medium { background: rgba(255, 193, 7, 0.12); color: var(--risk-medium); border: 1px solid var(--risk-medium); }
+.compare-tools__risk-badge--high { background: rgba(253, 126, 20, 0.12); color: var(--risk-high); border: 1px solid var(--risk-high); }
+.compare-tools__risk-badge--critical { background: rgba(220, 53, 69, 0.12); color: var(--risk-critical); border: 1px solid var(--risk-critical); } 

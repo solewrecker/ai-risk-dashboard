@@ -1,3 +1,17 @@
+/* --- Risk Level Color Variables (Global) --- */
+:root {
+  --risk-low: #28a745;
+  --risk-medium: #ffc107;
+  --risk-high: #fd7e14;
+  --risk-critical: #dc3545;
+}
+
+/* --- Risk Level Text Colors --- */
+.text-risk-low { color: var(--risk-low) !important; }
+.text-risk-medium { color: var(--risk-medium) !important; }
+.text-risk-high { color: var(--risk-high) !important; }
+.text-risk-critical { color: var(--risk-critical) !important; }
+
 /* Base Styles */
 @import 'base/reset.css';
 @import 'base/variables.css';
