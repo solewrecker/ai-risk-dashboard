@@ -342,11 +342,6 @@ function capitalize(str) {
 function getRiskBadge(risk, score) {
     let color = '', icon = '', label = '';
     switch ((risk || '').toLowerCase()) {
-        case 'critical':
-            color = 'compare-tools__risk-badge--critical';
-            icon = '⛔';
-            label = 'CRITICAL';
-            break;
         case 'high':
             color = 'compare-tools__risk-badge--high';
             icon = '⚠️';
