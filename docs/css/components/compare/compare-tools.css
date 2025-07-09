@@ -83,13 +83,13 @@
 }
 
 .compare-tools__summary-card.high .compare-tools__summary-value {
-    color: var(--risk-high);
+    color: var(--color-red-400);
 }
 .compare-tools__summary-card.medium .compare-tools__summary-value {
-    color: var(--risk-medium);
+    color: var(--color-yellow-400);
 }
 .compare-tools__summary-card.low .compare-tools__summary-value {
-    color: var(--risk-low);
+    color: var(--color-green-400);
 }
 
 .compare-tools__tags {
@@ -207,9 +207,9 @@
     display: inline-block;
 }
 
-.compare-tools__legend-dot.low { background: var(--risk-low); }
-.compare-tools__legend-dot.medium { background: var(--risk-medium); }
-.compare-tools__legend-dot.high { background: var(--risk-high); }
+.compare-tools__legend-dot.low { background: var(--color-green-400); }
+.compare-tools__legend-dot.medium { background: var(--color-yellow-400); }
+.compare-tools__legend-dot.high { background: var(--color-red-400); }
 .compare-tools__legend-dot.compliant { background: var(--color-green-400); }
 
 /* ==========================================================================
@@ -518,16 +518,16 @@
 }
 
 .compare-tools__modal-item-score--high { 
-    color: var(--risk-high);
-    text-shadow: 0 0 16px rgba(253, 126, 20, 0.4);
+    color: #f87171;
+    text-shadow: 0 0 16px rgba(248, 113, 113, 0.4);
 }
 .compare-tools__modal-item-score--medium { 
-    color: var(--risk-medium);
-    text-shadow: 0 0 16px rgba(255, 193, 7, 0.4);
+    color: #fbbf24;
+    text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
 }
 .compare-tools__modal-item-score--low { 
-    color: var(--risk-low);
-    text-shadow: 0 0 16px rgba(40, 167, 69, 0.4);
+    color: #34d399;
+    text-shadow: 0 0 16px rgba(52, 211, 153, 0.4);
 }
 
 .compare-tools__risk-badge {
@@ -545,27 +545,21 @@
 }
 
 .compare-tools__risk-badge--high {
-    color: var(--risk-high);
-    background: rgba(253, 126, 20, 0.08);
-    border-color: rgba(253, 126, 20, 0.25);
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.25);
 }
 
 .compare-tools__risk-badge--medium {
-    color: var(--risk-medium);
-    background: rgba(255, 193, 7, 0.08);
-    border-color: rgba(255, 193, 7, 0.25);
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+    border-color: rgba(251, 191, 36, 0.25);
 }
 
 .compare-tools__risk-badge--low {
-    color: var(--risk-low);
-    background: rgba(40, 167, 69, 0.08);
-    border-color: rgba(40, 167, 69, 0.25);
-}
-
-.compare-tools__risk-badge--critical {
-    color: var(--risk-critical);
-    background: rgba(220, 53, 69, 0.12);
-    border-color: rgba(220, 53, 69, 0.25);
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
+    border-color: rgba(52, 211, 153, 0.25);
 }
 
 .compare-tools__modal-footer {
@@ -789,22 +783,8 @@
   font-size: 0.97em;
 } 
 
-/* --- Risk Level Color Variables (Global) --- */
-:root {
-  --risk-low: #28a745;
-  --risk-medium: #ffc107;
-  --risk-high: #fd7e14;
-  --risk-critical: #dc3545;
-}
-
 /* --- Risk Level Text Colors --- */
-.text-risk-low { color: var(--risk-low) !important; }
-.text-risk-medium { color: var(--risk-medium) !important; }
-.text-risk-high { color: var(--risk-high) !important; }
-.text-risk-critical { color: var(--risk-critical) !important; }
-
-/* --- Risk Badge Colors --- */
-.compare-tools__risk-badge--low { background: rgba(40, 167, 69, 0.12); color: var(--risk-low); border: 1px solid var(--risk-low); }
-.compare-tools__risk-badge--medium { background: rgba(255, 193, 7, 0.12); color: var(--risk-medium); border: 1px solid var(--risk-medium); }
-.compare-tools__risk-badge--high { background: rgba(253, 126, 20, 0.12); color: var(--risk-high); border: 1px solid var(--risk-high); }
-.compare-tools__risk-badge--critical { background: rgba(220, 53, 69, 0.12); color: var(--risk-critical); border: 1px solid var(--risk-critical); } 
+.text-risk-low { color: var(--color-green-400, #4ade80); }
+.text-risk-medium { color: var(--color-yellow-400, #facc15); }
+.text-risk-high { color: var(--color-red-400, #f87171); }
+.text-risk-critical { color: var(--color-purple-400, #a78bfa); } 

@@ -46,12 +46,12 @@
   --color-purple-600: #7c3aed;
 
   /* Risk Levels */
-  --color-risk-low-bg: rgba(40, 167, 69, 0.2);
-  --color-risk-low-text: var(--risk-low);
-  --color-risk-medium-bg: rgba(255, 193, 7, 0.2);
-  --color-risk-medium-text: var(--risk-medium);
-  --color-risk-high-bg: rgba(253, 126, 20, 0.2);
-  --color-risk-high-text: var(--risk-high);
-  --color-risk-critical-bg: rgba(220, 53, 69, 0.2);
-  --color-risk-critical-text: var(--risk-critical);
+  --color-risk-low-bg: rgba(22, 163, 74, 0.2);
+  --color-risk-low-text: var(--color-green-400);
+  --color-risk-medium-bg: rgba(202, 138, 4, 0.2);
+  --color-risk-medium-text: var(--color-yellow-400);
+  --color-risk-high-bg: rgba(220, 38, 38, 0.2);
+  --color-risk-high-text: var(--color-red-400);
+  --color-risk-critical-bg: rgba(147, 51, 234, 0.2);
+  --color-risk-critical-text: var(--color-purple-400);
 }
