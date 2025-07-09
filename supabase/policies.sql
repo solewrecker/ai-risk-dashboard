@@ -19,54 +19,54 @@ ALTER TABLE public.assessments ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
   -- Admin full access policy
-  CREATE POLICY "Allow admin full access" ON public.ai_tools
-    FOR ALL
-    TO authenticated
-    WITH CHECK (auth.jwt()->>'role' = 'admin');
+CREATE POLICY "Allow admin full access" ON public.ai_tools
+  FOR ALL
+  TO authenticated
+  WITH CHECK (auth.jwt()->>'role' = 'admin');
 
   -- Service role read access
-  CREATE POLICY "Allow service account read" ON public.ai_tools
-    FOR SELECT
-    TO service_role
-    USING (true);
+CREATE POLICY "Allow service account read" ON public.ai_tools
+  FOR SELECT
+  TO service_role
+  USING (true);
 
   -- Authenticated users read access
-  CREATE POLICY "Allow authenticated read access" ON public.ai_tools
-    FOR SELECT
-    TO authenticated
-    USING (true);
+CREATE POLICY "Allow authenticated read access" ON public.ai_tools
+  FOR SELECT
+  TO authenticated
+  USING (true);
 
   -- Public read access with API key
-  CREATE POLICY "Allow keyed read access" ON public.ai_tools
-    FOR SELECT
-    TO anon
-    USING (current_setting('request.headers', true)::json->>'apikey' = current_setting('app.api_key'));
+CREATE POLICY "Allow keyed read access" ON public.ai_tools
+  FOR SELECT
+  TO anon
+  USING (current_setting('request.headers', true)::json->>'apikey' = current_setting('app.api_key'));
 END $$;
 
 -- Assessments Policies
 DO $$
 BEGIN
   -- Users can manage only their own assessments
-  CREATE POLICY "manage_own_assessments" ON public.assessments
-    FOR ALL
-    TO authenticated
-    USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "manage_own_assessments" ON public.assessments
+  FOR ALL
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
   -- Service role full access
-  CREATE POLICY "service_full_access" ON public.assessments
-    FOR ALL
-    TO service_role
-    USING (true);
+CREATE POLICY "service_full_access" ON public.assessments
+  FOR ALL
+  TO service_role
+  USING (true);
 
   -- Public read access for shared assessments
-  CREATE POLICY "allow_keyed_read" ON public.assessments
-    FOR SELECT
-    TO anon
-    USING (
-      current_setting('request.headers', true)::json->>'apikey' = current_setting('app.api_key')
-      AND is_public = true
-    );
+CREATE POLICY "allow_keyed_read" ON public.assessments
+  FOR SELECT
+  TO anon
+  USING (
+    current_setting('request.headers', true)::json->>'apikey' = current_setting('app.api_key')
+    AND is_public = true
+  );
 END $$;
 
 -- Table Constraints
