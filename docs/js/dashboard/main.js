@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
     
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window.supabaseClient = supabaseClient;
     console.log('Supabase client initialized');
     
     initAuth(supabaseClient);

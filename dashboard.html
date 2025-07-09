@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Assessment Dashboard</title>
+    <link rel="stylesheet" href="docs/css/base/reset.css">
+    <link rel="stylesheet" href="docs/css/base/variables.css">
+    <link rel="stylesheet" href="docs/css/base/typography.css">
+    <link rel="stylesheet" href="docs/css/layout.css">
+    <link rel="stylesheet" href="docs/css/components/dashboard/controls.css">
+    <link rel="stylesheet" href="docs/css/components/dashboard/navigation.css">
+    <link rel="stylesheet" href="docs/css/components/dashboard/assessment-table.css">
+    <link rel="stylesheet" href="docs/css/pages/dashboard-page.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="app-logo">AI Risk Framework</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="dashboard-nav active">
+                    <div class="dashboard-nav__content">
+                        <span class="dashboard-nav__icon">📊</span>
+                        <span class="dashboard-nav__text">Dashboard</span>
+                    </div>
+                </button>
+                <button class="dashboard-nav">
+                    <div class="dashboard-nav__content">
+                        <span class="dashboard-nav__icon">📋</span>
+                        <span class="dashboard-nav__text">Assessments</span>
+                    </div>
+                    <span class="dashboard-nav__badge">3</span>
+                </button>
+                <button class="dashboard-nav">
+                    <div class="dashboard-nav__content">
+                        <span class="dashboard-nav__icon">🔄</span>
+                        <span class="dashboard-nav__text">Compare Tools</span>
+                    </div>
+                </button>
+                <button class="dashboard-nav">
+                    <div class="dashboard-nav__content">
+                        <span class="dashboard-nav__icon">🏆</span>
+                        <span class="dashboard-nav__text">Achievements</span>
+                    </div>
+                    <span class="dashboard-nav__pro-icon">✨</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Dashboard</h1>
+                <div class="user-actions">
+                    <button class="btn btn-primary">New Assessment</button>
+                    <div class="user-profile">
+                        <span class="user-name">John Doe</span>
+                        <div class="user-avatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="dashboard-section">
+                <div class="dashboard-controls">
+                    <div class="dashboard-controls__search">
+                        <input type="text" class="dashboard-controls__input" placeholder="Search assessments...">
+                    </div>
+                    <div class="dashboard-controls__filter">
+                        <select class="dashboard-controls__select">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="risk-high">Highest Risk</option>
+                            <option value="risk-low">Lowest Risk</option>
+                            <option value="name-az">Name A-Z</option>
+                            <option value="name-za">Name Z-A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Multi-Select Filters -->
+                <div class="dashboard-filters">
+                    <div class="dashboard-filters__group" data-filter-type="risk">
+                        <span class="dashboard-filters__label">Risk Level</span>
+                        <div class="dashboard-filters__trigger">
+                            <span class="dashboard-filters__placeholder">Select risk levels...</span>
+                            <span class="dashboard-filters__arrow">▼</span>
+                        </div>
+                        <div class="dashboard-filters__dropdown">
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="risk-critical" value="critical" class="dashboard-filters__option-input">
+                                <label for="risk-critical" class="dashboard-filters__option-label">Critical Risk</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="risk-high" value="high" class="dashboard-filters__option-input">
+                                <label for="risk-high" class="dashboard-filters__option-label">High Risk</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="risk-medium" value="medium" class="dashboard-filters__option-input">
+                                <label for="risk-medium" class="dashboard-filters__option-label">Medium Risk</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="risk-low" value="low" class="dashboard-filters__option-input">
+                                <label for="risk-low" class="dashboard-filters__option-label">Low Risk</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-filters__group" data-filter-type="category">
+                        <span class="dashboard-filters__label">Category</span>
+                        <div class="dashboard-filters__trigger">
+                            <span class="dashboard-filters__placeholder">Select categories...</span>
+                            <span class="dashboard-filters__arrow">▼</span>
+                        </div>
+                        <div class="dashboard-filters__dropdown">
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="cat-conversational" value="conversational" class="dashboard-filters__option-input">
+                                <label for="cat-conversational" class="dashboard-filters__option-label">Conversational AI</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="cat-image" value="image" class="dashboard-filters__option-input">
+                                <label for="cat-image" class="dashboard-filters__option-label">Image Generation</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="cat-code" value="code" class="dashboard-filters__option-input">
+                                <label for="cat-code" class="dashboard-filters__option-label">Code Generation</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="cat-data" value="data" class="dashboard-filters__option-input">
+                                <label for="cat-data" class="dashboard-filters__option-label">Data Analysis</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-filters__group" data-filter-type="date">
+                        <span class="dashboard-filters__label">Date Range</span>
+                        <div class="dashboard-filters__trigger">
+                            <span class="dashboard-filters__placeholder">Select date range...</span>
+                            <span class="dashboard-filters__arrow">▼</span>
+                        </div>
+                        <div class="dashboard-filters__dropdown">
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="date-today" value="today" class="dashboard-filters__option-input">
+                                <label for="date-today" class="dashboard-filters__option-label">Today</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="date-week" value="week" class="dashboard-filters__option-input">
+                                <label for="date-week" class="dashboard-filters__option-label">This Week</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="date-month" value="month" class="dashboard-filters__option-input">
+                                <label for="date-month" class="dashboard-filters__option-label">This Month</label>
+                            </div>
+                            <div class="dashboard-filters__option">
+                                <input type="checkbox" id="date-year" value="year" class="dashboard-filters__option-input">
+                                <label for="date-year" class="dashboard-filters__option-label">This Year</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="dashboard-filters__clear">Clear All</button>
+                </div>
+
+                <!-- Active Filters -->
+                <div class="dashboard-filters__active is-hidden">
+                    <div class="dashboard-filters__active-title">Active Filters:</div>
+                    <div class="dashboard-filters__tags"></div>
+                </div>
+
+                <!-- Results Info -->
+                <div class="dashboard-controls__results">
+                    <div class="dashboard-controls__results-count">3 assessments total</div>
+                    <div class="dashboard-controls__view-toggle">
+                        <button class="dashboard-controls__view-btn is-active">Grid</button>
+                        <button class="dashboard-controls__view-btn">List</button>
+                    </div>
+                </div>
+
+                <!-- Assessment Items -->
+                <div class="assessment-grid">
+                    <div class="assessment-item" data-risk="high" data-category="conversational">
+                        <div class="assessment-item__header">
+                            <h3 class="assessment-item__title">ChatGPT Enterprise</h3>
+                            <span class="assessment-item__risk risk-high">High Risk</span>
+                        </div>
+                        <div class="assessment-item__content">
+                            <p class="assessment-item__description">Enterprise-level large language model with advanced capabilities.</p>
+                            <div class="assessment-item__meta">
+                                <span class="assessment-item__date">Oct 15, 2023</span>
+                                <span class="assessment-item__category">Conversational AI</span>
+                            </div>
+                        </div>
+                        <div class="assessment-item__actions">
+                            <button class="btn btn-sm">View Details</button>
+                            <button class="btn btn-sm btn-outline">Export</button>
+                        </div>
+                    </div>
+
+                    <div class="assessment-item" data-risk="medium" data-category="code">
+                        <div class="assessment-item__header">
+                            <h3 class="assessment-item__title">GitHub Copilot</h3>
+                            <span class="assessment-item__risk risk-medium">Medium Risk</span>
+                        </div>
+                        <div class="assessment-item__content">
+                            <p class="assessment-item__description">AI pair programmer that helps write better code faster.</p>
+                            <div class="assessment-item__meta">
+                                <span class="assessment-item__date">Sep 28, 2023</span>
+                                <span class="assessment-item__category">Code Generation</span>
+                            </div>
+                        </div>
+                        <div class="assessment-item__actions">
+                            <button class="btn btn-sm">View Details</button>
+                            <button class="btn btn-sm btn-outline">Export</button>
+                        </div>
+                    </div>
+
+                    <div class="assessment-item" data-risk="low" data-category="data">
+                        <div class="assessment-item__header">
+                            <h3 class="assessment-item__title">Fireflies.ai</h3>
+                            <span class="assessment-item__risk risk-low">Low Risk</span>
+                        </div>
+                        <div class="assessment-item__content">
+                            <p class="assessment-item__description">Meeting notes and transcription tool with AI capabilities.</p>
+                            <div class="assessment-item__meta">
+                                <span class="assessment-item__date">Nov 5, 2023</span>
+                                <span class="assessment-item__category">Data Analysis</span>
+                            </div>
+                        </div>
+                        <div class="assessment-item__actions">
+                            <button class="btn btn-sm">View Details</button>
+                            <button class="btn btn-sm btn-outline">Export</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="docs/js/dashboard/filters.js"></script>
+</body>
+</html> 
