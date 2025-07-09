@@ -90,6 +90,10 @@ function renderTable() {
             ` : ''}
         `;
     }).join('');
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function renderExpandedContent(tool) {
@@ -440,7 +444,7 @@ function normalizeAssessments(raw) {
                 dataStorage: scores.data_storage?.score,
                 trainingUsage: scores.training_usage?.score,
                 accessControls: scores.access_controls?.score,
-                complianceRisk: scores.compliance?.score,
+                complianceRisk: scores.compliance_risk?.score,
                 vendorTransparency: scores.vendor_transparency?.score,
             },
             compliance: assessmentData.compliance_certifications,
