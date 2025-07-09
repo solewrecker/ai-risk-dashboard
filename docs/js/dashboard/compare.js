@@ -346,7 +346,7 @@ function getRiskBadge(risk, score) {
     switch ((risk || '').toLowerCase()) {
         case 'critical':
             color = 'compare-tools__risk-badge--critical';
-            icon = '🔥';
+            icon = '🛑';
             label = 'CRITICAL';
             break;
         case 'high':
@@ -356,7 +356,7 @@ function getRiskBadge(risk, score) {
             break;
         case 'medium':
             color = 'compare-tools__risk-badge--medium';
-            icon = '👁️';
+            icon = '🟡';
             label = 'MEDIUM';
             break;
         case 'low':
