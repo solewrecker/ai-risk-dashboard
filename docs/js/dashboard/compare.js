@@ -74,8 +74,6 @@ function renderTable() {
             <td><span class="text-green-400 font-semibold">${tool.compliance_score ?? scores.complianceRisk ?? '-'}</span></td>
             <td><span class="text-green-400 font-semibold">${tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-'}</span></td>
             <td><span class="text-green-400 font-semibold">${tool.compliance ?? '-'}</span></td>
-            <td><span class="text-blue-400 font-semibold">${tool.category || formData.toolCategory || '-'}</span></td>
-            <td><span class="text-purple-400 font-semibold">${tool.data_classification || formData.dataClassification || '-'}</span></td>
         </tr>
         `;
     }).join('');
@@ -296,8 +294,9 @@ function getRiskLevel(tool) {
     if (tool.riskLevel) return tool.riskLevel.toLowerCase();
     if (tool.total_score || tool.totalScore) {
         const score = tool.total_score || tool.totalScore;
+        if (score >= 80) return 'critical';
         if (score >= 60) return 'high';
-        if (score >= 30) return 'medium';
+        if (score >= 35) return 'medium';
         return 'low';
     }
     return 'low';
@@ -311,6 +310,11 @@ function capitalize(str) {
 function getRiskBadge(risk, score) {
     let color = '', icon = '', label = '';
     switch ((risk || '').toLowerCase()) {
+        case 'critical':
+            color = 'compare-tools__risk-badge--critical';
+            icon = '⛔';
+            label = 'CRITICAL';
+            break;
         case 'high':
             color = 'compare-tools__risk-badge--high';
             icon = '⚠️';
