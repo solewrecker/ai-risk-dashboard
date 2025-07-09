@@ -409,8 +409,8 @@ function updateModalToolList() {
 // Function to load and render compare tools table
 async function loadCompareToolsTable() {
     try {
-        // Use window.supabase instead of supabase
-        const { data: assessments, error } = await window.supabase
+        // Use window.supabaseClient for the Supabase client instance
+        const { data: assessments, error } = await window.supabaseClient
             .from('assessments')
             .select('*');
 
