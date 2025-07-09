@@ -136,11 +136,11 @@
 }
 
 .score-value.risk-high { 
-    color: var(--color-red-400);
+    color: var(--color-orange-500);
 }
 
 .score-value.risk-critical { 
-    color: var(--color-purple-400);
+    color: var(--color-red-500);
 }
 
 .score-label {

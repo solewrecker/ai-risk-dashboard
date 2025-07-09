@@ -26,19 +26,24 @@
   --color-blue-700: #1d4ed8;
   
   /* Red Palette */
-  --color-red-400: #f87171;
-  --color-red-500: #ef4444;
-  --color-red-600: #dc2626;
+  --color-red-400: #ef4444;
+  --color-red-500: #dc2626;
+  --color-red-600: #b91c1c;
 
   /* Green Palette */
-  --color-green-400: #4ade80;
-  --color-green-500: #22c55e;
-  --color-green-600: #16a34a;
+  --color-green-400: #22c55e;
+  --color-green-500: #16a34a;
+  --color-green-600: #15803d;
 
   /* Yellow Palette */
-  --color-yellow-400: #facc15;
-  --color-yellow-500: #eab308;
-  --color-yellow-600: #ca8a04;
+  --color-yellow-400: #fbbf24;
+  --color-yellow-500: #f59e0b;
+  --color-yellow-600: #eab308;
+
+  /* Orange Palette */
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
 
   /* Purple Palette */
   --color-purple-400: #a78bfa;
@@ -51,7 +56,7 @@
   --color-risk-medium-bg: rgba(202, 138, 4, 0.2);
   --color-risk-medium-text: var(--color-yellow-400);
   --color-risk-high-bg: rgba(220, 38, 38, 0.2);
-  --color-risk-high-text: var(--color-red-400);
+  --color-risk-high-text: var(--color-orange-500);
   --color-risk-critical-bg: rgba(147, 51, 234, 0.2);
-  --color-risk-critical-text: var(--color-purple-400);
+  --color-risk-critical-text: var(--color-red-500);
 }
