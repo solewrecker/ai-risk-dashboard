@@ -718,3 +718,67 @@
     gap: 0.5rem;
     justify-content: flex-start;
 } 
+
+/* --- Expandable Details Row for Compare Tools Table --- */
+.compare-tools__details-row {
+  background: var(--color-gray-800, #23263a);
+  transition: background 0.2s;
+}
+
+.compare-tools__details {
+  padding: 1.25rem 2rem;
+  font-size: 0.97rem;
+  color: var(--color-gray-200, #cbd5e1);
+  background: var(--color-gray-900, #181a29);
+  border-radius: 0 0 0.75rem 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.compare-tools__expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  outline: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chevron {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border-right: 2px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
+  transform: rotate(-45deg);
+  transition: transform 0.2s;
+  margin-bottom: 2px;
+}
+.chevron--down {
+  transform: rotate(45deg);
+}
+
+.compare-tools__rec-priority {
+  color: #facc15;
+  font-size: 0.9em;
+  margin-left: 0.5em;
+}
+
+.compare-tools__details strong {
+  color: var(--color-white, #fff);
+  font-weight: 600;
+}
+
+.compare-tools__details ul {
+  margin: 0.5em 0 0 1.5em;
+  padding: 0;
+  list-style: disc;
+}
+
+.compare-tools__details li {
+  margin-bottom: 0.25em;
+  font-size: 0.97em;
+} 
