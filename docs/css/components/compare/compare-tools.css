@@ -83,7 +83,7 @@
 }
 
 .compare-tools__summary-card.high .compare-tools__summary-value {
-    color: var(--color-red-400);
+    color: var(--color-orange-500);
 }
 .compare-tools__summary-card.medium .compare-tools__summary-value {
     color: var(--color-yellow-400);
@@ -125,7 +125,7 @@
 
 .compare-tools__tag .compare-tools__tag-remove:hover {
     background: var(--color-gray-700);
-    color: var(--color-red-400);
+    color: var(--color-red-500);
 }
 
 .compare-tools__table-wrapper {
@@ -209,7 +209,7 @@
 
 .compare-tools__legend-dot.low { background: var(--color-green-400); }
 .compare-tools__legend-dot.medium { background: var(--color-yellow-400); }
-.compare-tools__legend-dot.high { background: var(--color-red-400); }
+.compare-tools__legend-dot.high { background: var(--color-orange-500); }
 .compare-tools__legend-dot.compliant { background: var(--color-green-400); }
 
 /* ==========================================================================
@@ -518,16 +518,16 @@
 }
 
 .compare-tools__modal-item-score--high { 
-    color: #f87171;
-    text-shadow: 0 0 16px rgba(248, 113, 113, 0.4);
+    color: #f97316;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.4);
 }
 .compare-tools__modal-item-score--medium { 
     color: #fbbf24;
     text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
 }
 .compare-tools__modal-item-score--low { 
-    color: #34d399;
-    text-shadow: 0 0 16px rgba(52, 211, 153, 0.4);
+    color: #22c55e;
+    text-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
 }
 
 .compare-tools__risk-badge {
@@ -545,9 +545,9 @@
 }
 
 .compare-tools__risk-badge--high {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.08);
-    border-color: rgba(248, 113, 113, 0.25);
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.25);
 }
 
 .compare-tools__risk-badge--medium {
@@ -557,9 +557,9 @@
 }
 
 .compare-tools__risk-badge--low {
-    color: #34d399;
-    background: rgba(52, 211, 153, 0.08);
-    border-color: rgba(52, 211, 153, 0.25);
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.25);
 }
 
 .compare-tools__modal-footer {
@@ -784,7 +784,7 @@
 } 
 
 /* --- Risk Level Text Colors --- */
-.text-risk-low { color: var(--color-green-400, #4ade80); }
-.text-risk-medium { color: var(--color-yellow-400, #facc15); }
-.text-risk-high { color: var(--color-red-400, #f87171); }
-.text-risk-critical { color: var(--color-purple-400, #a78bfa); } 
+.text-risk-low { color: var(--color-green-400, #22c55e); }
+.text-risk-medium { color: var(--color-yellow-400, #fbbf24); }
+.text-risk-high { color: var(--color-orange-500, #f97316); }
+.text-risk-critical { color: var(--color-red-500, #dc2626); } 

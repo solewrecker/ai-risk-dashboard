@@ -50,7 +50,7 @@
 
 .assessment-item__risk.risk-critical {
     background: rgba(220, 38, 38, 0.2);
-    color: #ef4444;
+    color: #dc2626;
     border: 1px solid rgba(220, 38, 38, 0.3);
 }
 

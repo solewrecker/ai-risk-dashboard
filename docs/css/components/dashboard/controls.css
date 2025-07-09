@@ -292,7 +292,7 @@
 .dashboard-filters__tag--risk-critical {
     background: rgba(220, 38, 38, 0.2);
     border-color: rgba(220, 38, 38, 0.4);
-    color: #ef4444;
+    color: #dc2626;
 }
 
 .dashboard-filters__tag--risk-high {
