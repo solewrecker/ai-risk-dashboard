@@ -47,53 +47,30 @@ function renderSelectedTags() {
     }
 }
 
-function renderTable(assessments) {
-    // Check if assessments is undefined or not an array
-    if (!assessments) {
-        console.error('Assessments is undefined or null');
-        return;
-    }
-
-    if (!Array.isArray(assessments)) {
-        console.error('Assessments is not an array', typeof assessments, assessments);
-        return;
-    }
-
-    // Log the number of assessments being rendered
-    console.log(`Rendering ${assessments.length} assessments`);
-
-    const tableBody = document.getElementById('compare-tools-table-body');
-    
-    // Add detailed error logging if table body is not found
-    if (!tableBody) {
-        console.error('Table body element not found. Details:', {
-            documentReadyState: document.readyState,
-            compareContentExists: !!document.getElementById('compare-content'),
-            allBodyElements: document.body.innerHTML.includes('compare-tools-table-body')
-        });
-        return;
-    }
-
-    // Clear existing rows
-    tableBody.innerHTML = ''; 
-
-    assessments.forEach(assessment => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${assessment.name || '-'}</td>
-            <td>${assessment.risk_level || '-'}</td>
-            <td>${assessment.total_score || '-'}</td>
-            <td>${assessment.assessment_data?.formData?.dataClassification || '-'}</td>
-            <td>${assessment.assessment_data?.formData?.toolVersion || '-'}</td>
-            <td>${assessment.assessment_data?.breakdown?.scores?.dataStorage || '-'}</td>
-            <td>${assessment.assessment_data?.breakdown?.scores?.trainingUsage || '-'}</td>
-            <td>${assessment.assessment_data?.breakdown?.scores?.accessControls || '-'}</td>
-            <td>${assessment.assessment_data?.breakdown?.scores?.complianceRisk || '-'}</td>
-            <td>${assessment.assessment_data?.breakdown?.scores?.vendorTransparency || '-'}</td>
-            <td>-</td>
-        `;
-        tableBody.appendChild(row);
-    });
+function renderTable() {
+    const tbody = document.getElementById('compare-tools-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = selectedTools.map(tool => `
+        <tr>
+            <td>
+                <div class="font-semibold text-white">${tool.name}</div>
+                <div class="text-gray-400 text-sm">${tool.vendor || ''}</div>
+            </td>
+            <td>
+                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(tool)}">
+                    ${capitalize(getRiskLevel(tool))}
+                </span>
+            </td>
+            <td><span class="font-bold">${tool.total_score || tool.totalScore || 0}</span><span class="text-gray-400 text-sm">/100</span></td>
+            <td><span class="text-red-400 font-semibold">${tool.data_storage || '-'}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${tool.training_usage || '-'}</span></td>
+            <td><span class="text-yellow-400 font-semibold">${tool.access_controls || '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.compliance_risk || '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.vendor_transparency || '-'}</span></td>
+            <td><span class="text-green-400 font-semibold">${tool.compliance || '-'}</span></td>
+            <td><!-- Actions (e.g., export) --></td>
+        </tr>
+    `).join('');
 }
 
 function renderLegend() {
@@ -323,8 +300,14 @@ function capitalize(str) {
 }
 
 function normalizeAssessments(raw) {
-    // Pass through the full assessment object
-    return raw;
+    return raw.map(a => ({
+        id: a.id,
+        name: a.name || 'Unknown Tool',
+        vendor: a.category || '', // Use category as vendor for the modal
+        risk_level: a.risk_level || '',
+        total_score: a.total_score || 0,
+        // Add more fields if needed
+    }));
 }
 
 // Add helper for risk badge
@@ -404,37 +387,4 @@ function updateModalToolList() {
             updateModalToolList();
         });
     });
-}
-
-// Function to load and render compare tools table
-async function loadCompareToolsTable() {
-    try {
-        // Use window.supabaseClient for the Supabase client instance
-        const { data: assessments, error } = await window.supabaseClient
-            .from('assessments')
-            .select('*');
-
-        if (error) {
-            console.error('Error fetching assessments:', error);
-            return;
-        }
-
-        if (!assessments || assessments.length === 0) {
-            console.warn('No assessments found');
-            return;
-        }
-
-        // Render the table with fetched assessments
-        renderTable(assessments);
-    } catch (err) {
-        console.error('Unexpected error loading compare tools:', err);
-    }
-}
-
-// Ensure this function is called when the page loads or the compare tab is activated
-document.addEventListener('DOMContentLoaded', () => {
-    const compareTab = document.querySelector('button[onclick="switchTab(\'compare\')"]');
-    if (compareTab) {
-        compareTab.addEventListener('click', loadCompareToolsTable);
-    }
-}); 
+} 
