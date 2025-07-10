@@ -738,27 +738,22 @@
     position: relative;
     width: 24px;
     height: 24px;
-    margin-right: 0.5rem;
+    margin-right: 1rem; /* Add some spacing */
     z-index: 1;
 }
 
-.chevron::before {
-    content: '\25B6'; /* Unicode for right-pointing triangle */
-    font-size: 18px;
-    color: var(--color-gray-400);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    transition: transform 0.3s ease, color 0.2s;
+.chevron {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease-in-out;
 }
 
-.chevron--down::before {
-    transform: translate(-50%, -50%) rotate(90deg);
-}
-
-.compare-tools__expand-btn:hover .chevron::before {
-    color: var(--color-white);
+.chevron--down {
+    transform: rotate(225deg);
 }
 
 .compare-tools__details {
