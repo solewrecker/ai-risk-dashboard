@@ -153,11 +153,15 @@ function renderTable() {
                     </section>
                     <section class="compare-tools__details-section">
                         <h4 class="compare-tools__details-header">Compliance Status</h4>
-                        <div class="compare-tools__compliance-grid">
-                            ${complianceIcons}
+                        <div class="compare-tools__compliance-content">
+                            <div class="compare-tools__compliance-grid">
+                                ${complianceIcons}
+                            </div>
+                            <div class="compare-tools__compliance-summary">
+                                <p><strong>Certifications:</strong> ${complianceCerts}</p>
+                                <p><strong>Summary:</strong> ${complianceSummary}</p>
+                            </div>
                         </div>
-                        <p><strong>Certifications:</strong> ${complianceCerts}</p>
-                        <p><strong>Summary:</strong> ${complianceSummary}</p>
                     </section>
                 </div>
             </td>
