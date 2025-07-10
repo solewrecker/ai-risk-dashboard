@@ -65,51 +65,100 @@ function renderTable() {
         const formData = ad.formData || {};
         const breakdown = ad.breakdown || {};
         const scores = breakdown.scores || {};
+        const detailedAssessment = ad.detailedAssessment || {};
+        const recommendations = ad.recommendations || [];
         const isExpanded = expandedToolId === tool.id;
         // Compliance info
         const complianceCerts = (tool.compliance_certifications || []).join(', ') || '-';
-        const complianceSummary = ad.compliance_summary || (ad.detailedAssessment && ad.detailedAssessment.compliance_summary) || '-';
+        const complianceSummary = ad.compliance_summary || (detailedAssessment.compliance_summary) || '-';
         // Recommendations
-        const recs = (ad.recommendations || []).map(r => `<li><strong>${r.title}</strong> <span class="compare-tools__rec-priority">[${r.priority}]</span></li>`).join('') || '<li>-</li>';
+        const recs = recommendations.map(r => `
+            <div class="compare-tools__recommendation">
+                <div class="compare-tools__rec-bullet compare-tools__rec-priority--${r.priority}"></div>
+                <div>
+                    <h5 class="compare-tools__rec-title">${r.title}</h5>
+                    <p class="compare-tools__rec-desc">${r.description}</p>
+                    <span class="compare-tools__rec-meta">Priority: ${r.priority} | Category: ${r.category}</span>
+                </div>
+            </div>
+        `).join('') || '<p>No recommendations available</p>';
+        // Detailed Breakdown
+        const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail]) => {
+            const categoryScore = detail.category_score || 0;
+            return `
+                <div class="compare-tools__detail-card">
+                    <h5 class="compare-tools__detail-title">${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</h5>
+                    <div class="compare-tools__detail-score">Score: ${categoryScore}</div>
+                    <div class="compare-tools__detail-content">
+                        ${Object.entries(detail.criteria || {}).map(([critKey, crit]) => `
+                            <div class="compare-tools__detail-item">
+                                <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> ${crit.score} - ${crit.justification}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('') || '<p>No detailed assessment available</p>';
+        // Compliance Icons (adapt from example)
+        const complianceIcons = Object.entries(tool.compliance || {}).map(([key, status]) => {
+            const icon = status === 'compliant' ? '<i data-lucide="check-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--noncompliant"></i>';
+            return `<div class="compare-tools__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
+        }).join('') || '<p>No compliance data</p>';
         // Score values
-        const dataStorage = tool.data_storage_score ?? scores.dataStorage ?? '-';
-        const trainingUsage = tool.training_usage_score ?? scores.trainingUsage ?? '-';
-        const accessControls = tool.access_controls_score ?? scores.accessControls ?? '-';
-        const complianceRisk = tool.compliance_score ?? scores.complianceRisk ?? '-';
-        const vendorTransparency = tool.vendor_transparency_score ?? scores.vendorTransparency ?? '-';
+        const dataStorage = scores.dataStorage ?? '-';
+        const trainingUsage = scores.trainingUsage ?? '-';
+        const accessControls = scores.accessControls ?? '-';
+        const complianceRisk = scores.complianceRisk ?? '-';
+        const vendorTransparency = scores.vendorTransparency ?? '-';
         const compliance = tool.compliance ?? '-';
         const totalScore = tool.total_score || ad.finalScore || 0;
+        const risk = getRiskLevel(totalScore);
         return `
-        <tr class="compare-tools__row">
+        <tr class="compare-tools__row compare-tools__row--${risk}">
             <td>
                 <button class="compare-tools__expand-btn" data-tool-id="${tool.id}" aria-expanded="${isExpanded}">
                     <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
                 </button>
-                <div class="font-semibold text-white">${tool.name || formData.toolName || 'Unknown Tool'}</div>
-                <div class="text-gray-400 text-xs">${formData.toolVersion ? formData.toolVersion : ''}</div>
-                <div class="text-gray-400 text-sm">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
+                <div class="compare-tools__tool-name">${tool.name || formData.toolName || 'Unknown Tool'}</div>
+                <div class="compare-tools__tool-version">${formData.toolVersion ? formData.toolVersion : ''}</div>
+                <div class="compare-tools__tool-category">${tool.vendor || formData.toolCategory || tool.category || ''}</div>
             </td>
             <td>
-                <span class="compare-tools__tag compare-tools__tag--${getRiskLevel(totalScore)}">
-                    ${capitalize(getRiskLevel(totalScore))}
+                <span class="compare-tools__tag compare-tools__tag--${risk}">
+                    ${capitalize(risk)}
                 </span>
             </td>
-            <td><span class="font-bold ${getRiskColorClass(totalScore)}">${totalScore}</span><span class="text-gray-400 text-sm">/100</span></td>
-            <td><span class="text-white font-semibold">${dataStorage}</span></td>
-            <td><span class="text-white font-semibold">${trainingUsage}</span></td>
-            <td><span class="text-white font-semibold">${accessControls}</span></td>
-            <td><span class="text-white font-semibold">${complianceRisk}</span></td>
-            <td><span class="text-white font-semibold">${vendorTransparency}</span></td>
-            <td><span class="text-white font-semibold">${compliance}</span></td>
+            <td><span class="compare-tools__score ${getRiskColorClass(totalScore)}">${totalScore}</span><span class="compare-tools__score-max">/100</span></td>
+            <td><span class="compare-tools__score">${dataStorage}</span></td>
+            <td><span class="compare-tools__score">${trainingUsage}</span></td>
+            <td><span class="compare-tools__score">${accessControls}</span></td>
+            <td><span class="compare-tools__score">${complianceRisk}</span></td>
+            <td><span class="compare-tools__score">${vendorTransparency}</span></td>
+            <td><span class="compare-tools__score">${compliance}</span></td>
         </tr>
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
             <td colspan="9">
                 <div class="compare-tools__details">
-                    <div><strong>Category:</strong> ${tool.category || formData.toolCategory || '-'}</div>
-                    <div><strong>Data Classification:</strong> ${tool.data_classification || formData.dataClassification || '-'}</div>
-                    <div><strong>Compliance Certifications:</strong> ${complianceCerts}</div>
-                    <div><strong>Compliance Summary:</strong> ${complianceSummary}</div>
-                    <div><strong>Recommendations:</strong><ul>${recs}</ul></div>
+                    <section class="compare-tools__details-section">
+                        <h4 class="compare-tools__details-header">Risk Assessment Details</h4>
+                        <div class="compare-tools__details-grid">
+                            ${detailsHTML}
+                        </div>
+                    </section>
+                    <section class="compare-tools__details-section">
+                        <h4 class="compare-tools__details-header">Recommendations</h4>
+                        <div class="compare-tools__recommendations-list">
+                            ${recs}
+                        </div>
+                    </section>
+                    <section class="compare-tools__details-section">
+                        <h4 class="compare-tools__details-header">Compliance Status</h4>
+                        <div class="compare-tools__compliance-grid">
+                            ${complianceIcons}
+                        </div>
+                        <p><strong>Certifications:</strong> ${complianceCerts}</p>
+                        <p><strong>Summary:</strong> ${complianceSummary}</p>
+                    </section>
                 </div>
             </td>
         </tr>
