@@ -115,8 +115,8 @@ function renderTable() {
         const risk = getRiskLevel(totalScore);
         return `
         <tr class="compare-tools__row compare-tools__row--${risk}">
-            <td>
-                <button class="compare-tools__expand-btn" data-tool-id="${tool.id}" aria-expanded="${isExpanded}">
+            <td class="compare-tools__tool-cell" data-tool-id="${tool.id}" style="cursor: pointer;">
+                <button class="compare-tools__expand-btn" aria-expanded="${isExpanded}">
                     <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
                 </button>
                 <div class="compare-tools__tool-name">${tool.name || formData.toolName || 'Unknown Tool'}</div>
@@ -164,7 +164,16 @@ function renderTable() {
         </tr>
         `;
     }).join('');
-    // Attach expand/collapse listeners
+    // Attach expand/collapse listeners to the tool cell
+    tbody.querySelectorAll('.compare-tools__tool-cell').forEach(cell => {
+        cell.addEventListener('click', e => {
+            if (e.target.closest('.compare-tools__expand-btn')) return; // Allow button click if needed, but since whole cell is clickable
+            const toolId = cell.getAttribute('data-tool-id');
+            expandedToolId = expandedToolId === toolId ? null : toolId;
+            renderTable();
+        });
+    });
+    // Keep existing button listener for completeness
     tbody.querySelectorAll('.compare-tools__expand-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             const toolId = btn.getAttribute('data-tool-id');
