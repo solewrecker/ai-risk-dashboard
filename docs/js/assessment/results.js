@@ -67,10 +67,8 @@ export function displayResults(results) {
     const breakdownData = detailedAssessment || (breakdown ? breakdown.subScores : null);
     renderDetailedBreakdown(breakdownData);
 
-    const exportMenu = document.getElementById('exportMenu');
-    if (exportMenu) {
-        exportMenu.style.visibility = 'visible';
-    }
+    // All old export functions will be removed from this file.
+    // New export functionality is handled by docs/js/dashboard/export.js
 }
 
 function renderInsights(breakdown) {
@@ -211,34 +209,5 @@ function getScoreDescription(score, level, toolName) {
 }
 
 // --- Export Functions ---
-export function toggleExportMenu() {
-    const menu = document.getElementById('exportMenu');
-    if(menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-}
-
-export function hideExportMenu() {
-    const menu = document.getElementById('exportMenu');
-    if (menu) menu.style.display = 'none';
-}
-
-export function exportAssessmentJSON() {
-    if (!currentAssessment) { alert('No assessment data to export.'); return; }
-    const jsonString = JSON.stringify(currentAssessment, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `assessment-${currentAssessment.formData.toolName.replace(/\s+/g, '-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-export async function exportFreePDF() {
-    alert('Free PDF export functionality is being refactored.');
-}
-
-export async function exportPremiumPDF() {
-    alert('Premium PDF export functionality is being refactored.');
-} 
+// All old export functions will be removed from this file.
+// New export functionality is handled by docs/js/dashboard/export.js 

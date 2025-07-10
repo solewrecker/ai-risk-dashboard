@@ -123,9 +123,12 @@
     padding: 0.5rem 1rem;
     background: var(--color-blue-600);
     color: var(--color-white);
+    border: none;
     border-radius: 0.5rem;
     font-weight: 500;
+    cursor: pointer;
     transition: all 150ms ease;
+    text-decoration: none; /* Ensure no underline on link */
 }
 
 .export-button:hover {
