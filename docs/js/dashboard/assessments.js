@@ -193,8 +193,11 @@ function renderAssessmentList() {
         const isExpanded = expandedAssessmentId === assessment.id;
         const formData = assessment.assessment_data?.formData || {};
         return `
-            <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
+            <div class="assessments-page__list-item assessments-page__list-item--clickable" data-assessment-id="${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
+                    <button class="assessments-page__expand-btn" aria-expanded="${isExpanded}">
+                        <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
+                    </button>
                     <div class="assessments-page__tool-info">
                         <h4>${assessment.name}</h4>
                         <p>${formData.toolCategory || assessment.category || 'General'}</p>
@@ -210,22 +213,75 @@ function renderAssessmentList() {
                     <span>${date}</span>
                 </div>
                 <div class="assessments-page__col assessments-page__col--actions" data-label="Actions">
-                    <button class="btn-icon" title="View Details" aria-expanded="${isExpanded}" aria-controls="details-${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
-                        <i data-lucide="eye" class="w-5 h-5"></i>
-                    </button>
                     ${canDelete ? `
-                        <button class="btn-icon" title="Delete" onclick="deleteAssessment('${assessment.id}')">
+                        <button class="btn-icon" title="Delete" onclick="event.stopPropagation(); deleteAssessment('${assessment.id}')">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                         </button>
                     ` : ''}
                 </div>
             </div>
-            <div class="assessments-page__details${isExpanded ? ' assessments-page__details--expanded' : ''}" id="details-${assessment.id}" style="display:${isExpanded ? 'block' : 'none'}" role="region" aria-hidden="${!isExpanded}">
-                ${isExpanded ? renderAssessmentDetails(assessment) : ''}
+            <div class="assessments-page__details-row" style="display:${isExpanded ? 'block' : 'none'}" id="details-${assessment.id}">
+                <div class="assessments-page__details">
+                    <div class="assessments-page__tabs">
+                        <button class="assessments-page__tab assessments-page__tab--active" data-tab="details" data-assessment-id="${assessment.id}">
+                            <i data-lucide="bar-chart-3"></i>
+                            Risk Assessment Details
+                        </button>
+                        <button class="assessments-page__tab" data-tab="recommendations" data-assessment-id="${assessment.id}">
+                            <i data-lucide="lightbulb"></i>
+                            Recommendations
+                        </button>
+                        <button class="assessments-page__tab" data-tab="compliance" data-assessment-id="${assessment.id}">
+                            <i data-lucide="shield-check"></i>
+                            Compliance Status
+                        </button>
+                    </div>
+                    
+                    <div class="assessments-page__tab-content assessments-page__tab-content--active" data-content="details">
+                        <div class="assessments-page__details-grid">
+                            ${renderAssessmentDetailsContent(assessment)}
+                        </div>
+                    </div>
+                    
+                    <div class="assessments-page__tab-content" data-content="recommendations">
+                        <div class="assessments-page__recommendations-list">
+                            ${renderAssessmentRecommendations(assessment)}
+                        </div>
+                    </div>
+                    
+                    <div class="assessments-page__tab-content" data-content="compliance">
+                        <div class="assessments-page__compliance-content">
+                            ${renderAssessmentCompliance(assessment)}
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
     container.innerHTML = listContent;
+    
+    // Add tab switching functionality
+    container.querySelectorAll('.assessments-page__tab').forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetTab = tab.getAttribute('data-tab');
+            const assessmentId = tab.getAttribute('data-assessment-id');
+            
+            // Find the parent details container
+            const detailsContainer = tab.closest('.assessments-page__details');
+            
+            // Remove active class from all tabs and content in this assessment's details
+            detailsContainer.querySelectorAll('.assessments-page__tab').forEach(t => t.classList.remove('assessments-page__tab--active'));
+            detailsContainer.querySelectorAll('.assessments-page__tab-content').forEach(c => c.classList.remove('assessments-page__tab-content--active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('assessments-page__tab--active');
+            detailsContainer.querySelector(`[data-content="${targetTab}"]`).classList.add('assessments-page__tab-content--active');
+        });
+    });
+    
     if (typeof lucide !== 'undefined') {
         setTimeout(() => lucide.createIcons(), 100);
     }
@@ -238,6 +294,78 @@ window.toggleAssessmentDetails = function(id) {
     expandedAssessmentId = expandedAssessmentId === id ? null : id;
     renderAssessmentList();
 };
+
+function renderAssessmentDetailsContent(assessment) {
+    const data = assessment.assessment_data || {};
+    const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
+    
+    const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail]) => {
+        const categoryScore = detail.category_score || 0;
+        return `
+            <div class="assessments-page__detail-card">
+                <h5 class="assessments-page__detail-title">
+                    ${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+                    <span class="assessments-page__detail-score">Score: ${categoryScore}</span>
+                </h5>
+                <div class="assessments-page__detail-content">
+                    ${Object.entries(detail.criteria || {}).map(([critKey, crit]) => `
+                        <div class="assessments-page__detail-item">
+                            <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> 
+                            <span>${crit.score} - ${crit.justification}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('') || '<p>No detailed assessment available</p>';
+    
+    return detailsHTML;
+}
+
+function renderAssessmentRecommendations(assessment) {
+    const data = assessment.assessment_data || {};
+    const recommendations = data.recommendations || data.results?.recommendations || [];
+    
+    const recs = recommendations.map(r => `
+        <div class="assessments-page__recommendation">
+            <div class="assessments-page__rec-bullet assessments-page__rec-priority--${r.priority}"></div>
+            <div>
+                <h5 class="assessments-page__rec-title">${r.title}</h5>
+                <p class="assessments-page__rec-desc">${r.description}</p>
+                <span class="assessments-page__rec-meta">Priority: ${r.priority} | Category: ${r.category}</span>
+            </div>
+        </div>
+    `).join('') || '<p>No recommendations available</p>';
+    
+    return recs;
+}
+
+function renderAssessmentCompliance(assessment) {
+    const data = assessment.assessment_data || {};
+    const formData = data.formData || {};
+    const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
+    
+    // Basic compliance info
+    const complianceIcons = Object.entries(assessment.compliance || {}).map(([key, status]) => {
+        const icon = status === 'compliant' ? '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
+        return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
+    }).join('') || '<p>No compliance data available</p>';
+    
+    const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || 'No compliance summary available';
+    const complianceCerts = (assessment.compliance_certifications || []).join(', ') || 'No certifications specified';
+    
+    return `
+        <div class="assessments-page__compliance-grid">
+            ${complianceIcons}
+        </div>
+        <div class="assessments-page__compliance-summary">
+            <p><strong>Data Classification:</strong> ${formData.dataClassification || 'Not specified'}</p>
+            <p><strong>Use Case:</strong> ${formData.useCase || 'Not specified'}</p>
+            <p><strong>Certifications:</strong> ${complianceCerts}</p>
+            <p><strong>Summary:</strong> ${complianceSummary}</p>
+        </div>
+    `;
+}
 
 function renderAssessmentDetails(assessment) {
     const data = assessment.assessment_data || {};
