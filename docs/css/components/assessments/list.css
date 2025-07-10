@@ -140,18 +140,17 @@
     color: var(--color-white);
 }
 
-.chevron::before {
-    content: '';
+.assessments-page__expand-btn-icon {
     display: inline-block;
     width: 0.5rem;
     height: 0.5rem;
     border-right: 2px solid currentColor;
-    border-top: 2px solid currentColor;
-    transform: rotate(45deg);
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
     transition: transform 0.2s;
 }
 
-.chevron--down::before {
+.assessments-page__list-item--expanded .assessments-page__expand-btn-icon {
     transform: rotate(135deg);
 }
 
