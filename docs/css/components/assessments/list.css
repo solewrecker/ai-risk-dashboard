@@ -436,6 +436,22 @@
     font-weight: 600;
 }
 
+/* Chevron for expand/collapse */
+.chevron {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease-in-out;
+    margin-right: 0.5rem;
+}
+
+.chevron--down {
+    transform: rotate(225deg);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .assessments-page__tabs {
