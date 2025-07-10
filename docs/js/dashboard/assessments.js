@@ -299,19 +299,17 @@ function renderAssessmentDetailsContent(assessment) {
     const data = assessment.assessment_data || {};
     const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
     
+    // Extract data exactly like compare.js does
     const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail]) => {
         const categoryScore = detail.category_score || 0;
         return `
             <div class="assessments-page__detail-card">
-                <h5 class="assessments-page__detail-title">
-                    ${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
-                    <span class="assessments-page__detail-score">Score: ${categoryScore}</span>
-                </h5>
+                <h5 class="assessments-page__detail-title">${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</h5>
+                <div class="assessments-page__detail-score">Score: ${categoryScore}</div>
                 <div class="assessments-page__detail-content">
                     ${Object.entries(detail.criteria || {}).map(([critKey, crit]) => `
                         <div class="assessments-page__detail-item">
-                            <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> 
-                            <span>${crit.score} - ${crit.justification}</span>
+                            <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> ${crit.score} - ${crit.justification}
                         </div>
                     `).join('')}
                 </div>
@@ -324,7 +322,8 @@ function renderAssessmentDetailsContent(assessment) {
 
 function renderAssessmentRecommendations(assessment) {
     const data = assessment.assessment_data || {};
-    const recommendations = data.recommendations || data.results?.recommendations || [];
+    // Access recommendations from multiple possible paths like compare.js does
+    const recommendations = data.recommendations || assessment.recommendations || data.results?.recommendations || [];
     
     const recs = recommendations.map(r => `
         <div class="assessments-page__recommendation">
@@ -345,22 +344,23 @@ function renderAssessmentCompliance(assessment) {
     const formData = data.formData || {};
     const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
     
-    // Basic compliance info
-    const complianceIcons = Object.entries(assessment.compliance || {}).map(([key, status]) => {
+    // Access compliance data from multiple possible paths like compare.js does
+    const complianceData = assessment.compliance || data.compliance || {};
+    const complianceIcons = Object.entries(complianceData).map(([key, status]) => {
         const icon = status === 'compliant' ? '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
         return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
     }).join('') || '<p>No compliance data available</p>';
     
-    const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || 'No compliance summary available';
-    const complianceCerts = (assessment.compliance_certifications || []).join(', ') || 'No certifications specified';
+    const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
+    const complianceCerts = (assessment.compliance_certifications || data.compliance_certifications || []).join(', ') || 'No certifications specified';
     
     return `
         <div class="assessments-page__compliance-grid">
             ${complianceIcons}
         </div>
         <div class="assessments-page__compliance-summary">
-            <p><strong>Data Classification:</strong> ${formData.dataClassification || 'Not specified'}</p>
-            <p><strong>Use Case:</strong> ${formData.useCase || 'Not specified'}</p>
+            <p><strong>Data Classification:</strong> ${formData.dataClassification || assessment.data_classification || 'Not specified'}</p>
+            <p><strong>Use Case:</strong> ${formData.useCase || assessment.primary_use_case || 'Not specified'}</p>
             <p><strong>Certifications:</strong> ${complianceCerts}</p>
             <p><strong>Summary:</strong> ${complianceSummary}</p>
         </div>
