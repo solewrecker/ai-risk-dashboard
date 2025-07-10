@@ -202,23 +202,6 @@
     color: var(--color-blue-300);
 }
 
-/* Export Button */
-.export-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--color-blue-600);
-    color: var(--color-white);
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all 150ms ease;
-}
-
-.export-button:hover {
-    background: var(--color-blue-700);
-}
-
 /* Icon Button */
 .icon-button {
     display: flex;

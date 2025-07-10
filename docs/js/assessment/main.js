@@ -160,13 +160,19 @@ function addEventListeners() {
 }
 
 function initialize() {
-    Auth.initializeSupabase(UI.updateUIForAuth);
-    UI.setupEventListeners({ // For listeners that need to be setup in UI module
-        closeAuthModal: Auth.closeAuthModal,
-        signOut: Auth.signOut,
-        showAuthModal: Auth.showAuthModal
+    // Event Listeners
+    UI.setupEventListeners({
+        onStartAssessment: startAssessment,
+        onStartNew: UI.startNewAssessment,
+        onLogin: Auth.showAuthModal,
+        onLogout: Auth.signOut
     });
-    UI.updateUIForAuth();
+
+    // Initialize Supabase and handle auth changes
+    Auth.initializeSupabase((user) => {
+        UI.updateUIForAuth(user);
+    });
+
     UI.showStep(1);
     addEventListeners();
 }
