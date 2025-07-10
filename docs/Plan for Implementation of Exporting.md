@@ -1,0 +1,5 @@
+**Design & Create Export Hub UI:** Create a new HTML file (`export.html`) and corresponding CSS for the export configuration page.
+**Refactor Existing Export Buttons:** Update all existing export buttons in `dashboard.html` to navigate to the new `export.html` page, passing the relevant context (e.g., selected tool IDs) as URL parameters.
+**Consolidate & Rename Templates:** Review the templates in `docs/templates/`, remove unused ones, and rename them to reflect their purpose (e.g., `template-summary.html`, `template-detailed.html`).
+**Create Unified Export Logic:** Create a new `js/dashboard/export.js` module to handle the logic for the Export Hub. This will involve fetching data, processing selections, and binding the data to the chosen template. This will replace the logic in `pdf-templates.js` and `template-binding.js`.
+**Implement Report Generation:** Use a library like `jsPDF` and `html2canvas` (if not already in use) to convert the final HTML template into a downloadable PDF.

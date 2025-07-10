@@ -549,19 +549,21 @@
         <div class="content">
             <div class="score-container">
                 <div class="score-content">
-                    <div class="score-number">{{finalScore}}</div>
-                    <div class="score-label">{{riskLevel}} RISK</div>
-                    <div class="score-description">
-                        <i data-lucide="trending-up" class="w-4 h-4"></i> Based on comprehensive security analysis
-                    </div>
+                    <div class="score-number">{{total_score}}</div>
+                    <div class="score-label">{{risk_level}}</div>
+                    <p class="score-description">
+                        Final consolidated risk score for {{tool_name}}
+                    </p>
                 </div>
             </div>
             
-            <h2><i data-lucide="info" class="w-5 h-5"></i> Tool Information</h2>
+            <h2><i data-lucide="info"></i> Assessment Overview</h2>
             <div class="section grid">
                 <div class="item">
-                    <span class="item-label"><i data-lucide="wrench" class="w-4 h-4"></i> Tool Name</span>
-                    <div class="item-value">{{toolName}}</div>
+                    <span class="item-label">
+                        <i data-lucide="shield"></i> Tool Name
+                    </span>
+                    <span class="item-value">{{tool_name}}</span>
                 </div>
                 <div class="item">
                     <span class="item-label"><i data-lucide="git-branch" class="w-4 h-4"></i> Version</span>
@@ -592,10 +594,10 @@
                 <!-- Risk breakdown will be inserted here by JavaScript -->
             </div>
             
-            <h2><i data-lucide="lightbulb" class="w-5 h-5"></i> Key Recommendations</h2>
+            <h2><i data-lucide="thumbs-up"></i> Recommendations</h2>
             <div class="section">
-                <ul class="recommendations" id="recommendations-container">
-                    <!-- Recommendations will be inserted here by JavaScript -->
+                <ul class="recommendations">
+                    {{recommendations_list}}
                 </ul>
             </div>
             

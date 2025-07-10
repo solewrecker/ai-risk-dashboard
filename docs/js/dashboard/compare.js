@@ -222,6 +222,17 @@ function renderTable() {
             renderTable();
         });
     });
+
+    // Update the export button link
+    const exportBtn = document.getElementById('compareExportBtn');
+    if (exportBtn && selectedTools.length > 0) {
+        const ids = selectedTools.map(t => t.id).join(',');
+        exportBtn.href = `export.html?ids=${ids}`;
+        exportBtn.classList.remove('disabled');
+    } else if (exportBtn) {
+        exportBtn.href = 'export.html';
+        exportBtn.classList.add('disabled');
+    }
 }
 
 function renderLegend() {
