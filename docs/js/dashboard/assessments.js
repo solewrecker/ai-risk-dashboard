@@ -297,7 +297,8 @@ window.toggleAssessmentDetails = function(id) {
 
 function renderAssessmentDetailsContent(assessment) {
     const data = assessment.assessment_data || {};
-    const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
+    // Handle both camelCase and snake_case for detailed assessment object
+    const detailedAssessment = data.detailedAssessment || data.detailed_assessment || data.results?.detailed_assessment || {};
     
     // Extract data exactly like compare.js does
     const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail]) => {
