@@ -139,20 +139,34 @@ function renderTable() {
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
             <td colspan="9">
                 <div class="compare-tools__details">
-                    <section class="compare-tools__details-section">
-                        <h4 class="compare-tools__details-header">Risk Assessment Details</h4>
+                    <div class="compare-tools__tabs">
+                        <button class="compare-tools__tab compare-tools__tab--active" data-tab="details" data-tool-id="${tool.id}">
+                            <i data-lucide="bar-chart-3"></i>
+                            Risk Assessment Details
+                        </button>
+                        <button class="compare-tools__tab" data-tab="recommendations" data-tool-id="${tool.id}">
+                            <i data-lucide="lightbulb"></i>
+                            Recommendations
+                        </button>
+                        <button class="compare-tools__tab" data-tab="compliance" data-tool-id="${tool.id}">
+                            <i data-lucide="shield-check"></i>
+                            Compliance Status
+                        </button>
+                    </div>
+                    
+                    <div class="compare-tools__tab-content compare-tools__tab-content--active" data-content="details">
                         <div class="compare-tools__details-grid">
                             ${detailsHTML}
                         </div>
-                    </section>
-                    <section class="compare-tools__details-section">
-                        <h4 class="compare-tools__details-header">Recommendations</h4>
+                    </div>
+                    
+                    <div class="compare-tools__tab-content" data-content="recommendations">
                         <div class="compare-tools__recommendations-list">
                             ${recs}
                         </div>
-                    </section>
-                    <section class="compare-tools__details-section">
-                        <h4 class="compare-tools__details-header">Compliance Status</h4>
+                    </div>
+                    
+                    <div class="compare-tools__tab-content" data-content="compliance">
                         <div class="compare-tools__compliance-content">
                             <div class="compare-tools__compliance-grid">
                                 ${complianceIcons}
@@ -162,7 +176,7 @@ function renderTable() {
                                 <p><strong>Summary:</strong> ${complianceSummary}</p>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -177,6 +191,29 @@ function renderTable() {
             renderTable();
         });
     });
+    
+    // Add tab switching functionality
+    tbody.querySelectorAll('.compare-tools__tab').forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetTab = tab.getAttribute('data-tab');
+            const toolId = tab.getAttribute('data-tool-id');
+            
+            // Find the parent details container
+            const detailsContainer = tab.closest('.compare-tools__details');
+            
+            // Remove active class from all tabs and content in this tool's details
+            detailsContainer.querySelectorAll('.compare-tools__tab').forEach(t => t.classList.remove('compare-tools__tab--active'));
+            detailsContainer.querySelectorAll('.compare-tools__tab-content').forEach(c => c.classList.remove('compare-tools__tab-content--active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('compare-tools__tab--active');
+            detailsContainer.querySelector(`[data-content="${targetTab}"]`).classList.add('compare-tools__tab-content--active');
+        });
+    });
+    
     // Keep existing button listener for completeness
     tbody.querySelectorAll('.compare-tools__expand-btn').forEach(btn => {
         btn.addEventListener('click', e => {
