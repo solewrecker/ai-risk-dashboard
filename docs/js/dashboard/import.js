@@ -84,7 +84,7 @@ export async function processImport() {
             return;
         }
         
-        // Validate score fields
+        // Validate score fields (these can be 0, so check for undefined/null)
         const scoreFields = ['data_storage_score', 'training_usage_score', 'access_controls_score', 'compliance_score', 'vendor_transparency_score'];
         const missingScores = scoreFields.filter(field => assessmentData[field] === undefined || assessmentData[field] === null);
         
@@ -93,9 +93,15 @@ export async function processImport() {
             return;
         }
         
-        // Validate detailed_assessment structure
-        if (!assessmentData.detailed_assessment || typeof assessmentData.detailed_assessment !== 'object') {
-            showError('Invalid assessment file format. Missing or invalid detailed_assessment field.');
+        // Validate detailed_assessment structure (optional but recommended)
+        if (assessmentData.detailed_assessment && typeof assessmentData.detailed_assessment !== 'object') {
+            showError('Invalid assessment file format. detailed_assessment must be an object if present.');
+            return;
+        }
+        
+        // Validate compliance_certifications if present
+        if (assessmentData.compliance_certifications && !Array.isArray(assessmentData.compliance_certifications)) {
+            showError('Invalid assessment file format. compliance_certifications must be an array if present.');
             return;
         }
         // Prepare multipart/form-data
