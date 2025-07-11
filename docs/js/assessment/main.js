@@ -143,7 +143,7 @@ function addEventListeners() {
 
     document.getElementById('exportMainBtn')?.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent body click from hiding menu immediately
-        Results.toggleExportMenu();
+        // Results.toggleExportMenu(); // REMOVE: No longer exists
     });
     document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
     document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
@@ -151,12 +151,12 @@ function addEventListeners() {
     // Add other export buttons if they exist, e.g., exportHtmlBtn
     
     // Global listeners
-    document.body.addEventListener('click', (e) => {
-        // Hide export menu if click is outside
-        if (!document.getElementById('exportMenu')?.contains(e.target) && !document.getElementById('exportMainBtn')?.contains(e.target)) {
-            Results.hideExportMenu();
-        }
-    });
+    // REMOVE: Results.hideExportMenu, as it no longer exists
+    // document.body.addEventListener('click', (e) => {
+    //     if (!document.getElementById('exportMenu')?.contains(e.target) && !document.getElementById('exportMainBtn')?.contains(e.target)) {
+    //         Results.hideExportMenu();
+    //     }
+    // });
 }
 
 function initialize() {
