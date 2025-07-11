@@ -165,7 +165,9 @@ function initialize() {
         onStartAssessment: startAssessment,
         onStartNew: UI.startNewAssessment,
         onLogin: Auth.showAuthModal,
-        onLogout: Auth.signOut
+        signOut: Auth.signOut,
+        showAuthModal: Auth.showAuthModal,
+        closeAuthModal: Auth.closeAuthModal
     });
 
     // Initialize Supabase and handle auth changes
