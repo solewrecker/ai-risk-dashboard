@@ -79,18 +79,18 @@ export async function processImport() {
         console.log('compliance_certifications field:', assessmentData.compliance_certifications);
         console.log('compliance_certifications type:', typeof assessmentData.compliance_certifications);
         console.log('Is array?', Array.isArray(assessmentData.compliance_certifications));
-        // Validate required fields based on database schema
-        const requiredFields = ['name', 'category', 'total_score', 'risk_level', 'vendor'];
+        
+        // Validate only the essential required fields
+        const requiredFields = ['name', 'total_score', 'risk_level'];
         const missingFields = requiredFields.filter(field => !assessmentData[field]);
         
         if (missingFields.length > 0) {
-            console.log('Assessment data:', assessmentData);
             console.log('Missing fields:', missingFields);
             showError(`Invalid assessment file format. Missing required fields: ${missingFields.join(', ')}`);
             return;
         }
         
-        // Validate score fields (these can be 0, so check for undefined/null)
+        // Validate score fields exist (can be 0)
         const scoreFields = ['data_storage_score', 'training_usage_score', 'access_controls_score', 'compliance_score', 'vendor_transparency_score'];
         const missingScores = scoreFields.filter(field => assessmentData[field] === undefined || assessmentData[field] === null);
         
@@ -105,15 +105,6 @@ export async function processImport() {
             return;
         }
         
-        // Validate compliance_certifications if present
-        if (assessmentData.compliance_certifications !== undefined && assessmentData.compliance_certifications !== null) {
-            if (!Array.isArray(assessmentData.compliance_certifications)) {
-                console.log('compliance_certifications value:', assessmentData.compliance_certifications);
-                console.log('compliance_certifications type:', typeof assessmentData.compliance_certifications);
-                showError('Invalid assessment file format. compliance_certifications must be an array if present.');
-                return;
-            }
-        }
         // Prepare multipart/form-data
         const formData = new FormData();
         formData.append('file', file);
