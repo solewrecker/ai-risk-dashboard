@@ -113,6 +113,12 @@ function setupEventListeners() {
 
     // Generate button
     generateReportBtn.addEventListener('click', generateReport);
+
+    // Mix-and-match sections
+    const mixMatchSelector = document.querySelector('.mix-match-selector');
+    if (mixMatchSelector) {
+        mixMatchSelector.addEventListener('change', updateUI);
+    }
 }
 
 // --- Report Generation ---
@@ -131,10 +137,46 @@ async function generateReport() {
         // For now, we'll just use the first selected assessment for the summary/detailed reports
         const primaryAssessment = selectedData[0]; 
 
-        const templateHtml = await fetchTemplate(selectedTemplate);
-        const populatedHtml = bindDataToTemplate(templateHtml, primaryAssessment, selectedData);
+        const selectedSections = Array.from(mixMatchSelector.querySelectorAll('input:checked')).map(input => input.dataset.section);
+
+        // For mix-and-match, start with a base template and add sections
+        let templateHtml = await fetchTemplate('base'); // Assume a base.html exists
+        if (selectedSections.includes('summary')) {
+            templateHtml += await fetchTemplate('summary-section');
+        }
+        // Similarly for other sections
+
+        const populatedHtml = bindDataToTemplate(templateHtml, primaryAssessment, selectedData, selectedSections);
         
-        await createPdf(populatedHtml);
+        // Generate shareable URL (example: link to view the assessment)
+        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
+
+        // Create QR code container
+        const qrContainer = document.createElement('div');
+        qrContainer.style.textAlign = 'center';
+        qrContainer.style.marginTop = '20px';
+        qrContainer.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
+
+        // Append to populated HTML (assume there's a footer or body)
+        populated = populated.replace('</body>', `${qrContainer.outerHTML}</body>`);
+
+        // Now, after rendering to container, generate the QR code
+        // But since container is off-screen, we need to generate QR after setting innerHTML
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.width = '1000px'; // Standard width for our reports
+        container.innerHTML = populated;
+        document.body.appendChild(container);
+
+        new QRCode(container.querySelector('#qrcode'), {
+            text: shareUrl,
+            width: 128,
+            height: 128
+        });
+        document.body.removeChild(container);
+
+        await createPdf(populated);
 
     } catch (error) {
         console.error('Error generating report:', error);
@@ -154,7 +196,7 @@ async function fetchTemplate(templateName) {
     return await response.text();
 }
 
-function bindDataToTemplate(html, primaryAssessment, allSelectedData) {
+function bindDataToTemplate(html, primaryAssessment, allSelectedData, selectedSections) {
     // This is a simplified binding function.
     // A more robust solution would use a templating engine like Handlebars.
     let populated = html.replace(/{{\s*tool_name\s*}}/gi, primaryAssessment.name);
@@ -183,7 +225,8 @@ async function createPdf(htmlContent) {
 
     const canvas = await html2canvas(container, {
         scale: 2, // Higher scale for better quality
-        useCORS: true
+        backgroundColor: '#ffffff', // Add background color
+        allowTaint: true // Allow taint for better fidelity
     });
 
     document.body.removeChild(container);
