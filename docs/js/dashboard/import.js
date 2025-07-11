@@ -73,6 +73,12 @@ export async function processImport() {
             showError('Invalid JSON file.');
             return;
         }
+        
+        // Debug: Log the parsed data to see what we're working with
+        console.log('Parsed assessment data:', assessmentData);
+        console.log('compliance_certifications field:', assessmentData.compliance_certifications);
+        console.log('compliance_certifications type:', typeof assessmentData.compliance_certifications);
+        console.log('Is array?', Array.isArray(assessmentData.compliance_certifications));
         // Validate required fields based on database schema
         const requiredFields = ['name', 'category', 'total_score', 'risk_level', 'vendor'];
         const missingFields = requiredFields.filter(field => !assessmentData[field]);
@@ -100,9 +106,13 @@ export async function processImport() {
         }
         
         // Validate compliance_certifications if present
-        if (assessmentData.compliance_certifications && !Array.isArray(assessmentData.compliance_certifications)) {
-            showError('Invalid assessment file format. compliance_certifications must be an array if present.');
-            return;
+        if (assessmentData.compliance_certifications !== undefined && assessmentData.compliance_certifications !== null) {
+            if (!Array.isArray(assessmentData.compliance_certifications)) {
+                console.log('compliance_certifications value:', assessmentData.compliance_certifications);
+                console.log('compliance_certifications type:', typeof assessmentData.compliance_certifications);
+                showError('Invalid assessment file format. compliance_certifications must be an array if present.');
+                return;
+            }
         }
         // Prepare multipart/form-data
         const formData = new FormData();
