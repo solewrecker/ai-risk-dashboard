@@ -50,12 +50,12 @@ serve(async (req) => {
     );
     
     // --- Data Mapping and Validation (same as before) ---
-    const { name, vendor, license_type, total_score, risk_level, data_storage_score, training_usage_score, access_controls_score, compliance_score, vendor_transparency_score, summary_and_recommendation, confidence, primary_use_case, data_classification, category, assessed_by, breakdown, details, azure_permissions, recommendations, sources, detailed_assessment, documentation_tier, assessment_notes, compliance_certifications } = toolData;
+    const { name, vendor, license_type, total_score, risk_level, data_storage_score, training_usage_score, access_controls_score, compliance_score, vendor_transparency_score, summary_and_recommendation, confidence, primary_use_case, data_classification, category, assessed_by, azure_permissions, recommendations, sources, detailed_assessment, documentation_tier, assessment_notes, compliance_certifications } = toolData;
 
     if (!name) {
       throw new Error("The 'name' field is required.");
     }
-    
+
     const recordToInsert = {
       name,
       vendor,
@@ -67,15 +67,13 @@ serve(async (req) => {
       access_controls_score: access_controls_score || 0,
       compliance_score: compliance_score || 0,
       vendor_transparency_score: vendor_transparency_score || 0,
-      compliance_certifications: compliance_certifications || [],
+      compliance_certifications: compliance_certifications || {},
       summary_and_recommendation,
       confidence: confidence || 0.8,
       primary_use_case,
       data_classification,
       category,
       assessed_by: assessed_by || "Bulk Import",
-      breakdown: breakdown || {},
-      details: details || {},
       azure_permissions: azure_permissions || {},
       recommendations: recommendations || {},
       sources: sources || [],
