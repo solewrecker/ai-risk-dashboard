@@ -743,8 +743,8 @@
                 <div class="report-meta">
                     <div class="meta-item"><strong>Report Date:</strong> <span id="reportDate"></span></div>
                     <div class="meta-item"><strong>Assessed By:</strong> AI Risk Pro</div>
-                </div>
-            </div>
+                    </div>
+                    </div>
         </header>
 
         <!-- Executive Summary -->
@@ -760,22 +760,22 @@
                 </div>
                 <div class="summary-insights">
                     <!-- Insights will be populated here -->
-                </div>
-            </div>
+                    </div>
+                    </div>
             <div class="key-findings">
                 <h3 class="findings-title">Key Recommendations</h3>
                 <ul class="findings-list">
                     {{recommendations_list}}
                 </ul>
-            </div>
+                </div>
         </section>
-        
+
         <!-- Detailed Breakdown -->
         <section class="detailed-breakdown">
              <!-- Detailed content will be populated here -->
         </section>
-    </div>
-
+                </div>
+                
     <script>
         document.getElementById('reportDate').textContent = new Date().toLocaleDateString('en-US', {
             year: 'numeric', month: 'long', day: 'numeric'
