@@ -360,7 +360,7 @@ function renderAssessmentCompliance(assessment) {
         
         // Access compliance data from multiple possible paths
         const complianceData = assessment.compliance || data.compliance || {};
-        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
+        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || detailedAssessment.compliance_certifications || [];
         
         console.log('Compliance Data:', {
             complianceData,
@@ -387,8 +387,9 @@ function renderAssessmentCompliance(assessment) {
         }
         
         // Fallback to certifications if no compliance data
-        if (!complianceIcons && Array.isArray(complianceCertifications) && complianceCertifications.length > 0) {
-            complianceIcons = complianceCertifications.map(cert => 
+        const safeComplianceCerts = Array.isArray(complianceCertifications) ? complianceCertifications : [];
+        if (!complianceIcons && safeComplianceCerts.length > 0) {
+            complianceIcons = safeComplianceCerts.map(cert => 
                 `<div class="assessments-page__compliance-item">
                     <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
                     <span>${String(cert).toUpperCase()}</span>
