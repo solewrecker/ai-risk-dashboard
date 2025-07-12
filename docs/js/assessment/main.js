@@ -26,7 +26,8 @@ async function startAssessment() {
             source: 'database',
             breakdown: toolData.breakdown,
             recommendations: toolData.recommendations,
-            detailedAssessment: toolData.detailed_assessment
+            detailedAssessment: toolData.detailed_assessment,
+            compliance_certifications: toolData.compliance_certifications || []
         };
     } else {
         // Generate heuristic score
@@ -38,7 +39,14 @@ async function startAssessment() {
             riskLevel: Scoring.getRiskLevel(finalScore),
             source: 'heuristic',
             breakdown: { scores: { /* Basic heuristic scores could go here */ } },
-            recommendations: Scoring.generateRecommendations(finalScore, formData)
+            recommendations: Scoring.generateRecommendations(finalScore, formData),
+            compliance_certifications: [
+                "HIPAA",
+                "GDPR",
+                "SOC 2",
+                "PII",
+                "CCPA"
+            ]
         };
     }
 
