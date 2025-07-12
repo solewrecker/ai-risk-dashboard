@@ -391,7 +391,7 @@ function renderAssessmentCompliance(assessment) {
             complianceIcons = complianceCertifications.map(cert => 
                 `<div class="assessments-page__compliance-item">
                     <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
-                    <span>${cert.toUpperCase()}</span>
+                    <span>${String(cert).toUpperCase()}</span>
                 </div>`
             ).join('');
         }
@@ -405,9 +405,9 @@ function renderAssessmentCompliance(assessment) {
         
         // Defensive check for compliance certifications
         const complianceCerts = Array.isArray(assessment.compliance_certifications) 
-            ? assessment.compliance_certifications.join(', ') 
+            ? assessment.compliance_certifications.map(cert => String(cert)).join(', ') 
             : Array.isArray(data.compliance_certifications) 
-                ? data.compliance_certifications.join(', ') 
+                ? data.compliance_certifications.map(cert => String(cert)).join(', ') 
                 : 'No certifications specified';
         
         return `
