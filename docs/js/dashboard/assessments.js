@@ -353,7 +353,12 @@ function renderAssessmentCompliance(assessment) {
     }).join('') || '<p>No compliance data available</p>';
     
     const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
-    const complianceCerts = (assessment.compliance_certifications || data.compliance_certifications || []).join(', ') || 'No certifications specified';
+    const complianceCerts = assessment.compliance_certifications && typeof assessment.compliance_certifications === 'object' 
+        ? Object.entries(assessment.compliance_certifications)
+            .filter(([_, status]) => status === 'Yes')
+            .map(([cert, _]) => cert)
+            .join(', ')
+        : 'No certifications specified';
     
     return `
         <div class="assessments-page__compliance-grid">
