@@ -84,7 +84,36 @@ async function initializeDashboard() {
             console.log('User is not admin, skipping admin UI injection');
         }
         
-        await loadAssessments();
+        // Wrap loadAssessments in a more robust error handler
+        try {
+            await loadAssessments();
+        } catch (loadError) {
+            console.error('Failed to load assessments:', loadError);
+            
+            // Render a user-friendly error message
+            const container = document.getElementById('assessment-list');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-state-container">
+                        <i data-lucide="alert-triangle" class="error-icon text-red-500"></i>
+                        <h3 class="error-title text-lg font-bold">Unable to Load Assessments</h3>
+                        <p class="error-message text-gray-400">
+                            We couldn't retrieve your assessments at this time. 
+                            This could be due to a network issue or temporary service disruption.
+                        </p>
+                        <button onclick="loadAssessments()" class="btn btn-secondary mt-4">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                            Retry Loading
+                        </button>
+                    </div>
+                `;
+                
+                // Reinitialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    setTimeout(() => lucide.createIcons(), 100);
+                }
+            }
+        }
         
         updateDashboardStats();
         updateProgressTracking();
@@ -98,5 +127,19 @@ async function initializeDashboard() {
         console.log('Dashboard initialized successfully');
     } catch (error) {
         console.error('Failed to initialize dashboard:', error);
+        
+        // Render a global error state
+        const mainContent = document.querySelector('.flex-1.p-6');
+        if (mainContent) {
+            mainContent.innerHTML = `
+                <div class="text-center p-10 bg-gray-800 rounded-lg">
+                    <h2 class="text-2xl font-bold mb-2 text-red-500">Dashboard Initialization Failed</h2>
+                    <p class="text-gray-400">We encountered an unexpected error. Please try refreshing the page.</p>
+                    <button onclick="window.location.reload()" class="mt-4 inline-block bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Reload Page
+                    </button>
+                </div>
+            `;
+        }
     }
 } 
