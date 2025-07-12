@@ -3,7 +3,7 @@
 // Initializes the app, loads modules, and coordinates everything.
 
 import { initAuth, checkAuth, getIsAdmin, getCurrentUser } from './auth.js';
-import { initAssessments, loadAssessments, viewAssessment, deleteAssessment, filterAssessmentsLegacy, clearAllFiltersLegacy } from './assessments.js';
+import { initAssessments, loadAssessments, viewAssessment, deleteAssessment as deleteAssessmentFn, filterAssessmentsLegacy, clearAllFiltersLegacy } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 import { AchievementsManager } from './achievements.js';
@@ -21,7 +21,7 @@ let currentTab = 'dashboard';
 window.switchTab = switchTab;
 window.viewAssessment = viewAssessment;
 window.deleteAssessment = async (id) => {
-    await deleteAssessment(id);
+    await deleteAssessmentFn(id);
     // Refresh achievements after deletion
     if (window.achievementsManager) {
         window.achievementsManager.updateProgress();
