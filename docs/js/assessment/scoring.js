@@ -65,6 +65,7 @@ export function applyClientSideMultipliers(dbData, formData) {
     return {
         ...dbData, // Pass through original data
         total_score: totalScore, // The new, client-adjusted total score
+        compliance_certifications: dbData.compliance_certifications || [], // Ensure compliance certifications are preserved
         breakdown: {
             ...dbData.breakdown,
             scores: baseScores
