@@ -151,13 +151,7 @@ ${JSON.stringify(jsonTemplate, null, 2)}
           gdpr: "unknown",
           hipaa: "unknown"
         },
-        compliance_certifications: assessmentJson.compliance_certifications || {
-          "HIPAA": "No",
-          "GDPR": "No",
-          "SOC_2": "No",
-          "PII": "No",
-          "CCPA": "No"
-        }
+        compliance_certifications: assessmentJson.compliance_certifications || [],
       },
       
       // Build the details object with text summaries

@@ -67,13 +67,7 @@ serve(async (req) => {
       access_controls_score: access_controls_score || 0,
       compliance_score: compliance_score || 0,
       vendor_transparency_score: vendor_transparency_score || 0,
-      compliance_certifications: compliance_certifications || {
-        "HIPAA": "No",
-        "GDPR": "No",
-        "SOC_2": "No",
-        "PII": "No",
-        "CCPA": "No"
-      },
+      compliance_certifications: compliance_certifications || [],
       summary_and_recommendation,
       confidence: confidence || 0.8,
       primary_use_case,

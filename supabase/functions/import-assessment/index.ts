@@ -43,13 +43,7 @@ serve(async (req) => {
         .from("ai_tools")
         .upsert({
           ...assessment,
-          compliance_certifications: assessment.compliance_certifications || {
-            "HIPAA": "No",
-            "GDPR": "No",
-            "SOC_2": "No",
-            "PII": "No",
-            "CCPA": "No"
-          },
+          compliance_certifications: assessment.compliance_certifications || [],
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'name'
