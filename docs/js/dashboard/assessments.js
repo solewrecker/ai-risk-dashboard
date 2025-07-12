@@ -55,7 +55,17 @@ export async function loadAssessments() {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase Query Error Details:', {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint,
+                user_id: user.id,
+                is_admin: getIsAdmin()
+            });
+            throw error;
+        }
 
         assessments = data || [];
         console.log(`Loaded ${assessments.length} assessments`);
@@ -341,51 +351,79 @@ function renderAssessmentRecommendations(assessment) {
 }
 
 function renderAssessmentCompliance(assessment) {
-    const data = assessment.assessment_data || {};
-    const formData = data.formData || {};
-    const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
-    
-    // Access compliance data from multiple possible paths
-    const complianceData = assessment.compliance || data.compliance || {};
-    const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
-    
-    // Handle different compliance data formats
-    let complianceIcons = '';
-    if (typeof complianceData === 'object' && Object.keys(complianceData).length > 0) {
-        complianceIcons = Object.entries(complianceData).map(([key, status]) => {
-            const icon = status === 'compliant' || status === true ? 
-                '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : 
-                '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
-            return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
-        }).join('');
-    } else if (Array.isArray(complianceCertifications) && complianceCertifications.length > 0) {
-        complianceIcons = complianceCertifications.map(cert => 
-            `<div class="assessments-page__compliance-item">
-                <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
-                <span>${cert.toUpperCase()}</span>
-            </div>`
-        ).join('');
+    try {
+        console.log('Rendering Compliance for Assessment:', assessment);
+
+        const data = assessment.assessment_data || {};
+        const formData = data.formData || {};
+        const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
+        
+        // Access compliance data from multiple possible paths
+        const complianceData = assessment.compliance || data.compliance || {};
+        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
+        
+        console.log('Compliance Data:', {
+            complianceData,
+            complianceCertifications,
+            assessmentData: data
+        });
+
+        // Defensive checks to prevent .join() errors
+        let complianceIcons = '';
+        
+        // Handle compliance data as an object
+        if (complianceData && typeof complianceData === 'object') {
+            const complianceEntries = Object.entries(complianceData);
+            console.log('Compliance Entries:', complianceEntries);
+            
+            if (complianceEntries.length > 0) {
+                complianceIcons = complianceEntries.map(([key, status]) => {
+                    const icon = status === 'compliant' || status === true ? 
+                        '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : 
+                        '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
+                    return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
+                }).join('');
+            }
+        }
+        
+        // Fallback to certifications if no compliance data
+        if (!complianceIcons && Array.isArray(complianceCertifications) && complianceCertifications.length > 0) {
+            complianceIcons = complianceCertifications.map(cert => 
+                `<div class="assessments-page__compliance-item">
+                    <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
+                    <span>${cert.toUpperCase()}</span>
+                </div>`
+            ).join('');
+        }
+        
+        // Final fallback
+        if (!complianceIcons) {
+            complianceIcons = '<p>No compliance data available</p>';
+        }
+        
+        const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
+        const complianceCerts = (assessment.compliance_certifications || data.compliance_certifications || []).join(', ') || 'No certifications specified';
+        
+        return `
+            <div class="assessments-page__compliance-grid">
+                ${complianceIcons}
+            </div>
+            <div class="assessments-page__compliance-summary">
+                <p><strong>Data Classification:</strong> ${formData.dataClassification || assessment.data_classification || 'Not specified'}</p>
+                <p><strong>Use Case:</strong> ${formData.useCase || assessment.primary_use_case || 'Not specified'}</p>
+                <p><strong>Certifications:</strong> ${complianceCerts}</p>
+                <p><strong>Summary:</strong> ${complianceSummary}</p>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error in renderAssessmentCompliance:', error);
+        return `
+            <div class="assessments-page__compliance-error">
+                <p>Error rendering compliance information</p>
+                <pre>${JSON.stringify(error, null, 2)}</pre>
+            </div>
+        `;
     }
-    
-    // Fallback if no compliance data
-    if (!complianceIcons) {
-        complianceIcons = '<p>No compliance data available</p>';
-    }
-    
-    const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
-    const complianceCerts = (assessment.compliance_certifications || data.compliance_certifications || []).join(', ') || 'No certifications specified';
-    
-    return `
-        <div class="assessments-page__compliance-grid">
-            ${complianceIcons}
-        </div>
-        <div class="assessments-page__compliance-summary">
-            <p><strong>Data Classification:</strong> ${formData.dataClassification || assessment.data_classification || 'Not specified'}</p>
-            <p><strong>Use Case:</strong> ${formData.useCase || assessment.primary_use_case || 'Not specified'}</p>
-            <p><strong>Certifications:</strong> ${complianceCerts}</p>
-            <p><strong>Summary:</strong> ${complianceSummary}</p>
-        </div>
-    `;
 }
 
 function renderAssessmentDetails(assessment) {
