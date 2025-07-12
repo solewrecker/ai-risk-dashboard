@@ -69,12 +69,7 @@ function renderTable() {
         const recommendations = ad.recommendations || [];
         const isExpanded = expandedToolId === tool.id;
         // Compliance info
-        const complianceCerts = tool.compliance_certifications && typeof tool.compliance_certifications === 'object'
-            ? Object.entries(tool.compliance_certifications)
-                .filter(([_, status]) => status === 'Yes')
-                .map(([cert, _]) => cert)
-                .join(', ')
-            : '-';
+        const complianceCerts = (tool.compliance_certifications || []).join(', ') || '-';
         const complianceSummary = ad.compliance_summary || (detailedAssessment.compliance_summary) || '-';
         // Recommendations
         const recs = recommendations.map(r => `
