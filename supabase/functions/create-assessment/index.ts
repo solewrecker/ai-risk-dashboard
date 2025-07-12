@@ -150,8 +150,7 @@ ${JSON.stringify(jsonTemplate, null, 2)}
           sox: "unknown",
           gdpr: "unknown",
           hipaa: "unknown"
-        },
-        compliance_certifications: assessmentJson.compliance_certifications || [],
+        }
       },
       
       // Build the details object with text summaries
