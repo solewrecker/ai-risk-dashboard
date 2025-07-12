@@ -19,6 +19,13 @@ async function startAssessment() {
 
     if (toolData) {
         console.log('toolData from DB:', toolData); // Debug log
+        // Ensure compliance_certifications is always an array of key-value strings
+        let certs = [];
+        if (Array.isArray(toolData.compliance_certifications)) {
+            certs = toolData.compliance_certifications;
+        } else if (toolData.compliance_certifications && typeof toolData.compliance_certifications === 'object') {
+            certs = Object.entries(toolData.compliance_certifications).map(([key, value]) => `${key}: ${value}`);
+        }
         currentAssessment = {
             formData: formData,
             finalScore: toolData.total_score,
@@ -27,9 +34,7 @@ async function startAssessment() {
             breakdown: toolData.breakdown,
             recommendations: toolData.recommendations,
             detailedAssessment: toolData.detailed_assessment,
-            compliance_certifications: Array.isArray(toolData.compliance_certifications)
-                ? toolData.compliance_certifications
-                : Object.keys(toolData.compliance_certifications || {})
+            compliance_certifications: certs
         };
     } else {
         // Generate heuristic score
