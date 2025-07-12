@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     // Read framework and template files at runtime
     const framework = await Deno.readTextFile("./ai_risk_framework.md");
-    const jsonTemplateString = await Deno.readTextFile("./ai_risk_database_template.json");
+    const jsonTemplateString = await Deno.readTextFile("./ai_risk_database Template.json");
     const jsonTemplate = JSON.parse(jsonTemplateString);
 
     const supabaseClient = createClient(
@@ -167,6 +167,7 @@ ${JSON.stringify(jsonTemplate, null, 2)}
       assessed_by: "AI Security Council",
       confidence: assessmentJson.confidence || 0.85,
       summary_and_recommendation: assessmentJson.summary_and_recommendation,
+      compliance_certifications: assessmentJson.compliance_certifications || [],
       detailed_assessment: assessmentJson,
       primary_use_case: assessmentJson.primary_use_case || assessmentJson.use_case_multiplier_applied?.use_case || "General",
       data_classification: assessmentJson.data_classification || assessmentJson.use_case_multiplier_applied?.data_classification || "Standard",
