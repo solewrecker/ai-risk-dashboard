@@ -402,7 +402,13 @@ function renderAssessmentCompliance(assessment) {
         }
         
         const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
-        const complianceCerts = (assessment.compliance_certifications || data.compliance_certifications || []).join(', ') || 'No certifications specified';
+        
+        // Defensive check for compliance certifications
+        const complianceCerts = Array.isArray(assessment.compliance_certifications) 
+            ? assessment.compliance_certifications.join(', ') 
+            : Array.isArray(data.compliance_certifications) 
+                ? data.compliance_certifications.join(', ') 
+                : 'No certifications specified';
         
         return `
             <div class="assessments-page__compliance-grid">
