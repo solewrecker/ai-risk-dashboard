@@ -360,7 +360,7 @@ function renderAssessmentCompliance(assessment) {
         
         // Access compliance data from multiple possible paths
         const complianceData = assessment.compliance || data.compliance || {};
-        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || detailedAssessment.compliance_certifications || [];
+        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
         
         console.log('Compliance Data:', {
             complianceData,
