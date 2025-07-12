@@ -18,7 +18,7 @@ async function startAssessment() {
     let toolData = await API.getToolFromDatabase(formData);
 
     if (toolData) {
-        // Use database data
+        console.log('toolData from DB:', toolData); // Debug log
         currentAssessment = {
             formData: formData,
             finalScore: toolData.total_score,
@@ -27,7 +27,9 @@ async function startAssessment() {
             breakdown: toolData.breakdown,
             recommendations: toolData.recommendations,
             detailedAssessment: toolData.detailed_assessment,
-            compliance_certifications: toolData.compliance_certifications || []
+            compliance_certifications: Array.isArray(toolData.compliance_certifications)
+                ? toolData.compliance_certifications
+                : Object.keys(toolData.compliance_certifications || {})
         };
     } else {
         // Generate heuristic score
