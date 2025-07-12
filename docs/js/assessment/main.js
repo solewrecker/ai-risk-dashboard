@@ -86,12 +86,26 @@ async function handleSaveToDatabase() {
 function getFormData() {
     const form = document.getElementById('assessmentForm');
     const formData = new FormData(form);
+    
+    // Capture only checked compliance certifications
+    const complianceCertifications = {};
+    const certifications = ["HIPAA", "GDPR", "SOC_2", "PII", "CCPA"];
+    
+    certifications.forEach(cert => {
+        if (formData.get(cert) === 'on') {
+            complianceCertifications[cert] = 'Yes';
+        }
+    });
+
     return {
         toolName: formData.get('toolName'),
         toolVersion: formData.get('toolVersion'),
         toolCategory: formData.get('toolCategory'),
         dataClassification: formData.get('dataClassification'),
-        useCase: formData.get('useCase')
+        useCase: formData.get('useCase'),
+        complianceCertifications: Object.keys(complianceCertifications).length > 0 
+            ? complianceCertifications 
+            : undefined
     };
 }
 

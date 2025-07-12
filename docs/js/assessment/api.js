@@ -97,6 +97,7 @@ export async function saveToDatabase(assessment) {
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
         data_classification: formData.dataClassification,
+        compliance_certifications: formData.complianceCertifications,
         assessment_data: assessment // Store the full assessment object
     };
     

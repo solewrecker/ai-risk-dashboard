@@ -150,6 +150,13 @@ ${JSON.stringify(jsonTemplate, null, 2)}
           sox: "unknown",
           gdpr: "unknown",
           hipaa: "unknown"
+        },
+        compliance_certifications: assessmentJson.compliance_certifications || {
+          "HIPAA": "No",
+          "GDPR": "No",
+          "SOC_2": "No",
+          "PII": "No",
+          "CCPA": "No"
         }
       },
       

@@ -9,13 +9,13 @@
   "access_controls_score": 0,
   "compliance_score": 0,
   "vendor_transparency_score": 0,
-  "compliance_certifications": [
-    "HIPAA",
-    "GDPR",
-    "SOC 2",
-    "PII",
-    "CCPA"
-  ],
+  "compliance_certifications": {
+    "HIPAA": "No",
+    "GDPR": "No",
+    "SOC_2": "No",
+    "PII": "No", 
+    "CCPA": "No"
+  },
   "summary_and_recommendation": "A summary of key risks and a final recommendation (e.g., Approve for general use, Block, Requires review).",
   "primary_use_case": "",
   "data_classification": "",
