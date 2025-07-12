@@ -66,7 +66,6 @@ function renderAssessmentSelector() {
 
     const html = allAssessments.map(assessment => {
         const isChecked = selectedAssessmentIds.has(assessment.id);
-        const complianceCerts = (assessment.compliance_certifications || []).join(', ') || 'N/A';
         return `
             <div class="assessment-item-row">
                 <input type="checkbox" id="assessment-${assessment.id}" data-id="${assessment.id}" ${isChecked ? 'checked' : ''}>
