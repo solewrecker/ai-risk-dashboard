@@ -18,16 +18,27 @@ let customSelectedSections = new Set(); // For mix-and-match
 const quickTemplates = {
     summary: {
         name: 'Executive Summary',
-        sections: ['summary']
+        sections: ['summary-section'], // Maps to template-summary-section.html
+        pages: '3-4 pages'
     },
     detailed: {
         name: 'Detailed Technical Report',
-        sections: ['detailed'] // Assuming detailed section template will be created
+        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section'], // Example sections
+        pages: '8-12 pages'
     },
     comparison: {
         name: 'Comparison Report',
-        sections: ['comparison'] // Assuming comparison section template will be created
+        sections: ['summary-section', 'comparison-table-section'], // Example sections
+        pages: '5-7 pages'
     }
+};
+
+// Map for data-section to display name (for custom selections)
+const sectionDisplayNames = {
+    summary: 'Executive Summary',
+    detailed: 'Detailed Breakdown',
+    recommendations: 'Recommendations',
+    comparison: 'Comparison Table'
 };
 
 // --- DOM Elements ---
@@ -37,56 +48,103 @@ const mixMatchSelector = document.querySelector('.mix-match-selector'); // This 
 const generateReportBtn = document.getElementById('generateReportBtn');
 const generateHelpText = document.getElementById('generateHelpText');
 const customNotice = document.getElementById('custom-notice');
+const modeIndicator = document.getElementById('mode-indicator');
+const previewSectionsContainer = document.getElementById('preview-sections');
+const previewStatus = document.querySelector('.preview-status');
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Listen for authentication state changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session) {
-            // User is logged in, proceed to load assessments
-            await loadAssessments();
-            setupEventListeners();
-        } else {
-            // User is not logged in or session expired
-            assessmentSelector.innerHTML = '<p class="text-red-400">You must be logged in to view and export assessments.</p>';
-            generateReportBtn.disabled = true;
-            generateHelpText.textContent = 'Please log in to enable export features.';
-            // Optionally, clear any previously loaded assessments or UI state
-            allAssessments = [];
-            selectedAssessmentIds.clear();
-            renderAssessmentSelector(); // Clear any rendered items
-        }
-    });
+    init();
 });
 
 async function init() {
-    // init will now be primarily handled by onAuthStateChange
-    // Existing calls to loadAssessments() and setupEventListeners() are removed here
-    // as they are now inside onAuthStateChange.
+    console.log('init(): Starting initialization...');
+    // Perform initial session check immediately
+    const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
+
+    if (getSessionError) {
+        console.error('init(): Error getting session:', getSessionError);
+        handleAuthError('Error fetching user session.');
+        return;
+    }
+
+    if (session) {
+        console.log('init(): User session found.', session.user);
+        // User is logged in initially
+        await loadAssessments();
+        setupEventListeners();
+    } else {
+        console.log('init(): No user session found.');
+        // User is not logged in initially
+        handleAuthError('No active user session. Please log in.');
+    }
+
+    // Set up listener for subsequent auth state changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('onAuthStateChange event:', event, 'session:', session);
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+            if (session) {
+                console.log('onAuthStateChange: User session active or refreshed.');
+                // Only load if assessments haven't been loaded yet OR if the session changes to logged in
+                // This prevents re-loading if already successfully loaded on init()
+                if (allAssessments.length === 0 || generateReportBtn.disabled) { // Check if assessments are empty or if buttons are disabled (implying auth issue)
+                    await loadAssessments();
+                    setupEventListeners(); // Re-set up listeners if elements changed/re-rendered
+                }
+            }
+        } else if (event === 'SIGNED_OUT') {
+            console.log('onAuthStateChange: User signed out.');
+            handleAuthError('User signed out. Please log in again.');
+        }
+    });
+}
+
+function handleAuthError(message) {
+    console.log('handleAuthError:', message);
+    assessmentSelector.innerHTML = `<p class="text-red-400">${message}</p>`;
+    generateReportBtn.disabled = true;
+    generateHelpText.textContent = 'Please log in to enable export features.';
+    allAssessments = [];
+    selectedAssessmentIds.clear();
+    renderAssessmentSelector(); // Clear any rendered items
+    updateUI(); // Update overall UI state
 }
 
 // --- Data Loading ---
 async function loadAssessments() {
+    console.log('loadAssessments(): Attempting to fetch assessments...');
     try {
         const { data, error } = await supabase
             .from('assessments')
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('loadAssessments(): Supabase fetch error:', error);
+            throw error;
+        }
         
-        allAssessments = data;
-        parseURLParams();
-        renderAssessmentSelector();
-        updateUI();
+        if (data) {
+            console.log('loadAssessments(): Assessments fetched successfully.', data.length, 'items.');
+            allAssessments = data;
+            parseURLParams();
+            renderAssessmentSelector();
+            updateUI();
+        } else {
+            console.log('loadAssessments(): No data received from Supabase.');
+            assessmentSelector.innerHTML = '<p class="text-gray-400">No assessments found.</p>';
+            updateUI();
+        }
 
     } catch (error) {
-        console.error('Error loading assessments:', error);
+        console.error('loadAssessments(): Error loading assessments:', error);
         assessmentSelector.innerHTML = '<p class="text-red-400">Error loading assessments. Please try again later.</p>';
+        updateUI();
     }
 }
 
 function parseURLParams() {
+    console.log('parseURLParams(): Parsing URL parameters...');
     const params = new URLSearchParams(window.location.search);
     const ids = params.get('ids');
     if (ids) {
@@ -96,6 +154,7 @@ function parseURLParams() {
 
 // --- UI Rendering ---
 function renderAssessmentSelector() {
+    console.log('renderAssessmentSelector(): Rendering assessment selector with', allAssessments.length, 'assessments.');
     if (!allAssessments.length) {
         assessmentSelector.innerHTML = '<p class="text-gray-400">No assessments found.</p>';
         return;
@@ -123,7 +182,7 @@ function setupEventListeners() {
     // Quick Select Template selection
     templateSelector.addEventListener('click', (e) => {
         const card = e.target.closest('.template-card');
-        if (!card) return;
+        if (!card || card.classList.contains('disabled')) return; // Ignore clicks on disabled cards
 
         // Clear previous template selection
         templateSelector.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
@@ -161,11 +220,14 @@ function setupEventListeners() {
     // Mix-and-match sections selection
     mixMatchSelector.addEventListener('change', (e) => {
         if (e.target.type === 'checkbox') {
-            const section = e.target.dataset.section;
+            const sectionId = e.target.dataset.section;
+            // We store the filename-friendly ID in the set
+            const sectionFilename = `${sectionId}-section`; // e.g., 'summary-section'
+
             if (e.target.checked) {
-                customSelectedSections.add(section);
+                customSelectedSections.add(sectionFilename);
             } else {
-                customSelectedSections.delete(section);
+                customSelectedSections.delete(sectionFilename);
             }
 
             if (customSelectedSections.size > 0) {
@@ -277,7 +339,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
     // Executive Summary Section replacements (if summary section is selected)
-    if (sectionsToGenerate.includes('summary')) {
+    if (sectionsToGenerate.includes('summary-section')) {
         const summaryData = primaryAssessment;
         populated = populated.replace(/{{overallScore}}/g, summaryData.total_score || '0');
         populated = populated.replace(/{{maxScore}}/g, '100'); // Assuming max score is 100
@@ -300,7 +362,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
 
     // Placeholder for injecting section content
     let sectionContent = '';
-    if (sectionsToGenerate.includes('summary')) {
+    if (sectionsToGenerate.includes('summary-section')) {
         // Fetch summary section HTML and inject into base template
         // This part will be handled in generateReport after fetching
     }
@@ -341,6 +403,7 @@ async function createPdf(htmlContent) {
 
 // --- UI State Management ---
 function updateUI() {
+    console.log('updateUI(): Updating UI based on current state.');
     let canGenerate = true;
     let helpText = '';
 
@@ -381,6 +444,50 @@ function updateUI() {
         customNotice.textContent = 'Select sections below to create a custom report';
     }
 
+    // Update Preview Section
+    previewSectionsContainer.innerHTML = ''; // Clear previous items
+    let sectionsToDisplay = [];
+    let estimatedPagesText = '';
+    let reportTitleForButton = 'Generate Report';
+
+    if (currentMode === 'template' && selectedTemplate) {
+        const templateInfo = quickTemplates[selectedTemplate];
+        // Use the sections array from quickTemplates as they are already display-friendly
+        sectionsToDisplay = templateInfo.sections.map(sectionId => sectionDisplayNames[sectionId.replace('-section', '')] || sectionId); // Map filename to display name
+        estimatedPagesText = templateInfo.pages;
+        modeIndicator.className = 'mode-indicator template';
+        modeIndicator.innerHTML = `📋 Using ${templateInfo.name} Template`;
+        reportTitleForButton = `📄 Generate ${templateInfo.name} Report`;
+    } else if (currentMode === 'custom' && customSelectedSections.size > 0) {
+        // Map custom selected section filenames to display names for preview
+        sectionsToDisplay = Array.from(customSelectedSections).map(sectionFilename => {
+            const sectionId = sectionFilename.replace('-section', '');
+            return sectionDisplayNames[sectionId] || sectionId; // Fallback to ID if no display name
+        });
+        const estimatedPages = Math.max(2, sectionsToDisplay.length); // Minimum 2 pages for custom
+        estimatedPagesText = `${estimatedPages} page${estimatedPages !== 1 ? 's' : ''}`;
+        modeIndicator.className = 'mode-indicator custom';
+        modeIndicator.innerHTML = '⚙️ Using Custom Configuration';
+        reportTitleForButton = '📄 Generate Custom Report';
+    } else {
+        // Default state when nothing is selected or an invalid state
+        modeIndicator.className = 'mode-indicator';
+        modeIndicator.textContent = '';
+        estimatedPagesText = '';
+        reportTitleForButton = 'Generate Report';
+    }
+
+    sectionsToDisplay.forEach(section => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+        item.style.cssText = 'padding: 0.5rem 0.75rem; background: #252d3d; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.875rem;';
+        item.innerHTML = `✓ ${section}`;
+        previewSectionsContainer.appendChild(item);
+    });
+
+    previewStatus.innerHTML = `<strong>${currentMode === 'template' && selectedTemplate ? quickTemplates[selectedTemplate].name + ' Template' : 'Custom Report'}</strong> • Estimated length: ${estimatedPagesText}`;
+    generateReportBtn.innerHTML = `<i data-lucide="download" class="w-5 h-5 mr-2"></i><span>${reportTitleForButton}</span>`;
+
     // Disable comparison template if less than 2 assessments are selected
     const comparisonCard = templateSelector.querySelector('[data-template="comparison"]');
     if (comparisonCard) {
@@ -389,15 +496,20 @@ function updateUI() {
             // If it was selected, unselect it and revert to summary if no custom sections
             if (selectedTemplate === 'comparison') {
                 selectedTemplate = 'summary';
+                currentMode = 'template'; // Revert mode to template as a summary is now selected
                 templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
                 comparisonCard.classList.remove('selected');
-                currentMode = 'template';
                 mixMatchSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
                 customSelectedSections.clear();
-                updateUI(); // Re-run checks to update other UI elements
             }
         } else {
             comparisonCard.classList.remove('disabled');
         }
     }
+    // Ensure the default template is selected initially if no custom sections are active
+    if (currentMode === 'template' && !selectedTemplate && templateSelector.querySelector('[data-template="summary"]')) {
+        templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
+        selectedTemplate = 'summary';
+    }
+    lucide.createIcons();
 } 
