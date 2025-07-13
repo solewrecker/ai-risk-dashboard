@@ -614,6 +614,14 @@ async function generateHtmlReport() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
+        // Debugging: Check current session before upload
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+            console.error('Error getting session before upload:', sessionError);
+        }
+        console.log('Session before upload:', session);
+        console.log('User before upload:', session?.user);
+
         // Upload to Supabase Storage and get shareable link
         const fileName = `report-${primaryAssessment.id}.html`;
         const { data: uploadData, error: uploadError } = await supabase.storage
