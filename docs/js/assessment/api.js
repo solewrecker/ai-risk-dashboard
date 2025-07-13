@@ -101,13 +101,21 @@ export async function saveToDatabase(assessment) {
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
         
+        // Add explicit mapping for the missing root-level fields
+        assessed_by: assessment.assessed_by || null,
+        confidence: assessment.confidence || null,
+        documentation_tier: assessment.documentation_tier || null,
+        assessment_notes: assessment.assessment_notes || null,
+        azure_permissions: assessment.azure_permissions || null,
+        sources: assessment.sources || null,
+
         // Map compliance_certifications to an array of strings for the top-level column
-        compliance_certifications: assessment.detailedAssessment?.compliance_certifications ? 
-                                   Object.keys(assessment.detailedAssessment.compliance_certifications).filter(key => 
-                                       assessment.detailedAssessment.compliance_certifications[key]?.status && 
-                                       assessment.detailedAssessment.compliance_certifications[key].status !== 'Not Applicable' && 
-                                       assessment.detailedAssessment.compliance_certifications[key].status !== 'No'
-                                   ) : [],
+        compliance_certifications: assessment.compliance_certifications ? 
+                                   Object.keys(assessment.compliance_certifications).filter(key => 
+                                       assessment.compliance_certifications[key]?.status && 
+                                       assessment.compliance_certifications[key].status !== 'Not Applicable' && 
+                                       assessment.compliance_certifications[key].status !== 'No'
+                                   ).map(key => `${key}: ${assessment.compliance_certifications[key].status}`) : [],
         
         // Store the full assessment object in assessment_data, ensuring it includes all details
         assessment_data: {
@@ -118,10 +126,11 @@ export async function saveToDatabase(assessment) {
             breakdown: assessment.breakdown,
             recommendations: assessment.recommendations,
             detailedAssessment: assessment.detailedAssessment,
+            // Ensure data_classification and category are populated within assessment_data
+            data_classification: assessment.data_classification || formData.dataClassification,
+            category: assessment.category || formData.toolCategory,
             // Include other top-level fields from ai_tools if they are not already part of detailedAssessment
             primary_use_case: assessment.primary_use_case || null,
-            data_classification: assessment.data_classification || null, // Redundant if already in formData, but ensures consistency
-            category: assessment.category || null, // Redundant if already in formData, but ensures consistency
             assessed_by: assessment.assessed_by || null,
             confidence: assessment.confidence || null,
             documentation_tier: assessment.documentation_tier || null,
