@@ -516,6 +516,12 @@ async function generateHtmlReport() {
 
         const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
 
+        console.log('Populated HTML before CSS link removal:', populatedHtml);
+
+        // Remove external CSS links first
+        let finalHtml = populatedHtml.replace('<link rel="stylesheet" href="css/pages/export-page.css">', '');
+        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/style.css">', '');
+        
         // --- Inline CSS and JS for self-contained HTML ---// Fetch CSS content
         const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
         const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
@@ -540,10 +546,7 @@ async function generateHtmlReport() {
         }
 
         // Inject CSS and JS into the populated HTML
-        let finalHtml = populatedHtml.replace('</head>', `    <style>${cssContent}</style>\n</head>`);
-        // Remove external CSS link
-        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/pages/export-page.css">', '');
-        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/style.css">', '');
+        finalHtml = finalHtml.replace('</head>', `    <style>${cssContent}</style>\n</head>`);
 
         // Remove external JS links and add inlined scripts
         finalHtml = finalHtml.replace('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>', ''); // Supabase not needed for static HTML
@@ -561,6 +564,9 @@ async function generateHtmlReport() {
         
         // Generate shareable URL
         const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
+
+        // Update the title dynamically
+        finalHtml = finalHtml.replace('<title>Export Assessments - AI Risk Pro</title>', `<title>${primaryAssessment.name || 'AI Risk Assessment'} Report</title>`);
 
         // Create QR code container
         const qrContainer = document.createElement('div');
