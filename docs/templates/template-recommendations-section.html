@@ -1,18 +1,18 @@
 <div class="recommendations-section">
-            <div class="summary-header">
-                <h2 class="section-title">
+            <div class="recommendations-section__header">
+                <h2 class="recommendations-section__title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 6c0 1.8.7 3.3 1.5 4.5 1 .8 1.5 1.8 1.5 2.5"/><path d="M2 17h20"/><path d="M12 22v-2"/><path d="M12 7V4"/></svg>
                     Key Recommendations
                 </h2>
             </div>
-            <div class="recommendations-grid">
+            <div class="recommendations-section__grid report-recommendations">
                 {{#each recommendations}}
-                <div class="recommendation-card priority-{{this.priority}}">
-                    <div class="recommendation-header">
-                        <h3 class="recommendation-title">{{this.title}}</h3>
-                        <div class="priority-badge priority-{{this.priority}}">{{this.priority}}</div>
+                <div class="report-recommendations__item report-recommendations__item--priority-{{this.priority}}">
+                    <div class="report-recommendations__bullet"></div>
+                    <div class="report-recommendations__content">
+                        <h3 class="report-recommendations__title">{{this.title}}</h3>
+                        <p class="report-recommendations__text">{{this.description}}</p>
                     </div>
-                    <p class="recommendation-text">{{this.description}}</p>
                 </div>
                 {{/each}}
             </div>

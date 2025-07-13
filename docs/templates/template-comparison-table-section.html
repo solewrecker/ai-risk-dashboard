@@ -1,12 +1,12 @@
-<div class="comparison-section">
-            <div class="summary-header">
-                <h2 class="section-title">
+<div class="comparison-table-section">
+            <div class="comparison-table-section__header">
+                <h2 class="comparison-table-section__title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-columns"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/><path d="M3 21h7a2 2 0 0 1 2-2V5a2 2 0 0 1-2-2H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2"/></svg>
                     Comparison Table
                 </h2>
             </div>
-            <div class="matrix-container">
-                <table class="matrix-table">
+            <div class="comparison-table-section__container">
+                <table class="comparison-table-section__table">
                     <thead>
                         <tr>
                             <th>Assessment</th>
@@ -19,8 +19,8 @@
                         {{#each allSelectedData}}
                         <tr>
                             <td>{{this.assessment_data.name}}</td>
-                            <td class="matrix-score-cell">{{this.assessment_data.total_score}}</td>
-                            <td class="matrix-risk-cell matrix-{{this.assessment_data.risk_level_lower}}">{{this.assessment_data.risk_level}}</td>
+                            <td class="comparison-table-section__score-cell">{{this.assessment_data.total_score}}</td>
+                            <td class="comparison-table-section__risk-cell comparison-table-section__risk-cell--{{this.assessment_data.risk_level_lower}}">{{this.assessment_data.risk_level}}</td>
                             <!-- Add more data points for comparison -->
                         </tr>
                         {{/each}}
