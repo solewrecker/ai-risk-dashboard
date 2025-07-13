@@ -630,25 +630,7 @@ async function generateHtmlReport() {
             });
 
         if (uploadError) {
-            console.error('Upload error:', uploadError);
-            // Check if file actually exists despite the error
-            const { data: fileList, error: listError } = await supabase.storage
-                .from('exported-html-reports')
-                .list('', {
-                    search: fileName
-                });
-
-            if (listError) {
-                console.error('Error listing files after failed upload:', listError);
-                throw uploadError; // Re-throw original error if listing also fails
-            }
-            
-            if (fileList && fileList.length > 0) {
-                console.log('File was actually uploaded successfully despite error:', fileList[0]);
-                // Continue with success logic (it's a false positive error)
-            } else {
-                throw uploadError; // Truly failed to upload
-            }
+            throw uploadError;
         }
 
         const { data: publicUrlData } = supabase.storage
