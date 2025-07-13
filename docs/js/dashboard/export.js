@@ -24,6 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function init() {
+    // Check user session before loading assessments
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        assessmentSelector.innerHTML = '<p class="text-red-400">You must be logged in to view and export assessments.</p>';
+        generateReportBtn.disabled = true;
+        generateHelpText.textContent = 'Please log in to enable export features.';
+        return;
+    }
+
     await loadAssessments();
     setupEventListeners();
 }
