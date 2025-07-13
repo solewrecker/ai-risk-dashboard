@@ -38,7 +38,11 @@ const sectionDisplayNames = {
     summary: 'Executive Summary',
     detailed: 'Detailed Breakdown',
     recommendations: 'Recommendations',
-    comparison: 'Comparison Table'
+    comparison: 'Comparison Table',
+    // Add display names for new sections
+    'detailed-breakdown-section': 'Detailed Breakdown',
+    'recommendations-section': 'Key Recommendations',
+    'comparison-table-section': 'Comparison Table'
 };
 
 // --- DOM Elements ---
@@ -353,8 +357,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
         populated = populated.replace(/{{keyStrengths}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No key strengths identified.');
         populated = populated.replace(/{{areasForImprovement}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
 
-        // Dummy findings for now, will map to actual data later
-        // These should ideally come from the assessment_data.detailed_assessment.summary_and_recommendation or a dedicated findings array
+        // Findings
         const findings = assessmentData.detailed_assessment?.summary_and_recommendation ?
                          assessmentData.detailed_assessment.summary_and_recommendation.split('. ').filter(f => f.trim() !== '') : [];
         
@@ -364,11 +367,84 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
         populated = populated.replace(/{{finding4}}/g, findings[3] || 'No finding 4 provided.');
     }
 
-    // Placeholder for injecting section content
-    let sectionContent = '';
-    if (sectionsToGenerate.includes('summary-section')) {
-        // Fetch summary section HTML and inject into base template
-        // This part will be handled in generateReport after fetching
+    // Detailed Breakdown Section replacements
+    if (sectionsToGenerate.includes('detailed-breakdown-section')) {
+        let categoriesHtml = '';
+        if (assessmentData.detailed_assessment?.assessment_details) {
+            for (const categoryKey in assessmentData.detailed_assessment.assessment_details) {
+                const category = assessmentData.detailed_assessment.assessment_details[categoryKey];
+                // Normalize categoryKey for display (e.g., data_storage_and_security to Data Storage and Security)
+                const displayName = categoryKey.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                const riskLevelLower = (category.final_risk_category || 'N/A').toLowerCase().replace(' ', '-');
+                categoriesHtml += `
+                    <div class="category-card ${riskLevelLower}">
+                        <div class="category-header">
+                            <h3 class="category-name">${displayName}</h3>
+                            <div class="category-score ${riskLevelLower}">${category.category_score || '0'}</div>
+                        </div>
+                        <p class="category-description">${category.summary_and_recommendation || 'No description provided.'}</p>
+                    </div>
+                `;
+            }
+        }
+        populated = populated.replace(/{{#each detailed_assessment.assessment_details}}/g, categoriesHtml);
+        populated = populated.replace(/{{\/each}}/g, ''); // Remove the closing Handlebars tag
+    }
+
+    // Recommendations Section replacements
+    if (sectionsToGenerate.includes('recommendations-section')) {
+        let recommendationsHtml = '';
+        if (assessmentData.recommendations && assessmentData.recommendations.length > 0) {
+            assessmentData.recommendations.forEach(rec => {
+                recommendationsHtml += `
+                    <div class="recommendation-card priority-${rec.priority}">
+                        <div class="recommendation-header">
+                            <h3 class="recommendation-title">${rec.title || 'N/A'}</h3>
+                            <div class="priority-badge priority-${rec.priority}">${rec.priority || 'N/A'}</div>
+                        </div>
+                        <p class="recommendation-text">${rec.description || 'No description provided.'}</p>
+                    </div>
+                `;
+            });
+        }
+        populated = populated.replace(/{{#each recommendations}}/g, recommendationsHtml);
+        populated = populated.replace(/{{\/each}}/g, ''); // Remove the closing Handlebars tag
+    }
+
+    // Comparison Table Section replacements
+    if (sectionsToGenerate.includes('comparison-table-section')) {
+        let comparisonHtml = '';
+        if (allSelectedData.length > 1) {
+            comparisonHtml += `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Assessment</th>
+                            <th>Total Score</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            allSelectedData.forEach(assessment => {
+                const riskLevelLower = (assessment.risk_level || 'N/A').toLowerCase().replace(' ', '-');
+                comparisonHtml += `
+                    <tr>
+                        <td>${assessment.name}</td>
+                        <td class="score-cell">${assessment.total_score || '0'}</td>
+                        <td class="risk-cell ${riskLevelLower}">${assessment.risk_level || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            comparisonHtml += `
+                    </tbody>
+                </table>
+            `;
+        } else {
+            comparisonHtml = '<p class="text-gray-400">Please select at least two assessments for comparison.</p>';
+        }
+        populated = populated.replace(/{{#each allSelectedData}}/g, comparisonHtml);
+        populated = populated.replace(/{{\/each}}/g, ''); // Remove the closing Handlebars tag
     }
     
     return populated;
