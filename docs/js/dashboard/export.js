@@ -516,10 +516,8 @@ async function generateHtmlReport() {
 
         const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
 
-        console.log('Populated HTML before CSS link removal:', populatedHtml);
-
-        // Remove external CSS links first
-        let finalHtml = populatedHtml.replace('<link rel="stylesheet" href="css/pages/export-page.css">', '');
+        // Remove external CSS links first (correcting paths to match HTML)
+        let finalHtml = populatedHtml.replace('<link rel="stylesheet" href="../css/pages/export-page.css">', '');
         finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/style.css">', '');
         
         // --- Inline CSS and JS for self-contained HTML ---// Fetch CSS content
