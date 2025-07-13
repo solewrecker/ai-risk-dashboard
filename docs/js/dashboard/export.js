@@ -47,14 +47,14 @@ const sectionDisplayNames = {
 
 // --- DOM Elements ---
 const assessmentSelector = document.getElementById('assessment-selector');
-const templateSelector = document.querySelector('.template-selector'); // This is now the quick-select container
+const templateSelector = document.querySelector('.template-selector--quick-select'); // This is now the quick-select container
 const mixMatchSelector = document.querySelector('.mix-match-selector'); // This is for custom sections
 const generateReportBtn = document.getElementById('generateReportBtn');
 const generateHelpText = document.getElementById('generateHelpText');
 const customNotice = document.getElementById('custom-notice');
-const modeIndicator = document.getElementById('mode-indicator');
+const modeIndicator = document.querySelector('.export-mode-indicator');
 const previewSectionsContainer = document.getElementById('preview-sections');
-const previewStatus = document.querySelector('.preview-status');
+const previewStatus = document.querySelector('.export-preview-status');
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -535,7 +535,7 @@ function updateUI() {
         // Use the sections array from quickTemplates as they are already display-friendly
         sectionsToDisplay = templateInfo.sections.map(sectionId => sectionDisplayNames[sectionId.replace('-section', '')] || sectionId); // Map filename to display name
         estimatedPagesText = templateInfo.pages;
-        modeIndicator.className = 'mode-indicator template';
+        modeIndicator.className = 'export-mode-indicator template';
         modeIndicator.innerHTML = `📋 Using ${templateInfo.name} Template`;
         reportTitleForButton = `📄 Generate ${templateInfo.name} Report`;
     } else if (currentMode === 'custom' && customSelectedSections.size > 0) {
@@ -546,12 +546,12 @@ function updateUI() {
         });
         const estimatedPages = Math.max(2, sectionsToDisplay.length); // Minimum 2 pages for custom
         estimatedPagesText = `${estimatedPages} page${estimatedPages !== 1 ? 's' : ''}`;
-        modeIndicator.className = 'mode-indicator custom';
+        modeIndicator.className = 'export-mode-indicator custom';
         modeIndicator.innerHTML = '⚙️ Using Custom Configuration';
         reportTitleForButton = '📄 Generate Custom Report';
     } else {
         // Default state when nothing is selected or an invalid state
-        modeIndicator.className = 'mode-indicator';
+        modeIndicator.className = 'export-mode-indicator';
         modeIndicator.textContent = '';
         estimatedPagesText = '';
         reportTitleForButton = 'Generate Report';
