@@ -322,7 +322,7 @@ async function generateReport() {
 }
 
 async function fetchTemplate(templateName) {
-    const response = await fetch(`../templates/template-${templateName}.html`);
+    const response = await fetch(`../../templates/template-${templateName}.html`);
     if (!response.ok) {
         throw new Error(`Failed to fetch template: ${templateName}`);
     }
@@ -332,27 +332,28 @@ async function fetchTemplate(templateName) {
 function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
     let populated = html;
 
+    const assessmentData = primaryAssessment.assessment_data || {}; // Get the nested assessment_data object
+
     // General replacements for base template
-    populated = populated.replace(/{{toolName}}/g, primaryAssessment.name || 'N/A');
-    populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
+    populated = populated.replace(/{{toolName}}/g, assessmentData.name || 'N/A');
+    populated = populated.replace(/{{toolSubtitle}}/g, assessmentData.vendor || 'N/A');
     populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
     populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
     // Executive Summary Section replacements (if summary section is selected)
     if (sectionsToGenerate.includes('summary-section')) {
-        const summaryData = primaryAssessment;
-        populated = populated.replace(/{{overallScore}}/g, summaryData.total_score || '0');
+        populated = populated.replace(/{{overallScore}}/g, assessmentData.total_score || '0');
         populated = populated.replace(/{{maxScore}}/g, '100'); // Assuming max score is 100
-        populated = populated.replace(/{{riskLevel}}/g, summaryData.risk_level || 'N/A');
-        populated = populated.replace(/{{riskLevelLower}}/g, (summaryData.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
-        populated = populated.replace(/{{riskDescription}}/g, summaryData.summary_and_recommendation || 'No description provided.');
-        populated = populated.replace(/{{keyStrengths}}/g, summaryData.detailed_assessment?.summary_and_recommendation || 'No key strengths identified.');
-        populated = populated.replace(/{{areasForImprovement}}/g, summaryData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
+        populated = populated.replace(/{{riskLevel}}/g, assessmentData.risk_level || 'N/A');
+        populated = populated.replace(/{{riskLevelLower}}/g, (assessmentData.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
+        populated = populated.replace(/{{riskDescription}}/g, assessmentData.summary_and_recommendation || 'No description provided.');
+        populated = populated.replace(/{{keyStrengths}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No key strengths identified.');
+        populated = populated.replace(/{{areasForImprovement}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
 
         // Dummy findings for now, will map to actual data later
         // These should ideally come from the assessment_data.detailed_assessment.summary_and_recommendation or a dedicated findings array
-        const findings = primaryAssessment.detailed_assessment?.summary_and_recommendation ?
-                         primaryAssessment.detailed_assessment.summary_and_recommendation.split('. ').filter(f => f.trim() !== '') : [];
+        const findings = assessmentData.detailed_assessment?.summary_and_recommendation ?
+                         assessmentData.detailed_assessment.summary_and_recommendation.split('. ').filter(f => f.trim() !== '') : [];
         
         populated = populated.replace(/{{finding1}}/g, findings[0] || 'No finding 1 provided.');
         populated = populated.replace(/{{finding2}}/g, findings[1] || 'No finding 2 provided.');
