@@ -322,9 +322,10 @@ async function generateReport() {
 }
 
 async function fetchTemplate(templateName) {
-    // Correcting path for GitHub Pages where 'docs' folder contents are served at the root of the domain.
-    // e.g., https://solewrecker.github.io/templates/template-base.html
-    const response = await fetch(`/templates/template-${templateName}.html`);
+    // Get the base path - will be '/ai-risk-dashboard' on GitHub Pages, '' locally
+    const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
+    
+    const response = await fetch(`${basePath}/templates/template-${templateName}.html`);
     if (!response.ok) {
         throw new Error(`Failed to fetch template: ${templateName}`);
     }
