@@ -34,7 +34,19 @@ async function startAssessment() {
             breakdown: toolData.breakdown,
             recommendations: toolData.recommendations,
             detailedAssessment: toolData.detailed_assessment,
-            compliance_certifications: certs
+            // Add new fields from ai_tools
+            vendor: toolData.vendor || null,
+            license_type: toolData.license_type || null,
+            primary_use_case: toolData.primary_use_case || null,
+            assessed_by: toolData.assessed_by || null,
+            confidence: toolData.confidence || null,
+            documentation_tier: toolData.documentation_tier || null,
+            assessment_notes: toolData.assessment_notes || null,
+            azure_permissions: toolData.azure_permissions || null,
+            sources: toolData.sources || null,
+            // compliance_certifications is handled in API.saveToDatabase for the root level, 
+            // but we ensure detailedAssessment.compliance_certifications is present for assessment_data
+            compliance_certifications: toolData.compliance_certifications // Keep the object structure from ai_tools for detailedAssessment
         };
     } else {
         // Generate heuristic score
@@ -47,13 +59,28 @@ async function startAssessment() {
             source: 'heuristic',
             breakdown: { scores: { /* Basic heuristic scores could go here */ } },
             recommendations: Scoring.generateRecommendations(finalScore, formData),
-            compliance_certifications: [
-                "HIPAA",
-                "GDPR",
-                "SOC 2",
-                "PII",
-                "CCPA"
-            ]
+            // For heuristic, create a placeholder for detailedAssessment.compliance_certifications as an object
+            detailedAssessment: {
+                compliance_certifications: {
+                    "HIPAA": { "status": "Not Applicable" },
+                    "GDPR": { "status": "Not Applicable" },
+                    "SOC_2": { "status": "No" },
+                    "ISO_27001": { "status": "No" },
+                    "PCI_DSS": { "status": "Not Applicable" },
+                    "CCPA": { "status": "Not Applicable" },
+                    "FedRAMP": { "status": "Not Applicable" }
+                }
+            },
+            // Initialize other new fields for heuristic assessments
+            vendor: null,
+            license_type: null,
+            primary_use_case: null,
+            assessed_by: null,
+            confidence: null,
+            documentation_tier: null,
+            assessment_notes: null,
+            azure_permissions: null,
+            sources: null
         };
     }
 

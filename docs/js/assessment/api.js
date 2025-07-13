@@ -88,6 +88,10 @@ export async function saveToDatabase(assessment) {
     const record = {
         user_id: user.id,
         name: formData.toolName,
+        vendor: assessment.vendor || null, // Add vendor
+        license_type: assessment.license_type || null, // Add license_type
+        primary_use_case: assessment.primary_use_case || null, // Add primary_use_case
+        data_classification: formData.dataClassification,
         category: formData.toolCategory,
         total_score: finalScore,
         risk_level: validRiskLevel,
@@ -96,9 +100,35 @@ export async function saveToDatabase(assessment) {
         access_controls_score: breakdown?.scores?.accessControls ?? 0,
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
-        data_classification: formData.dataClassification,
-        compliance_certifications: assessment.compliance_certifications || assessment.detailedAssessment?.compliance_certifications || [],
-        assessment_data: assessment // Store the full assessment object
+        
+        // Map compliance_certifications to an array of strings for the top-level column
+        compliance_certifications: assessment.detailedAssessment?.compliance_certifications ? 
+                                   Object.keys(assessment.detailedAssessment.compliance_certifications).filter(key => 
+                                       assessment.detailedAssessment.compliance_certifications[key]?.status && 
+                                       assessment.detailedAssessment.compliance_certifications[key].status !== 'Not Applicable' && 
+                                       assessment.detailedAssessment.compliance_certifications[key].status !== 'No'
+                                   ) : [],
+        
+        // Store the full assessment object in assessment_data, ensuring it includes all details
+        assessment_data: {
+            source: assessment.source,
+            formData: assessment.formData,
+            finalScore: assessment.finalScore,
+            riskLevel: assessment.riskLevel,
+            breakdown: assessment.breakdown,
+            recommendations: assessment.recommendations,
+            detailedAssessment: assessment.detailedAssessment,
+            // Include other top-level fields from ai_tools if they are not already part of detailedAssessment
+            primary_use_case: assessment.primary_use_case || null,
+            data_classification: assessment.data_classification || null, // Redundant if already in formData, but ensures consistency
+            category: assessment.category || null, // Redundant if already in formData, but ensures consistency
+            assessed_by: assessment.assessed_by || null,
+            confidence: assessment.confidence || null,
+            documentation_tier: assessment.documentation_tier || null,
+            assessment_notes: assessment.assessment_notes || null,
+            azure_permissions: assessment.azure_permissions || null,
+            sources: assessment.sources || null
+        }
     };
     
     try {
