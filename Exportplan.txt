@@ -78,40 +78,60 @@ Overall, these ideas enhance the Export Center without overcomplicating it—foc
 --- CURRENT assessment Table json ----
 [
   {
-    "id": "c4c9feab-a2d4-4920-83bc-3a0546674d7f",
+    "id": "ecea22ff-7e6c-4dce-9c27-c56c7ed782ea",
     "user_id": "a85a12a6-e381-4f0c-88d7-e3c110745079",
-    "created_at": "2025-07-13 18:45:38.109922+00",
-    "name": "Microsoft Copilot ",
-    "vendor": null,
-    "risk_level": "critical",
-    "total_score": 85,
-    "data_storage_score": 22,
+    "created_at": "2025-07-13 19:21:05.957127+00",
+    "name": "Microsoft Copilot",
+    "vendor": "Microsoft Corporation",
+    "risk_level": "high",
+    "total_score": 78,
+    "data_storage_score": 23,
     "training_usage_score": 15,
-    "access_controls_score": 26,
-    "compliance_score": 14,
+    "access_controls_score": 20,
+    "compliance_score": 12,
     "vendor_transparency_score": 8,
-    "category": "code-assistant",
-    "data_classification": "pii",
+    "category": "design-creative",
+    "data_classification": "financial",
     "assessment_data": {
       "source": "database",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+          "title": "Data, Privacy, and Security for Microsoft 365 Copilot",
+          "last_updated": "2024-03-01"
+        },
+        {
+          "url": "https://support.microsoft.com/en-us/office/copilot-in-microsoft-365-apps-for-home-your-data-and-privacy-6f0d8d80-f4bb-4c9f-989e-64a4adfd62e5",
+          "title": "Copilot in Microsoft 365 apps for home: your data and privacy",
+          "last_updated": "2024-01-15"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/copilot/privacy-and-protections",
+          "title": "Microsoft 365 Copilot Chat Privacy and Protections",
+          "last_updated": "2024-01-10"
+        }
+      ],
+      "category": "design-creative",
       "formData": {
-        "useCase": "legal-compliance",
-        "toolName": "Microsoft Copilot ",
+        "useCase": "research",
+        "toolName": "Microsoft Copilot",
         "toolVersion": "free",
-        "toolCategory": "code-assistant",
-        "dataClassification": "pii"
+        "toolCategory": "design-creative",
+        "dataClassification": "financial"
       },
       "breakdown": {
         "scores": {
-          "dataStorage": 22,
+          "dataStorage": 23,
           "trainingUsage": 15,
-          "accessControls": 26,
-          "complianceRisk": 14,
+          "accessControls": 20,
+          "complianceRisk": 12,
           "vendorTransparency": 8
         }
       },
       "riskLevel": "HIGH RISK",
-      "finalScore": 85,
+      "confidence": 0.6,
+      "finalScore": 78,
+      "assessed_by": "AI Security Council",
       "recommendations": [
         {
           "title": "Block for sensitive data processing",
@@ -132,6 +152,19 @@ Overall, these ideas enhance the Export Center without overcomplicating it—foc
           "description": "If allowing limited personal use, educate users on data handling and privacy implications"
         }
       ],
+      "assessment_notes": "Confidence limited due to lack of specific documentation for free consumer version. Assessment based on publicly available privacy policies and general Microsoft enterprise documentation. Significant gaps in enterprise-specific controls and compliance for free version.",
+      "primary_use_case": "General productivity assistance and content generation",
+      "azure_permissions": {
+        "required_permissions": [
+          "user.read",
+          "profile.read"
+        ],
+        "recommended_restrictions": [
+          "Block access to confidential data repositories",
+          "Implement content filtering policies",
+          "Monitor usage patterns for sensitive queries"
+        ]
+      },
       "detailedAssessment": {
         "tool_name": "Microsoft Copilot Free",
         "final_risk_score": 70,
@@ -216,25 +249,47 @@ Overall, these ideas enhance the Export Center without overcomplicating it—foc
           "final_score_with_multiplier": 41
         }
       },
-      "compliance_certifications": [
-        "CCPA: [object Object]",
-        "GDPR: [object Object]",
-        "HIPAA: [object Object]",
-        "SOC_2: [object Object]",
-        "FedRAMP: [object Object]",
-        "PCI_DSS: [object Object]",
-        "ISO_27001: [object Object]"
-      ]
+      "documentation_tier": "Tier 1: Public Only",
+      "data_classification": "financial"
     },
     "is_public": false,
     "compliance_certifications": [
-      "CCPA: [object Object]",
-      "GDPR: [object Object]",
-      "HIPAA: [object Object]",
-      "SOC_2: [object Object]",
-      "FedRAMP: [object Object]",
-      "PCI_DSS: [object Object]",
-      "ISO_27001: [object Object]"
+      "CCPA: Conditionally Compliant",
+      "GDPR: Conditionally Compliant"
+    ],
+    "license_type": "Free",
+    "primary_use_case": "General productivity assistance and content generation",
+    "assessed_by": "AI Security Council",
+    "confidence": 0.6,
+    "documentation_tier": "Tier 1: Public Only",
+    "assessment_notes": "Confidence limited due to lack of specific documentation for free consumer version. Assessment based on publicly available privacy policies and general Microsoft enterprise documentation. Significant gaps in enterprise-specific controls and compliance for free version.",
+    "azure_permissions": {
+      "required_permissions": [
+        "user.read",
+        "profile.read"
+      ],
+      "recommended_restrictions": [
+        "Block access to confidential data repositories",
+        "Implement content filtering policies",
+        "Monitor usage patterns for sensitive queries"
+      ]
+    },
+    "sources": [
+      {
+        "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+        "title": "Data, Privacy, and Security for Microsoft 365 Copilot",
+        "last_updated": "2024-03-01"
+      },
+      {
+        "url": "https://support.microsoft.com/en-us/office/copilot-in-microsoft-365-apps-for-home-your-data-and-privacy-6f0d8d80-f4bb-4c9f-989e-64a4adfd62e5",
+        "title": "Copilot in Microsoft 365 apps for home: your data and privacy",
+        "last_updated": "2024-01-15"
+      },
+      {
+        "url": "https://learn.microsoft.com/en-us/copilot/privacy-and-protections",
+        "title": "Microsoft 365 Copilot Chat Privacy and Protections",
+        "last_updated": "2024-01-10"
+      }
     ]
   }
 ]

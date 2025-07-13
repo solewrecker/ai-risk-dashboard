@@ -1408,4 +1408,63 @@ body {
   color: #9ca3af;
   font-size: 0.75rem;
   margin-top: 0.75rem;
+}
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide elements not relevant for print */
+  .dashboard-nav,
+  .export-step__header,
+  .export-step__content,
+  .export-hub .export-step:nth-child(1),
+  .export-hub .export-step:nth-child(2),
+  .export-hub .export-step:nth-child(4),
+  #generateReportBtn,
+  #generateHtmlBtn,
+  #generateHelpText,
+  .template-selector,
+  .custom-sections,
+  .export-step__header .export-step__number,
+  .export-step__title,
+  .export-hub > .export-step:not(:last-child):not(:first-child) { /* Hide all steps except the preview for printing */
+    display: none !important;
+  }
+
+  /* Make sure report content is visible and takes full width */
+  .flex,
+  .flex-1,
+  .export-hub {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Adjust header for print */
+  .flex-1 > div.flex {
+    display: none !important; /* Hide original header */
+  }
+
+  /* Ensure main content is visible */
+  #report-content {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure QR code is centered and clear */
+  #qrcode-container {
+    display: block !important;
+    margin: 20px auto !important;
+    text-align: center !important;
+  }
+
+  #qrcode-container p {
+    color: #000000 !important;
+  }
 } 

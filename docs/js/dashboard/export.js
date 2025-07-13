@@ -50,6 +50,7 @@ const assessmentSelector = document.getElementById('assessment-selector');
 const templateSelector = document.querySelector('.template-selector--quick-select'); // This is now the quick-select container
 const mixMatchSelector = document.querySelector('.mix-match-selector'); // This is for custom sections
 const generateReportBtn = document.getElementById('generateReportBtn');
+const generateHtmlBtn = document.getElementById('generateHtmlBtn'); // New HTML button
 const generateHelpText = document.getElementById('generateHelpText');
 const customNotice = document.getElementById('custom-notice');
 const modeIndicator = document.querySelector('.export-mode-indicator');
@@ -220,6 +221,9 @@ function setupEventListeners() {
 
     // Generate button (remains the same)
     generateReportBtn.addEventListener('click', generateReport);
+
+    // New: Generate HTML button
+    generateHtmlBtn.addEventListener('click', generateHtmlReport);
 
     // Mix-and-match sections selection
     mixMatchSelector.addEventListener('change', (e) => {
@@ -480,6 +484,161 @@ async function createPdf(htmlContent) {
     pdf.save('ai-risk-assessment-report.pdf');
 }
 
+async function generateHtmlReport() {
+    // Similar validation as generateReport
+    if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
+        alert('Please select at least one assessment and either a quick template or custom sections.');
+        return;
+    }
+
+    generateHtmlBtn.disabled = true;
+    generateHtmlBtn.innerHTML = '<i class="loader"></i> Generating HTML...';
+
+    try {
+        const selectedData = allAssessments.filter(a => selectedAssessmentIds.has(a.id));
+        const primaryAssessment = selectedData[0];
+
+        let sectionsToGenerate = [];
+        if (currentMode === 'template' && selectedTemplate) {
+            sectionsToGenerate = quickTemplates[selectedTemplate].sections;
+        } else if (currentMode === 'custom') {
+            sectionsToGenerate = Array.from(customSelectedSections);
+        }
+
+        let fullReportHtml = await fetchTemplate('base');
+        let sectionsHtml = '';
+
+        for (const section of sectionsToGenerate) {
+            sectionsHtml += await fetchTemplate(section); // Fetch each selected section
+        }
+
+        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
+
+        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
+
+        // --- Inline CSS and JS for self-contained HTML ---// Fetch CSS content
+        const cssResponse = await fetch('css/pages/export-page.css');
+        const cssContent = await cssResponse.text();
+
+        // Fetch Lucide Icons JS
+        const lucideResponse = await fetch('https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js');
+        const lucideContent = await lucideResponse.text();
+
+        // Fetch QRCode.js
+        const qrcodeResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
+        const qrcodeContent = await qrcodeResponse.text();
+
+        // Extract collapsible script from detailed breakdown template
+        let collapsibleScript = '';
+        if (sectionsToGenerate.includes('detailed-breakdown-section')) {
+            const detailedTemplate = await fetchTemplate('detailed-breakdown-section');
+            const scriptMatch = detailedTemplate.match(/<script>([\s\S]*?)<\/script>/);
+            if (scriptMatch && scriptMatch[1]) {
+                collapsibleScript = scriptMatch[1];
+            }
+        }
+
+        // Inject CSS and JS into the populated HTML
+        let finalHtml = populatedHtml.replace('</head>', `    <style>${cssContent}</style>\n</head>`);
+        // Remove external CSS link
+        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/pages/export-page.css">', '');
+        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/style.css">', '');
+
+        // Remove external JS links and add inlined scripts
+        finalHtml = finalHtml.replace('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>', ''); // Supabase not needed for static HTML
+        finalHtml = finalHtml.replace('<script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>', `<script>${lucideContent}</script>`);
+        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>', `<script>${qrcodeContent}</script>`);
+        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>', ''); // jsPDF not needed
+        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>', ''); // html2canvas not needed
+        finalHtml = finalHtml.replace('<script type="module" src="js/dashboard/export.js"></script>', ''); // Main script not needed
+        finalHtml = finalHtml.replace('<script>\n            document.addEventListener(\'DOMContentLoaded\', function() {\n                if (typeof lucide !== \'undefined\') {\n                    lucide.createIcons();\n                }\n            });\n        </script>', ''); // Remove existing lucide init
+
+        // Inject collapsible script
+        if (collapsibleScript) {
+            finalHtml = finalHtml.replace('</body>', `<script>${collapsibleScript}</script>\n</body>`);
+        }
+        
+        // Generate shareable URL
+        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
+
+        // Create QR code container
+        const qrContainer = document.createElement('div');
+        qrContainer.id = 'qrcode-container'; // Add an ID to the QR code container for print styles
+        qrContainer.style.textAlign = 'center';
+        qrContainer.style.marginTop = '20px';
+        qrContainer.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
+
+        let finalHtmlWithQr = finalHtml.replace('</body>', `${qrContainer.outerHTML}</body>`);
+
+        // Create a temporary container to render the QR code and Lucide icons off-screen
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.innerHTML = finalHtmlWithQr;
+        document.body.appendChild(container);
+
+        // Render Lucide icons in the temporary container
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({
+                container: container // Target the specific container for icon rendering
+            });
+        }
+
+        new QRCode(container.querySelector('#qrcode'), {
+            text: shareUrl,
+            width: 128,
+            height: 128
+        });
+
+        // Get the innerHTML of the container after QR code is rendered and icons created
+        const fullHtmlContent = container.innerHTML;
+        document.body.removeChild(container);
+
+        // Create a Blob from the HTML content
+        const blob = new Blob([fullHtmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary link and trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ai-risk-assessment-report-${new Date().toISOString().substring(0, 10)}.html`; // Dynamic filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Upload to Supabase Storage and get shareable link
+        const fileName = `report-${primaryAssessment.id}.html`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('exported-html-reports')
+            .upload(fileName, blob, {
+                contentType: 'text/html',
+                upsert: true // Overwrite if file with same name exists
+            });
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from('exported-html-reports')
+            .getPublicUrl(fileName);
+
+        if (publicUrlData && publicUrlData.publicUrl) {
+            alert(`HTML report generated and uploaded! You can share it via: ${publicUrlData.publicUrl}`);
+        } else {
+            alert('HTML report generated, but failed to get a shareable link.');
+        }
+
+    } catch (error) {
+        console.error('Error generating HTML report:', error);
+        alert('Failed to generate HTML report. Please check the console for details.');
+    } finally {
+        generateHtmlBtn.disabled = false;
+        generateHtmlBtn.innerHTML = '<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>Generate HTML</span>';
+        // lucide.createIcons(); // No need to re-create icons after download
+    }
+}
 
 // --- UI State Management ---
 function updateUI() {
@@ -513,6 +672,7 @@ function updateUI() {
     }
 
     generateReportBtn.disabled = !canGenerate;
+    generateHtmlBtn.disabled = !canGenerate; // Enable/disable HTML button as well
     generateHelpText.textContent = helpText;
 
     // Update custom notice visibility/text
@@ -566,6 +726,7 @@ function updateUI() {
 
     previewStatus.innerHTML = `<strong>${currentMode === 'template' && selectedTemplate ? quickTemplates[selectedTemplate].name + ' Template' : 'Custom Report'}</strong> • Estimated length: ${estimatedPagesText}`;
     generateReportBtn.innerHTML = `<i data-lucide="download" class="w-5 h-5 mr-2"></i><span>${reportTitleForButton}</span>`;
+    generateHtmlBtn.innerHTML = `<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>${reportTitleForButton.replace('Generate', 'Generate HTML')}</span>`;
 
     // Disable comparison template if less than 2 assessments are selected
     const comparisonCard = templateSelector.querySelector('[data-template="comparison"]');
