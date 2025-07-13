@@ -10,13 +10,33 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // --- State ---
 let allAssessments = [];
 const selectedAssessmentIds = new Set();
-let selectedTemplate = null;
+let selectedTemplate = 'summary'; // Default to summary template
+let currentMode = 'template'; // 'template' or 'custom'
+let customSelectedSections = new Set(); // For mix-and-match
+
+// Define template sections for quick select
+const quickTemplates = {
+    summary: {
+        name: 'Executive Summary',
+        sections: ['summary']
+    },
+    detailed: {
+        name: 'Detailed Technical Report',
+        sections: ['detailed'] // Assuming detailed section template will be created
+    },
+    comparison: {
+        name: 'Comparison Report',
+        sections: ['comparison'] // Assuming comparison section template will be created
+    }
+};
 
 // --- DOM Elements ---
 const assessmentSelector = document.getElementById('assessment-selector');
-const templateSelector = document.querySelector('.template-selector');
+const templateSelector = document.querySelector('.template-selector'); // This is now the quick-select container
+const mixMatchSelector = document.querySelector('.mix-match-selector'); // This is for custom sections
 const generateReportBtn = document.getElementById('generateReportBtn');
 const generateHelpText = document.getElementById('generateHelpText');
+const customNotice = document.getElementById('custom-notice');
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -100,22 +120,29 @@ function renderAssessmentSelector() {
 
 // --- Event Listeners ---
 function setupEventListeners() {
-    // Template selection
+    // Quick Select Template selection
     templateSelector.addEventListener('click', (e) => {
         const card = e.target.closest('.template-card');
         if (!card) return;
 
-        // Clear previous selection
+        // Clear previous template selection
         templateSelector.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
         
         // Add new selection
         card.classList.add('selected');
         selectedTemplate = card.dataset.template;
+        currentMode = 'template';
+
+        // Clear custom sections when a quick template is selected
+        mixMatchSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        customSelectedSections.clear();
 
         updateUI();
     });
 
-    // Assessment selection
+    // Assessment selection (remains the same)
     assessmentSelector.addEventListener('change', (e) => {
         if (e.target.type === 'checkbox') {
             const id = e.target.dataset.id;
@@ -128,20 +155,40 @@ function setupEventListeners() {
         }
     });
 
-    // Generate button
+    // Generate button (remains the same)
     generateReportBtn.addEventListener('click', generateReport);
 
-    // Mix-and-match sections
-    const mixMatchSelector = document.querySelector('.mix-match-selector');
-    if (mixMatchSelector) {
-        mixMatchSelector.addEventListener('change', updateUI);
-    }
+    // Mix-and-match sections selection
+    mixMatchSelector.addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+            const section = e.target.dataset.section;
+            if (e.target.checked) {
+                customSelectedSections.add(section);
+            } else {
+                customSelectedSections.delete(section);
+            }
+
+            if (customSelectedSections.size > 0) {
+                currentMode = 'custom';
+                // Deselect quick template if custom section is chosen
+                templateSelector.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                selectedTemplate = null; // No quick template selected
+            } else {
+                // If no custom sections, revert to default quick template
+                currentMode = 'template';
+                selectedTemplate = 'summary';
+                templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
+            }
+            updateUI();
+        }
+    });
 }
 
 // --- Report Generation ---
 async function generateReport() {
-    if (!selectedTemplate || selectedAssessmentIds.size === 0) {
-        alert('Please select a template and at least one assessment.');
+    // Adjust validation based on currentMode
+    if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
+        alert('Please select at least one assessment and either a quick template or custom sections.');
         return;
     }
 
@@ -150,26 +197,27 @@ async function generateReport() {
 
     try {
         const selectedData = allAssessments.filter(a => selectedAssessmentIds.has(a.id));
-        
-        // For now, we'll just use the first selected assessment for the summary/detailed reports
         const primaryAssessment = selectedData[0]; 
 
-        const selectedSections = Array.from(mixMatchSelector.querySelectorAll('input:checked')).map(input => input.dataset.section);
+        let sectionsToGenerate = [];
+        if (currentMode === 'template' && selectedTemplate) {
+            sectionsToGenerate = quickTemplates[selectedTemplate].sections;
+        } else if (currentMode === 'custom') {
+            sectionsToGenerate = Array.from(customSelectedSections);
+        }
 
         // Start with the base template
         let fullReportHtml = await fetchTemplate('base');
-        let sectionsToInjectHtml = '';
+        let sectionsHtml = '';
 
-        // Fetch and append selected sections
-        if (selectedSections.includes('summary')) {
-            sectionsToInjectHtml += await fetchTemplate('summary-section');
+        for (const section of sectionsToGenerate) {
+            sectionsHtml += await fetchTemplate(section); // Fetch each selected section
         }
-        // Add more conditions here for other sections as they are created
 
         // Inject all selected sections into the main content area of the base template
-        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsToInjectHtml}</main>`);
+        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
 
-        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, selectedSections);
+        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
         
         // Generate shareable URL (example: link to view the assessment)
         const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
@@ -219,7 +267,7 @@ async function fetchTemplate(templateName) {
     return await response.text();
 }
 
-function bindDataToTemplate(html, primaryAssessment, allSelectedData, selectedSections) {
+function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
     let populated = html;
 
     // General replacements for base template
@@ -229,7 +277,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, selectedSe
     populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
     // Executive Summary Section replacements (if summary section is selected)
-    if (selectedSections.includes('summary')) {
+    if (sectionsToGenerate.includes('summary')) {
         const summaryData = primaryAssessment;
         populated = populated.replace(/{{overallScore}}/g, summaryData.total_score || '0');
         populated = populated.replace(/{{maxScore}}/g, '100'); // Assuming max score is 100
@@ -240,15 +288,19 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, selectedSe
         populated = populated.replace(/{{areasForImprovement}}/g, summaryData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
 
         // Dummy findings for now, will map to actual data later
-        populated = populated.replace(/{{finding1}}/g, 'Finding 1: Placeholder for actual finding from data.');
-        populated = populated.replace(/{{finding2}}/g, 'Finding 2: Placeholder for actual finding from data.');
-        populated = populated.replace(/{{finding3}}/g, 'Finding 3: Placeholder for actual finding from data.');
-        populated = populated.replace(/{{finding4}}/g, 'Finding 4: Placeholder for actual finding from data.');
+        // These should ideally come from the assessment_data.detailed_assessment.summary_and_recommendation or a dedicated findings array
+        const findings = primaryAssessment.detailed_assessment?.summary_and_recommendation ?
+                         primaryAssessment.detailed_assessment.summary_and_recommendation.split('. ').filter(f => f.trim() !== '') : [];
+        
+        populated = populated.replace(/{{finding1}}/g, findings[0] || 'No finding 1 provided.');
+        populated = populated.replace(/{{finding2}}/g, findings[1] || 'No finding 2 provided.');
+        populated = populated.replace(/{{finding3}}/g, findings[2] || 'No finding 3 provided.');
+        populated = populated.replace(/{{finding4}}/g, findings[3] || 'No finding 4 provided.');
     }
 
     // Placeholder for injecting section content
     let sectionContent = '';
-    if (selectedSections.includes('summary')) {
+    if (sectionsToGenerate.includes('summary')) {
         // Fetch summary section HTML and inject into base template
         // This part will be handled in generateReport after fetching
     }
@@ -292,32 +344,57 @@ function updateUI() {
     let canGenerate = true;
     let helpText = '';
 
-    if (selectedAssessmentIds.size === 0) {
+    const selectedAssessmentsCount = selectedAssessmentIds.size;
+
+    // Determine if a template or custom sections are selected
+    const isTemplateSelected = currentMode === 'template' && selectedTemplate;
+    const isCustomSectionSelected = currentMode === 'custom' && customSelectedSections.size > 0;
+
+    if (selectedAssessmentsCount === 0) {
         canGenerate = false;
         helpText = 'Please select at least one assessment.';
-    } else if (!selectedTemplate) {
+    } else if (!isTemplateSelected && !isCustomSectionSelected) {
         canGenerate = false;
-        helpText = 'Please choose a report template.';
-    } else if (selectedTemplate === 'comparison' && selectedAssessmentIds.size < 2) {
+        helpText = 'Please choose a quick template or select custom sections.';
+    } else if (selectedTemplate === 'comparison' && selectedAssessmentsCount < 2) {
         canGenerate = false;
         helpText = 'The Comparison Report requires at least two assessments.';
     } else {
-        helpText = `Ready to generate a ${selectedTemplate} report for ${selectedAssessmentIds.size} assessment(s).`;
+        let reportTypeName = '';
+        if (currentMode === 'template' && selectedTemplate) {
+            reportTypeName = quickTemplates[selectedTemplate].name;
+        } else if (currentMode === 'custom') {
+            reportTypeName = `Custom Report with ${customSelectedSections.size} section${customSelectedSections.size !== 1 ? 's' : ''}`;
+        }
+        helpText = `Ready to generate a ${reportTypeName} for ${selectedAssessmentsCount} assessment(s).`;
     }
 
     generateReportBtn.disabled = !canGenerate;
     generateHelpText.textContent = helpText;
 
+    // Update custom notice visibility/text
+    if (currentMode === 'custom') {
+        customNotice.classList.add('active');
+        customNotice.textContent = `Custom report with ${customSelectedSections.size} section${customSelectedSections.size !== 1 ? 's' : ''} selected.`;
+    } else {
+        customNotice.classList.remove('active');
+        customNotice.textContent = 'Select sections below to create a custom report';
+    }
+
     // Disable comparison template if less than 2 assessments are selected
     const comparisonCard = templateSelector.querySelector('[data-template="comparison"]');
     if (comparisonCard) {
-        if (selectedAssessmentIds.size < 2) {
+        if (selectedAssessmentsCount < 2) {
             comparisonCard.classList.add('disabled');
-            // If it was selected, unselect it
+            // If it was selected, unselect it and revert to summary if no custom sections
             if (selectedTemplate === 'comparison') {
-                selectedTemplate = null;
+                selectedTemplate = 'summary';
+                templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
                 comparisonCard.classList.remove('selected');
-                updateUI(); // Re-run checks
+                currentMode = 'template';
+                mixMatchSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+                customSelectedSections.clear();
+                updateUI(); // Re-run checks to update other UI elements
             }
         } else {
             comparisonCard.classList.remove('disabled');

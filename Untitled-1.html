@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Center - Redesign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1419;
+            color: #e8eaed;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #1a1f2e;
+            padding: 16px 24px;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e8eaed;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .sidebar {
+            background: #1a1f2e;
+            padding: 20px;
+            border-right: 1px solid #2d3748;
+            width: 200px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            padding: 24px;
+        }
+
+        .step {
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .step-header {
+            background: #252d3d;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .step-content {
+            padding: 20px;
+        }
+
+        .assessment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .assessment-card {
+            background: #252d3d;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .assessment-card:hover {
+            border-color: #3b82f6;
+            background: #2d3748;
+        }
+
+        .assessment-card.selected {
+            border-color: #3b82f6;
+            background: #1e3a8a;
+        }
+
+        .assessment-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .assessment-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .assessment-type {
+            color: #9ca3af;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .assessment-count {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .choice-container {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        .choice-section {
+            flex: 1;
+        }
+
+        .choice-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e8eaed;
+        }
+
+        .choice-subtitle {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .quick-select {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .template-option {
+            background: #252d3d;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .template-option:hover {
+            border-color: #3b82f6;
+            background: #2d3748;
+        }
+
+        .template-option.selected {
+            border-color: #3b82f6;
+            background: #1e3a8a;
+        }
+
+        .template-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .template-description {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .template-includes {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .divider {
+            width: 1px;
+            background: #374151;
+            margin: 0 16px;
+            align-self: stretch;
+        }
+
+        .custom-sections {
+            background: #252d3d;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .custom-notice {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .custom-notice.active {
+            background: #1e3a8a;
+            border-color: #3b82f6;
+            color: #e8eaed;
+        }
+
+        .section-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #374151;
+        }
+
+        .section-toggle:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: #374151;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle-switch.active {
+            background: #3b82f6;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(18px);
+        }
+
+        .section-label {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .section-description {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .preview-panel {
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #3b82f6;
+        }
+
+        .preview-item {
+            padding: 8px 12px;
+            background: #252d3d;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .preview-status {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .generate-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .generate-button:hover {
+            background: #2563eb;
+        }
+
+        .generate-button:disabled {
+            background: #374151;
+            cursor: not-allowed;
+        }
+
+        .mode-indicator {
+            background: #1f2937;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mode-indicator.template {
+            color: #10b981;
+        }
+
+        .mode-indicator.custom {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div style="color: #3b82f6; font-weight: 600; margin-bottom: 20px; font-size: 18px;">AI Risk Pro</div>
+        <div style="color: #9ca3af; font-size: 14px;">FREE</div>
+        <div style="margin-top: 30px; padding: 10px 0; border-top: 1px solid #374151;">
+            <div style="color: #e8eaed; font-size: 14px;">📊 Dashboard</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Export Center</h1>
+            <p>Create and customize your assessment reports</p>
+        </div>
+
+        <!-- Step 1: Select Assessments -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2>Select Assessments</h2>
+            </div>
+            <div class="step-content">
+                <div class="assessment-grid">
+                    <div class="assessment-card selected">
+                        <div class="assessment-name">Fathom</div>
+                        <div class="assessment-type">content-generation</div>
+                        <div class="assessment-count">35 findings</div>
+                    </div>
+                    <div class="assessment-card">
+                        <div class="assessment-name">123 Notetaker AI</div>
+                        <div class="assessment-type">conversational</div>
+                        <div class="assessment-count">74 findings</div>
+                    </div>
+                    <div class="assessment-card">
+                        <div class="assessment-name">Claude.ai</div>
+                        <div class="assessment-type">code-assistant</div>
+                        <div class="assessment-count">3 findings</div>
+                    </div>
+                    <div class="assessment-card">
+                        <div class="assessment-name">ChatGPT</div>
+                        <div class="assessment-type">conversational</div>
+                        <div class="assessment-count">87 findings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Quick Select or Customize -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h2>Quick Select or Customize</h2>
+            </div>
+            <div class="step-content">
+                <div class="choice-container">
+                    <div class="choice-section">
+                        <div class="choice-title">📋 Quick Select</div>
+                        <div class="choice-subtitle">Choose a pre-built template</div>
+                        
+                        <div class="quick-select">
+                            <div class="template-option selected" data-template="executive">
+                                <div class="template-name">
+                                    📋 Executive Summary
+                                </div>
+                                <div class="template-description">High-level overview for management</div>
+                                <div class="template-includes">Includes: Overview, Key Risks, Recommendations • 3-4 pages</div>
+                            </div>
+                            
+                            <div class="template-option" data-template="technical">
+                                <div class="template-name">
+                                    🔧 Technical Report
+                                </div>
+                                <div class="template-description">Complete technical analysis</div>
+                                <div class="template-includes">Includes: All sections with detailed analysis • 8-12 pages</div>
+                            </div>
+                            
+                            <div class="template-option" data-template="compliance">
+                                <div class="template-name">
+                                    📊 Compliance Report
+                                </div>
+                                <div class="template-description">Regulatory compliance focus</div>
+                                <div class="template-includes">Includes: Compliance matrix, gaps, remediation • 6-8 pages</div>
+                            </div>
+                            
+                            <div class="template-option" data-template="comparison">
+                                <div class="template-name">
+                                    📈 Comparison Report
+                                </div>
+                                <div class="template-description">Side-by-side tool comparison</div>
+                                <div class="template-includes">Includes: Feature matrix, risk comparison • 5-7 pages</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="choice-section">
+                        <div class="choice-title">⚙️ Customize</div>
+                        <div class="choice-subtitle">Pick exactly what you want</div>
+                        
+                        <div class="custom-sections">
+                            <div class="custom-notice" id="custom-notice">
+                                Select sections below to create a custom report
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="executive-summary"></div>
+                                <div>
+                                    <div class="section-label">Executive Summary</div>
+                                    <div class="section-description">High-level findings and recommendations</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="risk-assessment"></div>
+                                <div>
+                                    <div class="section-label">Risk Assessment</div>
+                                    <div class="section-description">Detailed breakdown of identified risks</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="technical-details"></div>
+                                <div>
+                                    <div class="section-label">Technical Details</div>
+                                    <div class="section-description">In-depth technical analysis</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="recommendations"></div>
+                                <div>
+                                    <div class="section-label">Recommendations</div>
+                                    <div class="section-description">Actionable next steps</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="compliance-matrix"></div>
+                                <div>
+                                    <div class="section-label">Compliance Matrix</div>
+                                    <div class="section-description">Regulatory compliance breakdown</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-toggle">
+                                <div class="toggle-switch" data-section="appendices"></div>
+                                <div>
+                                    <div class="section-label">Appendices</div>
+                                    <div class="section-description">Supporting data and references</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Preview -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h2>Preview</h2>
+            </div>
+            <div class="step-content">
+                <div class="mode-indicator template" id="mode-indicator">
+                    📋 Using Executive Summary Template
+                </div>
+                
+                <div class="preview-panel">
+                    <div class="preview-title">Your Report Will Include</div>
+                    <div id="preview-sections">
+                        <div class="preview-item">✓ Executive Summary</div>
+                        <div class="preview-item">✓ Risk Assessment</div>
+                        <div class="preview-item">✓ Key Recommendations</div>
+                    </div>
+                    <div class="preview-status">
+                        <strong>Executive Summary Template</strong> • Estimated length: 3-4 pages
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Generate -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h2>Generate & Download</h2>
+            </div>
+            <div class="step-content">
+                <button class="generate-button" id="generate-button">
+                    📄 Generate Executive Summary Report
+                </button>
+                <div style="color: #9ca3af; font-size: 14px; margin-top: 12px; text-align: center;">
+                    Ready to generate report for 1 assessment
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'template';
+        let selectedTemplate = 'executive';
+        let customSections = [];
+
+        // Template definitions
+        const templates = {
+            executive: {
+                name: 'Executive Summary',
+                sections: ['Executive Summary', 'Risk Assessment', 'Key Recommendations'],
+                pages: '3-4 pages'
+            },
+            technical: {
+                name: 'Technical Report',
+                sections: ['Executive Summary', 'Technical Analysis', 'Risk Assessment', 'Detailed Findings', 'Recommendations', 'Appendices'],
+                pages: '8-12 pages'
+            },
+            compliance: {
+                name: 'Compliance Report',
+                sections: ['Executive Summary', 'Compliance Matrix', 'Risk Assessment', 'Regulatory Gaps', 'Remediation Plan'],
+                pages: '6-8 pages'
+            },
+            comparison: {
+                name: 'Comparison Report',
+                sections: ['Executive Summary', 'Tool Comparison Matrix', 'Feature Analysis', 'Risk Comparison', 'Recommendations'],
+                pages: '5-7 pages'
+            }
+        };
+
+        // Template selection
+        document.querySelectorAll('.template-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Clear all template selections
+                document.querySelectorAll('.template-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Clear all custom toggles
+                document.querySelectorAll('.toggle-switch').forEach(toggle => toggle.classList.remove('active'));
+                
+                // Set mode to template
+                currentMode = 'template';
+                selectedTemplate = this.dataset.template;
+                customSections = [];
+                
+                updateUI();
+            });
+        });
+
+        // Custom section toggles
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                // When ANY toggle is activated, switch to custom mode
+                const anyActive = document.querySelectorAll('.toggle-switch.active').length > 0;
+                
+                if (anyActive) {
+                    // Switch to custom mode
+                    currentMode = 'custom';
+                    
+                    // Clear template selections
+                    document.querySelectorAll('.template-option').forEach(o => o.classList.remove('selected'));
+                    
+                    // Update custom sections array
+                    customSections = [];
+                    document.querySelectorAll('.toggle-switch.active').forEach(activeToggle => {
+                        const label = activeToggle.parentElement.querySelector('.section-label').textContent;
+                        customSections.push(label);
+                    });
+                } else {
+                    // No toggles active, revert to template mode
+                    currentMode = 'template';
+                    selectedTemplate = 'executive';
+                    document.querySelector('.template-option[data-template="executive"]').classList.add('selected');
+                    customSections = [];
+                }
+                
+                updateUI();
+            });
+        });
+
+        // Assessment selection
+        document.querySelectorAll('.assessment-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateGenerateButton();
+            });
+        });
+
+        function updateUI() {
+            const modeIndicator = document.getElementById('mode-indicator');
+            const customNotice = document.getElementById('custom-notice');
+            const previewSections = document.getElementById('preview-sections');
+            const previewStatus = document.querySelector('.preview-status');
+            const generateButton = document.getElementById('generate-button');
+
+            if (currentMode === 'template') {
+                const template = templates[selectedTemplate];
+                
+                // Update mode indicator
+                modeIndicator.className = 'mode-indicator template';
+                modeIndicator.textContent = `📋 Using ${template.name} Template`;
+                
+                // Update custom notice
+                customNotice.className = 'custom-notice';
+                customNotice.textContent = 'Select sections below to create a custom report';
+                
+                // Update preview
+                previewSections.innerHTML = '';
+                template.sections.forEach(section => {
+                    const item = document.createElement('div');
+                    item.className = 'preview-item';
+                    item.innerHTML = `✓ ${section}`;
+                    previewSections.appendChild(item);
+                });
+                
+                previewStatus.innerHTML = `<strong>${template.name} Template</strong> • Estimated length: ${template.pages}`;
+                generateButton.textContent = `📄 Generate ${template.name} Report`;
+                
+            } else {
+                // Custom mode
+                modeIndicator.className = 'mode-indicator custom';
+                modeIndicator.textContent = '⚙️ Using Custom Configuration';
+                
+                customNotice.className = 'custom-notice active';
+                customNotice.textContent = `Custom report with ${customSections.length} section${customSections.length !== 1 ? 's' : ''}`;
+                
+                // Update preview
+                previewSections.innerHTML = '';
+                customSections.forEach(section => {
+                    const item = document.createElement('div');
+                    item.className = 'preview-item';
+                    item.innerHTML = `✓ ${section}`;
+                    previewSections.appendChild(item);
+                });
+                
+                const estimatedPages = Math.max(2, customSections.length);
+                previewStatus.innerHTML = `<strong>Custom Report</strong> • Estimated length: ${estimatedPages} pages`;
+                generateButton.textContent = '📄 Generate Custom Report';
+            }
+        }
+
+        function updateGenerateButton() {
+            const selectedAssessments = document.querySelectorAll('.assessment-card.selected');
+            const button = document.getElementById('generate-button');
+            const status = button.nextElementSibling;
+            
+            if (selectedAssessments.length === 0) {
+                button.disabled = true;
+                status.textContent = 'Select at least one assessment to generate report';
+            } else {
+                button.disabled = false;
+                status.textContent = `Ready to generate report for ${selectedAssessments.length} assessment${selectedAssessments.length > 1 ? 's' : ''}`;
+            }
+        }
+
+        // Initialize
+        updateUI();
+        updateGenerateButton();
+    </script>
+</body>
+</html>

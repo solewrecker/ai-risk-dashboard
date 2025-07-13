@@ -74,35 +74,55 @@
                 <div class="export-step">
                     <div class="export-step__header">
                         <span class="export-step__number">2</span>
-                        <h3 class="export-step__title">Choose Format & Template</h3>
+                        <h3 class="export-step__title">Choose Report Type & Sections</h3>
                     </div>
                     <div class="export-step__content">
-                        <div class="template-selector">
-                            <div class="template-card" data-template="summary">
-                                <i data-lucide="file-text" class="template-card__icon"></i>
-                                <h4 class="template-card__title">Executive Summary</h4>
-                                <p class="template-card__description">High-level overview with scores and risks. Ideal for management.</p>
-                                <span class="template-card__status-badge">PDF</span>
+                        <div class="choice-container" style="display: flex; gap: 2rem; align-items: flex-start;">
+                            <div class="choice-section" style="flex: 1;">
+                                <h4 class="choice-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">📋 Quick Select Template</h4>
+                                <p class="choice-subtitle" style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.25rem;">Choose a pre-built template for a standard report.</p>
+                                
+                                <div class="template-selector quick-select" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <div class="template-card" data-template="summary">
+                                        <i data-lucide="file-text" class="template-card__icon"></i>
+                                        <h4 class="template-card__title">Executive Summary</h4>
+                                        <p class="template-card__description">High-level overview with scores and risks. Ideal for management.</p>
+                                        <span class="template-card__status-badge">PDF</span>
+                                    </div>
+                                    <div class="template-card" data-template="detailed">
+                                        <i data-lucide="file-sliders" class="template-card__icon"></i>
+                                        <h4 class="template-card__title">Detailed Technical Report</h4>
+                                        <p class="template-card__description">In-depth breakdown of all criteria, justifications, and recommendations.</p>
+                                        <span class="template-card__status-badge">PDF</span>
+                                    </div>
+                                    <div class="template-card" data-template="comparison">
+                                        <i data-lucide="columns" class="template-card__icon"></i>
+                                        <h4 class="template-card__title">Comparison Report</h4>
+                                        <p class="template-card__description">Side-by-side comparison of selected tools. Requires 2+ tools.</p>
+                                        <span class="template-card__status-badge">PDF</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="template-card" data-template="detailed">
-                                <i data-lucide="file-sliders" class="template-card__icon"></i>
-                                <h4 class="template-card__title">Detailed Technical Report</h4>
-                                <p class="template-card__description">In-depth breakdown of all criteria, justifications, and recommendations.</p>
-                                <span class="template-card__status-badge">PDF</span>
+                            
+                            <div class="divider" style="width: 1px; background: #374151; margin: 0 1rem; align-self: stretch;"></div>
+                            
+                            <div class="choice-section" style="flex: 1;">
+                                <h4 class="choice-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">⚙️ Customize Sections</h4>
+                                <p class="choice-subtitle" style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.25rem;">Hand-pick specific sections to build a custom report.</p>
+                                
+                                <div class="custom-sections" style="background: #252d3d; border: 1px solid #374151; border-radius: 8px; padding: 1rem;">
+                                    <div class="custom-notice" id="custom-notice" style="background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; color: #9ca3af; font-size: 0.8rem;">
+                                        Select sections below to create a custom report
+                                    </div>
+                                    
+                                    <div class="mix-match-selector" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="summary"> Executive Summary</label>
+                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
+                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="recommendations"> Recommendations</label>
+                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="comparison"> Comparison Table</label>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="template-card" data-template="comparison">
-                                <i data-lucide="columns" class="template-card__icon"></i>
-                                <h4 class="template-card__title">Comparison Report</h4>
-                                <p class="template-card__description">Side-by-side comparison of selected tools. Requires 2+ tools.</p>
-                                <span class="template-card__status-badge">PDF</span>
-                            </div>
-                        </div>
-                        <h4 class="export-step__title" style="margin-top: 2rem;">Customize Sections (Mix-and-Match)</h4>
-                        <div class="mix-match-selector" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            <label><input type="checkbox" data-section="summary" checked> Executive Summary</label>
-                            <label><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
-                            <label><input type="checkbox" data-section="recommendations"> Recommendations</label>
-                            <label><input type="checkbox" data-section="comparison"> Comparison Table</label>
                         </div>
                     </div>
                 </div>
@@ -118,7 +138,7 @@
                             <i data-lucide="download" class="w-5 h-5 mr-2"></i>
                             <span>Generate Report</span>
                         </button>
-                        <p id="generateHelpText" class="text-gray-400 mt-2">Please select at least one assessment and a template.</p>
+                        <p id="generateHelpText" class="text-gray-400 mt-2">Please select at least one assessment and a template or custom sections.</p>
                     </div>
                 </div>
             </div>
