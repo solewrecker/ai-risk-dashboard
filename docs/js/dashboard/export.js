@@ -346,8 +346,8 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     const assessmentData = primaryAssessment.assessment_data || {}; // Get the nested assessment_data object
 
     // General replacements for base template
-    populated = populated.replace(/{{toolName}}/g, assessmentData.name || 'N/A');
-    populated = populated.replace(/{{toolSubtitle}}/g, assessmentData.vendor || 'N/A');
+    populated = populated.replace(/{{toolName}}/g, assessmentData.formData?.toolName || primaryAssessment.name || 'N/A');
+    populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
     populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
     populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
@@ -505,102 +505,163 @@ async function generateHtmlReport() {
             sectionsToGenerate = Array.from(customSelectedSections);
         }
 
-        let fullReportHtml = await fetchTemplate('base');
-        let sectionsHtml = '';
-
+        let fullReportHtmlString = await fetchTemplate('base'); // This fetches the string including <!DOCTYPE html><html><head><body>...
+        let sectionsHtmlString = '';
         for (const section of sectionsToGenerate) {
-            sectionsHtml += await fetchTemplate(section); // Fetch each selected section
+            sectionsHtmlString += await fetchTemplate(section);
         }
 
-        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
+        // Use a temporary DOM element to parse the fullReportHtml and safely manipulate it.
+        // This preserves the DOCTYPE and allows proper DOM operations.
+        const parser = new DOMParser();
+        let doc = parser.parseFromString(fullReportHtmlString, 'text/html');
 
-        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
+        const mainContentElement = doc.querySelector('main#report-content');
+        if (mainContentElement) {
+            mainContentElement.innerHTML = sectionsHtmlString;
+        }
 
-        // Remove external CSS links first (correcting paths to match HTML)
-        let finalHtml = populatedHtml.replace('<link rel="stylesheet" href="../css/pages/export-page.css">', '');
-        finalHtml = finalHtml.replace('<link rel="stylesheet" href="css/style.css">', '');
-        
-        // --- Inline CSS and JS for self-contained HTML ---// Fetch CSS content
+        // Get the updated HTML string (which still contains doctype, head, body etc.)
+        let processedHtmlString = doc.documentElement.outerHTML; // Get outerHTML of <html>
+
+        // Apply data binding to the string
+        processedHtmlString = bindDataToTemplate(processedHtmlString, primaryAssessment, selectedData, sectionsToGenerate);
+
+        // Re-parse the string to update the DOM object after string replacements from bindDataToTemplate
+        doc = parser.parseFromString(processedHtmlString, 'text/html');
+
+        // --- Inline CSS and JS for self-contained HTML ---
         const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
+
+        // Fetch CSS
         const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
         const cssContent = await cssResponse.text();
+        const styleElement = doc.createElement('style');
+        styleElement.textContent = cssContent;
+        doc.head.appendChild(styleElement);
+
+        // Remove external CSS links from the head (using querySelector for robustness)
+        let externalCssLink1 = doc.querySelector('link[href="../css/pages/export-page.css"]');
+        if (externalCssLink1) externalCssLink1.remove();
+        let externalCssLink2 = doc.querySelector('link[href="css/style.css"]');
+        if (externalCssLink2) externalCssLink2.remove();
 
         // Fetch Lucide Icons JS
         const lucideResponse = await fetch('https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js');
         const lucideContent = await lucideResponse.text();
+        const lucideScript = doc.createElement('script');
+        lucideScript.textContent = lucideContent;
+        doc.body.appendChild(lucideScript); // Append to body for execution after DOM parsing
 
         // Fetch QRCode.js
         const qrcodeResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
         const qrcodeContent = await qrcodeResponse.text();
+        const qrcodeScript = doc.createElement('script');
+        qrcodeScript.textContent = qrcodeContent;
+        doc.body.appendChild(qrcodeScript); // Append to body
 
-        // Extract collapsible script from detailed breakdown template
-        let collapsibleScript = '';
+        // Extract and inject collapsible script content (hardcoded)
+        let collapsibleScriptContent = '';
         if (sectionsToGenerate.includes('detailed-breakdown-section')) {
-            const detailedTemplate = await fetchTemplate('detailed-breakdown-section');
-            const scriptMatch = detailedTemplate.match(/<script>([\s\S]*?)<\/script>/);
-            if (scriptMatch && scriptMatch[1]) {
-                collapsibleScript = scriptMatch[1];
-            }
+            collapsibleScriptContent = `
+            document.addEventListener('DOMContentLoaded', function() {
+                const collapsibleHeaders = document.querySelectorAll('.detailed-breakdown__collapsible-header');
+                collapsibleHeaders.forEach(header => {
+                    header.addEventListener('click', function() {
+                        const content = this.nextElementSibling;
+                        const button = this.querySelector('.detailed-breakdown__toggle-button');
+                        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+                        if (isExpanded) {
+                            content.style.maxHeight = null;
+                            button.setAttribute('aria-expanded', 'false');
+                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            button.setAttribute('aria-expanded', 'true');
+                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>';
+                        }
+                    });
+                });
+            });
+            `;
+            const collapsibleScriptElement = doc.createElement('script');
+            collapsibleScriptElement.textContent = collapsibleScriptContent;
+            doc.body.appendChild(collapsibleScriptElement);
         }
 
-        // Inject CSS and JS into the populated HTML
-        finalHtml = finalHtml.replace('</head>', `    <style>${cssContent}</style>\n</head>`);
+        // Remove external JS links from the head (those in original export.html)
+        let externalJsLink1 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"]');
+        if (externalJsLink1) externalJsLink1.remove();
+        let externalJsLink2 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"]');
+        if (externalJsLink2) externalJsLink2.remove();
+        let externalJsLink3 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"]');
+        if (externalJsLink3) externalJsLink3.remove();
+        let externalJsLink4 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]');
+        if (externalJsLink4) externalJsLink4.remove();
+        let externalJsLink5 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"]');
+        if (externalJsLink5) externalJsLink5.remove();
+        let externalJsLink6 = doc.querySelector('script[type="module"][src="js/dashboard/export.js"]');
+        if (externalJsLink6) externalJsLink6.remove();
+        let existingLucideInitScript = doc.querySelector('script:not([src]):contains("lucide.createIcons()")');
+        if (existingLucideInitScript) existingLucideInitScript.remove();
 
-        // Remove external JS links and add inlined scripts
-        finalHtml = finalHtml.replace('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>', ''); // Supabase not needed for static HTML
-        finalHtml = finalHtml.replace('<script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>', `<script>${lucideContent}</script>`);
-        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>', `<script>${qrcodeContent}</script>`);
-        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>', ''); // jsPDF not needed
-        finalHtml = finalHtml.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>', ''); // html2canvas not needed
-        finalHtml = finalHtml.replace('<script type="module" src="js/dashboard/export.js"></script>', ''); // Main script not needed
-        finalHtml = finalHtml.replace('<script>\n            document.addEventListener(\'DOMContentLoaded\', function() {\n                if (typeof lucide !== \'undefined\') {\n                    lucide.createIcons();\n                }\n            });\n        </script>', ''); // Remove existing lucide init
-
-        // Inject collapsible script
-        if (collapsibleScript) {
-            finalHtml = finalHtml.replace('</body>', `<script>${collapsibleScript}</script>\n</body>`);
-        }
-        
-        // Generate shareable URL
-        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
 
         // Update the title dynamically
-        finalHtml = finalHtml.replace('<title>Export Assessments - AI Risk Pro</title>', `<title>${primaryAssessment.name || 'AI Risk Assessment'} Report</title>`);
+        const titleElement = doc.querySelector('title');
+        if (titleElement) {
+            titleElement.textContent = `${primaryAssessment.name || 'AI Risk Assessment'} Report`;
+        }
 
-        // Create QR code container
-        const qrContainer = document.createElement('div');
-        qrContainer.id = 'qrcode-container'; // Add an ID to the QR code container for print styles
-        qrContainer.style.textAlign = 'center';
-        qrContainer.style.marginTop = '20px';
-        qrContainer.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
+        // Generate shareable URL for QR code
+        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
 
-        let finalHtmlWithQr = finalHtml.replace('</body>', `${qrContainer.outerHTML}</body>`);
+        // Create QR code container element and append to body
+        const qrContainerDiv = doc.createElement('div'); // Use a different name to avoid conflict with existing qrContainer
+        qrContainerDiv.id = 'qrcode-container';
+        qrContainerDiv.style.textAlign = 'center';
+        qrContainerDiv.style.marginTop = '20px';
+        qrContainerDiv.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
+        doc.body.appendChild(qrContainerDiv); // Append to the document body object
 
-        // Create a temporary container to render the QR code and Lucide icons off-screen
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.innerHTML = finalHtmlWithQr;
-        document.body.appendChild(container);
+        // This part needs careful handling as QRCode.js and Lucide icons require a live DOM element to render.
+        // We will create a temporary iframe, load the document into it, then manipulate its DOM, and finally extract its content.
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; // Hide the iframe
+        document.body.appendChild(iframe); // Append to main document to allow script execution
 
-        // Render Lucide icons in the temporary container
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons({
-                container: container // Target the specific container for icon rendering
+        // Load the modified document (doc.documentElement.outerHTML) into the iframe's srcdoc
+        // The doctype will be correctly transferred by srcdoc.
+        // Using srcdoc is critical for preserving the doctype and allowing script execution within the iframe.
+        iframe.srcdoc = `<!DOCTYPE html>${doc.documentElement.outerHTML}`;
+
+        // Wait for iframe to load (important for script execution within iframe)
+        await new Promise(resolve => {
+            iframe.onload = () => resolve();
+        });
+
+        const iframeDoc = iframe.contentWindow.document;
+
+        // Render Lucide icons in the iframe's document
+        if (iframe.contentWindow.lucide && typeof iframe.contentWindow.lucide.createIcons === 'function') {
+            iframe.contentWindow.lucide.createIcons({
+                container: iframeDoc.body // Target the iframe's body for icon rendering
             });
         }
 
-        new QRCode(container.querySelector('#qrcode'), {
+        // Generate QR code in the iframe's document
+        new iframe.contentWindow.QRCode(iframeDoc.querySelector('#qrcode'), {
             text: shareUrl,
             width: 128,
             height: 128
         });
 
-        // Get the innerHTML of the container after QR code is rendered and icons created
-        const fullHtmlContent = container.innerHTML;
-        document.body.removeChild(container);
+        // Get the final HTML content including the DOCTYPE from the iframe
+        const finalHtmlContent = `<!DOCTYPE html>${iframeDoc.documentElement.outerHTML}`;
+        document.body.removeChild(iframe); // Clean up iframe
 
         // Create a Blob from the HTML content
-        const blob = new Blob([fullHtmlContent], { type: 'text/html' });
+        const blob = new Blob([finalHtmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
 
         // Create a temporary link and trigger download
