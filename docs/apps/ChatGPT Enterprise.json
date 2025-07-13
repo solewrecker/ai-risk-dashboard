@@ -1,14 +1,21 @@
 {
   "name": "ChatGPT Enterprise",
   "vendor": "OpenAI",
-  "license_type": "Enterprise/Commercial",
-  "total_score": 17,
+  "license_type": "Enterprise",
+  "total_score": 9,
   "risk_level": "LOW RISK",
   "data_storage_score": 5,
   "training_usage_score": 0,
   "access_controls_score": 2,
   "compliance_score": 0,
-  "vendor_transparency_score": 10,
+  "vendor_transparency_score": 2,
+  "compliance_certifications": {
+    "HIPAA": "Yes",
+    "GDPR": "Yes",
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Yes"
+  },
   "summary_and_recommendation": "APPROVE for general enterprise use. ChatGPT Enterprise provides robust security controls, guaranteed no-training data usage, comprehensive admin controls, and enterprise-grade compliance. Recommended for most business use cases with standard enterprise data.",
   "primary_use_case": "Enterprise conversational AI assistant",
   "data_classification": "Suitable for Internal Business Data and Customer Data",
@@ -57,21 +64,22 @@
       "last_updated": "2024"
     },
     {
-      "url": "https://openai.com/business-data/",
-      "title": "Business Data Privacy, Security, and Compliance",
+      "url": "https://openai.com/index/introducing-chatgpt-enterprise/",
+      "title": "Introducing ChatGPT Enterprise",
       "last_updated": "2024"
     },
     {
-      "url": "https://openai.com/index/introducing-chatgpt-enterprise/",
-      "title": "Introducing ChatGPT Enterprise",
+      "url": "https://help.openai.com/en/articles/8265053-what-is-chatgpt-enterprise",
+      "title": "What is ChatGPT Enterprise?",
       "last_updated": "2024"
     }
   ],
   
   "detailed_assessment": {
     "tool_name": "ChatGPT Enterprise",
-    "final_risk_score": 17,
+    "final_risk_score": 9,
     "final_risk_category": "LOW RISK",
+    "compliance_summary": "This tool is fully compliant with major enterprise regulations including HIPAA, GDPR, SOC 2, and CCPA with documented certifications and privacy protections.",
     "summary_and_recommendation": "APPROVE for general enterprise use. ChatGPT Enterprise provides robust security controls, guaranteed no-training data usage, comprehensive admin controls, and enterprise-grade compliance. Recommended for most business use cases with standard enterprise data.",
     "assessment_details": {
       "data_storage_and_security": {
@@ -79,7 +87,7 @@
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - OpenAI operates enterprise services with documented data residency controls and contractual guarantees for enterprise customers, though specific geographic control options for free tier are limited."
+            "justification": "Known secure regions (US, EU) with contracts - OpenAI operates enterprise services with documented data residency controls and contractual guarantees for enterprise customers, though specific geographic control options are limited to major secure jurisdictions."
           },
           "encryption_standards": {
             "score": 2,
@@ -135,11 +143,11 @@
         }
       },
       "vendor_transparency": {
-        "category_score": 10,
+        "category_score": 2,
         "criteria": {
           "documentation_and_support": {
-            "score": 10,
-            "justification": "No Transparency - While OpenAI provides extensive public documentation about ChatGPT Enterprise security features, detailed enterprise-specific security documentation, support responsiveness metrics, and comprehensive transparency reports are not publicly available, requiring direct vendor engagement for full transparency."
+            "score": 2,
+            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports - OpenAI provides comprehensive public documentation about ChatGPT Enterprise security features, privacy policies, and compliance certifications, though some enterprise-specific details require direct vendor engagement."
           }
         }
       }
@@ -147,8 +155,8 @@
     "use_case_multiplier_applied": {
       "use_case": "Enterprise AI Assistant",
       "data_classification": "Internal Business Data",
-      "base_score": 17,
-      "final_score_with_multiplier": 17
+      "base_score": 9,
+      "final_score_with_multiplier": 9
     }
   }
 }

@@ -1,103 +1,162 @@
 {
-  "name": "GitHub Copilot Enterprise",
-  "vendor": "GitHub (Microsoft)",
+  "name": "Microsoft Copilot Enterprise",
+  "vendor": "Microsoft Corporation",
   "license_type": "Enterprise",
-  "total_score": 12,
+  "total_score": 18,
   "risk_level": "LOW RISK",
-  "data_storage_score": 5,
+  "data_storage_score": 3,
   "training_usage_score": 0,
   "access_controls_score": 0,
-  "compliance_score": 3,
+  "compliance_score": 0,
   "vendor_transparency_score": 2,
-  "summary_and_recommendation": "GitHub Copilot Enterprise scores 12 (Low Risk). With comprehensive enterprise admin controls, no training data usage, full audit capabilities, strong encryption, and transparent documentation from an established vendor, this tool is suitable for enterprise development environments. The vendor provides contractual guarantees for data handling and comprehensive security controls.",
-  "primary_use_case": "Enterprise AI-assisted development and code generation",
-  "data_classification": "Source code, proprietary business logic, and development context",
-  "category": "Development Tools",
+  "compliance_certifications": {
+    "HIPAA": {
+      "status": "Certified",
+      "details": "Microsoft 365 Copilot Enterprise is covered under Microsoft's Business Associate Agreement (BAA) as of early 2024. HIPAA compliance applies to properly configured implementations but excludes web search queries.",
+      "evidence": "BAA available | Third-party audit",
+      "limitations": "Web search queries not covered by BAA | Requires proper configuration",
+      "last_verified": "2024-03-01 | Annual renewal | Ongoing compliance"
+    },
+    "GDPR": {
+      "status": "Certified",
+      "details": "Full GDPR compliance with Data Protection Addendum (DPA) coverage, EU Data Boundary support, and ISO/IEC 27018 certification.",
+      "evidence": "DPA available | Privacy policy compliant | Third-party audit",
+      "limitations": "EU Data Boundary doesn't apply to web search queries",
+      "last_verified": "2024-03-01 | Ongoing compliance | Annual renewal"
+    },
+    "SOC_2": {
+      "status": "Type II",
+      "details": "Microsoft Security Copilot achieved SOC 2 Type II certification in November 2024. Microsoft 365 platform maintains SOC 2 Type II compliance.",
+      "evidence": "Public report | Third-party verification | Customer portal",
+      "limitations": "None identified",
+      "last_verified": "2024-11-13 | Annual renewal | Ongoing compliance"
+    },
+    "ISO_27001": {
+      "status": "Certified",
+      "details": "Microsoft Copilot for Security attained ISO 27001, 27017, and 27018 certifications in June 2024. Microsoft 365 platform maintains ISO 27001 certification.",
+      "evidence": "Certificate | Third-party audit | Public attestation",
+      "limitations": "None identified",
+      "last_verified": "2024-06-06 | 3-year validity | Annual surveillance audits"
+    },
+    "PCI_DSS": {
+      "status": "Not Applicable",
+      "details": "Microsoft Copilot Enterprise does not process payment card data directly.",
+      "evidence": "Not applicable",
+      "limitations": "Not applicable",
+      "last_verified": "Not applicable"
+    },
+    "CCPA": {
+      "status": "Compliant",
+      "details": "Microsoft's privacy policy and DPA provide CCPA compliance through comprehensive data subject rights and privacy controls.",
+      "evidence": "Privacy policy | DPA addendum | Legal review",
+      "limitations": "None identified",
+      "last_verified": "2024-03-01 | Ongoing compliance | Annual review"
+    },
+    "FedRAMP": {
+      "status": "In Process",
+      "details": "Microsoft 365 Government Cloud has FedRAMP authorization. Standard commercial Copilot Enterprise working toward FedRAMP compliance.",
+      "evidence": "Documentation review | Government cloud ATO available",
+      "limitations": "Government cloud only for current authorization",
+      "last_verified": "2024-07-01 | In Progress | Expected completion 2025"
+    }
+  },
+  "summary_and_recommendation": "Microsoft Copilot Enterprise demonstrates strong security posture with comprehensive compliance certifications, enterprise-grade data protection, and contractual guarantees against training use. The tool scored 18/100 (LOW RISK) due to excellent data handling practices, enterprise controls, and vendor transparency. Recommended for general enterprise use with standard monitoring. Note: Web search functionality operates under different data handling practices than core Copilot features.",
+  "primary_use_case": "Enterprise productivity enhancement, document creation, data analysis, and business intelligence",
+  "data_classification": "Internal Business Data, Personally Identifiable Information, Protected Health Information (with BAA)",
+  "category": "AI-Powered Productivity Suite",
   "assessed_by": "AI Security Council",
-  "confidence": 0.8,
-  "documentation_tier": "Tier 2: Private enterprise documentation available",
-  "assessment_notes": "Strong public documentation with comprehensive security whitepapers and enterprise-specific documentation. Minor gaps in specific technical implementation details but established vendor provides strong assurance.",
+  "confidence": 0.9,
+  "documentation_tier": "Tier 3: Third-party validation with comprehensive public and private documentation",
+  "assessment_notes": "High confidence assessment based on comprehensive Microsoft documentation, third-party certifications, and established enterprise track record. Microsoft's extensive compliance program and transparent security practices provide strong evidence for scoring decisions.",
   
   "azure_permissions": {
     "required_permissions": [
-      "Code editor access",
-      "Repository read access",
-      "Internet connectivity to GitHub services",
-      "Enterprise admin access for policy management"
+      "Microsoft.Graph.User.Read",
+      "Microsoft.Graph.Mail.Read",
+      "Microsoft.Graph.Files.ReadWrite",
+      "Microsoft.Graph.Calendar.Read",
+      "Microsoft.Graph.Sites.Read.All"
     ],
     "recommended_restrictions": [
-      "Configure enterprise-wide content exclusions",
-      "Enable public code matching filters",
-      "Set up audit logging and monitoring",
-      "Implement role-based access controls"
+      "Enable data loss prevention policies",
+      "Configure sensitivity labels",
+      "Implement retention policies",
+      "Monitor audit logs regularly",
+      "Disable web search if not required"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Enterprise Policy Configuration",
-      "description": "Configure organization-wide policies for code suggestion matching, model access, and feature enablement through enterprise admin controls",
+      "title": "Configure Enterprise Data Protection",
+      "description": "Ensure Microsoft 365 Copilot Enterprise is properly configured with Enterprise Data Protection (EDP) enabled to maintain contractual protections and data isolation.",
       "priority": "high",
-      "category": "governance"
+      "category": "configuration"
     },
     {
-      "title": "Audit and Monitoring Setup",
-      "description": "Enable comprehensive audit logging and establish monitoring for usage patterns, model access, and code suggestion activities",
-      "priority": "high",
+      "title": "Implement Data Loss Prevention",
+      "description": "Deploy Microsoft Purview DLP policies to monitor and control sensitive data interactions with Copilot, particularly for PHI and financial data.",
+      "priority": "medium",
       "category": "security"
     },
     {
-      "title": "Content Exclusion Configuration",
-      "description": "Set up repository-level content exclusions for sensitive codebases and proprietary algorithms",
+      "title": "Review Web Search Settings",
+      "description": "Evaluate whether web search functionality is necessary for your use case, as it operates under different data handling practices than core Copilot features.",
       "priority": "medium",
       "category": "privacy"
     },
     {
-      "title": "SSO Integration",
-      "description": "Integrate with enterprise SSO systems for centralized authentication and access management",
-      "priority": "medium",
-      "category": "access_control"
+      "title": "Enable Comprehensive Auditing",
+      "description": "Configure Microsoft 365 audit logging to track all Copilot interactions and maintain compliance with organizational policies.",
+      "priority": "high",
+      "category": "compliance"
     }
   ],
   
   "sources": [
     {
-      "url": "https://docs.github.com/en/copilot/managing-copilot/managing-github-copilot-in-your-organization/managing-policies-for-copilot-in-your-organization",
-      "title": "Managing policies for Copilot in your organization",
-      "last_updated": "2024-12-01"
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection",
+      "title": "Enterprise data protection in Microsoft 365 Copilot",
+      "last_updated": "2024-03-01"
     },
     {
-      "url": "https://github.blog/news-insights/product-news/github-copilot-enterprise-is-now-generally-available/",
-      "title": "GitHub Copilot Enterprise is now generally available",
-      "last_updated": "2024-07-19"
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+      "title": "Data, Privacy, and Security for Microsoft 365 Copilot",
+      "last_updated": "2024-03-01"
     },
     {
-      "url": "https://docs.github.com/en/copilot/about-github-copilot/plans-for-github-copilot",
-      "title": "Plans for GitHub Copilot",
-      "last_updated": "2024-12-01"
+      "url": "https://techcommunity.microsoft.com/blog/securitycopilotblog/microsoft-security-copilot-achieves-soc-2-certification/4295363",
+      "title": "Microsoft Security Copilot Achieves SOC 2 Certification",
+      "last_updated": "2024-11-13"
+    },
+    {
+      "url": "https://www.nightfall.ai/blog/is-microsoft-copilot-hipaa-compliant",
+      "title": "Is Microsoft Copilot HIPAA Compliant?",
+      "last_updated": "2024-03-01"
     }
   ],
   
   "detailed_assessment": {
-    "tool_name": "GitHub Copilot Enterprise",
-    "final_risk_score": 12,
+    "tool_name": "Microsoft Copilot Enterprise",
+    "final_risk_score": 18,
     "final_risk_category": "LOW RISK",
-    "summary_and_recommendation": "GitHub Copilot Enterprise presents very low risk for enterprise development environments. Comprehensive enterprise controls, contractual data protections, no training data usage, and strong audit capabilities make it suitable for handling proprietary source code and development workflows.",
+    "compliance_summary": "Microsoft Copilot Enterprise maintains comprehensive compliance with major regulatory frameworks including HIPAA (with BAA), GDPR, SOC 2 Type II, and ISO 27001. Strong enterprise-grade security controls and contractual protections.",
+    "summary_and_recommendation": "Microsoft Copilot Enterprise demonstrates exceptional security posture with enterprise-grade data protection, comprehensive compliance certifications, and contractual guarantees against training use. The tool scored 18/100 (LOW RISK) making it suitable for general enterprise use including sensitive data processing. Recommended for approval with standard enterprise monitoring and proper configuration of Enterprise Data Protection features.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 5,
+        "category_score": 3,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - GitHub operates in Microsoft Azure regions with clear geographic presence in secure jurisdictions and contractual protections for enterprise customers. Data residency controls available through enterprise agreements."
+            "justification": "Microsoft provides data residency commitments through Product Terms and supports EU Data Boundary for GDPR compliance. Data location is contractually controlled and configurable for enterprise customers, placing it in known secure regions with proper contractual protections."
           },
           "encryption_standards": {
-            "score": 2,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications. GitHub provides comprehensive encryption documentation following Microsoft Azure enterprise security standards with detailed encryption specifications published."
+            "score": 0,
+            "justification": "Enterprise-grade encryption with AES-256 encryption at rest and in transit, documented encryption specifications, and rigorous physical security controls. Microsoft provides comprehensive encryption documentation and maintains industry-standard encryption practices."
           },
           "data_retention": {
             "score": 0,
-            "justification": "Customer-Controlled Retention - No data retention OR customer controls all retention periods OR immediate deletion available on demand. GitHub Copilot Enterprise provides customer-controlled retention policies with immediate deletion capabilities and granular data lifecycle management through enterprise admin controls."
+            "justification": "Customer-controlled retention through Microsoft 365 retention policies. Organizations can configure retention periods according to their needs, with immediate deletion capabilities and clear retention policy inheritance from underlying Microsoft 365 services."
           }
         }
       },
@@ -106,11 +165,11 @@
         "criteria": {
           "model_training": {
             "score": 0,
-            "justification": "Contractual guarantee of no training use - GitHub Copilot Enterprise includes contractual guarantees that customer code and prompts will not be used for training purposes. Enterprise customers receive explicit no-training data processing agreements."
+            "justification": "Microsoft provides contractual guarantee that customer data, prompts, and responses are not used to train foundation models. This is explicitly stated in the Data Protection Addendum and Product Terms, with enterprise data protection ensuring organizational data remains separate from training datasets."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Documentation confirms that data is processed within GitHub-owned Microsoft Azure tenants with contractual protections against third-party sharing. Enterprise agreements provide explicit data sharing restrictions."
+            "justification": "No third-party sharing of enterprise data. Microsoft operates as data processor under DPA with strict data isolation between tenants. Customer data remains within Microsoft's ecosystem with no external sharing except as explicitly instructed by customer."
           }
         }
       },
@@ -119,28 +178,28 @@
         "criteria": {
           "admin_management": {
             "score": 0,
-            "justification": "Full Enterprise Controls - Centralized admin dashboard + user provisioning/deprovisioning + role-based permissions + group management + domain verification. GitHub Copilot Enterprise provides comprehensive enterprise admin controls with centralized management, organization-wide policy control, and granular user management capabilities."
+            "justification": "Full enterprise controls through Microsoft 365 Admin Center with centralized admin dashboard, comprehensive user provisioning/deprovisioning, role-based permissions, group management, and domain verification. Advanced identity management through Microsoft Entra ID integration."
           },
           "audit_capabilities": {
             "score": 0,
-            "justification": "Comprehensive Auditing - Real-time activity logs + exportable reports + user action tracking + data access logs + compliance reporting features. GitHub provides detailed audit logs, usage tracking, and comprehensive compliance reporting through enterprise admin dashboards."
+            "justification": "Comprehensive auditing through Microsoft 365 audit logs with real-time activity tracking, exportable reports, user action logging, and compliance reporting features. Full integration with Microsoft Purview for advanced audit capabilities."
           },
           "integration": {
             "score": 0,
-            "justification": "Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration + API access for enterprise management. GitHub Copilot Enterprise supports full enterprise identity integration with SSO, automated provisioning, and comprehensive API access for enterprise management."
+            "justification": "Full enterprise integration with SAML/OIDC SSO, SCIM provisioning, Active Directory integration, and extensive API access. Native integration with Microsoft 365 ecosystem provides seamless enterprise identity management."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 3,
+        "category_score": 0,
         "criteria": {
           "regulatory_violations": {
-            "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements. Microsoft/GitHub maintains comprehensive compliance certifications (SOC 2, ISO 27001, GDPR, CCPA) with enterprise-specific compliance documentation, though some specialized industry certifications may require additional validation."
+            "score": 0,
+            "justification": "Fully compliant with comprehensive certifications including SOC 2 Type II, ISO 27001/27017/27018, HIPAA BAA available, GDPR DPA compliance, and ongoing compliance programs. Microsoft maintains industry-leading compliance posture with regular third-party audits and certifications."
           },
           "data_processing_transparency": {
             "score": 0,
-            "justification": "Full Transparency - Published data flow diagrams + specific data processing locations + detailed retention schedules + clear third-party processor list. GitHub provides comprehensive data processing transparency with detailed documentation of data flows, processing locations, and subprocessor relationships for enterprise customers."
+            "justification": "Full transparency with published data flow diagrams, clear data processing locations, detailed retention schedules, and comprehensive documentation of data handling practices. Microsoft provides extensive documentation on data processing activities and third-party relationships."
           }
         }
       },
@@ -149,16 +208,16 @@
         "criteria": {
           "documentation_and_support": {
             "score": 2,
-            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports. GitHub provides comprehensive public documentation, detailed security whitepapers, enterprise-specific documentation, and maintains transparency reporting typical of established enterprise vendors with responsive enterprise support."
+            "justification": "Good documentation with clear privacy policies, security whitepapers, and comprehensive Microsoft Learn documentation. Regular transparency reports and responsive enterprise support, though some enterprise-specific documentation requires customer portal access."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Internal IT/Development",
-      "data_classification": "Source code, proprietary business logic, and development context",
-      "base_score": 14,
-      "final_score_with_multiplier": 12
+      "use_case": "Enterprise productivity enhancement with potential PHI/PII processing",
+      "data_classification": "Internal Business Data, PII, PHI (with BAA)",
+      "base_score": 18,
+      "final_score_with_multiplier": 18
     }
   }
 }

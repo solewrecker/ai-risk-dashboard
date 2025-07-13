@@ -1,7 +1,7 @@
 {
-  "name": "Maestro Labs Notetaker Enterprise",
+  "name": "Maestro Labs Notetaker Enterprise (TeamsMaestro)",
   "vendor": "Maestro Labs Pte. Ltd.",
-  "license_type": "Enterprise SaaS",
+  "license_type": "Enterprise",
   "total_score": 42,
   "risk_level": "MEDIUM RISK",
   "data_storage_score": 9,
@@ -9,46 +9,107 @@
   "access_controls_score": 12,
   "compliance_score": 6,
   "vendor_transparency_score": 10,
-  "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with good data protection practices but gaps in enterprise controls and documentation. Key concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. Recommendation: APPROVE with enhanced monitoring and enterprise controls implementation.",
+  "compliance_certifications": {
+    "HIPAA": {
+      "status": "Not Applicable",
+      "details": "Meeting transcription service not primarily designed for healthcare environments",
+      "evidence": "No healthcare-specific documentation found",
+      "limitations": "Not applicable for healthcare use cases",
+      "last_verified": "None | Not applicable for this service type"
+    },
+    "GDPR": {
+      "status": "Compliant",
+      "details": "Privacy policy demonstrates GDPR compliance with data subject rights and lawful basis",
+      "evidence": "Privacy policy compliant | Standard Contractual Clauses mentioned",
+      "limitations": "EU data residency available upon request",
+      "last_verified": "2025-01-27 | Ongoing compliance | Privacy policy updated"
+    },
+    "SOC_2": {
+      "status": "Certified",
+      "details": "SOC 2 Type II certification claimed on main website",
+      "evidence": "Self-attestation | Public claim on website",
+      "limitations": "Specific report details not publicly available",
+      "last_verified": "2025 | Annual renewal | Claimed current certification"
+    },
+    "ISO_27001": {
+      "status": "No",
+      "details": "No evidence of ISO 27001 certification found",
+      "evidence": "No documentation found",
+      "limitations": "Not applicable",
+      "last_verified": "None | Not certified"
+    },
+    "PCI_DSS": {
+      "status": "Not Applicable",
+      "details": "No payment processing functionality",
+      "evidence": "Service does not process payments",
+      "limitations": "Not applicable for meeting transcription service",
+      "last_verified": "None | Not applicable"
+    },
+    "CCPA": {
+      "status": "Compliant",
+      "details": "Privacy policy includes CCPA-compliant data subject rights",
+      "evidence": "Privacy policy | Data deletion rights documented",
+      "limitations": "California residents only",
+      "last_verified": "2025-01-27 | Ongoing compliance | Privacy policy"
+    },
+    "FedRAMP": {
+      "status": "No",
+      "details": "No FedRAMP authorization found",
+      "evidence": "No government compliance documentation",
+      "limitations": "Not authorized for government use",
+      "last_verified": "None | Not authorized"
+    }
+  },
+  "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with reasonable data protection practices but significant gaps in enterprise controls and transparency. Key strengths include no data used for AI training and clear data retention policies. Critical concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. The vendor's Trust Center is inaccessible, raising transparency concerns. Recommendation: APPROVE with enhanced monitoring, mandatory enterprise controls implementation, and requirement for comprehensive security documentation before deployment.",
   "primary_use_case": "Meeting transcription and AI-powered note-taking for Microsoft Teams",
   "data_classification": "Internal Business Communications",
   "category": "AI Meeting Assistant",
   "assessed_by": "AI Security Council",
   "confidence": 0.6,
   "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "Assessment based on public privacy policy and security documentation. Limited enterprise-specific documentation available. Vendor claims SOC 2 Type II certification but details not publicly verified.",
+  "assessment_notes": "Assessment based primarily on public privacy policy and limited security documentation. Trust Center was inaccessible during assessment, limiting transparency evaluation. SOC 2 Type II certification claimed but not independently verified. Vendor appears responsive to security inquiries but detailed enterprise documentation was not available for review.",
   
   "azure_permissions": {
     "required_permissions": [
       "Team.ReadBasic.All",
       "OnlineMeetings.ReadWrite",
-      "CallRecords.Read.All"
+      "CallRecords.Read.All",
+      "Calendars.Read",
+      "OnlineMeetingArtifact.Read.All"
     ],
     "recommended_restrictions": [
       "Require admin approval for installation",
       "Monitor meeting recording activities",
-      "Enable audit logging"
+      "Enable comprehensive audit logging",
+      "Implement data loss prevention policies",
+      "Regular access reviews and provisioning audits"
     ]
   },
   
   "recommendations": [
     {
       "title": "Implement Enterprise Controls",
-      "description": "Work with vendor to establish enterprise admin dashboard and centralized user management",
+      "description": "Work with vendor to establish enterprise admin dashboard, centralized user management, and role-based access controls before deployment",
       "priority": "high",
       "category": "access_control"
     },
     {
       "title": "Enhanced Documentation Request",
-      "description": "Request security questionnaire, DPA, and SOC 2 Type II certification details",
-      "priority": "medium",
+      "description": "Request comprehensive security questionnaire, Data Processing Agreement (DPA), and verified SOC 2 Type II certification report",
+      "priority": "high",
       "category": "compliance"
     },
     {
       "title": "Audit Trail Implementation",
-      "description": "Ensure comprehensive logging of all meeting recordings and data access",
+      "description": "Ensure comprehensive logging of all meeting recordings, data access, and user activities with exportable reports",
       "priority": "medium",
       "category": "monitoring"
+    },
+    {
+      "title": "Trust Center Access",
+      "description": "Request working access to Trust Center documentation or alternative security documentation portal",
+      "priority": "medium",
+      "category": "transparency"
     }
   ],
   
@@ -59,37 +120,43 @@
       "last_updated": "2025-01-27"
     },
     {
-      "url": "https://www.maestrolabs.com/security",
-      "title": "Maestro Labs Security Information",
+      "url": "https://www.maestrolabs.com/",
+      "title": "Maestro Labs Main Website",
       "last_updated": "2025"
     },
     {
       "url": "https://www.maestrolabs.com/ai-note-taker-for-teams",
       "title": "TeamsMaestro Product Information",
       "last_updated": "2025"
+    },
+    {
+      "url": "https://security.maestrolabs.com/",
+      "title": "Maestro Labs Trust Center (Inaccessible)",
+      "last_updated": "2025"
     }
   ],
   
   "detailed_assessment": {
-    "tool_name": "TeamsMaestro (Maestro Labs Notetaker Enterprise)",
+    "tool_name": "Maestro Labs Notetaker Enterprise (TeamsMaestro)",
     "final_risk_score": 42,
     "final_risk_category": "MEDIUM RISK",
-    "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with good data protection practices but gaps in enterprise controls and documentation. Key concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. Recommendation: APPROVE with enhanced monitoring and enterprise controls implementation.",
+    "compliance_summary": "Tool demonstrates basic GDPR and CCPA compliance with claimed SOC 2 Type II certification. However, lacks comprehensive third-party validation and detailed compliance documentation.",
+    "summary_and_recommendation": "TeamsMaestro presents MEDIUM RISK (42/100) with reasonable data protection practices but significant gaps in enterprise controls and transparency. Key strengths include no data used for AI training and clear data retention policies. Critical concerns include limited admin management capabilities, basic audit features, and incomplete public documentation. The vendor's Trust Center is inaccessible, raising transparency concerns. Recommendation: APPROVE with enhanced monitoring, mandatory enterprise controls implementation, and requirement for comprehensive security documentation before deployment.",
     "assessment_details": {
       "data_storage_and_security": {
         "category_score": 9,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Privacy policy states 'personal information is stored in one or more databases hosted by third parties located in the United States and the European Union' with Standard Contractual Clauses for international transfers."
+            "justification": "Known secure regions (US, EU) with contracts - Privacy policy explicitly states 'personal information is stored in one or more databases hosted by third parties located in the United States and the European Union' with Standard Contractual Clauses for international transfers. Clear geographic boundaries established."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Security documentation states 'Data is encrypted at rest and in transit' with comprehensive encryption practices."
+            "justification": "Enterprise-Grade Encryption - Website claims 'encrypting data in transit and at rest' with comprehensive encryption practices. While specific technical details (AES-256) not documented, vendor demonstrates understanding of enterprise encryption requirements."
           },
           "data_retention": {
             "score": 3,
-            "justification": "Clear Limited Retention - Specific retention periods documented (≤90 days) + automatic deletion procedures + user deletion controls - Privacy policy states 'retention periods vary depending on the type of data' with 'zero-day retention available to enterprise customers' and data deletion upon verified request."
+            "justification": "Clear Limited Retention - Privacy policy states 'retention periods vary depending on the type of data' with specific mention of 'zero-day retention available to enterprise customers' and data deletion upon verified request. Clear customer control over retention periods."
           }
         }
       },
@@ -98,11 +165,11 @@
         "criteria": {
           "model_training": {
             "score": 0,
-            "justification": "Contractual guarantee of no training use - Security documentation explicitly states 'We only collect the data needed to deliver our services and it is never used to train AI models' providing clear contractual protection."
+            "justification": "Contractual guarantee of no training use - Website explicitly states 'We only collect the data needed to deliver our services and it is never used to train AI models' providing clear contractual protection against training data usage."
           },
           "data_sharing": {
             "score": 5,
-            "justification": "Broad sharing or unclear sharing practices - Privacy policy states data is 'shared with trusted third-party service providers' and 'share email content and user instructions with third-party AI models' with limited clarity on specific third parties."
+            "justification": "Broad sharing or unclear sharing practices - Privacy policy states data is 'shared with trusted third-party service providers' and mentions sharing 'email content and user instructions with third-party AI models' but lacks specific identification of third parties and clear data sharing boundaries."
           }
         }
       },
@@ -111,15 +178,15 @@
         "criteria": {
           "admin_management": {
             "score": 6,
-            "justification": "Limited Controls - User visibility only + minimal management capabilities - Documentation not found for enterprise admin dashboard, centralized user management, or role-based permissions. Standard penalty applied."
+            "justification": "Limited Controls - User visibility only + minimal management capabilities - No documentation found for enterprise admin dashboard, centralized user management, role-based permissions, or group management features. This is a significant gap for enterprise deployment."
           },
           "audit_capabilities": {
             "score": 4,
-            "justification": "Basic Auditing - Limited logs + manual export only + basic usage statistics - Privacy policy mentions data processing for 'troubleshooting issues' but no detailed audit logging capabilities documented."
+            "justification": "Basic Auditing - Limited logs + manual export only + basic usage statistics - Privacy policy mentions data processing for 'troubleshooting issues' but no detailed audit logging capabilities, exportable reports, or comprehensive user activity tracking documented."
           },
           "integration": {
             "score": 3,
-            "justification": "Limited Integration - SSO only + no provisioning + minimal enterprise features - Product integrates with Microsoft Teams but limited documentation on enterprise identity management features."
+            "justification": "Limited Integration - SSO only + no provisioning + minimal enterprise features - Product integrates with Microsoft Teams authentication but limited documentation on enterprise identity management, SCIM provisioning, or advanced enterprise integration features."
           }
         }
       },
@@ -128,11 +195,11 @@
         "criteria": {
           "regulatory_violations": {
             "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - Privacy policy shows GDPR compliance, mentions SOC 2 Type II certification, but lacks detailed third-party verification."
+            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - Privacy policy demonstrates GDPR compliance, SOC 2 Type II certification claimed, but lacks detailed third-party verification and comprehensive compliance documentation."
           },
           "data_processing_transparency": {
             "score": 2,
-            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Privacy policy provides general processing descriptions and mentions third-party AI models but lacks detailed data flow diagrams."
+            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Privacy policy provides general processing descriptions with retention periods and mentions third-party AI models, but lacks detailed data flow diagrams and specific processor identification."
           }
         }
       },
@@ -140,14 +207,14 @@
         "category_score": 10,
         "criteria": {
           "documentation_and_support": {
-            "score": 4,
-            "justification": "Adequate Documentation - Standard privacy policy + limited security information + support available but slower response times - Comprehensive privacy policy available, basic security page, but Trust Center was inaccessible and limited detailed security documentation publicly available."
+            "score": 6,
+            "justification": "Minimal Documentation - Basic privacy policy only + limited security details + inconsistent support responses - While privacy policy exists, Trust Center is inaccessible, limited public security documentation available, and lack of comprehensive security whitepapers or detailed transparency reporting."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Internal Business Communications",
+      "use_case": "Meeting transcription and AI-powered note-taking",
       "data_classification": "Internal Business Communications",
       "base_score": 42,
       "final_score_with_multiplier": 42

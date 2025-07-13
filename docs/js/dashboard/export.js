@@ -139,14 +139,20 @@ async function generateReport() {
 
         const selectedSections = Array.from(mixMatchSelector.querySelectorAll('input:checked')).map(input => input.dataset.section);
 
-        // For mix-and-match, start with a base template and add sections
-        let templateHtml = await fetchTemplate('base'); // Assume a base.html exists
-        if (selectedSections.includes('summary')) {
-            templateHtml += await fetchTemplate('summary-section');
-        }
-        // Similarly for other sections
+        // Start with the base template
+        let fullReportHtml = await fetchTemplate('base');
+        let sectionsToInjectHtml = '';
 
-        const populatedHtml = bindDataToTemplate(templateHtml, primaryAssessment, selectedData, selectedSections);
+        // Fetch and append selected sections
+        if (selectedSections.includes('summary')) {
+            sectionsToInjectHtml += await fetchTemplate('summary-section');
+        }
+        // Add more conditions here for other sections as they are created
+
+        // Inject all selected sections into the main content area of the base template
+        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsToInjectHtml}</main>`);
+
+        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, selectedSections);
         
         // Generate shareable URL (example: link to view the assessment)
         const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
@@ -158,7 +164,7 @@ async function generateReport() {
         qrContainer.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
 
         // Append to populated HTML (assume there's a footer or body)
-        populated = populated.replace('</body>', `${qrContainer.outerHTML}</body>`);
+        let finalHtmlWithQr = populatedHtml.replace('</body>', `${qrContainer.outerHTML}</body>`);
 
         // Now, after rendering to container, generate the QR code
         // But since container is off-screen, we need to generate QR after setting innerHTML
@@ -166,7 +172,7 @@ async function generateReport() {
         container.style.position = 'absolute';
         container.style.left = '-9999px';
         container.style.width = '1000px'; // Standard width for our reports
-        container.innerHTML = populated;
+        container.innerHTML = finalHtmlWithQr;
         document.body.appendChild(container);
 
         new QRCode(container.querySelector('#qrcode'), {
@@ -176,7 +182,7 @@ async function generateReport() {
         });
         document.body.removeChild(container);
 
-        await createPdf(populated);
+        await createPdf(finalHtmlWithQr);
 
     } catch (error) {
         console.error('Error generating report:', error);
@@ -197,18 +203,39 @@ async function fetchTemplate(templateName) {
 }
 
 function bindDataToTemplate(html, primaryAssessment, allSelectedData, selectedSections) {
-    // This is a simplified binding function.
-    // A more robust solution would use a templating engine like Handlebars.
-    let populated = html.replace(/{{\s*tool_name\s*}}/gi, primaryAssessment.name);
-    populated = populated.replace(/{{\s*total_score\s*}}/gi, primaryAssessment.total_score);
-    populated = populated.replace(/{{\s*risk_level\s*}}/gi, primaryAssessment.risk_level);
-    
-    // Add more replacements as needed for the detailed template
-    // For example:
-    const recommendations = primaryAssessment.assessment_data?.recommendations || [];
-    const recsHtml = recommendations.map(rec => `<li><strong>${rec.title}:</strong> ${rec.description}</li>`).join('');
-    populated = populated.replace(/{{\s*recommendations_list\s*}}/gi, recsHtml);
+    let populated = html;
 
+    // General replacements for base template
+    populated = populated.replace(/{{toolName}}/g, primaryAssessment.name || 'N/A');
+    populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
+    populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
+    populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
+
+    // Executive Summary Section replacements (if summary section is selected)
+    if (selectedSections.includes('summary')) {
+        const summaryData = primaryAssessment;
+        populated = populated.replace(/{{overallScore}}/g, summaryData.total_score || '0');
+        populated = populated.replace(/{{maxScore}}/g, '100'); // Assuming max score is 100
+        populated = populated.replace(/{{riskLevel}}/g, summaryData.risk_level || 'N/A');
+        populated = populated.replace(/{{riskLevelLower}}/g, (summaryData.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
+        populated = populated.replace(/{{riskDescription}}/g, summaryData.summary_and_recommendation || 'No description provided.');
+        populated = populated.replace(/{{keyStrengths}}/g, summaryData.detailed_assessment?.summary_and_recommendation || 'No key strengths identified.');
+        populated = populated.replace(/{{areasForImprovement}}/g, summaryData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
+
+        // Dummy findings for now, will map to actual data later
+        populated = populated.replace(/{{finding1}}/g, 'Finding 1: Placeholder for actual finding from data.');
+        populated = populated.replace(/{{finding2}}/g, 'Finding 2: Placeholder for actual finding from data.');
+        populated = populated.replace(/{{finding3}}/g, 'Finding 3: Placeholder for actual finding from data.');
+        populated = populated.replace(/{{finding4}}/g, 'Finding 4: Placeholder for actual finding from data.');
+    }
+
+    // Placeholder for injecting section content
+    let sectionContent = '';
+    if (selectedSections.includes('summary')) {
+        // Fetch summary section HTML and inject into base template
+        // This part will be handled in generateReport after fetching
+    }
+    
     return populated;
 }
 

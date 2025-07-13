@@ -9,6 +9,13 @@
   "access_controls_score": 13,
   "compliance_score": 8,
   "vendor_transparency_score": 10,
+  "compliance_certifications": {
+    "HIPAA": "Available on request",
+    "GDPR": "Yes",
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Yes"
+  },
   "summary_and_recommendation": "Read.ai Free presents medium risk due to significant limitations in enterprise controls and audit capabilities. While the vendor shows good transparency and has opt-out training policies, the free tier lacks essential enterprise features like comprehensive admin controls and audit logging. Recommend upgrading to Enterprise+ plan for organizational use or implementing additional monitoring controls.",
   "primary_use_case": "Meeting transcription and analysis",
   "data_classification": "Business Communications",
@@ -80,6 +87,7 @@
     "tool_name": "Read.ai Free",
     "final_risk_score": 47,
     "final_risk_category": "MEDIUM RISK",
+    "compliance_summary": "Read.ai is SOC 2 Type 2 certified and offers HIPAA compliance upon request with Business Associate Agreement. GDPR compliant with privacy-first approach.",
     "summary_and_recommendation": "Read.ai Free presents medium risk due to significant limitations in enterprise controls and audit capabilities. While the vendor shows good transparency and has opt-out training policies, the free tier lacks essential enterprise features like comprehensive admin controls and audit logging. Recommend upgrading to Enterprise+ plan for organizational use or implementing additional monitoring controls.",
     "assessment_details": {
       "data_storage_and_security": {

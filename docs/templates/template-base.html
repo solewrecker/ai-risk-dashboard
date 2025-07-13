@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Assessment Report</title>
+    <style>
+        /* === DYNAMIC VARIABLES === */
+        :root {
+            --risk-color: #3b82f6;
+            --risk-degrees: 180deg;
+        }
+
+        /* === BASE STYLES === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* === HEADER === */
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .report-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .report-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-highlight {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .tool-highlight .tool-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-highlight .tool-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        /* Risk Level Color Variables */
+        .risk-low {
+            --risk-color: #10b981;
+            --risk-color-light: #34d399;
+        }
+
+        .risk-medium {
+            --risk-color: #f59e0b;
+            --risk-color-light: #fbbf24;
+        }
+
+        .risk-high {
+            --risk-color: #ef4444;
+            --risk-color-light: #f87171;
+        }
+
+        .risk-critical {
+            --risk-color: #dc2626;
+            --risk-color-light: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="report-title">AI Risk Assessment Report</h1>
+                <p class="report-subtitle">Comprehensive Analysis of {{toolName}}</p>
+                <div class="tool-highlight">
+                    <h2 class="tool-name">{{toolName}}</h2>
+                    <p class="tool-subtitle">{{toolSubtitle}}</p>
+                </div>
+                <div class="report-meta">
+                    <span>Report Date: {{reportDate}}</span>
+                    <span>Assessment ID: {{assessmentId}}</span>
+                </div>
+            </div>
+        </header>
+        <main id="report-content">
+            <!-- Dynamic content will be injected here -->
+        </main>
+    </div>
+</body>
+</html> 

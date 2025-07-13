@@ -7,48 +7,63 @@
   "data_storage_score": 13,
   "training_usage_score": 0,
   "access_controls_score": 20,
-  "compliance_score": 6,
+  "compliance_score": 9,
   "vendor_transparency_score": 2,
-  "summary_and_recommendation": "Fireflies.ai Free presents moderate risk primarily due to lack of enterprise admin controls and extended data retention. The tool does not use data for training and provides good encryption, but the free plan lacks organizational oversight capabilities. Recommend upgrading to Business or Enterprise plan for organizational use, or implement additional monitoring controls if using the free version.",
+  "compliance_certifications": {
+    "HIPAA": "No",
+    "GDPR": "Yes",
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Yes"
+  },
+  "summary_and_recommendation": "Fireflies.ai Free presents moderate risk primarily due to lack of enterprise admin controls and extended data retention policies. While the tool provides excellent security practices including zero-day training data retention policy and strong encryption, the free tier lacks organizational oversight capabilities essential for enterprise use. The vendor demonstrates strong transparency and compliance certifications. Recommend upgrading to Business or Enterprise plan for organizational deployment, or implement strict usage controls and monitoring if using the free version.",
   "primary_use_case": "Meeting transcription and note-taking",
   "data_classification": "Internal Communications",
-  "category": "Productivity/Collaboration",
+  "category": "Productivity/Collaboration", 
   "assessed_by": "AI Security Council",
   "confidence": 0.8,
   "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "Assessment based on publicly available documentation. Good transparency from vendor with detailed security documentation and blog posts. Some enterprise features only available on paid plans.",
+  "assessment_notes": "Assessment based on comprehensive public documentation including security whitepapers, privacy policies, and compliance certifications. Vendor demonstrates excellent transparency with detailed security documentation and regular updates. Some enterprise features including admin controls and audit capabilities only available on paid plans, which significantly impacts free tier risk profile.",
   
   "azure_permissions": {
     "required_permissions": [
       "calendar.read",
-      "meetings.join",
-      "audio.record"
+      "meetings.join", 
+      "audio.record",
+      "teams.readwrite"
     ],
     "recommended_restrictions": [
       "Block network access to sensitive systems",
-      "Require meeting-specific consent",
-      "Monitor usage for sensitive meetings"
+      "Require explicit meeting consent protocols",
+      "Monitor usage for sensitive or confidential meetings",
+      "Implement data classification controls"
     ]
   },
   
   "recommendations": [
     {
       "title": "Upgrade to Business/Enterprise plan for organizational use",
-      "description": "Free plan lacks admin controls, audit logs, and organizational oversight required for enterprise use",
+      "description": "Free plan lacks critical enterprise features including admin controls, audit logs, SSO integration, and organizational oversight required for secure enterprise deployment",
       "priority": "high",
       "category": "access_control"
     },
     {
-      "title": "Implement meeting consent protocols",
-      "description": "Establish clear policies for when Fireflies bot can join meetings and obtain explicit consent",
-      "priority": "medium",
+      "title": "Implement comprehensive meeting consent protocols",
+      "description": "Establish clear policies for when Fireflies bot can join meetings, obtain explicit consent from all participants, and maintain consent documentation",
+      "priority": "high", 
       "category": "governance"
     },
     {
-      "title": "Regular data cleanup",
-      "description": "Since data is retained for 12+ months, implement regular review and deletion of old transcripts",
+      "title": "Regular data review and cleanup procedures",
+      "description": "Since free plan lacks automatic data deletion features, implement quarterly review and manual deletion of old transcripts and sensitive meeting data",
       "priority": "medium",
       "category": "data_management"
+    },
+    {
+      "title": "Sensitive meeting exclusion policy",
+      "description": "Develop clear guidelines for which meetings should exclude the Fireflies bot, particularly those involving confidential information, HR matters, or strategic planning",
+      "priority": "medium",
+      "category": "governance"
     }
   ],
   
@@ -60,13 +75,23 @@
     },
     {
       "url": "https://fireflies.ai/privacy",
-      "title": "Privacy Policy",
+      "title": "Privacy Policy", 
       "last_updated": "2024-12-04"
     },
     {
       "url": "https://fireflies.ai/blog/the-top-15-frequently-asked-questions-about-fireflies-security-2",
       "title": "Top 15 Security Questions",
       "last_updated": "2024-12-04"
+    },
+    {
+      "url": "https://fireflies.ai/blog/is-fireflies-ai-safe",
+      "title": "SOC 2 Type II Compliance Update",
+      "last_updated": "2024-05-20"
+    },
+    {
+      "url": "https://fireflies.ai/blog/security-at-fireflies-ai", 
+      "title": "How We Think About Security at Fireflies.ai",
+      "last_updated": "2025-02-20"
     }
   ],
   
@@ -74,22 +99,23 @@
     "tool_name": "Fireflies.ai Free",
     "final_risk_score": 52,
     "final_risk_category": "MEDIUM RISK",
-    "summary_and_recommendation": "Fireflies.ai Free presents moderate risk primarily due to lack of enterprise admin controls and extended data retention. The tool does not use data for training and provides good encryption, but the free plan lacks organizational oversight capabilities. Recommend upgrading to Business or Enterprise plan for organizational use, or implement additional monitoring controls if using the free version.",
+    "compliance_summary": "This tool is SOC 2 Type II and GDPR compliant with documented security practices, but HIPAA compliance is not available on the free plan (Enterprise only).",
+    "summary_and_recommendation": "Fireflies.ai Free presents moderate risk primarily due to lack of enterprise admin controls and extended data retention policies. While the tool provides excellent security practices including zero-day training data retention policy and strong encryption, the free tier lacks organizational oversight capabilities essential for enterprise use. The vendor demonstrates strong transparency and compliance certifications. Recommend upgrading to Business or Enterprise plan for organizational deployment, or implement strict usage controls and monitoring if using the free version.",
     "assessment_details": {
       "data_storage_and_security": {
         "category_score": 13,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Data stored in US cloud infrastructure by default with enterprise options for preferred location storage on paid plans."
+            "justification": "Known secure regions (US, EU) with contracts - Data stored in US cloud infrastructure (AWS S3) by default with enterprise options for preferred location storage and private cloud deployment on paid plans. Clear geographic control policies documented."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Uses 256-bit AES encryption for meeting notes and transcripts at rest, and TLS encryption for data in transit."
+            "justification": "Enterprise-Grade Encryption - Uses 256-bit AES encryption for meeting notes and transcripts at rest, and 256-bit SSL/TLS encryption for data in transit. End-to-end encryption architecture documented with vendor-managed keys and published encryption specifications."
           },
           "data_retention": {
             "score": 8,
-            "justification": "Very Long Retention - Retention >1 year + limited deletion options + unclear retention procedures - Data is saved for at least 12 months with user control over individual meeting deletion but no automatic deletion procedures."
+            "justification": "Very Long Retention - Data is retained indefinitely until manually deleted by users. Free plan lacks automatic deletion procedures, custom retention policies, or bulk deletion capabilities. Users must manually delete individual meetings, creating operational burden and potential data accumulation risk."
           }
         }
       },
@@ -98,11 +124,11 @@
         "criteria": {
           "model_training": {
             "score": 0,
-            "justification": "Contractual guarantee of no training use - Fireflies has a 0-day data retention policy with all vendors with access to user content, ensuring none of your data is used for training AI models."
+            "justification": "Contractual guarantee of no training use - Fireflies maintains a documented 0-day data retention policy with all AI/ML vendors, ensuring customer meeting data is never used for training AI models. This policy is clearly stated in security documentation and privacy policies."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Clear policy that user data is not shared with third parties for training purposes and has contractual guarantees with processing vendors."
+            "justification": "No third-party sharing - Clear policy that user meeting data is not shared with third parties for training purposes. Fireflies maintains strict contractual guarantees with all processing vendors and subprocessors regarding data use restrictions."
           }
         }
       },
@@ -111,28 +137,28 @@
         "criteria": {
           "admin_management": {
             "score": 8,
-            "justification": "No Admin Oversight - Individual accounts only + no organizational visibility + no centralized management - Free plan does not include admin controls, Super Admin, or organizational management features."
+            "justification": "No Admin Oversight - Free plan operates on individual account basis with no organizational visibility or centralized management capabilities. No admin dashboard, user provisioning/deprovisioning, role-based permissions, or domain verification available on free tier."
           },
           "audit_capabilities": {
             "score": 7,
-            "justification": "No Audit Capabilities - No activity logs OR logs not accessible to administrators OR no usage tracking - Free plan does not include audit logs or usage tracking capabilities."
+            "justification": "No Audit Capabilities - Free plan does not include audit logs, usage tracking, or activity monitoring accessible to administrators. No compliance reporting features, user action tracking, or exportable audit reports available."
           },
           "integration": {
             "score": 5,
-            "justification": "No Enterprise Integration - Username/password only + no SSO + no enterprise identity management - Free plan does not include SSO, SCIM provisioning, or enterprise integrations."
+            "justification": "No Enterprise Integration - Free plan limited to username/password authentication only. No SSO integration, SCIM provisioning, Active Directory integration, or API access for enterprise identity management available."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 6,
+        "category_score": 9,
         "criteria": {
           "regulatory_violations": {
-            "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - SOC 2 Type II and GDPR compliant, but HIPAA compliance only available on Enterprise plan."
+            "score": 6,
+            "justification": "Partially Compliant - Privacy policy present but lacks specific regulatory compliance statements for HIPAA on free plan + no third-party certifications for healthcare use + compliance claims without verification for medical data. SOC 2 Type II and GDPR compliant but HIPAA explicitly excluded on free tier."
           },
           "data_processing_transparency": {
             "score": 2,
-            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Clear documentation of data processing, retention policies, and third-party relationships."
+            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Clear documentation of data processing, retention policies, and third-party relationships in security whitepaper."
           }
         }
       },
@@ -141,14 +167,14 @@
         "criteria": {
           "documentation_and_support": {
             "score": 2,
-            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports - Comprehensive security documentation, detailed blog posts, and clear privacy policies available."
+            "justification": "Good Documentation - Comprehensive security documentation including detailed privacy policy, security whitepaper, compliance certifications, and regular blog updates on security practices. Responsive support with detailed FAQ and security-focused content."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
       "use_case": "Internal Communications",
-      "data_classification": "Internal Communications",
+      "data_classification": "Internal Communications", 
       "base_score": 52,
       "final_score_with_multiplier": 52
     }

@@ -1,52 +1,61 @@
 {
   "name": "Maestro Labs Notetaker Free",
   "vendor": "Maestro Labs Pte. Ltd.",
-  "license_type": "Freemium (Free tier available)",
-  "total_score": 51,
+  "license_type": "Free",
+  "total_score": 56,
   "risk_level": "MEDIUM RISK",
   "data_storage_score": 11,
-  "training_usage_score": 20,
+  "training_usage_score": 25,
   "access_controls_score": 8,
   "compliance_score": 6,
   "vendor_transparency_score": 6,
-  "summary_and_recommendation": "TeamsMaestro Free poses medium risk due to unclear AI training data usage policies, limited enterprise controls in the free tier, and data processing outside controlled jurisdictions. The tool automatically captures meeting audio and transcripts, which could include sensitive information. While the vendor shows good compliance posture with SOC 2 Type II certification, the free tier lacks enterprise-grade admin controls and audit capabilities. Recommend: Approve for general use only with public/marketing content meetings. Requires enterprise account upgrade for meetings with sensitive data.",
+  "compliance_certifications": [
+    "HIPAA: No",
+    "GDPR: Yes", 
+    "SOC 2: Not documented",
+    "PII: Yes",
+    "CCPA: Not documented"
+  ],
+  "summary_and_recommendation": "TeamsMaestro Free poses medium risk primarily due to explicit data sharing with third-party AI models for service provision with no clear opt-out mechanism, automatic capture of meeting audio/transcripts, and limited enterprise controls in free tier. The tool processes sensitive meeting data including audio recordings and transcripts. While vendor shows GDPR compliance, lacks documented SOC 2 or other enterprise certifications. Recommendation: Approve for general use with public/non-sensitive meetings only. Block for meetings containing PHI, financial data, or confidential information. Consider enterprise upgrade for sensitive use cases.",
   "primary_use_case": "AI meeting note-taking and transcription for Microsoft Teams",
-  "data_classification": "Meeting content, audio recordings, transcripts, personally identifiable information",
+  "data_classification": "Meeting audio recordings, transcripts, participant identification, personally identifiable information",
   "category": "AI-Powered Meeting Assistant",
   "assessed_by": "AI Security Council",
   "confidence": 0.8,
-  "documentation_tier": "Tier 1: Public documentation with detailed privacy policy",
-  "assessment_notes": "Good confidence level based on comprehensive privacy policy and public documentation. Some enterprise features unclear for free tier specifically.",
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Good confidence based on comprehensive privacy policy updated January 2025. However, enterprise features and security certifications not well documented for free tier.",
   
   "azure_permissions": {
     "required_permissions": [
       "Teams.ReadWrite.All",
       "OnlineMeetings.ReadWrite",
-      "Calendars.ReadWrite"
+      "Calendars.ReadWrite",
+      "User.Read"
     ],
     "recommended_restrictions": [
       "Block access to sensitive meeting rooms",
-      "Require explicit consent for recording",
-      "Monitor for sensitive data exposure"
+      "Require explicit consent notifications",
+      "Monitor for PHI/financial data exposure",
+      "Implement data classification policies"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Upgrade to Enterprise Account",
-      "description": "For meetings with sensitive data, upgrade to enterprise account to access better admin controls and potential data retention customization",
+      "title": "Implement Meeting Classification Policy",
+      "description": "Establish clear policies on which meeting types can use AI note-taking based on data sensitivity levels",
       "priority": "high",
-      "category": "access_control"
-    },
-    {
-      "title": "Meeting Content Guidelines",
-      "description": "Establish clear guidelines on which meetings can use AI note-taking tools based on content sensitivity",
-      "priority": "medium",
       "category": "policy"
     },
     {
+      "title": "Enhanced Consent Management",
+      "description": "Ensure all meeting participants receive clear notice of AI recording and processing, with opt-out mechanisms",
+      "priority": "high", 
+      "category": "compliance"
+    },
+    {
       "title": "Data Retention Monitoring",
-      "description": "Regular review of stored meeting data and deletion of sensitive content where possible",
+      "description": "Regular audit of stored meeting data with deletion of sensitive content where legally permissible",
       "priority": "medium",
       "category": "data_management"
     }
@@ -67,37 +76,38 @@
   
   "detailed_assessment": {
     "tool_name": "TeamsMaestro Free",
-    "final_risk_score": 51,
+    "final_risk_score": 56,
     "final_risk_category": "MEDIUM RISK",
-    "summary_and_recommendation": "TeamsMaestro Free poses medium risk due to unclear AI training data usage policies, limited enterprise controls in the free tier, and data processing outside controlled jurisdictions. The tool automatically captures meeting audio and transcripts, which could include sensitive information. While the vendor shows good compliance posture with SOC 2 Type II certification, the free tier lacks enterprise-grade admin controls and audit capabilities. Recommend: Approve for general use only with public/marketing content meetings. Requires enterprise account upgrade for meetings with sensitive data.",
+    "compliance_summary": "This tool demonstrates GDPR compliance and PII handling awareness, but lacks explicit SOC 2, HIPAA, or CCPA documentation for the free tier.",
+    "summary_and_recommendation": "TeamsMaestro Free poses medium risk primarily due to explicit data sharing with third-party AI models for service provision with no clear opt-out mechanism, automatic capture of meeting audio/transcripts, and limited enterprise controls in free tier. The tool processes sensitive meeting data including audio recordings and transcripts. While vendor shows GDPR compliance, lacks documented SOC 2 or other enterprise certifications. Recommendation: Approve for general use with public/non-sensitive meetings only. Block for meetings containing PHI, financial data, or confidential information. Consider enterprise upgrade for sensitive use cases.",
     "assessment_details": {
       "data_storage_and_security": {
         "category_score": 11,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Privacy policy states data is stored in United States and European Union with appropriate safeguards including standard data protection clauses under GDPR Article 46."
+            "justification": "Known secure regions (US, EU) with contracts - Privacy policy explicitly states data stored in United States and European Union with appropriate GDPR Article 46 safeguards and standard data protection clauses."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "Enterprise-Grade Encryption - Documentation states 'encrypting data in transit and at rest' with vendor-managed keys and published encryption specifications, though detailed technical specs not publicly available."
+            "justification": "Enterprise-Grade Encryption - Privacy policy states data is encrypted in transit and at rest with vendor-managed keys, though detailed technical specifications not publicly available."
           },
           "data_retention": {
             "score": 6,
-            "justification": "Extended Retention - Privacy policy states retention periods vary based on type of data and contractual agreements with some service data retained for longer periods, though specific timeframes not clearly defined for free tier users."
+            "justification": "Extended Retention - Privacy policy states retention periods vary based on data type and contractual agreements. Service data retained for varying periods with some enterprise customization available, but specific timeframes not clearly defined for free tier."
           }
         }
       },
       "training_data_usage": {
-        "category_score": 20,
+        "category_score": 25,
         "criteria": {
           "model_training": {
-            "score": 15,
-            "justification": "Default training use with difficult opt-out - Privacy policy states they share email content and user instructions with third-party AI models for service provision, with no clear opt-out mechanism documented for free tier users."
+            "score": 20,
+            "justification": "Always used for training, no opt-out - Privacy policy explicitly states 'we share email content and user instructions with third-party AI models as part of Maestro Lab's functionality' for service provision with no documented opt-out mechanism for free tier users."
           },
           "data_sharing": {
             "score": 5,
-            "justification": "Broad sharing or unclear sharing practices - Privacy policy indicates sharing with third-party AI services and mentions data may be anonymized 'depending on the language and processing requirements' but lacks specific details on data sharing boundaries."
+            "justification": "Broad sharing or unclear sharing practices - Privacy policy indicates sharing with third-party AI services for functionality, with data sometimes anonymized 'depending on the language and processing requirements' but lacks specific boundaries on data sharing scope."
           }
         }
       },
@@ -106,15 +116,15 @@
         "criteria": {
           "admin_management": {
             "score": 6,
-            "justification": "Limited Controls - Free tier appears to provide user visibility and basic management capabilities but lacks comprehensive enterprise admin dashboard and role-based permissions found in enterprise accounts."
+            "justification": "Limited Controls - Free tier provides basic user management through Microsoft Teams integration but lacks comprehensive enterprise admin dashboard, role-based permissions, or centralized organizational controls."
           },
           "audit_capabilities": {
             "score": 2,
-            "justification": "Good Auditing - Privacy policy mentions data processing agreements and tracking capabilities, though specific audit log details not fully documented for free tier."
+            "justification": "Good Auditing - Privacy policy indicates data processing agreements and basic tracking capabilities, though detailed audit logs and reporting features not specifically documented for free tier."
           },
           "integration": {
             "score": 0,
-            "justification": "Full Enterprise Integration - Native Microsoft Teams integration with OAuth authentication, seamless Microsoft 365 integration, and API access capabilities documented."
+            "justification": "Full Enterprise Integration - Native Microsoft Teams integration with OAuth authentication, seamless Microsoft 365 integration documented, providing enterprise-level identity management through Microsoft ecosystem."
           }
         }
       },
@@ -123,11 +133,11 @@
         "criteria": {
           "regulatory_violations": {
             "score": 3,
-            "justification": "Mostly Compliant - Privacy policy states SOC 2 Type II certification, GDPR compliance, and Microsoft attestation, with signed Data Processing Agreements available, though some specialized compliance gaps may exist."
+            "justification": "Mostly Compliant - Privacy policy demonstrates GDPR Article 46 compliance with standard data protection clauses, but lacks explicit SOC 2, HIPAA, or industry-specific certifications documentation for free tier."
           },
           "data_processing_transparency": {
             "score": 3,
-            "justification": "Basic Transparency - Privacy policy provides general data processing descriptions with retention periods stated and some third-party relationships disclosed, but lacks detailed data flow diagrams."
+            "justification": "Basic Transparency - Privacy policy provides general data processing descriptions with retention periods stated and some third-party AI service relationships disclosed, but lacks detailed data flow diagrams or specific processor lists."
           }
         }
       },
@@ -136,16 +146,16 @@
         "criteria": {
           "documentation_and_support": {
             "score": 6,
-            "justification": "Minimal Documentation - Standard privacy policy with limited security documentation details publicly available, though support contact information is provided and vendor appears responsive based on recent policy updates."
+            "justification": "Minimal Documentation - Standard privacy policy with recent updates (January 2025) and basic security contact information available, but lacks comprehensive security whitepaper or detailed enterprise security documentation publicly available."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Internal IT/Development",
-      "data_classification": "Meeting Content/Transcripts",
-      "base_score": 51,
-      "final_score_with_multiplier": 48
+      "use_case": "AI meeting note-taking and transcription",
+      "data_classification": "Meeting audio recordings and transcripts",
+      "base_score": 56,
+      "final_score_with_multiplier": 56
     }
   }
 }

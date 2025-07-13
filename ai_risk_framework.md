@@ -107,23 +107,58 @@
 
 ## Compliance Certifications (New Requirement)
 
-For each tool, explicitly list the following compliance certifications as a yes/no array:
-- HIPAA
-- GDPR
-- SOC 2
-- PII
-- CCPA
-- (add others as needed)
-
-Example:
-
 "compliance_certifications": {
-  "HIPAA": "Yes",
-  "GDPR": "No",
-  "SOC 2": "Yes",
-  "PII": "Yes",
-  "CCPA": "No"
-}
+    "HIPAA": {
+      "status": "Certified | In Progress or | Conditionally Compliant | Not Applicable | No",
+      "details": "Brief explanation of status, limitations, or conditions",
+      "evidence": "BAA available | Self-attestation | Third-party audit | Documentation review",
+      "limitations": "Enterprise only | Specific use cases | Geographic restrictions | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+
+    },
+    "GDPR": {
+      "status": "Certified | In Progress or | Conditionally Compliant | Not Applicable | No",
+      "details": "Brief explanation of status, limitations, or conditions",
+      "evidence": "DPA available | Privacy policy compliant | Legal opinion | Self-attestation",
+      "limitations": "EU data residency required | Specific plan tiers | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+
+    "SOC_2": {
+      "status": "Type II | Type I | In Progress or | Conditionally Compliant | No",
+      "details": "Type II completed, Type I for new services",
+      "evidence": "Public report | Customer portal | Attestation letter | Third-party verification",
+      "limitations": "Specific services only | Annual renewal pending | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+    },
+    "ISO_27001": {
+      "status": "Certified | In Progress or | Conditionally Compliant | Not Applicable | No",
+      "details": "Certification expected Q2 2025",
+      "evidence": "Certificate | Audit report | Self-assessment | Roadmap documentation",
+      "limitations": "Specific business units | Geographic scope | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+    },
+    "PCI_DSS": {
+      "status": "Level 1 | Level 2 | Level 3 | Level 4 | In Progress or | Not Applicable | No",
+      "details": "Level 1 Service Provider certification",
+      "evidence": "AOC available | Self-assessment | Third-party assessment",
+      "limitations": "Payment processing only | Specific integrations | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+    },
+    "CCPA": {
+      "status": "Compliant | In Progress or | Conditionally Compliant | Not Applicable | No",
+      "details": "Privacy policy updated for CCPA requirements",
+      "evidence": "Privacy policy | DPA addendum | Legal review | Self-attestation",
+      "limitations": "California residents only | Specific data types | etc.",
+      "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"
+    },
+    "FedRAMP": {
+      "status": "Authorized | In Process | Conditionally Compliant | Not Applicable | No",
+      "details": "FedRAMP Moderate authorization in progress or",
+      "evidence": "ATO letter | 3PAO assessment | Self-attestation | Documentation review",
+      "limitations": "Government use only | Specific cloud environments | etc.",
+     "last_verified": "The Date of Certified or None or In Progress or | Annual renewal or Ongoing compliance or  validity time frame ex (3-year validity) or In Progress or None | End of validity or None or Expected date of completion"  
+    }
+  },
 
 If a certification is not present, mark it as 'No'.
 

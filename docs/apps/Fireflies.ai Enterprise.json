@@ -2,60 +2,75 @@
   "name": "Fireflies.ai Enterprise",
   "vendor": "Fireflies.ai",
   "license_type": "Enterprise",
-  "total_score": 20,
+  "total_score": 18,
   "risk_level": "LOW RISK",
-  "data_storage_score": 6,
+  "data_storage_score": 5,
   "training_usage_score": 0,
-  "access_controls_score": 5,
-  "compliance_score": 7,
+  "access_controls_score": 2,
+  "compliance_score": 9,
   "vendor_transparency_score": 2,
-  "summary_and_recommendation": "Fireflies.ai Enterprise presents low risk with comprehensive enterprise controls, strong compliance framework, and no data training usage. The Enterprise plan addresses all major security concerns found in the free version through admin controls, audit capabilities, SSO integration, HIPAA compliance, and custom data retention. Recommended for enterprise use with proper configuration of admin controls and retention policies.",
+  "compliance_certifications": {
+    "HIPAA": "Yes",
+    "GDPR": "Yes",
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Partial"
+  },
+  "summary_and_recommendation": "Fireflies.ai Enterprise presents low risk with strong data protection guarantees, comprehensive enterprise controls, and excellent compliance framework. The Enterprise plan addresses security concerns through private storage options, SSO integration, HIPAA compliance with BAA availability, and custom data retention policies. Key strengths include contractual guarantees against AI training usage and end-to-end encryption. Recommended for enterprise use with proper configuration of admin controls and retention policies.",
   "primary_use_case": "Meeting transcription and note-taking",
   "data_classification": "Internal Communications",
   "category": "Productivity/Collaboration",
   "assessed_by": "AI Security Council",
   "confidence": 0.8,
-  "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "Assessment based on publicly available documentation and pricing page features. Good transparency from vendor with detailed security documentation. Enterprise features clearly documented but detailed configuration guides require customer account access.",
+  "documentation_tier": "Tier 2: Private enterprise documentation",
+  "assessment_notes": "Assessment based on publicly available documentation, security blog posts, and enterprise feature specifications. Good transparency from vendor with detailed security documentation and compliance certifications. Enterprise-specific features clearly documented though detailed configuration requires customer account access.",
   
   "azure_permissions": {
     "required_permissions": [
       "calendar.read",
       "meetings.join",
-      "audio.record"
+      "audio.record",
+      "teams.meetingrecording.write"
     ],
     "recommended_restrictions": [
-      "Configure SSO integration",
-      "Enable audit logging",
-      "Set custom data retention policies",
-      "Configure admin controls for sensitive meetings"
+      "Configure SSO integration with Azure AD",
+      "Enable audit logging and monitoring",
+      "Implement custom data retention policies aligned with organizational requirements",
+      "Configure Rules Engine for automated meeting governance",
+      "Enable Private Storage for sensitive data"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Configure Super Admin role and user groups",
-      "description": "Implement proper organizational hierarchy with Super Admin oversight and appropriate user group management",
+      "title": "Implement Private Storage for sensitive meetings",
+      "description": "Configure Private Storage option available in Enterprise plan to maintain complete data ownership and control over sensitive meeting content",
+      "priority": "high",
+      "category": "data_protection"
+    },
+    {
+      "title": "Configure SSO and user provisioning",
+      "description": "Integrate with enterprise identity management system using SSO capabilities and Super Admin role for centralized user management",
       "priority": "high",
       "category": "access_control"
     },
     {
-      "title": "Enable SSO and SCIM provisioning",
-      "description": "Integrate with enterprise identity management system for centralized user management and authentication",
-      "priority": "high",
-      "category": "access_control"
+      "title": "Set up Rules Engine for meeting governance",
+      "description": "Implement automated rules for meeting recording, transcription, and access based on meeting sensitivity and participant roles",
+      "priority": "medium",
+      "category": "governance"
     },
     {
       "title": "Configure custom data retention policies",
-      "description": "Set appropriate retention periods based on organizational needs and compliance requirements",
+      "description": "Establish retention periods aligned with organizational compliance requirements using Enterprise plan's custom retention features",
       "priority": "medium",
-      "category": "data_management"
+      "category": "compliance"
     },
     {
-      "title": "Implement Rules Engine for meeting governance",
-      "description": "Configure automated rules for meeting recording, transcription, and access based on meeting sensitivity",
-      "priority": "medium",
-      "category": "governance"
+      "title": "Establish BAA for HIPAA compliance",
+      "description": "Execute Business Associate Agreement with Fireflies for any meetings involving protected health information",
+      "priority": "high",
+      "category": "compliance"
     }
   ],
   
@@ -67,41 +82,47 @@
     },
     {
       "url": "https://fireflies.ai/pricing",
-      "title": "Pricing & Plans",
+      "title": "Enterprise Plans & Pricing",
       "last_updated": "2024-12-04"
+    },
+    {
+      "url": "https://fireflies.ai/blog/security-at-fireflies-ai",
+      "title": "Security at Fireflies.ai",
+      "last_updated": "2025-02-20"
+    },
+    {
+      "url": "https://fireflies.ai/blog/is-fireflies-ai-safe",
+      "title": "SOC 2 Type II Compliance Update",
+      "last_updated": "2024-05-20"
     },
     {
       "url": "https://fireflies.ai/blog/the-top-15-frequently-asked-questions-about-fireflies-security-2",
       "title": "Top 15 Security Questions",
-      "last_updated": "2024-12-04"
-    },
-    {
-      "url": "https://fireflies.ai/hipaa",
-      "title": "HIPAA Compliance",
       "last_updated": "2024-12-04"
     }
   ],
   
   "detailed_assessment": {
     "tool_name": "Fireflies.ai Enterprise",
-    "final_risk_score": 20,
+    "final_risk_score": 18,
     "final_risk_category": "LOW RISK",
-    "summary_and_recommendation": "Fireflies.ai Enterprise presents low risk with comprehensive enterprise controls, strong compliance framework, and no data training usage. The Enterprise plan addresses all major security concerns found in the free version through admin controls, audit capabilities, SSO integration, HIPAA compliance, and custom data retention. Recommended for enterprise use with proper configuration of admin controls and retention policies.",
+    "compliance_summary": "Fireflies.ai Enterprise is SOC 2 Type II, GDPR, and HIPAA compliant with BAA availability. Strong compliance framework with regular audits and certifications. CCPA compliance implied through GDPR alignment but not explicitly documented.",
+    "summary_and_recommendation": "Fireflies.ai Enterprise presents low risk with strong data protection guarantees, comprehensive enterprise controls, and excellent compliance framework. The Enterprise plan addresses security concerns through private storage options, SSO integration, HIPAA compliance with BAA availability, and custom data retention policies. Key strengths include contractual guarantees against AI training usage and end-to-end encryption. Recommended for enterprise use with proper configuration of admin controls and retention policies.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 6,
+        "category_score": 5,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Data stored in US cloud infrastructure by default with enterprise options for private storage and preferred location storage on Enterprise plan."
+            "justification": "Known secure regions (US, EU) with contracts - Data stored in US AWS data centers by default with Private Storage option available for Enterprise customers providing additional geographic control and data ownership."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Uses 256-bit AES encryption for meeting notes and transcripts at rest, and TLS encryption for data in transit."
+            "justification": "Enterprise-Grade Encryption - End-to-end encryption with AES-256 at rest and 256-bit SSL/TLS in transit. Data stored in encrypted AWS S3 buckets with comprehensive encryption specifications documented."
           },
           "data_retention": {
             "score": 0,
-            "justification": "Customer-Controlled Retention - No data retention OR customer controls all retention periods OR immediate deletion available on demand - Enterprise plan includes custom data retention policies allowing organizations to set their own retention periods and deletion procedures."
+            "justification": "Customer-Controlled Retention - Enterprise plan includes custom data retention policies allowing organizations to set their own retention periods and deletion procedures. Users maintain control over data deletion at any time."
           }
         }
       },
@@ -110,41 +131,41 @@
         "criteria": {
           "model_training": {
             "score": 0,
-            "justification": "Contractual guarantee of no training use - Fireflies has a 0-day data retention policy with all vendors with access to user content, ensuring none of your data is used for training AI models."
+            "justification": "Contractual guarantee of no training use - Fireflies maintains a 0-day data retention policy with all vendors and has signed BAAs ensuring customer data is never used for AI model training purposes."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Clear policy that user data is not shared with third parties for training purposes and has contractual guarantees with processing vendors."
+            "justification": "No third-party sharing - Clear contractual guarantees that user data is not shared with third parties for training purposes. All vendor relationships include BAAs preventing data use for training."
           }
         }
       },
       "access_controls": {
-        "category_score": 5,
+        "category_score": 2,
         "criteria": {
           "admin_management": {
             "score": 0,
-            "justification": "Full Enterprise Controls - Centralized admin dashboard + user provisioning/deprovisioning + role-based permissions + group management + domain verification - Enterprise plan includes Super Admin role, user groups, team analytics for admins, and comprehensive organizational management features."
+            "justification": "Full Enterprise Controls - Enterprise plan includes Super Admin role, user groups, team analytics for admins, comprehensive organizational management features, and centralized user provisioning/deprovisioning capabilities."
           },
           "audit_capabilities": {
             "score": 2,
-            "justification": "Good Auditing - Activity logs available + basic reporting + some user tracking capabilities - Enterprise plan includes team analytics and admin oversight capabilities, though detailed audit log specifications not fully documented in public materials."
+            "justification": "Good Auditing - Enterprise plan includes team analytics, admin oversight capabilities, and activity tracking. While comprehensive, detailed audit log specifications and real-time monitoring capabilities not fully documented in public materials."
           },
           "integration": {
             "score": 0,
-            "justification": "Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration + API access for enterprise management - Enterprise plan explicitly includes SSO integration and API access for enterprise management."
+            "justification": "Full Enterprise Integration - Enterprise plan explicitly includes SSO integration with SAML/OIDC support, API access for enterprise management, and integration with enterprise identity management systems."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 7,
+        "category_score": 9,
         "criteria": {
           "regulatory_violations": {
-            "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - SOC 2 Type II and GDPR compliant with documented HIPAA compliance available through BAA. Some gaps in broader certification portfolio (ISO 27001 not mentioned)."
+            "score": 6,
+            "justification": "Partially Compliant - SOC 2 Type II, GDPR, and HIPAA compliant with documented certifications and BAA availability. However, lacks broader certification portfolio (ISO 27001 planned but not yet achieved) and some regulatory gaps in comprehensive compliance framework."
           },
           "data_processing_transparency": {
             "score": 2,
-            "justification": "Basic Transparency - General data processing description + retention periods stated + some third-party relationships disclosed - Clear documentation of data processing, retention policies, and third-party relationships available."
+            "justification": "Basic Transparency - Clear documentation of data processing practices, retention policies, and third-party relationships. Good transparency about vendor relationships and data handling practices, though some technical implementation details require enterprise customer access."
           }
         }
       },
@@ -153,7 +174,7 @@
         "criteria": {
           "documentation_and_support": {
             "score": 2,
-            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports - Comprehensive security documentation, detailed blog posts, clear privacy policies, and dedicated account manager support for Enterprise customers."
+            "justification": "Good Documentation - Comprehensive security documentation including detailed blog posts, clear privacy policies, security whitepapers, and dedicated account manager support for Enterprise customers. Regular security updates and transparent communication about compliance status."
           }
         }
       }
@@ -161,8 +182,8 @@
     "use_case_multiplier_applied": {
       "use_case": "Internal Communications",
       "data_classification": "Internal Communications",
-      "base_score": 23,
-      "final_score_with_multiplier": 23
+      "base_score": 18,
+      "final_score_with_multiplier": 18
     }
   }
 }

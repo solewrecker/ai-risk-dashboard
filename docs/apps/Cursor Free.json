@@ -9,24 +9,35 @@
   "access_controls_score": 16,
   "compliance_score": 3,
   "vendor_transparency_score": 2,
+  "compliance_certifications": {
+    "HIPAA": "No",
+    "GDPR": "Yes", 
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Yes"
+  },
   "summary_and_recommendation": "Medium risk tool that can be used with standard enterprise controls. Privacy Mode provides strong data protection guarantees, but Free tier lacks enterprise management features. Recommend upgrading to Business/Enterprise plan for organizational use or implementing compensating controls.",
   "primary_use_case": "Internal IT/Development",
   "data_classification": "Trade Secrets/IP",
   "category": "AI Code Editor",
-  "assessed_by": "AI Security Council", 
+  "assessed_by": "AI Security Council",
   "confidence": 0.8,
   "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "High confidence assessment based on comprehensive public documentation including detailed security page, privacy policies, and trust center. Limited by lack of private enterprise documentation for Free tier.",
+  "assessment_notes": "High confidence assessment based on comprehensive public documentation. Limited by lack of enterprise-specific documentation for Free tier. Recent security incidents involving fake packages highlight supply chain risks.",
   
   "azure_permissions": {
     "required_permissions": [
       "network.outbound.allow",
-      "application.install.allow"
+      "application.install.allow",
+      "file.read.allow",
+      "file.write.allow"
     ],
     "recommended_restrictions": [
-      "Monitor network traffic to api2.cursor.sh",
-      "Ensure Privacy Mode is enabled",
-      "Block installation on sensitive systems without approval"
+      "Block network access to non-Cursor domains",
+      "Enforce Privacy Mode configuration",
+      "Monitor code exfiltration attempts",
+      "Restrict installation to approved devices only",
+      "Implement network traffic monitoring"
     ]
   },
   
@@ -40,20 +51,20 @@
     {
       "title": "Consider Business/Enterprise Upgrade",
       "description": "For organizational deployment, upgrade to Business or Enterprise plan for admin controls, SSO, and audit capabilities",
-      "priority": "high", 
+      "priority": "high",
       "category": "governance"
     },
     {
-      "title": "Network Monitoring",
-      "description": "Monitor network traffic to Cursor domains to ensure compliance with privacy policies",
-      "priority": "medium",
-      "category": "monitoring"
+      "title": "Supply Chain Security Controls",
+      "description": "Implement verification of installer authenticity and dependency checking due to recent security incidents targeting Cursor users",
+      "priority": "high",
+      "category": "security"
     },
     {
-      "title": "User Training",
-      "description": "Train users on Privacy Mode settings and data handling best practices",
-      "priority": "medium",
-      "category": "training"
+      "title": "Network Monitoring and Isolation",
+      "description": "Monitor all network traffic to Cursor endpoints and implement network isolation controls to prevent unauthorized data transmission.",
+      "priority": "high",
+      "category": "monitoring"
     }
   ],
   
@@ -61,7 +72,7 @@
     {
       "url": "https://cursor.com/en/security",
       "title": "Cursor Security Documentation",
-      "last_updated": "2025-06-18"
+      "last_updated": "2025-01-15"
     },
     {
       "url": "https://trust.cursor.com/",
@@ -69,9 +80,14 @@
       "last_updated": "2025-01-01"
     },
     {
-      "url": "https://docs.cursor.com/account/teams/sso",
-      "title": "Cursor SSO Documentation",
-      "last_updated": "2025-01-01"
+      "url": "https://forum.cursor.com/t/code-privacy-and-security-measures/5892",
+      "title": "Cursor Community Privacy Discussion",
+      "last_updated": "2024-06-20"
+    },
+    {
+      "url": "https://ai-cursor.com/data-privacy/",
+      "title": "Cursor AI Data Privacy Security Guide",
+      "last_updated": "2025-06-01"
     }
   ],
   
@@ -79,6 +95,7 @@
     "tool_name": "Cursor Free",
     "final_risk_score": 49,
     "final_risk_category": "MEDIUM RISK",
+    "compliance_summary": "SOC 2 Type II certified with annual penetration testing. Privacy policy compliant with GDPR, CCPA, and general PII protection requirements. Lacks explicit HIPAA certification and specialized healthcare compliance documentation.",
     "summary_and_recommendation": "Medium risk tool suitable for development work with proper controls. Privacy Mode provides strong data protection, but Free tier lacks enterprise management features essential for organizational deployment.",
     "assessment_details": {
       "data_storage_and_security": {
@@ -86,15 +103,15 @@
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Infrastructure primarily hosted on AWS with servers in US, some latency-critical servers in Tokyo and London regions. Clear documentation of data residency."
+            "justification": "Known secure regions (US, EU) with contracts - Infrastructure primarily hosted on AWS with servers in US and some latency-critical servers in Tokyo and London. Clear documentation of data residency but limited contractual control in Free tier."
           },
           "encryption_standards": {
             "score": 4,
-            "justification": "Basic Encryption - TLS encryption in transit + standard encryption at rest + limited encryption details published - Security documentation mentions encryption practices but lacks detailed specifications of encryption standards and key management."
+            "justification": "Basic Encryption - TLS encryption in transit + standard encryption at rest + limited encryption details published. Security documentation mentions encryption practices but lacks detailed specifications of encryption standards, key management procedures, and customer key control options."
           },
           "data_retention": {
             "score": 6,
-            "justification": "Extended Retention - Long retention periods documented (>90 days, ≤1 year) + deletion procedures available - Privacy Mode guarantees zero retention, but non-privacy mode has extended retention periods. Account deletion available with 30-day guarantee."
+            "justification": "Extended Retention - Privacy Mode guarantees zero retention with contractual backing. Non-privacy mode has extended retention periods (>90 days) with account deletion available but 30-day processing window. Lack of granular retention controls for different data types."
           }
         }
       },
@@ -103,11 +120,11 @@
         "criteria": {
           "model_training": {
             "score": 5,
-            "justification": "Opt-out available with clear process - Privacy Mode provides contractual guarantee of no training use. When Privacy Mode is disabled, data may be used for model training, but opt-out is clearly available."
+            "justification": "Opt-out available with clear process - Privacy Mode provides contractual guarantee of no training use with zero retention agreements with AI providers (OpenAI, Anthropic, Google, xAI). When Privacy Mode disabled, data may be used for training but clear opt-out available."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Zero data retention agreements with all AI model providers (OpenAI, Anthropic, Google, xAI). Clear documentation that third-party LLMs see but don't retain data when Privacy Mode is enabled."
+            "justification": "No third-party sharing - Zero data retention agreements with all AI model providers. Clear documentation that third-party LLMs process but don't retain data when Privacy Mode enabled. No data sharing with marketing or analytics partners."
           }
         }
       },
@@ -116,15 +133,15 @@
         "criteria": {
           "admin_management": {
             "score": 8,
-            "justification": "No Admin Oversight - Individual accounts only + no organizational visibility + no centralized management - Free tier provides individual accounts with no enterprise admin controls or organizational visibility."
+            "justification": "No Admin Oversight - Free tier provides individual accounts only with no enterprise admin controls, organizational visibility, or centralized management. No ability to enforce policies, manage users, or oversee organizational usage."
           },
           "audit_capabilities": {
             "score": 7,
-            "justification": "No Audit Capabilities - No activity logs OR logs not accessible to administrators OR no usage tracking - Free tier lacks audit capabilities or usage tracking accessible to administrators."
+            "justification": "No Audit Capabilities - Free tier lacks audit logs, usage tracking, or activity monitoring accessible to administrators. No compliance reporting capabilities or user activity oversight for enterprise governance."
           },
           "integration": {
             "score": 5,
-            "justification": "No Enterprise Integration - Username/password only + no SSO + no enterprise identity management - Free tier lacks SSO and enterprise identity management features."
+            "justification": "No Enterprise Integration - Free tier lacks SSO, SCIM provisioning, Active Directory integration, or enterprise identity management. Username/password authentication only with no enterprise authentication methods."
           }
         }
       },
@@ -133,11 +150,11 @@
         "criteria": {
           "regulatory_violations": {
             "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - SOC 2 Type II certified with annual penetration testing, but lacks some specialized compliance certifications."
+            "justification": "Mostly Compliant - SOC 2 Type II certified with annual penetration testing and security assessments. Privacy policy compliant with major regulations but lacks specialized compliance certifications (HIPAA, FedRAMP, PCI-DSS). Some gaps in specialized industry requirements."
           },
           "data_processing_transparency": {
             "score": 0,
-            "justification": "Full Transparency - Published data flow diagrams + specific data processing locations + detailed retention schedules + clear third-party processor list - Comprehensive security documentation with detailed data flow, processing locations, and complete subprocessor list."
+            "justification": "Full Transparency - Comprehensive security documentation with detailed data flow diagrams, specific processing locations, retention schedules, and complete subprocessor list. Clear documentation of AI model integrations and data handling procedures."
           }
         }
       },
@@ -146,16 +163,16 @@
         "criteria": {
           "documentation_and_support": {
             "score": 2,
-            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports - Comprehensive public security documentation, clear privacy policies, trust center with SOC 2 certification, and commitment to transparency reporting."
+            "justification": "Good Documentation - Comprehensive public security documentation, clear privacy policies, trust center with SOC 2 certification, and active community support. Regular security updates and transparency about data handling practices. Some limitations in enterprise-specific documentation for Free tier."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
       "use_case": "Internal IT/Development",
-      "data_classification": "Trade Secrets/IP", 
-      "base_score": 39,
-      "final_score_with_multiplier": 49
+      "data_classification": "Trade Secrets/IP",
+      "base_score": 49,
+      "final_score_with_multiplier": 61
     }
   }
 }

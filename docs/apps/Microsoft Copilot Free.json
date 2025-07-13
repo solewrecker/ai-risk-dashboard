@@ -1,156 +1,207 @@
 {
-  "name": "GitHub Copilot Free",
-  "vendor": "GitHub (Microsoft)",
-  "license_type": "Free Tier",
-  "total_score": 34,
-  "risk_level": "LOW RISK",
-  "data_storage_score": 11,
-  "training_usage_score": 5,
-  "access_controls_score": 8,
-  "compliance_score": 8,
-  "vendor_transparency_score": 2,
-  "summary_and_recommendation": "GitHub Copilot Free scores 34 (Low Risk). While it lacks enterprise admin controls typical of free tiers, strong encryption, opt-out capabilities, comprehensive documentation, and clear data handling practices make it suitable for general development use. The vendor transparency and compliance posture are strong for an established enterprise vendor.",
-  "primary_use_case": "Code completion and AI-assisted development",
-  "data_classification": "Source code and development context",
-  "category": "Development Tools",
+  "name": "Microsoft Copilot Free",
+  "vendor": "Microsoft Corporation",
+  "license_type": "Free",
+  "total_score": 70,
+  "risk_level": "HIGH RISK",
+  "data_storage_score": 18,
+  "training_usage_score": 15,
+  "access_controls_score": 20,
+  "compliance_score": 9,
+  "vendor_transparency_score": 8,
+  "compliance_certifications": {
+    "HIPAA": {
+      "status": "Not Applicable",
+      "details": "Free consumer version does not include HIPAA compliance features",
+      "evidence": "Microsoft documentation indicates HIPAA compliance only for enterprise M365 Copilot versions",
+      "limitations": "Consumer version excluded from healthcare compliance",
+      "last_verified": "January 2025 | Consumer version explicitly excluded from healthcare compliance frameworks"
+    },
+    "GDPR": {
+      "status": "Conditionally Compliant",
+      "details": "Microsoft privacy policy addresses GDPR requirements but limited controls in free version",
+      "evidence": "Privacy policy compliant",
+      "limitations": "Limited data subject rights in free version",
+      "last_verified": "January 2025 | Ongoing compliance"
+    },
+    "SOC_2": {
+      "status": "No",
+      "details": "SOC 2 Type II certification applies to enterprise services, not free consumer version",
+      "evidence": "Documentation review",
+      "limitations": "Enterprise services only",
+      "last_verified": "January 2025 | Not applicable for free version"
+    },
+    "ISO_27001": {
+      "status": "No",
+      "details": "ISO 27001 certification applies to Microsoft's enterprise infrastructure, not free consumer products",
+      "evidence": "Documentation review",
+      "limitations": "Enterprise services only",
+      "last_verified": "January 2025 | Not applicable for free version"
+    },
+    "PCI_DSS": {
+      "status": "Not Applicable",
+      "details": "Free version does not process payment information",
+      "evidence": "Service description review",
+      "limitations": "Not applicable to AI chat service",
+      "last_verified": "January 2025 | Not applicable"
+    },
+    "CCPA": {
+      "status": "Conditionally Compliant",
+      "details": "Microsoft privacy policy addresses CCPA requirements with limited user control in free version",
+      "evidence": "Privacy policy",
+      "limitations": "Limited data deletion and control options",
+      "last_verified": "January 2025 | Ongoing compliance"
+    },
+    "FedRAMP": {
+      "status": "Not Applicable",
+      "details": "Consumer version not designed for government use",
+      "evidence": "Product documentation review",
+      "limitations": "Consumer service only",
+      "last_verified": "January 2025 | Not applicable to consumer version"
+    }
+  },
+  "summary_and_recommendation": "Microsoft Copilot Free scores 70 (HIGH RISK) due to lack of enterprise controls, unclear training data usage for free version, and limited compliance certifications. Recommend blocking for any business use containing sensitive data. Consider enterprise version for organizational use.",
+  "primary_use_case": "General productivity assistance and content generation",
+  "data_classification": "Public/Marketing Data",
+  "category": "AI Assistant/Content Generation",
   "assessed_by": "AI Security Council",
-  "confidence": 0.7,
-  "documentation_tier": "Tier 2: Private enterprise documentation available",
-  "assessment_notes": "Good public documentation with detailed security whitepapers. Some gaps in free tier specific policies requiring inference from Individual tier documentation.",
+  "confidence": 0.6,
+  "documentation_tier": "Tier 1: Public Only",
+  "assessment_notes": "Confidence limited due to lack of specific documentation for free consumer version. Assessment based on publicly available privacy policies and general Microsoft enterprise documentation. Significant gaps in enterprise-specific controls and compliance for free version.",
   
   "azure_permissions": {
     "required_permissions": [
-      "Code editor access",
-      "Repository read access",
-      "Internet connectivity to GitHub services"
+      "user.read",
+      "profile.read"
     ],
     "recommended_restrictions": [
-      "Configure content exclusions for sensitive repositories",
-      "Disable training data sharing in settings",
-      "Enable public code matching filter"
+      "Block access to confidential data repositories",
+      "Implement content filtering policies",
+      "Monitor usage patterns for sensitive queries"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Configure Privacy Settings",
-      "description": "Immediately configure GitHub Copilot settings to opt-out of data sharing for training purposes and enable content exclusions for sensitive repositories",
+      "title": "Block for sensitive data processing",
+      "description": "Free version lacks enterprise controls and compliance certifications required for business data",
       "priority": "high",
-      "category": "privacy"
-    },
-    {
-      "title": "Enable Public Code Filter",
-      "description": "Enable the public code matching filter to prevent suggestions that match existing public code repositories",
-      "priority": "medium",
-      "category": "compliance"
-    },
-    {
-      "title": "Monitor Usage Patterns",
-      "description": "Implement monitoring to track which repositories and file types are being accessed by Copilot",
-      "priority": "medium",
       "category": "security"
+    },
+    {
+      "title": "Consider Microsoft 365 Copilot for business use",
+      "description": "Enterprise version provides better data protection, compliance, and administrative controls",
+      "priority": "medium",
+      "category": "alternative"
+    },
+    {
+      "title": "User education required",
+      "description": "If allowing limited personal use, educate users on data handling and privacy implications",
+      "priority": "medium",
+      "category": "training"
     }
   ],
   
   "sources": [
     {
-      "url": "https://resources.github.com/learn/pathways/copilot/essentials/how-github-copilot-handles-data/",
-      "title": "GitHub Copilot Data Pipeline Security",
-      "last_updated": "2024-12-01"
+      "url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy",
+      "title": "Data, Privacy, and Security for Microsoft 365 Copilot",
+      "last_updated": "2024-03-01"
     },
     {
-      "url": "https://resources.github.com/copilot-trust-center/",
-      "title": "GitHub Copilot Trust Center",
-      "last_updated": "2024-11-15"
+      "url": "https://support.microsoft.com/en-us/office/copilot-in-microsoft-365-apps-for-home-your-data-and-privacy-6f0d8d80-f4bb-4c9f-989e-64a4adfd62e5",
+      "title": "Copilot in Microsoft 365 apps for home: your data and privacy",
+      "last_updated": "2024-01-15"
     },
     {
-      "url": "https://github.com/features/copilot",
-      "title": "GitHub Copilot Features and Pricing",
-      "last_updated": "2024-12-18"
+      "url": "https://learn.microsoft.com/en-us/copilot/privacy-and-protections",
+      "title": "Microsoft 365 Copilot Chat Privacy and Protections",
+      "last_updated": "2024-01-10"
     }
   ],
   
   "detailed_assessment": {
-    "tool_name": "GitHub Copilot Free",
-    "final_risk_score": 34,
-    "final_risk_category": "LOW RISK",
-    "summary_and_recommendation": "GitHub Copilot Free presents low risk for enterprise use. Strong vendor transparency, clear data handling practices, and established compliance posture from Microsoft/GitHub offset the limited admin controls typical of free tier offerings.",
+    "tool_name": "Microsoft Copilot Free",
+    "final_risk_score": 70,
+    "final_risk_category": "HIGH RISK",
+    "compliance_summary": "Free version lacks enterprise compliance certifications. Limited GDPR/CCPA compliance through general Microsoft privacy policy but no enterprise-grade controls or certifications.",
+    "summary_and_recommendation": "HIGH RISK tool unsuitable for business use due to lack of enterprise controls, unclear training data policies for free version, and missing compliance certifications. Recommend blocking for sensitive data and consider enterprise alternative.",
     "assessment_details": {
       "data_storage_and_security": {
-        "category_score": 11,
+        "category_score": 18,
         "criteria": {
           "geographic_control": {
-            "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - GitHub operates in Microsoft Azure regions with clear geographic presence in secure jurisdictions. While traffic routing is capacity-based, the underlying infrastructure operates within established secure regions with contractual protections."
+            "score": 6,
+            "justification": "Free version provides limited geographic control information. Data processed in Microsoft global infrastructure with unclear specific residency guarantees for free users."
           },
           "encryption_standards": {
-            "score": 2,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications. GitHub provides comprehensive encryption documentation and follows enterprise security standards."
+            "score": 4,
+            "justification": "Microsoft implements enterprise-grade encryption (AES-256) across infrastructure, but free version lacks detailed encryption specifications and customer control options available in enterprise versions."
           },
           "data_retention": {
-            "score": 6,
-            "justification": "Extended Retention - Long retention periods documented (>90 days, ≤1 year) + deletion procedures available. Code editor prompts are discarded immediately, but engagement data is retained for up to 2 years with clear deletion procedures available."
+            "score": 8,
+            "justification": "Free version has unclear and potentially extended data retention policies. Consumer versions typically retain data longer than enterprise versions with limited user control over deletion timing, falling into the 'very long retention' category."
           }
         }
       },
       "training_data_usage": {
-        "category_score": 5,
+        "category_score": 15,
         "criteria": {
           "model_training": {
-            "score": 5,
-            "justification": "Opt-out available with clear process - GitHub Copilot Individual subscribers (including Free tier) can opt-out of sharing prompts with GitHub for training purposes. Clear documentation exists on how to configure this setting, though default behavior may include training use."
+            "score": 15,
+            "justification": "Microsoft's documentation indicates that interaction data may be used for model training by default in the consumer version, though users can opt-out through privacy settings. The opt-out process exists but requires user action, placing this in the 'default training use with difficult opt-out' category."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Documentation confirms that data is processed within GitHub-owned Microsoft Azure tenants and is not shared with external third parties for purposes other than the service provision."
+            "justification": "Microsoft's privacy policy indicates no broad third-party sharing of user data. Data processing is limited to Microsoft and its controlled subsidiaries with clear disclosure of any data sharing arrangements."
           }
         }
       },
       "access_controls": {
-        "category_score": 8,
+        "category_score": 20,
         "criteria": {
           "admin_management": {
             "score": 8,
-            "justification": "No Admin Oversight - GitHub Copilot Free operates as individual accounts only with no organizational visibility or centralized management capabilities. No enterprise admin dashboard available for the free tier."
+            "justification": "Free version provides no enterprise admin controls. Individual consumer accounts only with no organizational visibility or centralized management capabilities."
           },
           "audit_capabilities": {
-            "score": 0,
-            "justification": "Comprehensive Auditing - GitHub provides detailed activity logs, usage tracking, and comprehensive audit capabilities through the GitHub platform, including real-time monitoring of Copilot usage and code suggestions."
+            "score": 7,
+            "justification": "Free version lacks comprehensive audit capabilities. Limited activity history available to individual users but no enterprise-grade logging or compliance reporting."
           },
           "integration": {
-            "score": 0,
-            "justification": "Full Enterprise Integration - GitHub Copilot integrates with major IDEs (VS Code, Visual Studio, JetBrains), supports SSO through GitHub accounts, and provides API access for enterprise management through GitHub's platform."
+            "score": 5,
+            "justification": "Free version lacks enterprise integration features. No SSO, SCIM provisioning, or Active Directory integration. Limited to individual Microsoft account authentication."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 8,
+        "category_score": 9,
         "criteria": {
           "regulatory_violations": {
-            "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements. Microsoft/GitHub maintains SOC 2 compliance and GDPR/CCPA compliance, though free tier may lack specialized industry certifications."
+            "score": 6,
+            "justification": "Free version lacks enterprise compliance certifications (SOC 2, ISO 27001, HIPAA). Basic privacy policy compliance but no business-grade regulatory protections or BAA availability."
           },
           "data_processing_transparency": {
-            "score": 5,
-            "justification": "Opaque Processing - Vague processing descriptions OR missing retention policies OR undisclosed third-party relationships. While GitHub provides general processing information, specific data flow details and exact subprocessor relationships could be more comprehensively documented."
+            "score": 3,
+            "justification": "Microsoft provides reasonable transparency about data processing in general terms, but free version lacks detailed data flow documentation and specific processing location information."
           }
         }
       },
       "vendor_transparency": {
-        "category_score": 2,
+        "category_score": 8,
         "criteria": {
           "documentation_and_support": {
-            "score": 2,
-            "justification": "Good Documentation - Clear privacy policy + basic security documentation + responsive support + annual transparency reports. GitHub provides comprehensive public documentation, detailed security whitepapers, and maintains transparency reporting typical of established enterprise vendors."
+            "score": 8,
+            "justification": "Free version documentation is limited and generic. Lacks enterprise-specific security whitepapers, detailed privacy controls, and responsive business support. Consumer support has slower response times and limited security detail."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Internal IT/Development",
-      "data_classification": "Source code and development context",
-      "base_score": 41,
-      "final_score_with_multiplier": 34
+      "use_case": "General productivity assistance and content generation",
+      "data_classification": "Public/Marketing Data",
+      "base_score": 45,
+      "final_score_with_multiplier": 41
     }
   }
 }

@@ -1,22 +1,29 @@
 {
   "name": "Claude.ai Enterprise",
   "vendor": "Anthropic",
-  "license_type": "Enterprise Commercial License",
-  "total_score": 6,
+  "license_type": "Enterprise",
+  "total_score": 3,
   "risk_level": "LOW RISK",
   "data_storage_score": 3,
   "training_usage_score": 0,
   "access_controls_score": 0,
-  "compliance_score": 3,
+  "compliance_score": 0,
   "vendor_transparency_score": 0,
-  "summary_and_recommendation": "Claude.ai Enterprise presents LOW RISK for enterprise use with comprehensive security controls and administrative features. Anthropic provides strong data protection, no training use guarantees, full enterprise controls including SSO/SCIM, and transparent security practices. Recommended for general enterprise use including sensitive data processing with appropriate governance frameworks. Consider custom data retention controls for regulated industries.",
+  "compliance_certifications": {
+    "HIPAA": "Yes",
+    "GDPR": "Yes",
+    "SOC 2": "Yes",
+    "PII": "Yes",
+    "CCPA": "Yes"
+  },
+  "summary_and_recommendation": "Claude.ai Enterprise presents LOW RISK for enterprise use with comprehensive security controls, verified compliance certifications, and strong administrative features. Anthropic provides contractual guarantees against training use, full enterprise controls including SSO/SCIM, comprehensive audit capabilities, and maintains SOC 2 Type I/II and HIPAA certifications. The tool offers customer-controlled data retention and enterprise-grade encryption. Recommended for general enterprise use including regulated industries. Ideal for organizations requiring strong compliance posture and data governance.",
   "primary_use_case": "Enterprise AI assistance and knowledge management",
   "data_classification": "Business/Internal Data",
   "category": "Enterprise AI/ML Tool",
   "assessed_by": "AI Security Council",
-  "confidence": 0.8,
-  "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "High confidence assessment based on comprehensive public documentation from Anthropic's enterprise pages, privacy center, and recent product announcements. Some gaps in specific technical compliance certification details that would require vendor engagement for Tier 2 assessment.",
+  "confidence": 0.9,
+  "documentation_tier": "Tier 2: Public + Private Documentation",
+  "assessment_notes": "Very high confidence assessment based on comprehensive public documentation, verified compliance certifications (SOC 2, HIPAA), and availability of enterprise documentation through Trust Center. Minor geographic control uncertainty for some regions, but overall excellent security posture.",
   
   "azure_permissions": {
     "required_permissions": [
@@ -25,30 +32,31 @@
     ],
     "recommended_restrictions": [
       "Enforce SSO authentication",
-      "Enable audit logging",
+      "Enable comprehensive audit logging",
       "Implement role-based access controls",
-      "Configure custom data retention policies"
+      "Configure custom data retention policies",
+      "Enable domain capture for organizational control"
     ]
   },
   
   "recommendations": [
     {
-      "title": "Implement Full Enterprise Controls",
-      "description": "Deploy SSO integration, configure role-based access controls, and establish audit logging to maximize security benefits of enterprise tier",
+      "title": "Deploy Full Enterprise Security Stack",
+      "description": "Implement SSO/SCIM integration, configure role-based permissions, enable comprehensive audit logging, and establish domain capture to maximize security benefits of enterprise tier",
       "priority": "high",
       "category": "security_controls"
     },
     {
-      "title": "Configure Custom Data Retention",
-      "description": "Set organization-specific data retention periods using Claude Enterprise's custom retention controls to meet regulatory requirements",
-      "priority": "medium",
+      "title": "Establish Data Governance Framework",
+      "description": "Configure custom data retention policies, implement data classification guidelines, and establish clear usage policies for different data types including regulated data",
+      "priority": "high",
       "category": "data_governance"
     },
     {
-      "title": "Establish Usage Governance",
-      "description": "Create internal policies for Claude Enterprise usage, including data classification guidelines and approved use cases",
+      "title": "Leverage Compliance Certifications",
+      "description": "Utilize Anthropic's SOC 2 and HIPAA certifications for regulatory compliance efforts and obtain BAA for healthcare use cases",
       "priority": "medium",
-      "category": "governance"
+      "category": "compliance"
     }
   ],
   
@@ -64,32 +72,38 @@
       "last_updated": "2024"
     },
     {
-      "url": "https://privacy.anthropic.com/en/articles/10458704-how-does-anthropic-protect-the-personal-data-of-claude-ai-users",
-      "title": "Anthropic Data Protection Practices",
+      "url": "https://support.anthropic.com/en/articles/7996892-do-you-have-a-soc-2-or-hipaa-certifications",
+      "title": "Anthropic SOC 2 and HIPAA Certifications",
+      "last_updated": "2024"
+    },
+    {
+      "url": "https://trust.anthropic.com/updates",
+      "title": "Anthropic Trust Center",
       "last_updated": "2024"
     }
   ],
   
   "detailed_assessment": {
     "tool_name": "Claude.ai Enterprise",
-    "final_risk_score": 6,
+    "final_risk_score": 3,
     "final_risk_category": "LOW RISK",
-    "summary_and_recommendation": "Claude.ai Enterprise presents LOW RISK for enterprise use with comprehensive security controls and administrative features. Anthropic provides strong data protection, no training use guarantees, full enterprise controls including SSO/SCIM, and transparent security practices. Recommended for general enterprise use including sensitive data processing with appropriate governance frameworks. Consider custom data retention controls for regulated industries.",
+    "compliance_summary": "This tool is fully compliant with SOC 2 Type I/II, HIPAA, and GDPR requirements. Anthropic maintains comprehensive compliance certifications and provides Business Associate Agreements for commercial customers.",
+    "summary_and_recommendation": "Claude.ai Enterprise presents LOW RISK for enterprise use with comprehensive security controls, verified compliance certifications, and strong administrative features. Anthropic provides contractual guarantees against training use, full enterprise controls including SSO/SCIM, comprehensive audit capabilities, and maintains SOC 2 Type I/II and HIPAA certifications. The tool offers customer-controlled data retention and enterprise-grade encryption. Recommended for general enterprise use including regulated industries. Ideal for organizations requiring strong compliance posture and data governance.",
     "assessment_details": {
       "data_storage_and_security": {
         "category_score": 3,
         "criteria": {
           "geographic_control": {
             "score": 3,
-            "justification": "Known secure regions (US, EU) with contracts - Anthropic is US-based with documented security practices and enterprise customers can establish specific data processing agreements including geographic controls through commercial contracts."
+            "justification": "Known secure regions (US, EU) with contracts - Anthropic is US-based with documented security practices and enterprise customers can establish specific data processing agreements including geographic controls through commercial contracts. While not explicitly documented for all regions, enterprise contracts provide geographic control options."
           },
           "encryption_standards": {
             "score": 0,
-            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications - Anthropic documents comprehensive encryption practices with 'Your data is automatically encrypted both while in transit, and stored (at rest)' with industry-standard encryption protocols."
+            "justification": "Enterprise-Grade Encryption - AES-256 encryption at rest and in transit + vendor-managed keys + published encryption specifications. Anthropic documents comprehensive encryption practices with industry-standard AES-256 encryption both in transit and at rest, with detailed security specifications available through their Trust Center."
           },
           "data_retention": {
             "score": 0,
-            "justification": "Customer-Controlled Retention - No data retention OR customer controls all retention periods OR immediate deletion available on demand - Claude Enterprise provides custom data retention controls where organizations can 'Set custom data retention periods for your organization's chats and projects' with full customer control."
+            "justification": "Customer-Controlled Retention - Claude Enterprise provides custom data retention controls where organizations can set specific retention periods for chats and projects, with options for immediate deletion and full customer control over data lifecycle. This includes the ability to configure organization-wide retention policies."
           }
         }
       },
@@ -98,11 +112,11 @@
         "criteria": {
           "model_training": {
             "score": 0,
-            "justification": "Contractual guarantee of no training use - Anthropic explicitly states 'By default, we will not use your Claude for Work data to train our models' with contractual guarantees for enterprise customers that prevent any training use of customer data."
+            "justification": "Contractual guarantee of no training use - Anthropic provides explicit contractual guarantees for enterprise customers that customer data will not be used for AI model training. This is documented in their enterprise agreements and privacy policies, with clear opt-out protections that are automatically applied to enterprise accounts."
           },
           "data_sharing": {
             "score": 0,
-            "justification": "No third-party sharing - Anthropic's enterprise documentation confirms no sharing of customer data with third parties, with dedicated enterprise security controls protecting company data."
+            "justification": "No third-party sharing - Anthropic's enterprise documentation explicitly states no sharing of customer data with third parties. Enterprise customers have dedicated security controls and contractual protections preventing any third-party data sharing without explicit consent."
           }
         }
       },
@@ -111,28 +125,28 @@
         "criteria": {
           "admin_management": {
             "score": 0,
-            "justification": "Full Enterprise Controls - Centralized admin dashboard + user provisioning/deprovisioning + role-based permissions + group management + domain verification - Claude Enterprise provides 'Role-based access with fine-grained permissioning' with 'Single primary owner of a workspace for security and information management' and domain capture capabilities."
+            "justification": "Full Enterprise Controls - Claude Enterprise provides centralized admin dashboard with comprehensive user provisioning/deprovisioning, role-based permissions with fine-grained controls, group management capabilities, and domain verification features. Administrators have complete visibility and control over organizational usage."
           },
           "audit_capabilities": {
             "score": 0,
-            "justification": "Comprehensive Auditing - Real-time activity logs + exportable reports + user action tracking + data access logs + compliance reporting features - Claude Enterprise includes 'Audit logs' that 'Trace system activities for security and compliance monitoring' with comprehensive activity tracking."
+            "justification": "Comprehensive Auditing - Claude Enterprise includes comprehensive audit logs that trace all system activities for security and compliance monitoring. This includes real-time activity logging, exportable compliance reports, detailed user action tracking, and data access logs suitable for regulatory compliance requirements."
           },
           "integration": {
             "score": 0,
-            "justification": "Full Enterprise Integration - SAML/OIDC SSO + SCIM provisioning + Active Directory integration + API access for enterprise management - Claude Enterprise supports 'Single sign-on (SSO) and domain capture' plus 'System for Cross-domain Identity Management (SCIM)' for automated user provisioning and enterprise identity management."
+            "justification": "Full Enterprise Integration - Claude Enterprise supports complete SAML/OIDC SSO integration, SCIM provisioning for automated user management, Active Directory integration, and API access for enterprise management. The platform provides full enterprise identity management capabilities with automated user lifecycle management."
           }
         }
       },
       "compliance_and_legal_risk": {
-        "category_score": 3,
+        "category_score": 0,
         "criteria": {
           "regulatory_violations": {
-            "score": 3,
-            "justification": "Mostly Compliant - Basic compliance certifications + privacy policy compliant with major regulations + some gaps in specialized requirements - Anthropic maintains enterprise-grade security with Business Associate Agreements available for commercial customers and supports regulatory requirements like GDPR, though specific third-party compliance certifications (SOC 2, ISO 27001) are not detailed in public documentation."
+            "score": 0,
+            "justification": "Fully Compliant - Anthropic maintains SOC 2 Type I and Type II certifications, HIPAA compliance with Business Associate Agreements available, GDPR Article 28 compliance documentation, and comprehensive regulatory compliance framework. The company provides verified third-party compliance certifications and maintains a Trust Center for compliance documentation access."
           },
           "data_processing_transparency": {
             "score": 0,
-            "justification": "Full Transparency - Published data flow diagrams + specific data processing locations + detailed retention schedules + clear third-party processor list - Anthropic provides comprehensive transparency with detailed data processing documentation, clear retention policies, and explicit statements about third-party relationships for enterprise customers."
+            "justification": "Full Transparency - Anthropic provides comprehensive data processing transparency through their Trust Center, including detailed data flow documentation, specific retention schedules, clear third-party processor relationships, and transparent data processing practices. Enterprise customers receive detailed data processing agreements with full transparency."
           }
         }
       },
@@ -141,16 +155,16 @@
         "criteria": {
           "documentation_and_support": {
             "score": 0,
-            "justification": "Comprehensive Documentation - Published security whitepaper + detailed privacy policy + incident response procedures + regular transparency reports + responsive support (replies within 48 hours) - Anthropic provides extensive public documentation through their privacy center, enterprise security documentation, and dedicated enterprise support channels with comprehensive transparency about their practices."
+            "justification": "Comprehensive Documentation - Anthropic provides extensive security documentation through their Trust Center, detailed privacy policies and procedures, comprehensive incident response documentation, and dedicated enterprise support channels. The company maintains high transparency standards with responsive enterprise support and regular compliance reporting."
           }
         }
       }
     },
     "use_case_multiplier_applied": {
-      "use_case": "Internal IT/Development",
+      "use_case": "Enterprise AI assistance and knowledge management",
       "data_classification": "Business/Internal Data",
-      "base_score": 6,
-      "final_score_with_multiplier": 6
+      "base_score": 3,
+      "final_score_with_multiplier": 3
     }
   }
 }

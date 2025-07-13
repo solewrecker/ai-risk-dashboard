@@ -1,7 +1,7 @@
 {
   "name": "ChatGPT Free",
   "vendor": "OpenAI",
-  "license_type": "Free/Consumer",
+  "license_type": "Free",
   "total_score": 70,
   "risk_level": "HIGH RISK",
   "data_storage_score": 18,
@@ -10,56 +10,106 @@
   "compliance_score": 2,
   "vendor_transparency_score": 10,
   "compliance_certifications": {
-    "HIPAA": "No",
-    "GDPR": "Yes",
-    "SOC_2": "Yes",
-    "PII": "Yes",
-    "CCPA": "Yes"
+    "HIPAA": {
+      "status": "No",
+      "details": "ChatGPT Free does not offer HIPAA compliance. Business Associate Agreements (BAAs) are only available for enterprise customers.",
+      "evidence": "Public documentation review, no BAA available for free tier",
+      "limitations": "HIPAA compliance requires enterprise subscription",
+      "last_verified": "None"
+    },
+    "GDPR": {
+      "status": "Conditionally Compliant",
+      "details": "OpenAI has documented GDPR compliance measures including data subject rights, lawful basis for processing, and privacy controls. However, free tier users have limited control over data processing.",
+      "evidence": "Privacy policy compliant | Data Processing Agreement available",
+      "limitations": "Enhanced controls require enterprise subscription",
+      "last_verified": "2024-01-31 | Ongoing compliance"
+    },
+    "SOC_2": {
+      "status": "Type II",
+      "details": "OpenAI maintains SOC 2 Type II compliance with annual audits covering security, availability, and confidentiality",
+      "evidence": "Public attestation | Third-party audit reports",
+      "limitations": "Report details not publicly available",
+      "last_verified": "2024 | Annual renewal"
+    },
+    "ISO_27001": {
+      "status": "No",
+      "details": "OpenAI does not currently hold ISO 27001 certification",
+      "evidence": "Documentation review",
+      "limitations": "No certification available",
+      "last_verified": "None"
+    },
+    "PCI_DSS": {
+      "status": "Not Applicable",
+      "details": "ChatGPT Free does not process payment card data directly",
+      "evidence": "Service assessment",
+      "limitations": "Not applicable to service function",
+      "last_verified": "Not Applicable"
+    },
+    "CCPA": {
+      "status": "Compliant",
+      "details": "Privacy policy includes CCPA-compliant data subject rights including access, deletion, and opt-out mechanisms",
+      "evidence": "Privacy policy | Data deletion controls available",
+      "limitations": "California residents only",
+      "last_verified": "2024-01-31 | Ongoing compliance"
+    },
+    "FedRAMP": {
+      "status": "No",
+      "details": "OpenAI does not currently hold FedRAMP authorization",
+      "evidence": "Documentation review",
+      "limitations": "No government authorization available",
+      "last_verified": "None"
+    }
   },
-  "compliance_summary": "OpenAI maintains SOC 2 Type 2 compliance and has documented GDPR compliance measures. However, ChatGPT Free lacks HIPAA compliance and enterprise-specific compliance controls.",
-  "summary_and_recommendation": "BLOCK for enterprise use. ChatGPT Free poses significant risks due to default training data usage (with opt-out available but not prominent), lack of enterprise admin controls, indefinite data retention, and no organizational oversight capabilities. Suitable only for public content generation with explicit training opt-out enabled.",
-  "primary_use_case": "General conversational AI assistant",
-  "data_classification": "Public/Marketing Data only",
+  "summary_and_recommendation": "BLOCK for enterprise use. ChatGPT Free poses significant risks due to default training data usage (opt-out available but requires user action), lack of enterprise admin controls, indefinite data retention by default, and no organizational oversight capabilities. Suitable only for public content generation with explicit training opt-out enabled and careful data handling practices.",
+  "primary_use_case": "General conversational AI assistant for personal use",
+  "data_classification": "Public/Marketing Data only - NOT suitable for sensitive or proprietary data",
   "category": "Generative AI - Text",
   "assessed_by": "AI Security Council",
   "confidence": 0.8,
   "documentation_tier": "Tier 1: Public Only",
-  "assessment_notes": "High confidence based on comprehensive public documentation and help center articles. Limited enterprise-specific documentation available for free tier users.",
+  "assessment_notes": "High confidence assessment based on comprehensive public documentation from OpenAI Help Center, privacy policies, and enterprise documentation. Limited enterprise-specific documentation available for free tier users. Assessment reflects current data handling practices as of 2024-2025.",
   
   "azure_permissions": {
     "required_permissions": [
-      "No specific Azure permissions - web-based service"
+      "No specific Azure permissions - web-based service accessed via browser"
     ],
     "recommended_restrictions": [
-      "Block network access to chat.openai.com",
-      "Implement URL filtering for ChatGPT domains",
-      "Monitor for data exfiltration attempts",
-      "Deploy DLP policies to detect sensitive data uploads"
+      "Block network access to chat.openai.com and *.openai.com domains",
+      "Implement URL filtering for OpenAI domains",
+      "Deploy DLP policies to detect and block sensitive data uploads",
+      "Monitor for potential data exfiltration attempts",
+      "Implement network-level blocking via firewall rules"
     ]
   },
   
   "recommendations": [
     {
       "title": "Block ChatGPT Free for Enterprise Use",
-      "description": "The free version lacks enterprise controls and uses data for training by default. Block access and direct users to approved alternatives or enterprise-grade solutions.",
+      "description": "The free version lacks enterprise controls, uses data for training by default, and provides no organizational oversight. Block access and direct users to approved enterprise alternatives.",
       "priority": "critical",
       "category": "access_control"
     },
     {
       "title": "Implement Network-Level Blocking",
-      "description": "Use firewall rules and web filtering to block access to chat.openai.com and related domains for enterprise networks.",
+      "description": "Use firewall rules, web filtering, and DNS blocking to prevent access to chat.openai.com and related domains from enterprise networks.",
       "priority": "high",
       "category": "security"
     },
     {
-      "title": "User Education and Training",
-      "description": "Educate users about the risks of using free AI tools with corporate data, emphasizing training data usage and lack of enterprise controls.",
+      "title": "Deploy Data Loss Prevention (DLP) Policies",
+      "description": "Implement DLP solutions to detect and prevent sensitive data uploads to AI services, including pattern recognition for proprietary information.",
+      "priority": "high",
+      "category": "data_protection"
+    },
+    {
+      "title": "User Education Program",
+      "description": "Educate users about risks of using free AI tools with corporate data, emphasizing training data usage, retention policies, and lack of enterprise controls.",
       "priority": "high",
       "category": "governance"
     },
     {
       "title": "Evaluate Enterprise Alternatives",
-      "description": "Consider OpenAI's enterprise offerings or other enterprise-grade AI solutions that provide proper data controls and admin oversight.",
+      "description": "Consider OpenAI's Team/Enterprise offerings or other enterprise-grade AI solutions that provide proper data controls, admin oversight, and compliance features.",
       "priority": "medium",
       "category": "governance"
     }
@@ -77,8 +127,13 @@
       "last_updated": "2024"
     },
     {
-      "url": "https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance",
-      "title": "How Your Data is Used to Improve Model Performance",
+      "url": "https://help.openai.com/en/articles/8983778-chat-and-file-retention-policies-in-chatgpt",
+      "title": "Chat and File Retention Policies in ChatGPT",
+      "last_updated": "2024"
+    },
+    {
+      "url": "https://help.openai.com/en/articles/8983130-what-if-i-want-to-keep-my-history-on-but-disable-model-training",
+      "title": "Disable Model Training While Keeping History",
       "last_updated": "2024"
     },
     {
@@ -92,23 +147,23 @@
     "tool_name": "ChatGPT Free Version",
     "final_risk_score": 70,
     "final_risk_category": "HIGH RISK",
-    "compliance_summary": "OpenAI maintains SOC 2 Type 2 compliance and has documented GDPR compliance measures. However, ChatGPT Free lacks HIPAA compliance and enterprise-specific compliance controls.",
-    "summary_and_recommendation": "BLOCK for enterprise use. ChatGPT Free poses significant risks due to default training data usage (with opt-out available but not prominent), lack of enterprise admin controls, indefinite data retention, and no organizational oversight capabilities. Suitable only for public content generation with explicit training opt-out enabled.",
+    "compliance_summary": "OpenAI maintains SOC 2 Type II compliance and has documented GDPR and CCPA compliance measures. However, ChatGPT Free lacks HIPAA compliance, ISO 27001 certification, and enterprise-specific compliance controls required for regulated industries.",
+    "summary_and_recommendation": "BLOCK for enterprise use. ChatGPT Free poses significant risks due to default training data usage (opt-out available but requires user action), lack of enterprise admin controls, indefinite data retention by default, and no organizational oversight capabilities. Suitable only for public content generation with explicit training opt-out enabled and careful data handling practices.",
     "assessment_details": {
       "data_storage_and_security": {
         "category_score": 18,
         "criteria": {
           "geographic_control": {
             "score": 6,
-            "justification": "External servers, unclear location - OpenAI operates globally with servers in multiple jurisdictions. While enterprise plans mention data residency controls, free tier users have no geographic control options and limited visibility into data processing locations."
+            "justification": "External servers, unclear location - OpenAI operates globally with servers in multiple jurisdictions including US and international locations. Free tier users have no geographic control options and limited visibility into specific data processing locations. Enterprise plans offer some data residency controls but not available for free users."
           },
           "encryption_standards": {
             "score": 2,
-            "justification": "Enterprise-Grade Encryption - OpenAI documentation confirms AES-256 encryption at rest and TLS 1.2+ encryption in transit. Published encryption specifications are available and meet enterprise standards."
+            "justification": "Enterprise-Grade Encryption - OpenAI implements AES-256 encryption at rest and TLS 1.2+ encryption in transit. Published encryption specifications are available and meet enterprise standards. Encryption practices are well-documented and regularly audited as part of SOC 2 compliance."
           },
           "data_retention": {
             "score": 10,
-            "justification": "Indefinite/Unclear Retention - Chat history is retained indefinitely by default unless manually deleted by users. While the policy is clearly stated and deleted chats are hard deleted within 30 days, the default behavior is indefinite retention with no automatic deletion policies for active conversations."
+            "justification": "Indefinite/Unclear Retention - Chat history is retained indefinitely by default unless manually deleted by users. While deleted conversations are removed within 30 days, the default behavior is indefinite retention with no automatic deletion policies. Users must actively manage deletion, and there are no organizational retention policies available for free accounts."
           }
         }
       },
@@ -117,11 +172,11 @@
         "criteria": {
           "model_training": {
             "score": 15,
-            "justification": "Default training use with difficult opt-out - ChatGPT Free uses conversations for model training by default. While OpenAI now provides opt-out options through settings (Data Controls > Improve the model for everyone), this is not prominently presented during onboarding and requires user action to disable."
+            "justification": "Default training use with difficult opt-out - ChatGPT Free uses conversations for model training by default. While OpenAI now provides opt-out options through Settings > Data Controls > 'Improve the model for everyone' toggle, this is not prominently presented during onboarding and requires user action to disable. The opt-out is available but not default behavior."
           },
           "data_sharing": {
             "score": 5,
-            "justification": "Broad sharing or unclear sharing practices - OpenAI's privacy policy mentions sharing with service providers and for legal compliance. While some third-party relationships are disclosed, the free tier lacks detailed transparency about specific data sharing arrangements."
+            "justification": "Broad sharing or unclear sharing practices - OpenAI's privacy policy mentions sharing with service providers, affiliates, and for legal compliance. While some third-party relationships are disclosed, the free tier lacks detailed transparency about specific data sharing arrangements and subprocessor agreements that enterprise customers receive."
           }
         }
       },
@@ -130,15 +185,15 @@
         "criteria": {
           "admin_management": {
             "score": 8,
-            "justification": "No Admin Oversight - ChatGPT Free provides individual accounts only with no organizational visibility, centralized management capabilities, admin dashboard, or user provisioning. Organizations cannot manage employee access or monitor usage."
+            "justification": "No Admin Oversight - ChatGPT Free provides individual accounts only with no organizational visibility, centralized management capabilities, admin dashboard, or user provisioning. Organizations cannot manage employee access, monitor usage, or enforce policies. No enterprise account management features available."
           },
           "audit_capabilities": {
             "score": 7,
-            "justification": "No Audit Capabilities - Free version provides no activity logs accessible to administrators, no usage tracking for organizations, and no audit trail capabilities. Individual users can see their own history but organizations have no oversight."
+            "justification": "No Audit Capabilities - Free version provides no activity logs accessible to administrators, no usage tracking for organizations, and no audit trail capabilities. Individual users can see their own conversation history but organizations have no oversight, monitoring, or reporting capabilities."
           },
           "integration": {
             "score": 5,
-            "justification": "No Enterprise Integration - ChatGPT Free requires username/password authentication only, with no SSO support, no enterprise identity management integration, and no API access for enterprise management or provisioning."
+            "justification": "No Enterprise Integration - ChatGPT Free requires individual username/password authentication only, with no SSO support, no enterprise identity management integration, no SCIM provisioning, and no API access for enterprise management. All authentication is individual account-based."
           }
         }
       },
@@ -147,11 +202,11 @@
         "criteria": {
           "regulatory_violations": {
             "score": 0,
-            "justification": "Fully Compliant - OpenAI maintains SOC 2 Type 2 compliance, has documented GDPR compliance measures, and provides Business Associate Agreements for enterprise customers. The company demonstrates strong regulatory compliance frameworks."
+            "justification": "Fully Compliant - OpenAI maintains SOC 2 Type II compliance with annual audits, has documented GDPR compliance measures including data subject rights, and provides Business Associate Agreements for enterprise customers. The company demonstrates strong regulatory compliance frameworks and has no recent violations."
           },
           "data_processing_transparency": {
             "score": 2,
-            "justification": "Basic Transparency - OpenAI provides general data processing descriptions and retention periods with some third-party relationships disclosed. However, the free tier lacks detailed data flow diagrams and specific subprocessor information that enterprise users typically require."
+            "justification": "Basic Transparency - OpenAI provides general data processing descriptions, retention periods, and some third-party relationships disclosed in privacy documentation. However, the free tier lacks detailed data flow diagrams, specific subprocessor information, and comprehensive transparency reports that enterprise users typically require."
           }
         }
       },
@@ -160,7 +215,7 @@
         "criteria": {
           "documentation_and_support": {
             "score": 10,
-            "justification": "No Transparency - While OpenAI provides extensive documentation for enterprise products and general privacy policies, the free tier has extremely limited security documentation specific to individual users, no dedicated support (community forums only), and lacks enterprise-specific transparency reports or direct communication channels."
+            "justification": "No Transparency - While OpenAI provides extensive documentation for enterprise products and general privacy policies, the free tier has extremely limited security documentation specific to individual users, no dedicated support channels (community forums only), lacks enterprise-specific transparency reports, and provides no direct communication channels for security inquiries."
           }
         }
       }
