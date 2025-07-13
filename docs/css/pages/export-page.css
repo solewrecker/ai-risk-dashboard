@@ -1,5 +1,352 @@
 /* docs/css/pages/export-page.css */
 
+/* === BASE STYLES === */
+:root {
+    --risk-color: #3b82f6;
+    --risk-degrees: 180deg;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #1e293b; /* Dark text for light background */
+    background: #f8fafc; /* Light background */
+}
+
+.report-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.report-main {
+    padding: 2rem;
+}
+
+/* === HEADER (BEM) === */
+.report-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.report-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50px, -50px);
+}
+
+.report-header__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.report-header__title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.report-header__subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+}
+
+.report-header__tool-highlight {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1.5rem auto; /* Center highlight block */
+    max-width: 400px; /* Limit width */
+}
+
+.report-header__tool-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.report-header__tool-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.report-header__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+}
+
+/* Risk Level Color Variables */
+.risk-low {
+    --risk-color: #10b981;
+    --risk-color-light: #34d399;
+}
+
+.risk-medium {
+    --risk-color: #f59e0b;
+    --risk-color-light: #fbbf24;
+}
+
+.risk-high {
+    --risk-color: #ef4444;
+    --risk-color-light: #f87171;
+}
+
+.risk-critical {
+    --risk-color: #dc2626;
+    --risk-color-light: #ef4444;
+}
+
+/* === REPORT COMPONENTS === */
+.report-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.report-badge--risk-low {
+    background-color: var(--risk-color-light); /* Use light variable for background */
+    color: var(--risk-color);
+}
+
+.report-badge--risk-medium {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+.report-badge--risk-high {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+.report-badge--risk-critical {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+/* === INSIGHTS GRID (BEM) === */
+.report-insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.report-insight-card {
+    background: #ffffff; /* White background for insights */
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.report-insight-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.report-insight-card__icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--risk-color);
+    /* Use dynamic risk color */
+}
+
+.report-insight-card__content {
+    flex-grow: 1;
+}
+
+.report-insight-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b; /* Dark slate text */
+    margin-bottom: 0.5rem;
+}
+
+.report-insight-card__value {
+    font-size: 0.875rem;
+    color: #475569; /* Slate 600 */
+    line-height: 1.5;
+}
+
+/* === RECOMMENDATIONS (BEM) === */
+.report-recommendations {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #f8fafc; /* Light background */
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+.report-recommendations__heading {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b; /* Dark slate text */
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 2.5rem; /* Space for icon */
+}
+
+.report-recommendations__heading::before {
+    content: '✨'; /* Sparkle icon */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+}
+
+.report-recommendations__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.report-recommendations__item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.report-recommendations__item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.report-recommendations__bullet {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--risk-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 1rem;
+    margin-top: 0.25rem; /* Align with text */
+}
+
+.report-recommendations__text {
+    font-size: 0.95rem;
+    color: #475569; /* Slate 600 */
+    line-height: 1.6;
+}
+
+/* === BREAKDOWN CATEGORIES (BEM) === */
+.report-breakdown-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.report-breakdown-card {
+    background: #ffffff; /* White background for breakdown cards */
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.report-breakdown-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.report-breakdown-card__header {
+    background: var(--risk-color-light);
+    color: var(--risk-color);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-breakdown-card__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.report-breakdown-card__content {
+    padding: 1.5rem;
+}
+
+.report-breakdown-card__item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.report-breakdown-card__item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.report-breakdown-card__item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.report-breakdown-card__item-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b; /* Dark slate text */
+}
+
+.report-breakdown-card__score {
+    font-weight: 700;
+    color: var(--risk-color);
+}
+
+.report-breakdown-card__note {
+    font-size: 0.85rem;
+    color: #475569; /* Slate 600 */
+    line-height: 1.5;
+}
+
+/* Existing styles below */
+
 .export-hub {
     display: flex;
     flex-direction: column;
@@ -173,4 +520,123 @@
 }
 #assessment-selector::-webkit-scrollbar-thumb:hover {
     background: var(--color-gray-500);
+} 
+
+/* === REPORT RESULTS (BEM) === */
+.report-results-card {
+    background: white; /* Changed to white for report */
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-top: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.report-results-card.active {
+    display: block;
+}
+
+.report-modern-results-container {
+    padding: 2rem; /* Consistent padding */
+}
+
+.report-results-header {
+    background: linear-gradient(90deg, var(--risk-color) 0%, var(--risk-color-light) 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem 0.75rem 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.report-results-header::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.report-results-header__tool-title-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.report-results-header__tool-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: white;
+}
+
+.report-results-header__subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.report-score-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin: 2rem 0;
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8fafc; /* Light background for score card */
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+.report-score-card__section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.report-score-card__number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--risk-color);
+    margin-bottom: 0.5rem;
+}
+
+.report-score-card__label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--risk-color);
+    margin-bottom: 0.5rem;
+}
+
+.report-score-card__description {
+    font-size: 0.875rem;
+    color: #475569; /* Slate 600 */
+    max-width: 250px;
+    line-height: 1.5;
+}
+
+.report-score-card__data-source {
+    font-size: 0.75rem;
+    color: #64748b; /* Slate 500 */
+    margin-top: 1rem;
+    font-style: italic;
+}
+
+/* Risk colors for score numbers and labels */
+.report-score-card__number.risk-critical, .report-score-card__label.risk-critical { color: var(--risk-color); }
+.report-score-card__number.risk-high, .report-score-card__label.risk-high { color: var(--risk-color); }
+.report-score-card__number.risk-medium, .report-score-card__label.risk-medium { color: var(--risk-color); }
+.report-score-card__number.risk-low, .report-score-card__label.risk-low { color: var(--risk-color); }
+
+@keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 0.2; }
+    100% { transform: scale(0.8); opacity: 0; }
 } 
