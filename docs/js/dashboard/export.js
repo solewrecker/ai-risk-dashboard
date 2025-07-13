@@ -621,12 +621,13 @@ async function generateHtmlReport() {
         console.log('User before upload:', session?.user);
 
         // Upload to Supabase Storage and get shareable link
-        const fileName = `report-${primaryAssessment.id}.html`;
+        const timestamp = new Date().toISOString().replace(/[:.-]/g, '_'); // Create a clean timestamp
+        const fileName = `report-${primaryAssessment.id}-${timestamp}.html`;
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from('exported-html-reports')
             .upload(fileName, blob, {
                 contentType: 'text/html',
-                upsert: true // Overwrite if file with same name exists
+                upsert: false // Set upsert to false to create new unique files
             });
 
         if (uploadError) {
