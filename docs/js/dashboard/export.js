@@ -517,7 +517,8 @@ async function generateHtmlReport() {
         const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
 
         // --- Inline CSS and JS for self-contained HTML ---// Fetch CSS content
-        const cssResponse = await fetch('css/pages/export-page.css');
+        const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
+        const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
         const cssContent = await cssResponse.text();
 
         // Fetch Lucide Icons JS
