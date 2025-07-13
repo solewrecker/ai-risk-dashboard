@@ -3,8 +3,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // --- Supabase Client ---
-const SUPABASE_URL = 'https://tnrvvgnbfxusqkhjzzqm.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRucnZ2Z25iZnh1c3FraGp6enFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTczNTQzMjYsImV4cCI6MjAzMjkzMDMyNn0.8D93jH2D9g9iHk5s_1_jC2iS6k6pL8sP233f2-z3gJM';
+const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- State ---
@@ -20,21 +20,29 @@ const generateHelpText = document.getElementById('generateHelpText');
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    init();
+    // Listen for authentication state changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+            // User is logged in, proceed to load assessments
+            await loadAssessments();
+            setupEventListeners();
+        } else {
+            // User is not logged in or session expired
+            assessmentSelector.innerHTML = '<p class="text-red-400">You must be logged in to view and export assessments.</p>';
+            generateReportBtn.disabled = true;
+            generateHelpText.textContent = 'Please log in to enable export features.';
+            // Optionally, clear any previously loaded assessments or UI state
+            allAssessments = [];
+            selectedAssessmentIds.clear();
+            renderAssessmentSelector(); // Clear any rendered items
+        }
+    });
 });
 
 async function init() {
-    // Check user session before loading assessments
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-        assessmentSelector.innerHTML = '<p class="text-red-400">You must be logged in to view and export assessments.</p>';
-        generateReportBtn.disabled = true;
-        generateHelpText.textContent = 'Please log in to enable export features.';
-        return;
-    }
-
-    await loadAssessments();
-    setupEventListeners();
+    // init will now be primarily handled by onAuthStateChange
+    // Existing calls to loadAssessments() and setupEventListeners() are removed here
+    // as they are now inside onAuthStateChange.
 }
 
 // --- Data Loading ---
