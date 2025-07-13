@@ -377,12 +377,12 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
                 const displayName = categoryKey.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                 const riskLevelLower = (category.final_risk_category || 'N/A').toLowerCase().replace(' ', '-');
                 categoriesHtml += `
-                    <div class="category-card ${riskLevelLower}">
-                        <div class="category-header">
-                            <h3 class="category-name">${displayName}</h3>
-                            <div class="category-score ${riskLevelLower}">${category.category_score || '0'}</div>
+                    <div class="detailed-breakdown__category-card detailed-breakdown__category-card--${riskLevelLower}">
+                        <div class="detailed-breakdown__category-header">
+                            <h3 class="detailed-breakdown__category-name">${displayName}</h3>
+                            <div class="detailed-breakdown__category-score detailed-breakdown__category-score--${riskLevelLower}">${category.category_score || '0'}</div>
                         </div>
-                        <p class="category-description">${category.summary_and_recommendation || 'No description provided.'}</p>
+                        <p class="detailed-breakdown__category-description">${category.summary_and_recommendation || 'No description provided.'}</p>
                     </div>
                 `;
             }
@@ -397,12 +397,12 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
         if (assessmentData.recommendations && assessmentData.recommendations.length > 0) {
             assessmentData.recommendations.forEach(rec => {
                 recommendationsHtml += `
-                    <div class="recommendation-card priority-${rec.priority}">
-                        <div class="recommendation-header">
-                            <h3 class="recommendation-title">${rec.title || 'N/A'}</h3>
-                            <div class="priority-badge priority-${rec.priority}">${rec.priority || 'N/A'}</div>
+                    <div class="recommendations__card recommendations__card--priority-${rec.priority}">
+                        <div class="recommendations__header">
+                            <h3 class="recommendations__title">${rec.title || 'N/A'}</h3>
+                            <div class="recommendations__priority-badge recommendations__priority-badge--${rec.priority}">${rec.priority || 'N/A'}</div>
                         </div>
-                        <p class="recommendation-text">${rec.description || 'No description provided.'}</p>
+                        <p class="recommendations__text">${rec.description || 'No description provided.'}</p>
                     </div>
                 `;
             });
@@ -419,9 +419,9 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Assessment</th>
-                            <th>Total Score</th>
-                            <th>Risk Level</th>
+                            <th class="comparison-table__header-cell">Assessment</th>
+                            <th class="comparison-table__header-cell">Total Score</th>
+                            <th class="comparison-table__header-cell">Risk Level</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -430,9 +430,9 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
                 const riskLevelLower = (assessment.risk_level || 'N/A').toLowerCase().replace(' ', '-');
                 comparisonHtml += `
                     <tr>
-                        <td>${assessment.name}</td>
-                        <td class="score-cell">${assessment.total_score || '0'}</td>
-                        <td class="risk-cell ${riskLevelLower}">${assessment.risk_level || 'N/A'}</td>
+                        <td class="comparison-table__data-cell">${assessment.name}</td>
+                        <td class="comparison-table__data-cell comparison-table__score-cell">${assessment.total_score || '0'}</td>
+                        <td class="comparison-table__data-cell comparison-table__risk-cell comparison-table__risk-cell--${riskLevelLower}">${assessment.risk_level || 'N/A'}</td>
                     </tr>
                 `;
             });
@@ -441,7 +441,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
                 </table>
             `;
         } else {
-            comparisonHtml = '<p class="text-gray-400">Please select at least two assessments for comparison.</p>';
+            comparisonHtml = '<p class="comparison-table__no-data-message">Please select at least two assessments for comparison.</p>';
         }
         populated = populated.replace(/{{#each allSelectedData}}/g, comparisonHtml);
         populated = populated.replace(/{{\/each}}/g, ''); // Remove the closing Handlebars tag
@@ -560,7 +560,6 @@ function updateUI() {
     sectionsToDisplay.forEach(section => {
         const item = document.createElement('div');
         item.className = 'preview-item';
-        item.style.cssText = 'padding: 0.5rem 0.75rem; background: #252d3d; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.875rem;';
         item.innerHTML = `✓ ${section}`;
         previewSectionsContainer.appendChild(item);
     });

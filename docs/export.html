@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data:;">
     <title>Export Assessments - AI Risk Pro</title>
 
     <!-- Add Supabase Client Library -->
@@ -77,12 +77,12 @@
                         <h3 class="export-step__title">Choose Report Type & Sections</h3>
                     </div>
                     <div class="export-step__content">
-                        <div class="choice-container" style="display: flex; gap: 2rem; align-items: flex-start;">
-                            <div class="choice-section" style="flex: 1;">
-                                <h4 class="choice-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">📋 Quick Select Template</h4>
-                                <p class="choice-subtitle" style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.25rem;">Choose a pre-built template for a standard report.</p>
+                        <div class="export-choice-container">
+                            <div class="export-choice-section">
+                                <h4 class="export-choice-title">📋 Quick Select Template</h4>
+                                <p class="export-choice-subtitle">Choose a pre-built template for a standard report.</p>
                                 
-                                <div class="template-selector quick-select" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="template-selector template-selector--quick-select">
                                     <div class="template-card" data-template="summary">
                                         <i data-lucide="file-text" class="template-card__icon"></i>
                                         <h4 class="template-card__title">Executive Summary</h4>
@@ -104,22 +104,22 @@
                                 </div>
                             </div>
                             
-                            <div class="divider" style="width: 1px; background: #374151; margin: 0 1rem; align-self: stretch;"></div>
+                            <div class="export-divider"></div>
                             
-                            <div class="choice-section" style="flex: 1;">
-                                <h4 class="choice-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">⚙️ Customize Sections</h4>
-                                <p class="choice-subtitle" style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.25rem;">Hand-pick specific sections to build a custom report.</p>
+                            <div class="export-choice-section">
+                                <h4 class="export-choice-title">⚙️ Customize Sections</h4>
+                                <p class="export-choice-subtitle">Hand-pick specific sections to build a custom report.</p>
                                 
-                                <div class="custom-sections" style="background: #252d3d; border: 1px solid #374151; border-radius: 8px; padding: 1rem;">
-                                    <div class="custom-notice" id="custom-notice" style="background: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; color: #9ca3af; font-size: 0.8rem;">
+                                <div class="custom-sections">
+                                    <div class="custom-notice" id="custom-notice">
                                         Select sections below to create a custom report
                                     </div>
                                     
-                                    <div class="mix-match-selector" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="summary"> Executive Summary</label>
-                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
-                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="recommendations"> Recommendations</label>
-                                        <label class="section-toggle" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #374151;"><input type="checkbox" data-section="comparison"> Comparison Table</label>
+                                    <div class="mix-match-selector">
+                                        <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="summary"> Executive Summary</label>
+                                        <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
+                                        <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="recommendations"> Recommendations</label>
+                                        <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="comparison"> Comparison Table</label>
                                     </div>
                                 </div>
                             </div>
@@ -134,17 +134,17 @@
                         <h3 class="export-step__title">Preview</h3>
                     </div>
                     <div class="export-step__content">
-                        <div class="mode-indicator template" id="mode-indicator" style="background: #1f2937; padding: 0.5rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; margin-bottom: 0.75rem; color: #10b981;">
+                        <div class="export-mode-indicator template" id="mode-indicator">
                             📋 Using Executive Summary Template
                         </div>
                         
-                        <div class="preview-panel" style="background: #1a1f2e; border: 1px solid #2d3748; border-radius: 8px; padding: 1.25rem; margin-top: 1.5rem;">
-                            <div class="preview-title" style="font-weight: 600; margin-bottom: 0.75rem; color: #3b82f6;">Your Report Will Include</div>
+                        <div class="export-preview-panel">
+                            <div class="export-preview-title">Your Report Will Include</div>
                             <div id="preview-sections">
                                 <!-- Dynamic sections will be inserted here -->
-                                <div class="preview-item" style="padding: 0.5rem 0.75rem; background: #252d3d; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.875rem;">✓ Executive Summary</div>
+                                <div class="preview-item">✓ Executive Summary</div>
                             </div>
-                            <div class="preview-status" style="color: #9ca3af; font-size: 0.75rem; margin-top: 0.75rem;">
+                            <div class="export-preview-status">
                                 <strong>Executive Summary Template</strong> • Estimated length: 3-4 pages
                             </div>
                         </div>

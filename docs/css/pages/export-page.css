@@ -1284,3 +1284,128 @@ body {
         grid-template-columns: 1fr;
     }
 } 
+
+.risk-badge {
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.risk-badge--low {
+  background-color: #10b981;
+  color: #064e3b;
+}
+
+.risk-badge--medium {
+  background-color: #f59e0b;
+  color: #78350f;
+}
+
+.risk-badge--high {
+  background-color: #ef4444;
+  color: #7f1d1d;
+}
+
+.risk-badge--critical {
+  background-color: #dc2626;
+  color: #7f1d1d;
+}
+
+/* New styles for export.html refactoring */
+.export-choice-container {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.export-choice-section {
+  flex: 1;
+}
+
+.export-choice-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.export-choice-subtitle {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.template-selector--quick-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.export-divider {
+  width: 1px;
+  background: #374151;
+  margin: 0 1rem;
+  align-self: stretch;
+}
+
+.custom-sections {
+  background: #252d3d;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.custom-notice {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.mix-match-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mix-match-selector__section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid #374151;
+}
+
+.export-mode-indicator {
+  background: #1f2937;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: #10b981;
+}
+
+.export-preview-panel {
+  background: #1a1f2e;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.export-preview-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #3b82f6;
+}
+
+.export-preview-status {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  margin-top: 0.75rem;
+} 
