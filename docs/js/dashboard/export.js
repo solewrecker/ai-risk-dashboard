@@ -343,27 +343,37 @@ async function fetchTemplate(templateName) {
 function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
     let populated = html;
 
-    const assessmentData = primaryAssessment.assessment_data || {}; // Get the nested assessment_data object
-
     // General replacements for base template
-    populated = populated.replace(/{{toolName}}/g, assessmentData.formData?.toolName || primaryAssessment.name || 'N/A');
+    populated = populated.replace(/{{toolName}}/g, primaryAssessment.name || 'N/A');
     populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
     populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
     populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
     // Executive Summary Section replacements (if summary section is selected)
     if (sectionsToGenerate.includes('summary-section')) {
-        populated = populated.replace(/{{overallScore}}/g, assessmentData.total_score || '0');
+        populated = populated.replace(/{{overallScore}}/g, primaryAssessment.total_score || '0');
         populated = populated.replace(/{{maxScore}}/g, '100'); // Assuming max score is 100
-        populated = populated.replace(/{{riskLevel}}/g, assessmentData.risk_level || 'N/A');
-        populated = populated.replace(/{{riskLevelLower}}/g, (assessmentData.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
-        populated = populated.replace(/{{riskDescription}}/g, assessmentData.summary_and_recommendation || 'No description provided.');
-        populated = populated.replace(/{{keyStrengths}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No key strengths identified.');
-        populated = populated.replace(/{{areasForImprovement}}/g, assessmentData.detailed_assessment?.summary_and_recommendation || 'No areas for improvement identified.');
+        populated = populated.replace(/{{riskLevel}}/g, primaryAssessment.risk_level || 'N/A');
+        populated = populated.replace(/{{riskLevelLower}}/g, (primaryAssessment.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
+        
+        // Use summary_and_recommendation directly from the primaryAssessment for high-level
+        populated = populated.replace(/{{riskDescription}}/g, primaryAssessment.summary_and_recommendation || 'No description provided.');
 
-        // Findings
-        const findings = assessmentData.detailed_assessment?.summary_and_recommendation ?
-                         assessmentData.detailed_assessment.summary_and_recommendation.split('. ').filter(f => f.trim() !== '') : [];
+        // Key Strengths and Areas for Improvement
+        // These are often derived from the recommendations or the overall summary
+        // For now, let's derive them from the general summary or specific recommendation categories if available
+        const recommendations = primaryAssessment.recommendations || [];
+        const keyStrengths = recommendations.filter(rec => rec.category === 'strength').map(rec => rec.description).join(' ');
+        const areasForImprovement = recommendations.filter(rec => rec.category !== 'strength').map(rec => rec.description).join(' ');
+
+        populated = populated.replace(/{{keyStrengths}}/g, keyStrengths || 'No key strengths identified.');
+        populated = populated.replace(/{{areasForImprovement}}/g, areasForImprovement || 'No areas for improvement identified.');
+
+        // Findings - these are usually specific points derived from the overall summary or detailed assessment
+        // If assessmentData.detailed_assessment?.summary_and_recommendation contains distinct sentences, parse them.
+        // Otherwise, use a fallback.
+        const summaryAndRecommendation = primaryAssessment.detailed_assessment?.summary_and_recommendation || '';
+        const findings = summaryAndRecommendation.split('. ').filter(f => f.trim() !== '');
         
         populated = populated.replace(/{{finding1}}/g, findings[0] || 'No finding 1 provided.');
         populated = populated.replace(/{{finding2}}/g, findings[1] || 'No finding 2 provided.');
@@ -374,12 +384,14 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     // Detailed Breakdown Section replacements
     if (sectionsToGenerate.includes('detailed-breakdown-section')) {
         let categoriesHtml = '';
-        if (assessmentData.detailed_assessment?.assessment_details) {
-            for (const categoryKey in assessmentData.detailed_assessment.assessment_details) {
-                const category = assessmentData.detailed_assessment.assessment_details[categoryKey];
+        if (primaryAssessment.detailed_assessment?.assessment_details) {
+            for (const categoryKey in primaryAssessment.detailed_assessment.assessment_details) {
+                const category = primaryAssessment.detailed_assessment.assessment_details[categoryKey];
                 // Normalize categoryKey for display (e.g., data_storage_and_security to Data Storage and Security)
                 const displayName = categoryKey.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                const riskLevelLower = (category.final_risk_category || 'N/A').toLowerCase().replace(' ', '-');
+                // Ensure risk level is correctly extracted and formatted for class
+                const categoryRiskLevel = category.final_risk_category || primaryAssessment.risk_level || 'N/A';
+                const riskLevelLower = categoryRiskLevel.toLowerCase().replace(' ', '-');
                 categoriesHtml += `
                     <div class="detailed-breakdown__category-card detailed-breakdown__category-card--${riskLevelLower}">
                         <div class="detailed-breakdown__category-header">
@@ -398,8 +410,9 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     // Recommendations Section replacements
     if (sectionsToGenerate.includes('recommendations-section')) {
         let recommendationsHtml = '';
-        if (assessmentData.recommendations && assessmentData.recommendations.length > 0) {
-            assessmentData.recommendations.forEach(rec => {
+        // Use primaryAssessment.recommendations directly
+        if (primaryAssessment.recommendations && primaryAssessment.recommendations.length > 0) {
+            primaryAssessment.recommendations.forEach(rec => {
                 recommendationsHtml += `
                     <div class="recommendations__card recommendations__card--priority-${rec.priority}">
                         <div class="recommendations__header">
