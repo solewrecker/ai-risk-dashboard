@@ -560,7 +560,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     return populated;
 }
 
-async function createPdf(htmlContent) {
+export async function createPdf(htmlContent) {
     const { jsPDF } = window.jspdf;
     
     // Create a temporary container to render the HTML for conversion
