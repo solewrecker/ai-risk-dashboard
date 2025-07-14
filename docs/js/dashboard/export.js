@@ -23,7 +23,7 @@ const quickTemplates = {
     },
     detailed: {
         name: 'Detailed Technical Report',
-        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section', 'compliance-section'], // Added compliance-section
+        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section'], // Example sections
         pages: '8-12 pages'
     },
     comparison: {
@@ -39,12 +39,10 @@ const sectionDisplayNames = {
     detailed: 'Detailed Breakdown',
     recommendations: 'Recommendations',
     comparison: 'Comparison Table',
-    compliance: 'Compliance Status',
     // Add display names for new sections
     'detailed-breakdown-section': 'Detailed Breakdown',
     'recommendations-section': 'Key Recommendations',
-    'comparison-table-section': 'Comparison Table',
-    'compliance-section': 'Compliance Status'
+    'comparison-table-section': 'Comparison Table'
 };
 
 // --- DOM Elements ---
@@ -78,8 +76,8 @@ async function init() {
     if (session) {
         console.log('init(): User session found.', session.user);
         // User is logged in initially
-    await loadAssessments();
-    setupEventListeners();
+        await loadAssessments();
+        setupEventListeners();
     } else {
         console.log('init(): No user session found.');
         // User is not logged in initially
@@ -141,9 +139,9 @@ async function loadAssessments() {
                 }
                 return assessment;
             });
-        parseURLParams();
-        renderAssessmentSelector();
-        updateUI();
+            parseURLParams();
+            renderAssessmentSelector();
+            updateUI();
         } else {
             console.log('loadAssessments(): No data received from Supabase.');
             assessmentSelector.innerHTML = '<p class="text-gray-400">No assessments found.</p>';
@@ -259,7 +257,7 @@ function setupEventListeners() {
                 templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
             }
             updateUI();
-    }
+        }
     });
 }
 
@@ -362,49 +360,55 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
     };
 
     // General replacements for base template
-    populated = populated.replace(/{{toolName}}/g, safeGet(primaryAssessment, 'name'));
-    populated = populated.replace(/{{vendor}}/g, safeGet(primaryAssessment, 'vendor'));
+    populated = populated.replace(/{{toolName}}/g, primaryAssessment.name || 'N/A');
+    populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
     populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
-    populated = populated.replace(/{{assessed_by}}/g, safeGet(primaryAssessment, 'assessed_by'));
-    populated = populated.replace(/{{category}}/g, safeGet(primaryAssessment, 'category'));
-    populated = populated.replace(/{{data_classification}}/g, safeGet(primaryAssessment, 'data_classification'));
-
-    // Footer replacements
-    populated = populated.replace(/{{assessment_notes}}/g, safeGet(primaryAssessment, 'assessment_notes'));
-    populated = populated.replace(/{{documentation_tier}}/g, safeGet(primaryAssessment, 'documentation_tier'));
-    populated = populated.replace(/{{license_type}}/g, safeGet(primaryAssessment, 'license_type'));
-
-    const sourcesList = safeGet(primaryAssessment, 'sources', []).map(s => s.title).join(', ') || 'N/A';
-    populated = populated.replace(/{{sources_list}}/g, sourcesList);
-
-    const azureRequired = safeGet(primaryAssessment, 'azure_permissions.required_permissions', []).join(', ') || 'N/A';
-    populated = populated.replace(/{{azure_permissions_required}}/g, azureRequired);
-
-    const azureRestrictions = safeGet(primaryAssessment, 'azure_permissions.recommended_restrictions', []).join(', ') || 'N/A';
-    populated = populated.replace(/{{azure_permissions_restrictions}}/g, azureRestrictions);
+    populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
 
     // Executive Summary Section replacements
     if (sectionsToGenerate.includes('summary-section')) {
-        populated = populated.replace(/{{overallScore}}/g, safeGet(primaryAssessment, 'total_score', '0'));
-        populated = populated.replace(/{{maxScore}}/g, '100'); // Max score is always 100
-        populated = populated.replace(/{{riskLevel}}/g, safeGet(primaryAssessment, 'risk_level', 'N/A'));
-        populated = populated.replace(/{{riskLevelLower}}/g, (safeGet(primaryAssessment, 'risk_level', 'N/A')).toLowerCase().replace(' ', '-'));
+        populated = populated.replace(/{{overallScore}}/g, primaryAssessment.total_score || '0');
+        populated = populated.replace(/{{maxScore}}/g, '100');
+        populated = populated.replace(/{{riskLevel}}/g, primaryAssessment.risk_level || 'N/A');
+        populated = populated.replace(/{{riskLevelLower}}/g, (primaryAssessment.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
         
-        const summaryText = safeGet(primaryAssessment, 'summary_and_recommendation') ||
-                            safeGet(primaryAssessment, 'detailedAssessment.summary_and_recommendation') ||
-                            'No description provided.';
+        // More robust summary handling, check both locations for summary_and_recommendation
+        const summaryText = primaryAssessment.summary_and_recommendation || // Direct access from primaryAssessment
+                           primaryAssessment.detailedAssessment?.summary_and_recommendation || // Direct access from primaryAssessment
+                           'No description provided.';
         populated = populated.replace(/{{riskDescription}}/g, summaryText);
 
-        populated = populated.replace(/{{primary_use_case}}/g, safeGet(primaryAssessment, 'primary_use_case', 'N/A'));
-        const confidence = safeGet(primaryAssessment, 'confidence', 0) * 100;
-        populated = populated.replace(/{{confidence_percentage}}/g, `${confidence}%`);
+        // Better recommendations handling
+        const recommendations = primaryAssessment.recommendations || []; // Direct access from primaryAssessment
+        const keyStrengths = recommendations
+            .filter(rec => rec?.category === 'strength')
+            .map(rec => rec?.description)
+            .filter(Boolean)
+            .join(' ') || 'No key strengths identified.';
+            
+        const areasForImprovement = recommendations
+            .filter(rec => rec?.category && rec.category !== 'strength')
+            .map(rec => rec?.description)
+            .filter(Boolean)
+            .join(' ') || 'No areas for improvement identified.';
 
+        populated = populated.replace(/{{keyStrengths}}/g, keyStrengths);
+        populated = populated.replace(/{{areasForImprovement}}/g, areasForImprovement);
+
+        // Better findings parsing
+        const summaryForFindings = summaryText !== 'No description provided.' ? summaryText : '';
+        const findings = summaryForFindings.split(/[.!?]+/).filter(f => f.trim().length > 10);
+        
+        for (let i = 1; i <= 4; i++) {
+            const finding = findings[i - 1]?.trim() || `No finding ${i} provided.`;
+            populated = populated.replace(new RegExp(`{{finding${i}}}`, 'g'), finding);
+        }
     }
 
     // Detailed Breakdown Section
     if (sectionsToGenerate.includes('detailed-breakdown-section')) {
         let categoriesHtml = '';
-        const assessmentDetails = safeGet(primaryAssessment, 'detailedAssessment.assessment_details', {});
+        const assessmentDetails = primaryAssessment.detailedAssessment?.assessment_details; // Direct access from primaryAssessment
         
         if (assessmentDetails && typeof assessmentDetails === 'object') {
             for (const [categoryKey, category] of Object.entries(assessmentDetails)) {
@@ -415,26 +419,23 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ');
                     
-                const categoryRiskLevel = safeGet(category, 'final_risk_category') || 
-                                        safeGet(category, 'risk_level') || 
-                                        safeGet(primaryAssessment, 'risk_level') || 
+                const categoryRiskLevel = category.final_risk_category || 
+                                        category.risk_level || 
+                                        primaryAssessment?.risk_level || 
                                         'medium';
                 const riskLevelLower = categoryRiskLevel.toLowerCase().replace(/\s+/g, '-');
                 
                 categoriesHtml += `
-                    <div class="breakdown-category">
-                        <div class="breakdown-category__header" onclick="toggleCategory(this)">
-                            <h3 class="breakdown-category__name">${displayName}</h3>
-                            <div class="breakdown-category__score">
-                                <span class="breakdown-category__score-value">${safeGet(category, 'category_score', '0')}</span>
-                                <button class="breakdown-category__toggle">▼</button>
+                    <div class="detailed-breakdown__category-card detailed-breakdown__category-card--${riskLevelLower}">
+                        <div class="detailed-breakdown__category-header">
+                            <h3 class="detailed-breakdown__category-name">${displayName}</h3>
+                            <div class="detailed-breakdown__category-score detailed-breakdown__category-score--${riskLevelLower}">
+                                ${category.category_score || category.score || '0'}
                             </div>
                         </div>
-                        <div class="breakdown-category__content">
-                            <p class="breakdown-category__description">
-                                ${safeGet(category, 'summary_and_recommendation') || safeGet(category, 'summary') || safeGet(category, 'description') || 'No description provided.'}
-                            </p>
-                        </div>
+                        <p class="detailed-breakdown__category-description">
+                            ${category.summary_and_recommendation || category.summary || category.description || 'No description provided.'}
+                        </p>
                     </div>
                 `;
             }
@@ -442,28 +443,29 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
             categoriesHtml = '<p class="text-gray-400">No detailed breakdown available.</p>';
         }
         
+        // Fix: Use proper regex replacement instead of string replacement
         populated = populated.replace(/{{#each detailedAssessment\.assessment_details}}[\s\S]*?{{\/each}}/g, categoriesHtml);
     }
 
     // Recommendations Section
     if (sectionsToGenerate.includes('recommendations-section')) {
         let recommendationsHtml = '';
-        const recommendations = safeGet(primaryAssessment, 'recommendations', []);
+        const recommendations = primaryAssessment.recommendations; // Direct access from primaryAssessment
         
         if (recommendations && Array.isArray(recommendations) && recommendations.length > 0) {
             recommendations.forEach(rec => {
                 if (!rec || typeof rec !== 'object') return;
                 
-                const priority = safeGet(rec, 'priority', 'medium');
+                const priority = rec.priority || 'medium';
                 recommendationsHtml += `
-                    <div class="recommendation-item recommendation-item--${priority}">
-                        <div class="recommendation-item__content">
-                            <h3 class="recommendation-item__title">${safeGet(rec, 'title', 'Recommendation')}</h3>
-                            <p class="recommendation-item__description">
-                                ${safeGet(rec, 'description', 'No description provided.')}
-                            </p>
+                    <div class="recommendations__card recommendations__card--priority-${priority}">
+                        <div class="recommendations__header">
+                            <h3 class="recommendations__title">${rec.title || 'Recommendation'}</h3>
+                            <div class="recommendations__priority-badge recommendations__priority-badge--${priority}">
+                                ${priority.charAt(0).toUpperCase() + priority.slice(1)}
+                            </div>
                         </div>
-                        <div class="priority-badge priority-badge--${priority}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</div>
+                        <p class="recommendations__text">${rec.description || 'No description provided.'}</p>
                     </div>
                 `;
             });
@@ -474,34 +476,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
         populated = populated.replace(/{{#each recommendations}}[\s\S]*?{{\/each}}/g, recommendationsHtml);
     }
 
-    // New: Compliance Section
-    if (sectionsToGenerate.includes('compliance-section')) {
-        let complianceHtml = '';
-        const complianceCertifications = safeGet(primaryAssessment, 'compliance_certifications', {});
-
-        if (complianceCertifications && typeof complianceCertifications === 'object') {
-            for (const [certKey, cert] of Object.entries(complianceCertifications)) {
-                if (!cert || typeof cert !== 'object') continue;
-
-                const statusLower = safeGet(cert, 'status', 'N/A').toLowerCase().replace(' ', '-');
-                complianceHtml += `
-                    <div class="compliance-item">
-                        <div class="compliance-item__header">
-                            <span class="compliance-item__name">${certKey}</span>
-                            <span class="compliance-status compliance-status--${statusLower}">${safeGet(cert, 'status', 'N/A')}</span>
-                        </div>
-                    </div>
-                `;
-            }
-        } else {
-            complianceHtml = '<p class="text-gray-400">No compliance certifications available.</p>';
-        }
-
-        populated = populated.replace(/{{#each compliance_certifications}}[\s\S]*?{{\/each}}/g, complianceHtml);
-    }
-
-
-    // Comparison Table Section (remains mostly same, just ensuring data access is correct)
+    // Comparison Table Section
     if (sectionsToGenerate.includes('comparison-table-section')) {
         let comparisonHtml = '';
         if (allSelectedData && allSelectedData.length > 1) {
@@ -520,12 +495,12 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
             allSelectedData.forEach(assessment => {
                 if (!assessment) return;
                 
-                const riskLevel = safeGet(assessment, 'risk_level', 'N/A');
+                const riskLevel = assessment.risk_level || 'N/A';
                 const riskLevelLower = riskLevel.toLowerCase().replace(/\s+/g, '-');
                 comparisonHtml += `
                     <tr>
-                        <td class="comparison-table__data-cell">${safeGet(assessment, 'name', 'Unnamed Assessment')}</td>
-                        <td class="comparison-table__data-cell comparison-table__score-cell">${safeGet(assessment, 'total_score', '0')}</td>
+                        <td class="comparison-table__data-cell">${assessment.name || 'Unnamed Assessment'}</td>
+                        <td class="comparison-table__data-cell comparison-table__score-cell">${assessment.total_score || '0'}</td>
                         <td class="comparison-table__data-cell comparison-table__risk-cell comparison-table__risk-cell--${riskLevelLower}">${riskLevel}</td>
                     </tr>
                 `;
@@ -538,7 +513,7 @@ function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsTo
         
         populated = populated.replace(/{{#each allSelectedData}}[\s\S]*?{{\/each}}/g, comparisonHtml);
     }
-
+    
     return populated;
 }
 
@@ -872,27 +847,6 @@ function debugDataStructure(primaryAssessment, selectedData) {
     }
     
     console.log('=== END DEBUG ===');
-}
-
-/*
- * Toggles the visibility of detailed breakdown categories.
- * This function is directly included in the generated HTML for export and also used here for preview.
- */
-function toggleCategory(header) {
-    const content = header.nextElementSibling;
-    const toggle = header.querySelector('.breakdown-category__toggle'); // Updated class name
-    
-    const isActive = content.classList.contains('breakdown-category__content--active'); // Updated class name
-    
-    if (isActive) {
-        content.classList.remove('breakdown-category__content--active'); // Updated class name
-        toggle.classList.remove('breakdown-category__toggle--active');
-        header.classList.remove('breakdown-category__header--active');
-    } else {
-        content.classList.add('breakdown-category__content--active'); // Updated class name
-        toggle.classList.add('breakdown-category__toggle--active');
-        header.classList.add('breakdown-category__header--active');
-    }
 }
 
 // --- UI State Management ---

@@ -1,20 +1,33 @@
-<section class="detailed-breakdown">
-    <h2 class="detailed-breakdown__title">Detailed Risk Assessment</h2>
-    
-    {{#each detailedAssessment.assessment_details}}
-    <div class="breakdown-category">
-        <div class="breakdown-category__header" onclick="toggleCategory(this)">
-            <h3 class="breakdown-category__name">{{@key}}</h3>
-            <div class="breakdown-category__score">
-                <span class="breakdown-category__score-value">{{category_score}}</span>
-                <button class="breakdown-category__toggle">▼</button>
+<div class="detailed-breakdown-section">
+            <div class="detailed-breakdown-section__header">
+                <h2 class="detailed-breakdown-section__title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    Detailed Breakdown of Risks
+                </h2>
             </div>
-        </div>
-        <div class="breakdown-category__content">
-            <p class="breakdown-category__description">
-                {{summary_and_recommendation}}{{#if description}}{{description}}{{/if}}
-            </p>
-        </div>
-    </div>
-    {{/each}}
-</section> 
+            <div class="detailed-breakdown-section__categories-grid report-breakdown-categories">
+                {{#each detailed_assessment.assessment_details}}
+                <div class="report-breakdown-card report-breakdown-card--{{this.final_risk_category_lower}}">
+                    <div class="report-breakdown-card__header detailed-breakdown__collapsible-header">
+                        <h3 class="report-breakdown-card__title">{{@key}}</h3>
+                        <div class="report-breakdown-card__score report-breakdown-card__score--{{this.final_risk_category_lower}}">{{this.category_score}}</div>
+                        <button class="detailed-breakdown__toggle-button" aria-expanded="false" aria-controls="content-{{@index}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="report-breakdown-card__content detailed-breakdown__collapsible-content" id="content-{{@index}}">
+                        <p class="report-breakdown-card__note">{{this.justification}}</p>
+                        <!-- Add more detailed criteria here if available -->
+                        <div class="detailed-breakdown__criteria">
+                            {{#each this.criteria}}
+                            <div class="detailed-breakdown__criterion-item">
+                                <h4 class="detailed-breakdown__criterion-title">{{@key}} <span class="detailed-breakdown__criterion-score">Score: {{this.score}}</span></h4>
+                                <p class="detailed-breakdown__criterion-justification">{{this.justification}}</p>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div> 

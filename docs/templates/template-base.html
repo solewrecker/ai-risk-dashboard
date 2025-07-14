@@ -3,65 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{toolName}} Security Assessment Report</title>
+    <title>AI Risk Assessment Report</title>
+    <link rel="stylesheet" href="../css/pages/export-page.css">
 </head>
 <body>
     <div class="report-container">
-        <!-- Report Header -->
         <header class="report-header">
             <div class="report-header__content">
-                <h1 class="report-header__title">AI Tool Security Assessment</h1>
-                <p class="report-header__subtitle">{{toolName}} - {{vendor}}</p>
+                <h1 class="report-header__title">AI Risk Assessment Report</h1>
+                <p class="report-header__subtitle">Comprehensive Analysis of {{toolName}}</p>
+                <div class="report-header__tool-highlight">
+                    <h2 class="report-header__tool-name">{{toolName}}</h2>
+                    <p class="report-header__tool-subtitle">{{toolSubtitle}}</p>
+                </div>
                 <div class="report-header__meta">
-                    <div class="report-header__meta-item">
-                        <span>📊</span>
-                        <span>Assessment Date: {{reportDate}}</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>🏢</span>
-                        <span>Assessed by: {{assessed_by}}</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>📋</span>
-                        <span>Category: {{category}}</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>🔒</span>
-                        <span>Data Classification: {{data_classification}}</span>
-                    </div>
+                    <span>Report Date: {{reportDate}}</span>
+                    <span>Assessment ID: {{assessmentId}}</span>
                 </div>
             </div>
         </header>
-
-        <!-- Main Report Content Sections will be injected here by JS -->
-        <main id="report-content"></main>
-
-        <!-- Report Footer -->
-        <footer class="report-footer">
-            <div class="report-footer__grid">
-                <div class="report-footer__section">
-                    <h3 class="report-footer__section-title">Assessment Notes</h3>
-                    <div class="report-footer__section-content">
-                        {{assessment_notes}}
-                    </div>
-                </div>
-                <div class="report-footer__section">
-                    <h3 class="report-footer__section-title">Documentation Sources</h3>
-                    <div class="report-footer__section-content">
-                        <p><strong>Tier 1:</strong> {{documentation_tier}}</p>
-                        <p><strong>License Type:</strong> {{license_type}}</p>
-                        <p><strong>Sources:</strong> {{sources_list}}</p>
-                    </div>
-                </div>
-                <div class="report-footer__section">
-                    <h3 class="report-footer__section-title">Azure Permissions</h3>
-                    <div class="report-footer__section-content">
-                        <p><strong>Required:</strong> {{azure_permissions_required}}</p>
-                        <p><strong>Restrictions:</strong> {{azure_permissions_restrictions}}</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <main id="report-content" class="report-main">
+            <!-- Dynamic content will be injected here -->
+        </main>
     </div>
 </body>
 </html> 
