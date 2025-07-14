@@ -356,7 +356,7 @@ export async function generateHtmlReport(selectedAssessmentIds, allAssessments, 
     }
 }
 
-async function fetchTemplate(templateName) {
+export async function fetchTemplate(templateName) {
     // Get the base path - will be '/ai-risk-dashboard' on GitHub Pages, '' locally
     const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
     
