@@ -700,6 +700,9 @@ async function generateHtmlReport() {
         console.log('Session before upload:', session);
         console.log('User before upload:', session?.user);
 
+        // ADD THIS LINE:
+        debugDataStructure(primaryAssessment, selectedData);
+
         // Upload to Supabase Storage and get shareable link
         const timestamp = new Date().toISOString().replace(/[:.-]/g, '_'); // Create a clean timestamp
         const fileName = `report-${primaryAssessment.id}-${timestamp}.html`;
@@ -732,6 +735,49 @@ async function generateHtmlReport() {
         generateHtmlBtn.innerHTML = '<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>Generate HTML</span>';
         // lucide.createIcons(); // No need to re-create icons after download
     }
+}
+
+// Add this to your generateHtmlReport function right after getting selectedData
+function debugDataStructure(primaryAssessment, selectedData) {
+    console.log('=== DEBUG: Data Structure Analysis ===');
+    console.log('Primary Assessment:', primaryAssessment);
+    console.log('Selected Data Count:', selectedData.length);
+    
+    // Check key fields
+    const keyFields = [
+        'name', 'vendor', 'total_score', 'risk_level', 
+        'summary_and_recommendation', 'recommendations', 'detailed_assessment'
+    ];
+    
+    keyFields.forEach(field => {
+        const value = primaryAssessment[field];
+        console.log(`${field}:`, value ? 'EXISTS' : 'MISSING', typeof value, value);
+    });
+    
+    // Check detailed_assessment structure
+    if (primaryAssessment.detailed_assessment) {
+        console.log('Detailed Assessment Keys:', Object.keys(primaryAssessment.detailed_assessment));
+        
+        if (primaryAssessment.detailed_assessment.assessment_details) {
+            console.log('Assessment Details Keys:', Object.keys(primaryAssessment.detailed_assessment.assessment_details));
+            
+            // Check first category structure
+            const firstCategoryKey = Object.keys(primaryAssessment.detailed_assessment.assessment_details)[0];
+            if (firstCategoryKey) {
+                console.log('First Category Structure:', primaryAssessment.detailed_assessment.assessment_details[firstCategoryKey]);
+            }
+        }
+    }
+    
+    // Check recommendations structure
+    if (primaryAssessment.recommendations) {
+        console.log('Recommendations Count:', primaryAssessment.recommendations.length);
+        if (primaryAssessment.recommendations[0]) {
+            console.log('First Recommendation Structure:', primaryAssessment.recommendations[0]);
+        }
+    }
+    
+    console.log('=== END DEBUG ===');
 }
 
 // --- UI State Management ---
