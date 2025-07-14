@@ -367,7 +367,7 @@ export async function fetchTemplate(templateName) {
     return await response.text();
 }
 
-function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
+export function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
     let populated = html;
 
     // Add validation and fallbacks
@@ -590,8 +590,7 @@ export async function createPdf(htmlContent) {
     pdf.save('ai-risk-assessment-report.pdf');
 }
 
-// Add this to your generateHtmlReport function right after getting selectedData
-function debugDataStructure(primaryAssessment, selectedData) {
+export function debugDataStructure(primaryAssessment, selectedData) {
     console.log('=== DEBUG: Data Structure Analysis ===');
     console.log('Primary Assessment:', primaryAssessment);
     console.log('Selected Data Count:', selectedData.length);
