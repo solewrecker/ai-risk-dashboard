@@ -1,11 +1,7 @@
 // docs/js/dashboard/export.js
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-// --- Supabase Client ---
-const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { loadAssessmentsApi, getSessionApi, supabase } from './supabase-api.js';
+import { generateReport as generateReportLogic, generateHtmlReport as generateHtmlReportLogic, toggleCategory, fetchTemplate, bindDataToTemplate, createPdf, debugDataStructure } from './report-generator.js';
 
 // --- State ---
 let allAssessments = [];
@@ -15,6 +11,7 @@ let currentMode = 'template'; // 'template' or 'custom'
 let customSelectedSections = new Set(); // For mix-and-match
 
 // Define template sections for quick select
+// These will eventually be managed by report-generator.js or a config file.
 const quickTemplates = {
     summary: {
         name: 'Executive Summary',
@@ -23,7 +20,7 @@ const quickTemplates = {
     },
     detailed: {
         name: 'Detailed Technical Report',
-        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section'], // Example sections
+        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section', 'compliance-section'], // Added compliance-section
         pages: '8-12 pages'
     },
     comparison: {
@@ -39,10 +36,12 @@ const sectionDisplayNames = {
     detailed: 'Detailed Breakdown',
     recommendations: 'Recommendations',
     comparison: 'Comparison Table',
+    compliance: 'Compliance Status',
     // Add display names for new sections
     'detailed-breakdown-section': 'Detailed Breakdown',
     'recommendations-section': 'Key Recommendations',
-    'comparison-table-section': 'Comparison Table'
+    'comparison-table-section': 'Comparison Table',
+    'compliance-section': 'Compliance Status'
 };
 
 // --- DOM Elements ---
@@ -65,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function init() {
     console.log('init(): Starting initialization...');
     // Perform initial session check immediately
-    const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
+    const { session, error: getSessionError } = await getSessionApi();
 
     if (getSessionError) {
         console.error('init(): Error getting session:', getSessionError);
@@ -119,26 +118,10 @@ function handleAuthError(message) {
 async function loadAssessments() {
     console.log('loadAssessments(): Attempting to fetch assessments...');
     try {
-        const { data, error } = await supabase
-            .from('assessments')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('loadAssessments(): Supabase fetch error:', error);
-            throw error;
-        }
+        const data = await loadAssessmentsApi();
         
-        if (data) {
-            console.log('loadAssessments(): Assessments fetched successfully.', data.length, 'items.');
-            // Process fetched data to merge nested assessment_data properties
-            allAssessments = data.map(assessment => {
-                if (assessment.assessment_data && typeof assessment.assessment_data === 'object') {
-                    // Merge assessment_data properties into the top-level assessment object
-                    return { ...assessment, ...assessment.assessment_data };
-                }
-                return assessment;
-            });
+        if (data && data.length > 0) {
+            allAssessments = data; // Data is already processed by loadAssessmentsApi
             parseURLParams();
             renderAssessmentSelector();
             updateUI();
@@ -226,11 +209,41 @@ function setupEventListeners() {
         }
     });
 
-    // Generate button (remains the same)
-    generateReportBtn.addEventListener('click', generateReport);
+    // Generate button
+    generateReportBtn.addEventListener('click', async () => {
+        generateReportBtn.disabled = true;
+        generateReportBtn.innerHTML = '<i class="loader"></i> Generating...';
+        try {
+            const result = await generateReportLogic(selectedAssessmentIds, allAssessments, currentMode, selectedTemplate, customSelectedSections, quickTemplates);
+            if (result.success) {
+                // Handle success, e.g., show a toast message or download confirmation
+            } else {
+                // Error already handled inside generateReportLogic (alert), but you can add more here
+            }
+        } finally {
+            generateReportBtn.disabled = false;
+            generateReportBtn.innerHTML = '<i data-lucide="download" class="w-5 h-5 mr-2"></i><span>Generate Report</span>';
+            lucide.createIcons();
+        }
+    });
 
     // New: Generate HTML button
-    generateHtmlBtn.addEventListener('click', generateHtmlReport);
+    generateHtmlBtn.addEventListener('click', async () => {
+        generateHtmlBtn.disabled = true;
+        generateHtmlBtn.innerHTML = '<i class="loader"></i> Generating HTML...';
+        try {
+            const result = await generateHtmlReportLogic(selectedAssessmentIds, allAssessments, currentMode, selectedTemplate, customSelectedSections, quickTemplates, toggleCategory);
+            if (result.success) {
+                // Handle success, e.g., show a toast message
+            } else {
+                // Error already handled inside generateHtmlReportLogic (alert), but you can add more here
+            }
+        } finally {
+            generateHtmlBtn.disabled = false;
+            generateHtmlBtn.innerHTML = '<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>Generate HTML</span>';
+            // lucide.createIcons(); // No need to re-create icons after download, done by inline script
+        }
+    });
 
     // Mix-and-match sections selection
     mixMatchSelector.addEventListener('change', (e) => {
@@ -261,596 +274,6 @@ function setupEventListeners() {
     });
 }
 
-// --- Report Generation ---
-async function generateReport() {
-    // Adjust validation based on currentMode
-    if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
-        alert('Please select at least one assessment and either a quick template or custom sections.');
-        return;
-    }
-
-    generateReportBtn.disabled = true;
-    generateReportBtn.innerHTML = '<i class="loader"></i> Generating...';
-
-    try {
-        const selectedData = allAssessments.filter(a => selectedAssessmentIds.has(a.id));
-        const primaryAssessment = selectedData[0]; 
-
-        let sectionsToGenerate = [];
-        if (currentMode === 'template' && selectedTemplate) {
-            sectionsToGenerate = quickTemplates[selectedTemplate].sections;
-        } else if (currentMode === 'custom') {
-            sectionsToGenerate = Array.from(customSelectedSections);
-        }
-
-        // Start with the base template
-        let fullReportHtml = await fetchTemplate('base');
-        let sectionsHtml = '';
-
-        for (const section of sectionsToGenerate) {
-            sectionsHtml += await fetchTemplate(section); // Fetch each selected section
-        }
-
-        // Inject all selected sections into the main content area of the base template
-        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
-
-        const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
-        
-        // Generate shareable URL (example: link to view the assessment)
-        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
-
-        // Create QR code container
-        const qrContainer = document.createElement('div');
-        qrContainer.style.textAlign = 'center';
-        qrContainer.style.marginTop = '20px';
-        qrContainer.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
-
-        // Append to populated HTML (assume there's a footer or body)
-        let finalHtmlWithQr = populatedHtml.replace('</body>', `${qrContainer.outerHTML}</body>`);
-
-        // Now, after rendering to container, generate the QR code
-        // But since container is off-screen, we need to generate QR after setting innerHTML
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.width = '1000px'; // Standard width for our reports
-        container.innerHTML = finalHtmlWithQr;
-        document.body.appendChild(container);
-
-        new QRCode(container.querySelector('#qrcode'), {
-            text: shareUrl,
-            width: 128,
-            height: 128
-        });
-        document.body.removeChild(container);
-
-        await createPdf(finalHtmlWithQr);
-
-    } catch (error) {
-        console.error('Error generating report:', error);
-        alert('Failed to generate report. Please check the console for details.');
-    } finally {
-        generateReportBtn.disabled = false;
-        generateReportBtn.innerHTML = '<i data-lucide="download" class="w-5 h-5 mr-2"></i><span>Generate Report</span>';
-        lucide.createIcons();
-    }
-}
-
-async function fetchTemplate(templateName) {
-    // Get the base path - will be '/ai-risk-dashboard' on GitHub Pages, '' locally
-    const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
-    
-    const response = await fetch(`${basePath}/templates/template-${templateName}.html`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch template: ${templateName}`);
-    }
-    return await response.text();
-}
-
-function bindDataToTemplate(html, primaryAssessment, allSelectedData, sectionsToGenerate) {
-    let populated = html;
-
-    const assessmentData = primaryAssessment.assessment_data || {}; // Get the nested assessment_data object
-
-    // Add validation and fallbacks
-    const safeGet = (obj, path, fallback = 'N/A') => {
-        try {
-            return path.split('.').reduce((o, p) => o?.[p], obj) || fallback;
-        } catch {
-            return fallback;
-        }
-    };
-
-    // General replacements for base template
-    populated = populated.replace(/{{toolName}}/g, primaryAssessment.name || 'N/A');
-    populated = populated.replace(/{{toolSubtitle}}/g, primaryAssessment.vendor || 'N/A');
-    populated = populated.replace(/{{reportDate}}/g, new Date().toLocaleDateString());
-    populated = populated.replace(/{{assessmentId}}/g, primaryAssessment.id ? primaryAssessment.id.substring(0, 8) : 'N/A');
-
-    // Executive Summary Section replacements
-    if (sectionsToGenerate.includes('summary-section')) {
-        populated = populated.replace(/{{overallScore}}/g, primaryAssessment.total_score || '0');
-        populated = populated.replace(/{{maxScore}}/g, '100');
-        populated = populated.replace(/{{riskLevel}}/g, primaryAssessment.risk_level || 'N/A');
-        populated = populated.replace(/{{riskLevelLower}}/g, (primaryAssessment.risk_level || 'N/A').toLowerCase().replace(' ', '-'));
-        
-        // More robust summary handling, check both locations for summary_and_recommendation
-        const summaryText = assessmentData.summary_and_recommendation ||
-                           assessmentData.detailedAssessment?.summary_and_recommendation || // Corrected casing
-                           'No description provided.';
-        populated = populated.replace(/{{riskDescription}}/g, summaryText);
-
-        // Better recommendations handling
-        const recommendations = assessmentData.recommendations || []; // Access from assessmentData
-        const keyStrengths = recommendations
-            .filter(rec => rec?.category === 'strength')
-            .map(rec => rec?.description)
-            .filter(Boolean)
-            .join(' ') || 'No key strengths identified.';
-            
-        const areasForImprovement = recommendations
-            .filter(rec => rec?.category && rec.category !== 'strength')
-            .map(rec => rec?.description)
-            .filter(Boolean)
-            .join(' ') || 'No areas for improvement identified.';
-
-        populated = populated.replace(/{{keyStrengths}}/g, keyStrengths);
-        populated = populated.replace(/{{areasForImprovement}}/g, areasForImprovement);
-
-        // Better findings parsing
-        const summaryForFindings = summaryText !== 'No description provided.' ? summaryText : '';
-        const findings = summaryForFindings.split(/[.!?]+/).filter(f => f.trim().length > 10);
-        
-        for (let i = 1; i <= 4; i++) {
-            const finding = findings[i - 1]?.trim() || `No finding ${i} provided.`;
-            populated = populated.replace(new RegExp(`{{finding${i}}}`, 'g'), finding);
-        }
-    }
-
-    // Detailed Breakdown Section
-    if (sectionsToGenerate.includes('detailed-breakdown-section')) {
-        let categoriesHtml = '';
-        const assessmentDetails = assessmentData.detailedAssessment?.assessment_details; // Corrected casing
-        
-        if (assessmentDetails && typeof assessmentDetails === 'object') {
-            for (const [categoryKey, category] of Object.entries(assessmentDetails)) {
-                if (!category || typeof category !== 'object') continue;
-                
-                const displayName = categoryKey.replace(/_/g, ' ')
-                    .split(' ')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ');
-                    
-                const categoryRiskLevel = category.final_risk_category || 
-                                        category.risk_level || 
-                                        primaryAssessment?.risk_level || 
-                                        'medium';
-                const riskLevelLower = categoryRiskLevel.toLowerCase().replace(/\s+/g, '-');
-                
-                categoriesHtml += `
-                    <div class="detailed-breakdown__category-card detailed-breakdown__category-card--${riskLevelLower}">
-                        <div class="detailed-breakdown__category-header">
-                            <h3 class="detailed-breakdown__category-name">${displayName}</h3>
-                            <div class="detailed-breakdown__category-score detailed-breakdown__category-score--${riskLevelLower}">
-                                ${category.category_score || category.score || '0'}
-                            </div>
-                        </div>
-                        <p class="detailed-breakdown__category-description">
-                            ${category.summary_and_recommendation || category.summary || category.description || 'No description provided.'}
-                        </p>
-                    </div>
-                `;
-            }
-        } else {
-            categoriesHtml = '<p class="text-gray-400">No detailed breakdown available.</p>';
-        }
-        
-        // Fix: Use proper regex replacement instead of string replacement
-        populated = populated.replace(/{{#each detailed_assessment\.assessment_details}}[\s\S]*?{{\/each}}/g, categoriesHtml);
-    }
-
-    // Recommendations Section
-    if (sectionsToGenerate.includes('recommendations-section')) {
-        let recommendationsHtml = '';
-        const recommendations = assessmentData.recommendations; // Access from assessmentData
-        
-        if (recommendations && Array.isArray(recommendations) && recommendations.length > 0) {
-            recommendations.forEach(rec => {
-                if (!rec || typeof rec !== 'object') return;
-                
-                const priority = rec.priority || 'medium';
-                recommendationsHtml += `
-                    <div class="recommendations__card recommendations__card--priority-${priority}">
-                        <div class="recommendations__header">
-                            <h3 class="recommendations__title">${rec.title || 'Recommendation'}</h3>
-                            <div class="recommendations__priority-badge recommendations__priority-badge--${priority}">
-                                ${priority.charAt(0).toUpperCase() + priority.slice(1)}
-                            </div>
-                        </div>
-                        <p class="recommendations__text">${rec.description || 'No description provided.'}</p>
-                    </div>
-                `;
-            });
-        } else {
-            recommendationsHtml = '<p class="text-gray-400">No recommendations available.</p>';
-        }
-        
-        populated = populated.replace(/{{#each recommendations}}[\s\S]*?{{\/each}}/g, recommendationsHtml);
-    }
-
-    // Comparison Table Section
-    if (sectionsToGenerate.includes('comparison-table-section')) {
-        let comparisonHtml = '';
-        if (allSelectedData && allSelectedData.length > 1) {
-            comparisonHtml = `
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th class="comparison-table__header-cell">Assessment</th>
-                            <th class="comparison-table__header-cell">Total Score</th>
-                            <th class="comparison-table__header-cell">Risk Level</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            allSelectedData.forEach(assessment => {
-                if (!assessment) return;
-                
-                const riskLevel = assessment.risk_level || 'N/A';
-                const riskLevelLower = riskLevel.toLowerCase().replace(/\s+/g, '-');
-                comparisonHtml += `
-                    <tr>
-                        <td class="comparison-table__data-cell">${assessment.name || 'Unnamed Assessment'}</td>
-                        <td class="comparison-table__data-cell comparison-table__score-cell">${assessment.total_score || '0'}</td>
-                        <td class="comparison-table__data-cell comparison-table__risk-cell comparison-table__risk-cell--${riskLevelLower}">${riskLevel}</td>
-                    </tr>
-                `;
-            });
-            
-            comparisonHtml += '</tbody></table>';
-        } else {
-            comparisonHtml = '<p class="comparison-table__no-data-message">Please select at least two assessments for comparison.</p>';
-        }
-        
-        populated = populated.replace(/{{#each allSelectedData}}[\s\S]*?{{\/each}}/g, comparisonHtml);
-    }
-    
-    return populated;
-}
-
-async function createPdf(htmlContent) {
-    const { jsPDF } = window.jspdf;
-    
-    // Create a temporary container to render the HTML for conversion
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.width = '1000px'; // Standard width for our reports
-    container.innerHTML = htmlContent;
-    document.body.appendChild(container);
-
-    const canvas = await html2canvas(container, {
-        scale: 2, // Higher scale for better quality
-        backgroundColor: '#ffffff', // Add background color
-        allowTaint: true // Allow taint for better fidelity
-    });
-
-    document.body.removeChild(container);
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-    });
-
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save('ai-risk-assessment-report.pdf');
-}
-
-async function generateHtmlReport() {
-    // Similar validation as generateReport
-    if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
-        alert('Please select at least one assessment and either a quick template or custom sections.');
-        return;
-    }
-
-    generateHtmlBtn.disabled = true;
-    generateHtmlBtn.innerHTML = '<i class="loader"></i> Generating HTML...';
-
-    try {
-        const selectedData = allAssessments.filter(a => selectedAssessmentIds.has(a.id));
-        const primaryAssessment = selectedData[0];
-
-        let sectionsToGenerate = [];
-        if (currentMode === 'template' && selectedTemplate) {
-            sectionsToGenerate = quickTemplates[selectedTemplate].sections;
-        } else if (currentMode === 'custom') {
-            sectionsToGenerate = Array.from(customSelectedSections);
-        }
-
-        let fullReportHtmlString = await fetchTemplate('base'); // This fetches the string including <!DOCTYPE html><html><head><body>...
-        let sectionsHtmlString = '';
-        for (const section of sectionsToGenerate) {
-            sectionsHtmlString += await fetchTemplate(section);
-        }
-
-        // Use a temporary DOM element to parse the fullReportHtml and safely manipulate it.
-        // This preserves the DOCTYPE and allows proper DOM operations.
-        const parser = new DOMParser();
-        let doc = parser.parseFromString(fullReportHtmlString, 'text/html');
-
-        const mainContentElement = doc.querySelector('main#report-content');
-        if (mainContentElement) {
-            mainContentElement.innerHTML = sectionsHtmlString;
-        }
-
-        // Get the updated HTML string (which still contains doctype, head, body etc.)
-        let processedHtmlString = doc.documentElement.outerHTML; // Get outerHTML of <html>
-
-        // Apply data binding to the string
-        processedHtmlString = bindDataToTemplate(processedHtmlString, primaryAssessment, selectedData, sectionsToGenerate);
-
-        // Re-parse the string to update the DOM object after string replacements from bindDataToTemplate
-        doc = parser.parseFromString(processedHtmlString, 'text/html');
-
-        // --- Inline CSS and JS for self-contained HTML ---
-        const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
-
-        // Fetch CSS
-        const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
-        const cssContent = await cssResponse.text();
-        const styleElement = doc.createElement('style');
-        styleElement.textContent = cssContent;
-        doc.head.appendChild(styleElement);
-
-        // Remove external CSS links from the head (using querySelector for robustness)
-        let externalCssLink1 = doc.querySelector('link[href="../css/pages/export-page.css"]');
-        if (externalCssLink1) externalCssLink1.remove();
-        let externalCssLink2 = doc.querySelector('link[href="css/style.css"]');
-        if (externalCssLink2) externalCssLink2.remove();
-
-        // Fetch Lucide Icons JS
-        const lucideResponse = await fetch('https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js');
-        const lucideContent = await lucideResponse.text();
-        const lucideScript = doc.createElement('script');
-        lucideScript.textContent = lucideContent;
-        doc.body.appendChild(lucideScript); // Append to body for execution after DOM parsing
-
-        // Fetch QRCode.js
-        const qrcodeResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
-        const qrcodeContent = await qrcodeResponse.text();
-        const qrcodeScript = doc.createElement('script');
-        qrcodeScript.textContent = qrcodeContent;
-        doc.body.appendChild(qrcodeScript); // Append to body
-
-        // Extract and inject collapsible script content (hardcoded)
-        let collapsibleScriptContent = '';
-        if (sectionsToGenerate.includes('detailed-breakdown-section')) {
-            collapsibleScriptContent = `
-            document.addEventListener('DOMContentLoaded', function() {
-                const collapsibleHeaders = document.querySelectorAll('.detailed-breakdown__collapsible-header');
-                collapsibleHeaders.forEach(header => {
-                    header.addEventListener('click', function() {
-                        const content = this.nextElementSibling;
-                        const button = this.querySelector('.detailed-breakdown__toggle-button');
-                        const isExpanded = button.getAttribute('aria-expanded') === 'true';
-
-                        if (isExpanded) {
-                            content.style.maxHeight = null;
-                            button.setAttribute('aria-expanded', 'false');
-                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
-                        } else {
-                            content.style.maxHeight = content.scrollHeight + "px";
-                            button.setAttribute('aria-expanded', 'true');
-                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>';
-                        }
-                    });
-                });
-            });
-            `;
-            const collapsibleScriptElement = doc.createElement('script');
-            collapsibleScriptElement.textContent = collapsibleScriptContent;
-            doc.body.appendChild(collapsibleScriptElement);
-        }
-
-        // Remove external JS links from the head (those in original export.html)
-        let externalJsLink1 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"]');
-        if (externalJsLink1) externalJsLink1.remove();
-        let externalJsLink2 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"]');
-        if (externalJsLink2) externalJsLink2.remove();
-        let externalJsLink3 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"]');
-        if (externalJsLink3) externalJsLink3.remove();
-        let externalJsLink4 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]');
-        if (externalJsLink4) externalJsLink4.remove();
-        let externalJsLink5 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"]');
-        if (externalJsLink5) externalJsLink5.remove();
-        let externalJsLink6 = doc.querySelector('script[type="module"][src="js/dashboard/export.js"]');
-        if (externalJsLink6) externalJsLink6.remove();
-
-        // Find and remove the inline Lucide initialization script by checking its content
-        const inlineScripts = doc.querySelectorAll('script:not([src])');
-        inlineScripts.forEach(script => {
-            if (script.textContent.includes('lucide.createIcons()') && !script.textContent.includes('collapsibleHeaders')) {
-                script.remove();
-            }
-        });
-
-
-        // Update the title dynamically
-        const titleElement = doc.querySelector('title');
-        if (titleElement) {
-            titleElement.textContent = `${primaryAssessment.name || 'AI Risk Assessment'} Report`;
-        }
-
-        // Generate shareable URL for QR code
-        const shareUrl = `${window.location.origin}/assessment-detail.html?id=${primaryAssessment.id}`;
-
-        // Create QR code container element and append to body
-        const qrContainerDiv = doc.createElement('div'); // Use a different name to avoid conflict with existing qrContainer
-        qrContainerDiv.id = 'qrcode-container';
-        qrContainerDiv.style.textAlign = 'center';
-        qrContainerDiv.style.marginTop = '20px';
-        qrContainerDiv.innerHTML = `<p>Scan to view assessment: </p><div id="qrcode"></div>`;
-        doc.body.appendChild(qrContainerDiv); // Append to the document body object
-
-        // This part needs careful handling as QRCode.js and Lucide icons require a live DOM element to render.
-        // We will create a temporary iframe, load the document into it, then manipulate its DOM, and finally extract its content.
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none'; // Hide the iframe
-        document.body.appendChild(iframe); // Append to main document to allow script execution
-
-        // Load the modified document (doc.documentElement.outerHTML) into the iframe's srcdoc
-        // The doctype will be correctly transferred by srcdoc.
-        // Using srcdoc is critical for preserving the doctype and allowing script execution within the iframe.
-        iframe.srcdoc = `<!DOCTYPE html>${doc.documentElement.outerHTML}`;
-
-        // Wait for iframe to load (important for script execution within iframe)
-        await new Promise(resolve => {
-            iframe.onload = () => resolve();
-        });
-
-        const iframeDoc = iframe.contentWindow.document;
-
-        // Render Lucide icons in the iframe's document
-        if (iframe.contentWindow.lucide && typeof iframe.contentWindow.lucide.createIcons === 'function') {
-            iframe.contentWindow.lucide.createIcons({
-                container: iframeDoc.body // Target the iframe's body for icon rendering
-            });
-        }
-
-        // Generate QR code in the iframe's document
-        new iframe.contentWindow.QRCode(iframeDoc.querySelector('#qrcode'), {
-            text: shareUrl,
-            width: 128,
-            height: 128
-        });
-
-        // Get the final HTML content including the DOCTYPE from the iframe
-        const finalHtmlContent = `<!DOCTYPE html>${iframeDoc.documentElement.outerHTML}`;
-        document.body.removeChild(iframe); // Clean up iframe
-
-        // Create a Blob from the HTML content
-        const blob = new Blob([finalHtmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-
-        // Create a temporary link and trigger download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `ai-risk-assessment-report-${new Date().toISOString().substring(0, 10)}.html`; // Dynamic filename
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        // Debugging: Check current session before upload
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-            console.error('Error getting session before upload:', sessionError);
-        }
-        console.log('Session before upload:', session);
-        console.log('User before upload:', session?.user);
-
-        // ADD THIS LINE:
-        debugDataStructure(primaryAssessment, selectedData);
-
-        // Upload to Supabase Storage and get shareable link
-        const timestamp = new Date().toISOString().replace(/[:.-]/g, '_'); // Create a clean timestamp
-        const fileName = `report-${primaryAssessment.id}-${timestamp}.html`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('exported-html-reports')
-            .upload(fileName, blob, {
-                contentType: 'text/html',
-                upsert: false // Set upsert to false to create new unique files
-            });
-
-        if (uploadError) {
-            throw uploadError;
-        }
-
-        const { data: publicUrlData } = supabase.storage
-            .from('exported-html-reports')
-            .getPublicUrl(fileName);
-
-        if (publicUrlData && publicUrlData.publicUrl) {
-            alert(`HTML report generated and uploaded! You can share it via: ${publicUrlData.publicUrl}`);
-        } else {
-            alert('HTML report generated, but failed to get a shareable link.');
-        }
-
-    } catch (error) {
-        console.error('Error generating HTML report:', error);
-        alert('Failed to generate HTML report. Please check the console for details.');
-    } finally {
-        generateHtmlBtn.disabled = false;
-        generateHtmlBtn.innerHTML = '<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>Generate HTML</span>';
-        // lucide.createIcons(); // No need to re-create icons after download
-    }
-}
-
-// Add this to your generateHtmlReport function right after getting selectedData
-function debugDataStructure(primaryAssessment, selectedData) {
-    console.log('=== DEBUG: Data Structure Analysis ===');
-    console.log('Primary Assessment:', primaryAssessment);
-    console.log('Selected Data Count:', selectedData.length);
-    
-    // Check key fields directly from primaryAssessment (top-level properties)
-    const topLevelKeyFields = [
-        'name', 'vendor', 'total_score', 'risk_level'
-    ];
-    
-    topLevelKeyFields.forEach(field => {
-        const value = primaryAssessment[field];
-        console.log(`${field} (top-level):`, value ? 'EXISTS' : 'MISSING', typeof value, value);
-    });
-
-    // Check assessment_data structure
-    if (primaryAssessment.assessment_data) {
-        console.log('primaryAssessment.assessment_data EXISTS');
-        const assessmentData = primaryAssessment.assessment_data;
-
-        const nestedKeyFields = [
-            'summary_and_recommendation',
-            'recommendations',
-            'detailedAssessment' // Note: camelCase as per your JSON structure
-        ];
-
-        nestedKeyFields.forEach(field => {
-            const value = assessmentData[field];
-            console.log(`${field} (nested under assessment_data):`, value ? 'EXISTS' : 'MISSING', typeof value, value);
-        });
-        
-        // Check detailedAssessment structure more deeply
-        if (assessmentData.detailedAssessment) {
-            console.log('Detailed Assessment (nested) Keys:', Object.keys(assessmentData.detailedAssessment));
-            
-            if (assessmentData.detailedAssessment.assessment_details) {
-                console.log('Assessment Details (nested) Keys:', Object.keys(assessmentData.detailedAssessment.assessment_details));
-                
-                // Check first category structure
-                const firstCategoryKey = Object.keys(assessmentData.detailedAssessment.assessment_details)[0];
-                if (firstCategoryKey) {
-                    console.log('First Category Structure (nested):', assessmentData.detailedAssessment.assessment_details[firstCategoryKey]);
-                }
-            }
-        }
-        
-        // Check recommendations structure more deeply
-        if (assessmentData.recommendations) {
-            console.log('Recommendations (nested) Count:', assessmentData.recommendations.length);
-            if (assessmentData.recommendations[0]) {
-                console.log('First Recommendation Structure (nested):', assessmentData.recommendations[0]);
-            }
-        }
-
-    } else {
-        console.log('primaryAssessment.assessment_data MISSING or empty');
-    }
-    
-    console.log('=== END DEBUG ===');
-}
-
 // --- UI State Management ---
 function updateUI() {
     console.log('updateUI(): Updating UI based on current state.');
@@ -866,17 +289,21 @@ function updateUI() {
     if (selectedAssessmentsCount === 0) {
         canGenerate = false;
         helpText = 'Please select at least one assessment.';
-    } else if (!isTemplateSelected && !isCustomSectionSelected) {
+    }
+    else if (!isTemplateSelected && !isCustomSectionSelected) {
         canGenerate = false;
         helpText = 'Please choose a quick template or select custom sections.';
-    } else if (selectedTemplate === 'comparison' && selectedAssessmentsCount < 2) {
+    }
+    else if (selectedTemplate === 'comparison' && selectedAssessmentsCount < 2) {
         canGenerate = false;
         helpText = 'The Comparison Report requires at least two assessments.';
-    } else {
+    }
+    else {
         let reportTypeName = '';
         if (currentMode === 'template' && selectedTemplate) {
             reportTypeName = quickTemplates[selectedTemplate].name;
-        } else if (currentMode === 'custom') {
+        }
+        else if (currentMode === 'custom') {
             reportTypeName = `Custom Report with ${customSelectedSections.size} section${customSelectedSections.size !== 1 ? 's' : ''}`;
         }
         helpText = `Ready to generate a ${reportTypeName} for ${selectedAssessmentsCount} assessment(s).`;
@@ -890,7 +317,8 @@ function updateUI() {
     if (currentMode === 'custom') {
         customNotice.classList.add('active');
         customNotice.textContent = `Custom report with ${customSelectedSections.size} section${customSelectedSections.size !== 1 ? 's' : ''} selected.`;
-    } else {
+    }
+    else {
         customNotice.classList.remove('active');
         customNotice.textContent = 'Select sections below to create a custom report';
     }
@@ -909,7 +337,8 @@ function updateUI() {
         modeIndicator.className = 'export-mode-indicator template';
         modeIndicator.innerHTML = `📋 Using ${templateInfo.name} Template`;
         reportTitleForButton = `📄 Generate ${templateInfo.name} Report`;
-    } else if (currentMode === 'custom' && customSelectedSections.size > 0) {
+    }
+    else if (currentMode === 'custom' && customSelectedSections.size > 0) {
         // Map custom selected section filenames to display names for preview
         sectionsToDisplay = Array.from(customSelectedSections).map(sectionFilename => {
             const sectionId = sectionFilename.replace('-section', '');
@@ -920,7 +349,8 @@ function updateUI() {
         modeIndicator.className = 'export-mode-indicator custom';
         modeIndicator.innerHTML = '⚙️ Using Custom Configuration';
         reportTitleForButton = '📄 Generate Custom Report';
-    } else {
+    }
+    else {
         // Default state when nothing is selected or an invalid state
         modeIndicator.className = 'export-mode-indicator';
         modeIndicator.textContent = '';
@@ -953,7 +383,8 @@ function updateUI() {
                 mixMatchSelector.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
                 customSelectedSections.clear();
             }
-        } else {
+        }
+        else {
             comparisonCard.classList.remove('disabled');
         }
     }
