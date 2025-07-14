@@ -603,8 +603,14 @@ async function generateHtmlReport() {
         if (externalJsLink5) externalJsLink5.remove();
         let externalJsLink6 = doc.querySelector('script[type="module"][src="js/dashboard/export.js"]');
         if (externalJsLink6) externalJsLink6.remove();
-        let existingLucideInitScript = doc.querySelector('script:not([src]):contains("lucide.createIcons()")');
-        if (existingLucideInitScript) existingLucideInitScript.remove();
+
+        // Find and remove the inline Lucide initialization script by checking its content
+        const inlineScripts = doc.querySelectorAll('script:not([src])');
+        inlineScripts.forEach(script => {
+            if (script.textContent.includes('lucide.createIcons()') && !script.textContent.includes('collapsibleHeaders')) {
+                script.remove();
+            }
+        });
 
 
         // Update the title dynamically
