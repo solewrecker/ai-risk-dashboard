@@ -131,7 +131,14 @@ async function loadAssessments() {
         
         if (data) {
             console.log('loadAssessments(): Assessments fetched successfully.', data.length, 'items.');
-            allAssessments = data;
+            // Process fetched data to merge nested assessment_data properties
+            allAssessments = data.map(assessment => {
+                if (assessment.assessment_data && typeof assessment.assessment_data === 'object') {
+                    // Merge assessment_data properties into the top-level assessment object
+                    return { ...assessment, ...assessment.assessment_data };
+                }
+                return assessment;
+            });
             parseURLParams();
             renderAssessmentSelector();
             updateUI();
@@ -788,38 +795,57 @@ function debugDataStructure(primaryAssessment, selectedData) {
     console.log('Primary Assessment:', primaryAssessment);
     console.log('Selected Data Count:', selectedData.length);
     
-    // Check key fields
-    const keyFields = [
-        'name', 'vendor', 'total_score', 'risk_level', 
-        'summary_and_recommendation', 'recommendations', 'detailed_assessment'
+    // Check key fields directly from primaryAssessment (top-level properties)
+    const topLevelKeyFields = [
+        'name', 'vendor', 'total_score', 'risk_level'
     ];
     
-    keyFields.forEach(field => {
+    topLevelKeyFields.forEach(field => {
         const value = primaryAssessment[field];
-        console.log(`${field}:`, value ? 'EXISTS' : 'MISSING', typeof value, value);
+        console.log(`${field} (top-level):`, value ? 'EXISTS' : 'MISSING', typeof value, value);
     });
-    
-    // Check detailed_assessment structure
-    if (primaryAssessment.detailed_assessment) {
-        console.log('Detailed Assessment Keys:', Object.keys(primaryAssessment.detailed_assessment));
+
+    // Check assessment_data structure
+    if (primaryAssessment.assessment_data) {
+        console.log('primaryAssessment.assessment_data EXISTS');
+        const assessmentData = primaryAssessment.assessment_data;
+
+        const nestedKeyFields = [
+            'summary_and_recommendation',
+            'recommendations',
+            'detailedAssessment' // Note: camelCase as per your JSON structure
+        ];
+
+        nestedKeyFields.forEach(field => {
+            const value = assessmentData[field];
+            console.log(`${field} (nested under assessment_data):`, value ? 'EXISTS' : 'MISSING', typeof value, value);
+        });
         
-        if (primaryAssessment.detailed_assessment.assessment_details) {
-            console.log('Assessment Details Keys:', Object.keys(primaryAssessment.detailed_assessment.assessment_details));
+        // Check detailedAssessment structure more deeply
+        if (assessmentData.detailedAssessment) {
+            console.log('Detailed Assessment (nested) Keys:', Object.keys(assessmentData.detailedAssessment));
             
-            // Check first category structure
-            const firstCategoryKey = Object.keys(primaryAssessment.detailed_assessment.assessment_details)[0];
-            if (firstCategoryKey) {
-                console.log('First Category Structure:', primaryAssessment.detailed_assessment.assessment_details[firstCategoryKey]);
+            if (assessmentData.detailedAssessment.assessment_details) {
+                console.log('Assessment Details (nested) Keys:', Object.keys(assessmentData.detailedAssessment.assessment_details));
+                
+                // Check first category structure
+                const firstCategoryKey = Object.keys(assessmentData.detailedAssessment.assessment_details)[0];
+                if (firstCategoryKey) {
+                    console.log('First Category Structure (nested):', assessmentData.detailedAssessment.assessment_details[firstCategoryKey]);
+                }
             }
         }
-    }
-    
-    // Check recommendations structure
-    if (primaryAssessment.recommendations) {
-        console.log('Recommendations Count:', primaryAssessment.recommendations.length);
-        if (primaryAssessment.recommendations[0]) {
-            console.log('First Recommendation Structure:', primaryAssessment.recommendations[0]);
+        
+        // Check recommendations structure more deeply
+        if (assessmentData.recommendations) {
+            console.log('Recommendations (nested) Count:', assessmentData.recommendations.length);
+            if (assessmentData.recommendations[0]) {
+                console.log('First Recommendation Structure (nested):', assessmentData.recommendations[0]);
+            }
         }
+
+    } else {
+        console.log('primaryAssessment.assessment_data MISSING or empty');
     }
     
     console.log('=== END DEBUG ===');
