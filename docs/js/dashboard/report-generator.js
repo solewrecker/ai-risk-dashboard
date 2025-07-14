@@ -184,7 +184,7 @@ export async function generateHtmlReport(selectedAssessmentIds, allAssessments, 
         doc.head.appendChild(styleElement);
 
         // Remove external CSS links from the head (using querySelector for robustness)
-        let externalCssLink1 = doc.querySelector('link[href="../css/pages/export-page.css"]');
+        let externalCssLink1 = doc.querySelector('link[href="css/pages/export-page-default-theme.css"]');
         if (externalCssLink1) externalCssLink1.remove();
         let externalCssLink2 = doc.querySelector('link[href="css/style.css"]');
         if (externalCssLink2) externalCssLink2.remove();
