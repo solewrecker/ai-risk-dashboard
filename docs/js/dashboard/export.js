@@ -30,11 +30,6 @@ const quickTemplates = {
         name: 'Comparison Report',
         sections: ['summary-section', 'comparison-table-section'], // Example sections
         pages: '5-7 pages'
-    },
-    'default-export': {
-        name: 'Default Report',
-        sections: ['default-export'],
-        pages: '6-10 pages' 
     }
 };
 
@@ -288,22 +283,16 @@ async function generateReport() {
             sectionsToGenerate = Array.from(customSelectedSections);
         }
 
-        let fullReportHtml = '';
-        if (selectedTemplate === 'default-export') {
-            // For default-export, fetch the template as a whole and skip section injection
-            fullReportHtml = await fetchTemplate('default-export');
-        } else {
-            // Start with the base template for other templates/custom sections
-            fullReportHtml = await fetchTemplate('base');
-            let sectionsHtml = '';
+        // Start with the base template
+        let fullReportHtml = await fetchTemplate('base');
+        let sectionsHtml = '';
 
-            for (const section of sectionsToGenerate) {
-                sectionsHtml += await fetchTemplate(section); // Fetch each selected section
-            }
-
-            // Inject all selected sections into the main content area of the base template
-            fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
+        for (const section of sectionsToGenerate) {
+            sectionsHtml += await fetchTemplate(section); // Fetch each selected section
         }
+
+        // Inject all selected sections into the main content area of the base template
+        fullReportHtml = fullReportHtml.replace('<main id="report-content"></main>', `<main id="report-content">${sectionsHtml}</main>`);
 
         const populatedHtml = bindDataToTemplate(fullReportHtml, primaryAssessment, selectedData, sectionsToGenerate);
         
@@ -351,13 +340,7 @@ async function fetchTemplate(templateName) {
     // Get the base path - will be '/ai-risk-dashboard' on GitHub Pages, '' locally
     const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
     
-    // Handle special case for 'default-export' template which is a full HTML page
-    let templatePath = `${basePath}/templates/template-${templateName}.html`;
-    if (templateName === 'default-export') {
-        templatePath = `${basePath}/templates/template-default-export.html`;
-    }
-
-    const response = await fetch(templatePath);
+    const response = await fetch(`${basePath}/templates/template-${templateName}.html`);
     if (!response.ok) {
         throw new Error(`Failed to fetch template: ${templateName}`);
     }
@@ -585,28 +568,10 @@ async function generateHtmlReport() {
             sectionsToGenerate = Array.from(customSelectedSections);
         }
 
-        let fullReportHtmlString = '';
-        if (selectedTemplate === 'default-export') {
-            // For default-export, fetch the template as a whole and skip section injection
-            fullReportHtmlString = await fetchTemplate('default-export');
-        } else {
-            // For other templates or custom sections, start with the base template
-            fullReportHtmlString = await fetchTemplate('base');
-            let sectionsHtmlString = '';
-            for (const section of sectionsToGenerate) {
-                sectionsHtmlString += await fetchTemplate(section);
-            }
-
-            // Use a temporary DOM element to parse the fullReportHtml and safely manipulate it.
-            // This preserves the DOCTYPE and allows proper DOM operations.
-            const parser = new DOMParser();
-            let doc = parser.parseFromString(fullReportHtmlString, 'text/html');
-
-            const mainContentElement = doc.querySelector('main#report-content');
-            if (mainContentElement) {
-                mainContentElement.innerHTML = sectionsHtmlString;
-            }
-            fullReportHtmlString = doc.documentElement.outerHTML; // Update the string after modification
+        let fullReportHtmlString = await fetchTemplate('base'); // This fetches the string including <!DOCTYPE html><html><head><body>...
+        let sectionsHtmlString = '';
+        for (const section of sectionsToGenerate) {
+            sectionsHtmlString += await fetchTemplate(section);
         }
 
         // Use a temporary DOM element to parse the fullReportHtml and safely manipulate it.
@@ -614,72 +579,73 @@ async function generateHtmlReport() {
         const parser = new DOMParser();
         let doc = parser.parseFromString(fullReportHtmlString, 'text/html');
 
+        const mainContentElement = doc.querySelector('main#report-content');
+        if (mainContentElement) {
+            mainContentElement.innerHTML = sectionsHtmlString;
+        }
+
+        // Get the updated HTML string (which still contains doctype, head, body etc.)
+        let processedHtmlString = doc.documentElement.outerHTML; // Get outerHTML of <html>
+
+        // Apply data binding to the string
+        processedHtmlString = bindDataToTemplate(processedHtmlString, primaryAssessment, selectedData, sectionsToGenerate);
+
+        // Re-parse the string to update the DOM object after string replacements from bindDataToTemplate
+        doc = parser.parseFromString(processedHtmlString, 'text/html');
+
         // --- Inline CSS and JS for self-contained HTML ---
         const basePath = window.location.pathname.includes('/ai-risk-dashboard') ? '/ai-risk-dashboard' : '';
 
-        // Inline CSS for non-default-export templates
-        if (selectedTemplate !== 'default-export') {
-            const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
-            const cssContent = await cssResponse.text();
-            const styleElement = doc.createElement('style');
-            styleElement.textContent = cssContent;
-            doc.head.appendChild(styleElement);
+        // Fetch CSS
+        const cssResponse = await fetch(`${basePath}/css/pages/export-page.css`);
+        const cssContent = await cssResponse.text();
+        const styleElement = doc.createElement('style');
+        styleElement.textContent = cssContent;
+        doc.head.appendChild(styleElement);
 
-            // Remove external CSS links from the head (using querySelector for robustness)
-            let externalCssLink1 = doc.querySelector('link[href="../css/pages/export-page.css"]');
-            if (externalCssLink1) externalCssLink1.remove();
-            let externalCssLink2 = doc.querySelector('link[href="css/style.css"]');
-            if (externalCssLink2) externalCssLink2.remove();
-        }
+        // Remove external CSS links from the head (using querySelector for robustness)
+        let externalCssLink1 = doc.querySelector('link[href="../css/pages/export-page.css"]');
+        if (externalCssLink1) externalCssLink1.remove();
+        let externalCssLink2 = doc.querySelector('link[href="css/style.css"]');
+        if (externalCssLink2) externalCssLink2.remove();
 
-        // Fetch Lucide Icons JS (always needed if icons are used across templates)
+        // Fetch Lucide Icons JS
         const lucideResponse = await fetch('https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js');
         const lucideContent = await lucideResponse.text();
         const lucideScript = doc.createElement('script');
         lucideScript.textContent = lucideContent;
         doc.body.appendChild(lucideScript); // Append to body for execution after DOM parsing
 
-        // Fetch QRCode.js (always needed)
+        // Fetch QRCode.js
         const qrcodeResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
         const qrcodeContent = await qrcodeResponse.text();
         const qrcodeScript = doc.createElement('script');
         qrcodeScript.textContent = qrcodeContent;
         doc.body.appendChild(qrcodeScript); // Append to body
 
-        // Extract and inject collapsible script content (only if detailed-breakdown-section is part of generated sections)
+        // Extract and inject collapsible script content (hardcoded)
         let collapsibleScriptContent = '';
-        if (sectionsToGenerate.includes('detailed-breakdown-section') || selectedTemplate === 'default-export') { // Add default-export as it has collapsible
+        if (sectionsToGenerate.includes('detailed-breakdown-section')) {
             collapsibleScriptContent = `
             document.addEventListener('DOMContentLoaded', function() {
-                const collapsibleHeaders = document.querySelectorAll('.assessment-category__header'); // Updated selector
+                const collapsibleHeaders = document.querySelectorAll('.detailed-breakdown__collapsible-header');
                 collapsibleHeaders.forEach(header => {
                     header.addEventListener('click', function() {
                         const content = this.nextElementSibling;
-                        const toggle = this.querySelector('.assessment-category__toggle');
-                        
-                        const isActive = content.classList.contains('assessment-category__content--active');
-                        
-                        if (isActive) {
-                            content.classList.remove('assessment-category__content--active');
-                            toggle.classList.remove('assessment-category__toggle--active');
-                            header.classList.remove('assessment-category__header--active');
+                        const button = this.querySelector('.detailed-breakdown__toggle-button');
+                        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+                        if (isExpanded) {
+                            content.style.maxHeight = null;
+                            button.setAttribute('aria-expanded', 'false');
+                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
                         } else {
-                            content.classList.add('assessment-category__content--active');
-                            toggle.classList.add('assessment-category__toggle--active');
-                            header.classList.add('assessment-category__header--active');
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            button.setAttribute('aria-expanded', 'true');
+                            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>';
                         }
                     });
                 });
-                // Initialize with first category expanded for default-export if applicable
-                if (document.querySelector('.assessment-category__header')) {
-                    const firstCategory = document.querySelector('.assessment-category__header');
-                    if (firstCategory) {
-                        // Ensure it's not already active to prevent double-toggle
-                        if (!firstCategory.nextElementSibling.classList.contains('assessment-category__content--active')) {
-                            firstCategory.click(); // Simulate click to expand
-                        }
-                    }
-                }
             });
             `;
             const collapsibleScriptElement = doc.createElement('script');
@@ -687,35 +653,27 @@ async function generateHtmlReport() {
             doc.body.appendChild(collapsibleScriptElement);
         }
 
-        // Remove external JS links from the head (those in original export.html) for non-default-export templates
-        if (selectedTemplate !== 'default-export') {
-            let externalJsLink1 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"]');
-            if (externalJsLink1) externalJsLink1.remove();
-            let externalJsLink2 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"]');
-            if (externalJsLink2) externalJsLink2.remove();
-            let externalJsLink3 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"]');
-            if (externalJsLink3) externalJsLink3.remove();
-            let externalJsLink4 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]');
-            if (externalJsLink4) externalJsLink4.remove();
-            let externalJsLink5 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"]');
-            if (externalJsLink5) externalJsLink5.remove();
-            let externalJsLink6 = doc.querySelector('script[type="module"][src="js/dashboard/export.js"]');
-            if (externalJsLink6) externalJsLink6.remove();
+        // Remove external JS links from the head (those in original export.html)
+        let externalJsLink1 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"]');
+        if (externalJsLink1) externalJsLink1.remove();
+        let externalJsLink2 = doc.querySelector('script[src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"]');
+        if (externalJsLink2) externalJsLink2.remove();
+        let externalJsLink3 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"]');
+        if (externalJsLink3) externalJsLink3.remove();
+        let externalJsLink4 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]');
+        if (externalJsLink4) externalJsLink4.remove();
+        let externalJsLink5 = doc.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"]');
+        if (externalJsLink5) externalJsLink5.remove();
+        let externalJsLink6 = doc.querySelector('script[type="module"][src="js/dashboard/export.js"]');
+        if (externalJsLink6) externalJsLink6.remove();
 
-            // Find and remove the inline Lucide initialization script by checking its content
-            const inlineScripts = doc.querySelectorAll('script:not([src])');
-            inlineScripts.forEach(script => {
-                if (script.textContent.includes('lucide.createIcons()') && !script.textContent.includes('collapsibleHeaders')) {
-                    script.remove();
-                }
-            });
-        } else {
-            // For default-export, remove its specific external JS link if present and embed the content
-            let defaultExportScriptLink = doc.querySelector('script[src="../js/dashboard/default-export.js"]');
-            if (defaultExportScriptLink) {
-                defaultExportScriptLink.remove();
+        // Find and remove the inline Lucide initialization script by checking its content
+        const inlineScripts = doc.querySelectorAll('script:not([src])');
+        inlineScripts.forEach(script => {
+            if (script.textContent.includes('lucide.createIcons()') && !script.textContent.includes('collapsibleHeaders')) {
+                script.remove();
             }
-        }
+        });
 
 
         // Update the title dynamically
