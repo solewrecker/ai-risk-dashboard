@@ -120,7 +120,7 @@ export async function generateReport(selectedAssessmentIds, allAssessments, quic
         container.innerHTML = finalHtmlWithQr;
         document.body.appendChild(container);
 
-        new QRCode(container.querySelector('#qrcode'), {
+        new window.QRCode(container.querySelector('#qrcode'), {
             text: shareUrl,
             width: 128,
             height: 128
@@ -139,7 +139,7 @@ export async function generateReport(selectedAssessmentIds, allAssessments, quic
     }
 }
 
-export async function generateHtmlReport(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections, reportTitleForButton) {
+export async function generateHtmlReport(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections) {
     if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
         alert('Please select at least one assessment and either a quick template or custom sections.');
         return;
@@ -148,6 +148,14 @@ export async function generateHtmlReport(selectedAssessmentIds, allAssessments, 
     const generateHtmlBtn = document.getElementById('generateHtmlBtn');
     generateHtmlBtn.disabled = true;
     generateHtmlBtn.innerHTML = `<i class="loader"></i> Generating HTML...`;
+
+    let reportTitleForButton = 'Generate Report';
+    if (currentMode === 'template' && selectedTemplate) {
+        const templateInfo = quickTemplates[selectedTemplate];
+        reportTitleForButton = `📄 Generate ${templateInfo.name} Report`;
+    } else if (currentMode === 'custom' && customSelectedSections.size > 0) {
+        reportTitleForButton = '📄 Generate Custom Report';
+    }
 
     try {
         const selectedData = allAssessments.filter(a => selectedAssessmentIds.has(a.id));
