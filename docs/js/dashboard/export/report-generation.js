@@ -18,7 +18,7 @@ export async function fetchTemplate(templateName) {
         throw new Error(`Failed to fetch template: ${templateName}`);
     }
     const templateString = await response.text();
-    return Handlebars.compile(templateString);
+    return window.Handlebars.compile(templateString);
 }
 
 // Data preparation for Handlebars templates
