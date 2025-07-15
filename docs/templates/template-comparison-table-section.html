@@ -16,11 +16,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{#each allSelectedData}}
+                        {{#each comparisonData}}
                         <tr>
-                            <td>{{this.assessment_data.name}}</td>
-                            <td class="comparison-table-section__score-cell">{{this.assessment_data.total_score}}</td>
-                            <td class="comparison-table-section__risk-cell comparison-table-section__risk-cell--{{this.assessment_data.risk_level_lower}}">{{this.assessment_data.risk_level}}</td>
+                            <td>{{this.name}}</td>
+                            <td class="comparison-table-section__score-cell">{{this.total_score}}</td>
+                            <td class="comparison-table-section__risk-cell comparison-table-section__risk-cell--{{this.risk_level}}">{{this.risk_level}}</td>
                             <!-- Add more data points for comparison -->
                         </tr>
                         {{/each}}
