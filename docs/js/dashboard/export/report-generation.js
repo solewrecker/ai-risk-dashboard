@@ -1,7 +1,7 @@
 // docs/js/dashboard/export/report-generation.js
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import Handlebars from 'https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js';
+// import Handlebars from 'https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js'; // No longer needed
 
 // Supabase Client (might be imported from a shared API module later)
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
