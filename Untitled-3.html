@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Pro - Export Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid #334155;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: #60a5fa;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #60a5fa;
+        }
+
+        .nav-tab:hover {
+            color: #e2e8f0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Theme Gallery */
+        .theme-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .theme-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-card:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+
+        .theme-card.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 200px;
+            background: #0f172a;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-preview.modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-preview.corporate {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+
+        .theme-preview.minimal {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .theme-preview.dark {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+        }
+
+        .theme-preview::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .theme-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .theme-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .theme-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .theme-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .theme-badge.free {
+            background: #10b981;
+            color: white;
+        }
+
+        .theme-badge.premium {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .theme-badge.pro {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .theme-description {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .theme-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Report Configuration */
+        .report-config {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .report-option {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .report-option:hover {
+            border-color: #60a5fa;
+        }
+
+        .report-option.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .report-icon {
+            width: 48px;
+            height: 48px;
+            background: #60a5fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-description {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 2rem;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .preview-content {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 2rem;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-mock {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.3;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .preview-text {
+            position: relative;
+            z-index: 1;
+            color: #94a3b8;
+            text-align: center;
+            padding-top: 150px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #60a5fa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3b82f6;
+        }
+
+        .btn-secondary {
+            background: #374151;
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Marketplace Elements */
+        .marketplace-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: #374151;
+            color: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #60a5fa;
+        }
+
+        .ai-generator {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .ai-generator h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-generator p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .ai-btn {
+            background: white;
+            color: #8b5cf6;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-input {
+            display: none;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #60a5fa;
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-input:checked + .checkbox-label .checkbox-custom {
+            background: #60a5fa;
+        }
+
+        .checkbox-input:checked + .checkbox-label .checkbox-custom::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Export Center</h1>
+            <p>Create and customize your assessment reports with themes and data configurations</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('themes')">Theme Gallery</button>
+            <button class="nav-tab" onclick="switchTab('marketplace')">Marketplace</button>
+            <button class="nav-tab" onclick="switchTab('ai-generator')">AI Generator</button>
+        </div>
+
+        <div id="themes" class="tab-content active">
+            <div class="layout-container">
+                <div>
+                    <h2 style="margin-bottom: 1.5rem;">Choose Your Theme</h2>
+                    <div class="theme-gallery">
+                        <div class="theme-card selected" onclick="selectTheme(this, 'modern')">
+                            <div class="theme-preview modern"></div>
+                            <div class="theme-info">
+                                <div class="theme-name">Modern</div>
+                                <div class="theme-badge free">Free</div>
+                            </div>
+                            <div class="theme-description">Clean, professional design with gradients and modern typography</div>
+                            <div class="theme-features">
+                                <span class="feature-tag">Responsive</span>
+                                <span class="feature-tag">Dark Mode</span>
+                                <span class="feature-tag">Charts</span>
+                            </div>
+                        </div>
+
+                        <div class="theme-card" onclick="selectTheme(this, 'corporate')">
+                            <div class="theme-preview corporate"></div>
+                            <div class="theme-info">
+                                <div class="theme-name">Corporate</div>
+                                <div class="theme-badge premium">Premium</div>
+                            </div>
+                            <div class="theme-description">Traditional business theme with formal layouts and conservative colors</div>
+                            <div class="theme-features">
+                                <span class="feature-tag">Print Ready</span>
+                                <span class="feature-tag">Logo Support</span>
+                                <span class="feature-tag">Branded</span>
+                            </div>
+                        </div>
+
+                        <div class="theme-card" onclick="selectTheme(this, 'minimal')">
+                            <div class="theme-preview minimal"></div>
+                            <div class="theme-info">
+                                <div class="theme-name">Minimal</div>
+                                <div class="theme-badge free">Free</div>
+                            </div>
+                            <div class="theme-description">Simple, clean design focusing on content with minimal distractions</div>
+                            <div class="theme-features">
+                                <span class="feature-tag">Lightweight</span>
+                                <span class="feature-tag">Fast Load</span>
+                                <span class="feature-tag">Clean</span>
+                            </div>
+                        </div>
+
+                        <div class="theme-card" onclick="selectTheme(this, 'dark')">
+                            <div class="theme-preview dark"></div>
+                            <div class="theme-info">
+                                <div class="theme-name">Dark Pro</div>
+                                <div class="theme-badge pro">Pro</div>
+                            </div>
+                            <div class="theme-description">Dark theme optimized for technical reports with syntax highlighting</div>
+                            <div class="theme-features">
+                                <span class="feature-tag">Dark Mode</span>
+                                <span class="feature-tag">Technical</span>
+                                <span class="feature-tag">Syntax</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-config">
+                        <h3 style="margin-bottom: 1.5rem;">Configure Report Content</h3>
+                        <div class="report-grid">
+                            <div class="report-option selected" onclick="toggleReport(this)">
+                                <input type="checkbox" class="checkbox-input" id="exec-summary" checked>
+                                <label for="exec-summary" class="checkbox-label">
+                                    <div class="checkbox-custom"></div>
+                                    <div>
+                                        <div class="report-title">Executive Summary</div>
+                                        <div class="report-description">High-level overview with scores and risks</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="report-option" onclick="toggleReport(this)">
+                                <input type="checkbox" class="checkbox-input" id="detailed-breakdown">
+                                <label for="detailed-breakdown" class="checkbox-label">
+                                    <div class="checkbox-custom"></div>
+                                    <div>
+                                        <div class="report-title">Detailed Breakdown</div>
+                                        <div class="report-description">In-depth analysis of all findings</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="report-option" onclick="toggleReport(this)">
+                                <input type="checkbox" class="checkbox-input" id="recommendations">
+                                <label for="recommendations" class="checkbox-label">
+                                    <div class="checkbox-custom"></div>
+                                    <div>
+                                        <div class="report-title">Recommendations</div>
+                                        <div class="report-description">Actionable recommendations and next steps</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="report-option" onclick="toggleReport(this)">
+                                <input type="checkbox" class="checkbox-input" id="comparison">
+                                <label for="comparison" class="checkbox-label">
+                                    <div class="checkbox-custom"></div>
+                                    <div>
+                                        <div class="report-title">Comparison Table</div>
+                                        <div class="report-description">Side-by-side comparison of tools</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <div class="preview-title">Live Preview</div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-mock"></div>
+                        <div class="preview-text">
+                            <p>Select a theme and reports to see preview</p>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary">Save Template</button>
+                        <button class="btn btn-primary">Export Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="marketplace" class="tab-content">
+            <div class="marketplace-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Free</button>
+                <button class="filter-btn">Premium</button>
+                <button class="filter-btn">Most Popular</button>
+                <button class="filter-btn">Newest</button>
+            </div>
+
+            <div class="theme-gallery">
+                <div class="theme-card">
+                    <div class="theme-preview modern"></div>
+                    <div class="theme-info">
+                        <div class="theme-name">Cybersecurity Pro</div>
+                        <div class="theme-badge premium">$19</div>
+                    </div>
+                    <div class="theme-description">Specialized theme for cybersecurity reports with threat indicators</div>
+                    <div class="theme-features">
+                        <span class="feature-tag">Threat Maps</span>
+                        <span class="feature-tag">Risk Matrix</span>
+                        <span class="feature-tag">Compliance</span>
+                    </div>
+                </div>
+
+                <div class="theme-card">
+                    <div class="theme-preview corporate"></div>
+                    <div class="theme-info">
+                        <div class="theme-name">Financial Report</div>
+                        <div class="theme-badge premium">$29</div>
+                    </div>
+                    <div class="theme-description">Professional financial reporting theme with charts and tables</div>
+                    <div class="theme-features">
+                        <span class="feature-tag">Financial Charts</span>
+                        <span class="feature-tag">Compliance</span>
+                        <span class="feature-tag">Auditable</span>
+                    </div>
+                </div>
+
+                <div class="theme-card">
+                    <div class="theme-preview minimal"></div>
+                    <div class="theme-info">
+                        <div class="theme-name">Technical Documentation</div>
+                        <div class="theme-badge free">Free</div>
+                    </div>
+                    <div class="theme-description">Clean documentation theme perfect for technical reports</div>
+                    <div class="theme-features">
+                        <span class="feature-tag">Code Blocks</span>
+                        <span class="feature-tag">Diagrams</span>
+                        <span class="feature-tag">TOC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ai-generator" class="tab-content">
+            <div class="ai-generator">
+                <h3>AI Theme Generator</h3>
+                <p>Describe your ideal report theme and let AI create a custom design for you</p>
+                <button class="ai-btn" onclick="openAIGenerator()">Generate Custom Theme</button>
+            </div>
+
+            <div style="background: #1e293b; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Recent AI Generations</h3>
+                <div class="theme-gallery">
+                    <div class="theme-card">
+                        <div class="theme-preview dark"></div>
+                        <div class="theme-info">
+                            <div class="theme-name">My Custom Theme</div>
+                            <div class="theme-badge pro">AI Generated</div>
+                        </div>
+                        <div class="theme-description">Healthcare compliance theme with medical iconography</div>
+                        <div class="theme-features">
+                            <span class="feature-tag">Healthcare</span>
+                            <span class="feature-tag">HIPAA</span>
+                            <span class="feature-tag">Medical</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTheme = 'modern';
+        let selectedReports = ['exec-summary'];
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function selectTheme(element, theme) {
+            // Remove selection from all theme cards
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            element.classList.add('selected');
+            selectedTheme = theme;
+            updatePreview();
+        }
+
+        function toggleReport(element) {
+            const checkbox = element.querySelector('.checkbox-input');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+                selectedReports.push(checkbox.id);
+            } else {
+                element.classList.remove('selected');
+                selectedReports = selectedReports.filter(id => id !== checkbox.id);
+            }
+            
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const preview = document.querySelector('.preview-mock');
+            const previewText = document.querySelector('.preview-text');
+            
+            // Update preview based on selected theme
+            const themeClasses = {
+                'modern': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'corporate': 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
+                'minimal': 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                'dark': 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)'
+            };
+            
+            preview.style.background = themeClasses[selectedTheme];
+            
+            if (selectedReports.length > 0) {
+                previewText.innerHTML = `
+                    <h4>Preview: ${selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)} Theme</h4>
+                    <p>Selected sections: ${selectedReports.length}</p>
+                    <p style="margin-top: 1rem; font-size: 0.8rem;">This preview shows how your selected theme will style the chosen report sections.</p>
+                `;
+            } else {
+                previewText.innerHTML = '<p>Select reports to see preview</p>';
+            }
+        }
+
+        function openAIGenerator() {
+            alert('AI Theme Generator would open here - allowing users to describe their ideal theme and generate custom designs.');
+        }
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>

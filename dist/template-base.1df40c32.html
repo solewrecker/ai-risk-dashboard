@@ -1,0 +1,236 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tool Security Assessment Report</title>
+    <link rel="stylesheet" href="/template-base.5791482b.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Report Header -->
+        <header class="report-header">
+            <div class="report-header__content">
+                <h1 class="report-header__title">AI Tool Security Assessment</h1>
+                <p class="report-header__subtitle">Microsoft Copilot - Microsoft Corporation</p>
+                <div class="report-header__meta">
+                    <div class="report-header__meta-item">
+                        <span>📊</span>
+                        <span>Assessment Date: July 13, 2025</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>🏢</span>
+                        <span>Assessed by: AI Security Council</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>📋</span>
+                        <span>Category: Design &amp; Creative</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>🔒</span>
+                        <span>Data Classification: Financial</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content area for sections to be dynamically inserted -->
+        <main id="report-content">
+            <!-- Executive Summary -->
+            <section class="executive-summary">
+                <div class="executive-summary__header">
+                    <h2 class="executive-summary__title">Executive Summary</h2>
+                    <div class="executive-summary__score">
+                        <span class="executive-summary__score-value">78</span>
+                        <div class="executive-summary__score-label">Overall Score</div>
+                    </div>
+                </div>
+                
+                <div class="executive-summary__content">
+                    <div>
+                        <h3 style="color: #2c3e50; margin-bottom: 15px">Risk Assessment</h3>
+                        <div class="risk-badge risk-badge--high">
+                            ⚠️ High Risk
+                        </div>
+                        <p style="color: #555; margin-top: 15px; line-height: 1.7">
+                            HIGH RISK tool unsuitable for business use due to lack of enterprise controls, unclear training data policies for free version, and missing compliance certifications. Recommend blocking for sensitive data and consider enterprise alternative.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 style="color: #2c3e50; margin-bottom: 15px">Primary Use Case</h3>
+                        <p style="color: #555; line-height: 1.7">
+                            General productivity assistance and content generation
+                        </p>
+                        <h3 style="color: #2c3e50; margin-top: 20px; margin-bottom: 15px">Confidence Level</h3>
+                        <div style="background: #e9ecef; border-radius: 4px; height: 8px; overflow: hidden">
+                            <div style="background: #3498db; border-radius: 4px; width: 60%; height: 100%"></div>
+                        </div>
+                        <p style="color: #7f8c8d; margin-top: 5px; font-size: .9rem">60% Confidence</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Breakdown -->
+            <section class="detailed-breakdown">
+                <h2 class="detailed-breakdown__title">Detailed Risk Assessment</h2>
+                
+                <div class="assessment-category">
+                    <div class="assessment-category__header" onclick="toggleCategory(this)">
+                        <h3 class="assessment-category__name">Data Storage and Security</h3>
+                        <div class="assessment-category__score">
+                            <span class="assessment-category__score-value">23</span>
+                            <button class="assessment-category__toggle">▼</button>
+                        </div>
+                    </div>
+                    <div class="assessment-category__content">
+                        <p class="assessment-category__description">
+                            Unclear data retention and geographic control for free users.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="assessment-category">
+                    <div class="assessment-category__header" onclick="toggleCategory(this)">
+                        <h3 class="assessment-category__name">Training Data Usage</h3>
+                        <div class="assessment-category__score">
+                            <span class="assessment-category__score-value">15</span>
+                            <button class="assessment-category__toggle">▼</button>
+                        </div>
+                    </div>
+                    <div class="assessment-category__content">
+                        <p class="assessment-category__description">
+                            User data may be used for model training by default, requiring user opt-out.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="assessment-category">
+                    <div class="assessment-category__header" onclick="toggleCategory(this)">
+                        <h3 class="assessment-category__name">Access Controls</h3>
+                        <div class="assessment-category__score">
+                            <span class="assessment-category__score-value">20</span>
+                            <button class="assessment-category__toggle">▼</button>
+                        </div>
+                    </div>
+                    <div class="assessment-category__content">
+                        <p class="assessment-category__description">
+                            Access controls are minimal for the free version, lacking enterprise integration like SSO.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="assessment-category">
+                    <div class="assessment-category__header" onclick="toggleCategory(this)">
+                        <h3 class="assessment-category__name">Compliance and Legal Risk</h3>
+                        <div class="assessment-category__score">
+                            <span class="assessment-category__score-value">12</span>
+                            <button class="assessment-category__toggle">▼</button>
+                        </div>
+                    </div>
+                    <div class="assessment-category__content">
+                        <p class="assessment-category__description">
+                            Free version lacks enterprise compliance certifications (e.g., SOC 2, ISO 27001).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="assessment-category">
+                    <div class="assessment-category__header" onclick="toggleCategory(this)">
+                        <h3 class="assessment-category__name">Vendor Transparency</h3>
+                        <div class="assessment-category__score">
+                            <span class="assessment-category__score-value">8</span>
+                            <button class="assessment-category__toggle">▼</button>
+                        </div>
+                    </div>
+                    <div class="assessment-category__content">
+                        <p class="assessment-category__description">
+                            Documentation is limited for the free version, lacking detailed security whitepapers.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recommendations -->
+            <section class="recommendations">
+                <h2 class="recommendations__title">Key Recommendations</h2>
+                
+                <div class="recommendation-item recommendation-item--high">
+                    <div class="recommendation-item__content">
+                        <h3 class="recommendation-item__title">Block for sensitive data processing</h3>
+                        <p class="recommendation-item__description">
+                            Free version lacks enterprise controls and compliance certifications required for business data
+                        </p>
+                    </div>
+                    <div class="priority-badge priority-badge--high">High</div>
+                </div>
+
+                <div class="recommendation-item recommendation-item--medium">
+                    <div class="recommendation-item__content">
+                        <h3 class="recommendation-item__title">Consider Microsoft 365 Copilot for business use</h3>
+                        <p class="recommendation-item__description">
+                            Enterprise version provides better data protection, compliance, and administrative controls
+                        </p>
+                    </div>
+                    <div class="priority-badge priority-badge--medium">Medium</div>
+                </div>
+
+                <div class="recommendation-item recommendation-item--medium">
+                    <div class="recommendation-item__content">
+                        <h3 class="recommendation-item__title">User education required</h3>
+                        <p class="recommendation-item__description">
+                            If allowing limited personal use, educate users on data handling and privacy implications
+                        </p>
+                    </div>
+                    <div class="priority-badge priority-badge--medium">Medium</div>
+                </div>
+            </section>
+
+            <!-- Compliance Section -->
+            <section class="compliance-section">
+                <h2 class="compliance-section__title">Compliance Status</h2>
+                <div class="compliance-grid">
+                    <div class="compliance-item">
+                        <div class="compliance-item__header">
+                            <span class="compliance-item__name">CCPA</span>
+                            <span class="compliance-status compliance-status--conditional">Conditionally Compliant</span>
+                        </div>
+                    </div>
+                    <div class="compliance-item">
+                        <div class="compliance-item__header">
+                            <span class="compliance-item__name">GDPR</span>
+                            <span class="compliance-status compliance-status--conditional">Conditionally Compliant</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Report Footer -->
+            <footer class="report-footer">
+                <div class="report-footer__grid">
+                    <div class="report-footer__section">
+                        <h3 class="report-footer__section-title">Assessment Notes</h3>
+                        <div class="report-footer__section-content">
+                            Confidence limited due to lack of specific documentation for free consumer version. Assessment based on publicly available privacy policies and general Microsoft enterprise documentation. Significant gaps in enterprise-specific controls and compliance for free version.
+                        </div>
+                    </div>
+                    <div class="report-footer__section">
+                        <h3 class="report-footer__section-title">Documentation Sources</h3>
+                        <div class="report-footer__section-content">
+                            <p><strong>Tier 1:</strong> Public Only</p>
+                            <p><strong>License Type:</strong> Free</p>
+                            <p><strong>Sources:</strong> Microsoft Learn Documentation, Support Documentation</p>
+                        </div>
+                    </div>
+                    <div class="report-footer__section">
+                        <h3 class="report-footer__section-title">Azure Permissions</h3>
+                        <div class="report-footer__section-content">
+                            <p><strong>Required:</strong> user.read, profile.read</p>
+                            <p><strong>Restrictions:</strong> Block access to confidential data repositories</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/template-base.69dc19f3.js"></script>
+
+<script src="/template-base.9b35e5d7.js"></script></body></html>

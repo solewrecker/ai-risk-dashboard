@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tool Security Assessment Report</title>
+    <link rel="stylesheet" href="../css/pages/default-export-page.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Report Header -->
+        <header class="report-header">
+            <div class="report-header__content">
+                <h1 class="report-header__title">AI Tool Security Assessment</h1>
+                <p class="report-header__subtitle">{{toolSubtitle}} - {{toolName}}</p>
+                <div class="report-header__meta">
+                    <div class="report-header__meta-item">
+                        <span>📊</span>
+                        <span>Assessment Date: {{reportDate}}</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>🏢</span>
+                        <span>Assessed by: AI Security Council</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>📋</span>
+                        <span>Category: Design & Creative</span>
+                    </div>
+                    <div class="report-header__meta-item">
+                        <span>🔒</span>
+                        <span>Data Classification: Financial</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Template Name -->
+        <div class="template-name">
+            <h2 class="template-name__title">Premium Report</h2>
+        </div>
+
+        <!-- Main content area for sections to be dynamically inserted -->
+        <main id="report-content">
+            {{{sectionsHtml}}}
+        </main>
+
+
+    </div>
+</body>
+</html>

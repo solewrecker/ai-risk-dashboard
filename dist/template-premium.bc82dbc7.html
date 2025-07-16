@@ -1,0 +1,451 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium AI Risk Assessment Report</title>
+    <style>:root {
+  --risk-color: #8b5cf6;
+  --risk-degrees: 180deg;
+  --primary-text: #1e293b;
+  --secondary-text: #475569;
+  --background-color: #f1f5f9;
+  --card-background: #fff;
+  --header-gradient-start: #4c1d95;
+  --header-gradient-end: #8b5cf6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--primary-text);
+  background: var(--background-color);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+  line-height: 1.6;
+}
+
+.report-container {
+  background: var(--card-background);
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px -1px #0000001a;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+  color: #fff;
+  padding: 3rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.header:before {
+  content: "";
+  background: #ffffff1a;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50px, -50px);
+}
+
+.header-content {
+  z-index: 2;
+  text-align: center;
+  position: relative;
+}
+
+.report-title {
+  letter-spacing: -.025em;
+  margin-bottom: .5rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.report-subtitle {
+  opacity: .9;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.tool-highlight {
+  background: #ffffff26;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  padding: 1rem;
+}
+
+.tool-highlight .tool-name {
+  margin-bottom: .25rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.tool-highlight .tool-subtitle {
+  opacity: .9;
+  font-size: 1rem;
+}
+
+.report-meta {
+  border-top: 1px solid #fff3;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  font-size: .9rem;
+  display: flex;
+}
+
+.executive-summary {
+  background: var(--card-background);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 2rem;
+}
+
+.summary-header {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: var(--primary-text);
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+}
+
+.summary-grid {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+  display: grid;
+}
+
+.risk-score-display {
+  background: linear-gradient(135deg, var(--risk-color, #8b5cf6) 0%, var(--risk-color-light, #a78bfa) 100%);
+  text-align: center;
+  color: #fff;
+  border-radius: 16px;
+  min-width: 250px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px #00000026;
+}
+
+.risk-score-number {
+  margin-bottom: .5rem;
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.risk-score-total {
+  opacity: .9;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.risk-level-badge {
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  backdrop-filter: blur(10px);
+  background: #fff3;
+  border-radius: 25px;
+  margin-bottom: 1rem;
+  padding: .75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.risk-description {
+  color: #ffffffe6;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.risk-low {
+  --risk-color: #10b981;
+  --risk-color-light: #34d399;
+}
+
+.risk-medium {
+  --risk-color: #f59e0b;
+  --risk-color-light: #fbbf24;
+}
+
+.risk-high {
+  --risk-color: #ef4444;
+  --risk-color-light: #f87171;
+}
+
+.risk-critical {
+  --risk-color: #dc2626;
+}
+
+.premium-analysis, .assessment-metadata, .compliance-section, .permissions-section, .sources-section {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 2rem;
+}
+
+.analysis-grid, .metadata-grid, .permissions-grid {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  display: grid;
+}
+
+.analysis-item, .metadata-item, .permissions-list {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.analysis-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.analysis-item h4, .metadata-item h4, .permissions-list h4 {
+  color: var(--secondary-text);
+  margin-bottom: .5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.compliance-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  display: grid;
+}
+
+.compliance-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: box-shadow .3s;
+}
+
+.compliance-card:hover {
+  box-shadow: 0 4px 12px #00000014;
+}
+
+.compliance-name {
+  margin-bottom: .5rem;
+  font-weight: 600;
+}
+
+.compliance-status {
+  color: #fff;
+  border-radius: 12px;
+  margin-bottom: .5rem;
+  padding: .25rem .75rem;
+  font-size: .875rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.status-conditionally-compliant {
+  background-color: #f59e0b;
+}
+
+.status-not-applicable {
+  background-color: #64748b;
+}
+
+.status-no {
+  background-color: #ef4444;
+}
+
+.permissions-list ul, .sources-list {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.permissions-list li, .sources-list li {
+  margin-bottom: .5rem;
+}
+
+.sources-list a {
+  color: var(--risk-color);
+  text-decoration: none;
+}
+
+.sources-list a:hover {
+  text-decoration: underline;
+}
+
+.summary-insights {
+  flex-direction: column;
+  display: flex;
+}
+
+.premium-features {
+  background: #e0e7ff;
+  border-bottom: 1px solid #c7d2fe;
+  padding: 2rem;
+}
+
+.premium-features .section-title {
+  color: #3730a3;
+}
+
+.feature-list {
+  padding: 0;
+  list-style: none;
+}
+
+.feature-item {
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+}
+
+.feature-icon {
+  color: #6366f1;
+  font-size: 1.5rem;
+}
+</style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Report Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="report-title">Premium AI Security Assessment</h1>
+                <div class="tool-highlight">
+                    <div class="tool-name">{{toolName}}</div>
+                    <div class="tool-subtitle">{{toolVendor}}</div>
+                </div>
+                <div class="report-meta">
+                    <span>Assessment Date: {{assessmentDate}}</span>
+                    <span>Assessed By: {{assessedBy}}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Executive Summary -->
+        <section class="executive-summary">
+            <div class="summary-header">
+                <h2 class="section-title">Executive Summary</h2>
+            </div>
+            <div class="summary-grid">
+                <div class="risk-score-display {{riskLevelClass}}">
+                    <div class="risk-score-number">{{overallScore}}</div>
+                    <div class="risk-score-total">/ 100</div>
+                    <div class="risk-level-badge">{{riskLevel}}</div>
+                    <p class="risk-description">{{riskSummary}}</p>
+                </div>
+                <div class="summary-insights">
+                    <!-- Insights here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW PREMIUM SECTION -->
+        <section class="premium-features">
+            <h2 class="section-title">Premium Analysis</h2>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <span class="feature-icon">🛡️</span>
+                    <span>In-depth Threat Intelligence Integration</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">⚖️</span>
+                    <span>Advanced Legal &amp; Compliance Analysis</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">📈</span>
+                    <span>Peer Benchmarking Data</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Detailed Breakdown will be inserted here -->
+        <main id="report-content">
+            <section class="premium-analysis">
+                <h2 class="section-title">Premium Analysis</h2>
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <h4>Confidence Score</h4>
+                        <p>{{ confidence }}</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>Documentation Tier</h4>
+                        <p>{{ documentationTier }}</p>
+                    </div>
+                    <div class="analysis-item full-width">
+                        <h4>Assessment Notes</h4>
+                        <p>{{ assessmentNotes }}</p>
+                    </div>
+                </div>
+            </section>
+            <section class="assessment-metadata">
+                <h2 class="section-title">Assessment Metadata</h2>
+                <div class="metadata-grid">
+                    <div class="metadata-item">
+                        <h4>Primary Use Case</h4>
+                        <p>{{ primaryUseCase }}</p>
+                    </div>
+                    <div class="metadata-item">
+                        <h4>Data Classification</h4>
+                        <p>{{ dataClassification }}</p>
+                    </div>
+                </div>
+            </section>
+            <section class="compliance-section">
+                <h2 class="section-title">Compliance &amp; Certifications</h2>
+                <div class="compliance-grid">
+                    {{#each complianceCertifications}}
+                    <div class="compliance-card">
+                        <div class="compliance-name">{{ name }}</div>
+                        <div class="compliance-status status-{{toLowerCase status}}">{{ status }}</div>
+                        <div class="compliance-details">{{ details }}</div>
+                    </div>
+                    {{/each}}
+                </div>
+            </section>
+            <section class="permissions-section">
+                <h2 class="section-title">Azure Permissions</h2>
+                <div class="permissions-grid">
+                    <div class="permissions-list">
+                        <h4>Required Permissions</h4>
+                        <ul>
+                            {{#each azurePermissions.required_permissions}}
+                            <li>{{ this }}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                    <div class="permissions-list">
+                        <h4>Recommended Restrictions</h4>
+                        <ul>
+                            {{#each azurePermissions.recommended_restrictions}}
+                            <li>{{ this }}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section class="sources-section">
+                <h2 class="section-title">Sources</h2>
+                <ul class="sources-list">
+                    {{#each sources}}
+                    <li><a href="{{ url }}" target="_blank">{{ title }}</a> (Last Updated: {{ last_updated }})</li>
+                    {{/each}}
+                </ul>
+            </section>
+        </main>
+
+    </div>
+
+<script src="/template-premium.2390722c.js"></script></body></html>

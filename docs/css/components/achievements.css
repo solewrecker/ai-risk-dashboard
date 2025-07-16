@@ -44,9 +44,9 @@
 }
 
 .achievement-card.unlocked {
-    background: var(--color-green-500/10);
-    border-color: var(--color-green-500/30);
-    box-shadow: 0 0 0 1px var(--color-green-500/20), 0 2px 8px var(--color-green-500/10);
+    background: rgba(22, 163, 74, 0.1);
+    border-color: rgba(22, 163, 74, 0.3);
+    box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.2), 0 2px 8px rgba(22, 163, 74, 0.1);
     transition: all 200ms ease;
 }
 
@@ -167,7 +167,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-green-400);
-    background: var(--color-green-500/10);
+    background: rgba(22, 163, 74, 0.1);
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     width: fit-content;
@@ -182,8 +182,8 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: var(--color-yellow-400/10);
-    border: 1px solid var(--color-yellow-500/30);
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     display: flex;

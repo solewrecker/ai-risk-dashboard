@@ -1,0 +1,37 @@
+{
+  "name": "ai-tool-risk-framework-app",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solewrecker/ai-risk-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/solewrecker/ai-risk-dashboard/issues"
+  },
+  "homepage": "https://github.com/solewrecker/ai-risk-dashboard#readme",
+  "devDependencies": {
+    "@parcel/transformer-inline-string": "^2.15.4",
+    "buffer": "^6.0.3",
+    "parcel": "^2.15.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.51.0",
+    "handlebars": "^4.7.8",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "lucide": "^0.525.0",
+    "qrcode": "^1.5.4",
+    "qrcodejs": "^1.0.0"
+  }
+}

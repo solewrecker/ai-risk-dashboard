@@ -1,7 +1,7 @@
 // docs/js/dashboard/export.js
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { generateReport, generateHtmlReport } from './export/report-generation.js';
+import { createClient } from '@supabase/supabase-js';
+import { prepareReportData } from './export/report-generation.js';
 
 // --- Supabase Client ---
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
@@ -13,7 +13,11 @@ let allAssessments = [];
 const selectedAssessmentIds = new Set();
 let selectedTemplate = 'summary'; // Default to summary template
 let currentMode = 'template'; // 'template' or 'custom'
+let selectedTheme = 'theme-professional'; // Default to professional theme
 let customSelectedSections = new Set(); // For mix-and-match
+
+// Flag to ensure event listeners are attached only once
+let listenersAttached = false;
 
 // Define template sections for quick select
 const quickTemplates = {
@@ -31,6 +35,11 @@ const quickTemplates = {
         name: 'Comparison Report',
         sections: ['summary-section', 'comparison-table-section'], // Example sections
         pages: '5-7 pages'
+    },
+    premium: {
+        name: 'Premium Report',
+        sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section', 'premium-section'],
+        pages: '12-15 pages'
     }
 };
 
@@ -50,13 +59,13 @@ const sectionDisplayNames = {
 const assessmentSelector = document.getElementById('assessment-selector');
 const templateSelector = document.querySelector('.template-selector--quick-select'); // This is now the quick-select container
 const mixMatchSelector = document.querySelector('.mix-match-selector'); // This is for custom sections
-const generateReportBtn = document.getElementById('generateReportBtn');
-const generateHtmlBtn = document.getElementById('generateHtmlBtn'); // New HTML button
+const previewReportBtn = document.getElementById('previewReportBtn');
 const generateHelpText = document.getElementById('generateHelpText');
 const customNotice = document.getElementById('custom-notice');
 const modeIndicator = document.querySelector('.export-mode-indicator');
 const previewSectionsContainer = document.getElementById('preview-sections');
 const previewStatus = document.querySelector('.export-preview-status');
+// themeSelector removed - now using theme gallery system
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -85,6 +94,15 @@ async function init() {
         handleAuthError('No active user session. Please log in.');
     }
 
+    // Initialize tab navigation and theme gallery
+    initializeTabNavigation();
+    initializeThemeGallery();
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
     // Set up listener for subsequent auth state changes
     supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('onAuthStateChange event:', event, 'session:', session);
@@ -93,7 +111,7 @@ async function init() {
                 console.log('onAuthStateChange: User session active or refreshed.');
                 // Only load if assessments haven't been loaded yet OR if the session changes to logged in
                 // This prevents re-loading if already successfully loaded on init()
-                if (allAssessments.length === 0 || generateReportBtn.disabled) { // Check if assessments are empty or if buttons are disabled (implying auth issue)
+                if (allAssessments.length === 0) {
                     await loadAssessments();
                     setupEventListeners(); // Re-set up listeners if elements changed/re-rendered
                 }
@@ -105,10 +123,188 @@ async function init() {
     });
 }
 
+// Initialize tab navigation
+function initializeTabNavigation() {
+    const tabs = document.querySelectorAll('.export-nav__tab');
+    const tabContents = document.querySelectorAll('.export-tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (tab.classList.contains('export-nav__tab--disabled')) {
+                return;
+            }
+
+            const targetTab = tab.dataset.tab;
+
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('export-nav__tab--active'));
+            tab.classList.add('export-nav__tab--active');
+
+            // Update active content
+            tabContents.forEach(content => {
+                content.classList.remove('export-tab-content--active');
+            });
+            
+            const targetContent = document.getElementById(`${targetTab}-content`);
+            if (targetContent) {
+                targetContent.classList.add('export-tab-content--active');
+            }
+
+            // Re-initialize Lucide icons for new content
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    });
+}
+
+// Initialize theme gallery
+function initializeThemeGallery() {
+    const themeCards = document.querySelectorAll('.theme-card');
+    const previewMock = document.getElementById('theme-preview-mock');
+    const currentThemeName = document.getElementById('current-theme-name');
+    const applyThemeBtn = document.getElementById('apply-theme-btn');
+    const previewWithThemeBtn = document.getElementById('preview-with-theme-btn');
+
+    // Theme configurations for preview updates
+    const themeConfigs = {
+        'theme-professional': {
+            name: 'Professional Theme',
+            headerColor: '#1e40af',
+            scoreColor: '#1e40af',
+            scoreBg: '#eff6ff'
+        },
+        'theme-executive': {
+            name: 'Executive Theme',
+            headerColor: '#1e3a8a',
+            scoreColor: '#1e3a8a',
+            scoreBg: '#eff6ff'
+        },
+        'theme-modern': {
+            name: 'Modern Theme',
+            headerColor: '#7c3aed',
+            scoreColor: '#7c3aed',
+            scoreBg: '#f3e8ff'
+        },
+        'theme-dark': {
+            name: 'Dark Theme',
+            headerColor: '#111827',
+            scoreColor: '#a855f7',
+            scoreBg: '#1f2937'
+        }
+    };
+
+    // Handle theme card selection
+    themeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const themeId = card.dataset.theme;
+            
+            // Update selected state
+            themeCards.forEach(c => c.classList.remove('theme-card--selected'));
+            card.classList.add('theme-card--selected');
+
+            // Update global selected theme
+            selectedTheme = themeId;
+
+            // Update live preview
+            updateThemePreview(themeId, themeConfigs[themeId]);
+        });
+    });
+
+    // Apply theme button
+    if (applyThemeBtn) {
+        applyThemeBtn.addEventListener('click', () => {
+            // Switch to configure tab
+            const configureTab = document.getElementById('configure-tab');
+            if (configureTab) {
+                configureTab.click();
+            }
+            
+            // Show success message or update UI to indicate theme applied
+            showThemeAppliedMessage();
+        });
+    }
+
+    // Preview with theme button
+    if (previewWithThemeBtn) {
+        previewWithThemeBtn.addEventListener('click', () => {
+            // Generate preview with selected theme
+            generatePreview();
+        });
+    }
+
+    // Initialize with default theme
+    updateThemePreview('theme-professional', themeConfigs['theme-professional']);
+}
+
+// Update theme preview mock
+function updateThemePreview(themeId, config) {
+    const previewMock = document.getElementById('theme-preview-mock');
+    const currentThemeName = document.getElementById('current-theme-name');
+    const selectedThemeName = document.getElementById('selected-theme-name');
+    
+    if (!config) return;
+
+    // Update theme name in both locations
+    if (currentThemeName) {
+        currentThemeName.textContent = config.name;
+    }
+    if (selectedThemeName) {
+        selectedThemeName.textContent = config.name;
+    }
+
+    // Update preview mock colors
+    if (previewMock) {
+        const header = previewMock.querySelector('.theme-preview-mock__header');
+        const score = previewMock.querySelector('.theme-preview-mock__score');
+        
+        if (header) {
+            header.style.backgroundColor = config.headerColor;
+        }
+        
+        if (score) {
+            score.style.color = config.scoreColor;
+            score.style.backgroundColor = config.scoreBg;
+        }
+    }
+}
+
+// Show theme applied message
+function showThemeAppliedMessage() {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'theme-applied-notification';
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            font-weight: 500;
+        ">
+            ✓ Theme applied successfully!
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
 function handleAuthError(message) {
     console.log('handleAuthError:', message);
     assessmentSelector.innerHTML = `<p class="text-red-400">${message}</p>`;
-    generateReportBtn.disabled = true;
+    previewReportBtn.disabled = true;
     generateHelpText.textContent = 'Please log in to enable export features.';
     allAssessments = [];
     selectedAssessmentIds.clear();
@@ -192,6 +388,12 @@ function renderAssessmentSelector() {
 
 // --- Event Listeners ---
 function setupEventListeners() {
+    if (listenersAttached) {
+        console.log('setupEventListeners(): Listeners already attached, skipping.');
+        return;
+    }
+    console.log('setupEventListeners(): Attaching event listeners...');
+
     // Quick Select Template selection
     templateSelector.addEventListener('click', (e) => {
         const card = e.target.closest('.template-card');
@@ -227,11 +429,8 @@ function setupEventListeners() {
         }
     });
 
-    // Generate button (remains the same)
-    generateReportBtn.addEventListener('click', () => generateReport(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections));
-
-    // New: Generate HTML button
-    generateHtmlBtn.addEventListener('click', () => generateHtmlReport(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections));
+    // Generate button
+    previewReportBtn.addEventListener('click', () => prepareReportData(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections, selectedTheme));
 
     // Mix-and-match sections selection
     mixMatchSelector.addEventListener('change', (e) => {
@@ -260,6 +459,11 @@ function setupEventListeners() {
             updateUI();
         }
     });
+
+    // Theme selector functionality is now handled by initializeThemeGallery()
+
+    // After all listeners are set up, set the flag to true
+    listenersAttached = true;
 }
 
 // --- UI State Management ---
@@ -293,8 +497,7 @@ function updateUI() {
         helpText = `Ready to generate a ${reportTypeName} for ${selectedAssessmentsCount} assessment(s).`;
     }
 
-    generateReportBtn.disabled = !canGenerate;
-    generateHtmlBtn.disabled = !canGenerate; // Enable/disable HTML button as well
+    previewReportBtn.disabled = !canGenerate;
     generateHelpText.textContent = helpText;
 
     // Update custom notice visibility/text
@@ -347,8 +550,7 @@ function updateUI() {
     });
 
     previewStatus.innerHTML = `<strong>${currentMode === 'template' && selectedTemplate ? quickTemplates[selectedTemplate].name + ' Template' : 'Custom Report'}</strong> • Estimated length: ${estimatedPagesText}`;
-    generateReportBtn.innerHTML = `<i data-lucide="download" class="w-5 h-5 mr-2"></i><span>${reportTitleForButton}</span>`;
-    generateHtmlBtn.innerHTML = `<i data-lucide="code" class="w-5 h-5 mr-2"></i><span>${reportTitleForButton.replace('Generate', 'Generate HTML')}</span>`;
+    previewReportBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5 mr-2"></i><span>Preview Report</span>`;
 
     // Disable comparison template if less than 2 assessments are selected
     const comparisonCard = templateSelector.querySelector('[data-template="comparison"]');
@@ -373,5 +575,4 @@ function updateUI() {
         templateSelector.querySelector('[data-template="summary"]').classList.add('selected');
         selectedTemplate = 'summary';
     }
-    lucide.createIcons();
-} 
+}
