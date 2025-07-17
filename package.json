@@ -7,6 +7,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel serve docs/index.html --port 1234",
     "build": "parcel build docs/*.html --dist-dir dist --public-url /"
   },
   "repository": {

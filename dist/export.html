@@ -1,134 +1,145 @@
-<!DOCTYPE html><html lang=en><script type=importmap>{"imports":{"14NDh":"/index.es.0e1905f8.js","5zbQZ":"/purify.75716046.js"}}</script><script type=module src=/export.dc9c7543.js></script><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><meta http-equiv=Content-Security-Policy content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://*.supabase.co; img-src 'self' data:;"><title>Export Assessments - AI Risk Pro</title><link rel=stylesheet href=/export.26a741d0.css><link rel=stylesheet href=/export.626d2820.css><body class="bg-gray-900 dashboard-page min-h-screen text-white">
-    <div class=flex>
-        
-        <div class="bg-gray-800 min-h-screen p-4 w-64">
-            
-            <div class="flex items-center mb-8 space-x-3">
-                <i data-lucide=shield class="h-8 text-blue-400 w-8"></i>
+<!DOCTYPE html><html lang="en"><head><script type="importmap">{"imports":{"bAPSX":"/index.es.34fb467d.js","lv1wX":"/purify.f659f139.js"}}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://*.supabase.co; img-src 'self' data:;">
+    <title>Export Assessments - AI Risk Pro</title>
+
+    <!-- Parcel will handle all JS and CSS bundling -->
+    
+    <link rel="stylesheet" href="/docs.6998aac1.css">
+    <link rel="stylesheet" href="/export.018b3e2d.css">
+</head>
+<body class="dashboard-page bg-gray-900 text-white min-h-screen">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 min-h-screen p-4">
+            <!-- Brand -->
+            <div class="flex items-center space-x-3 mb-8">
+                <i data-lucide="shield" class="w-8 h-8 text-blue-400"></i>
                 <div>
-                    <h1 class="font-bold text-xl">AI Risk Pro</h1>
-                    <span id=tierBadge class="bg-green-600 px-2 py-0.5 rounded-full text-xs">FREE</span>
+                    <h1 class="text-xl font-bold">AI Risk Pro</h1>
+                    <span id="tierBadge" class="text-xs bg-green-600 px-2 py-0.5 rounded-full">FREE</span>
                 </div>
             </div>
 
-            
-            <nav class=space-y-2>
-                <a href=/dashboard.html class=dashboard-nav>
-                    <div class=dashboard-nav__content>
-                        <i data-lucide=bar-chart-3 class="h-5 w-5"></i>
-                        <span class=dashboard-nav__text>Dashboard</span>
+            <!-- Navigation -->
+            <nav class="space-y-2">
+                <a href="/dashboard.html" class="dashboard-nav">
+                    <div class="dashboard-nav__content">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                        <span class="dashboard-nav__text">Dashboard</span>
                     </div>
                 </a>
             </nav>
         </div>
 
-        
+        <!-- Main Content -->
         <div class="flex-1 p-6">
-            
+            <!-- Header -->
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="font-bold mb-2 text-2xl">Export Center</h2>
-                    <p class=text-gray-400>Create and customize your assessment reports</p>
+                    <h2 class="text-2xl font-bold mb-2">Export Center</h2>
+                    <p class="text-gray-400">Create and customize your assessment reports</p>
                 </div>
             </div>
 
-            
-            <div class=export-nav>
-                <button class="export-nav__tab export-nav__tab--active" data-tab=configure id=configure-tab>
-                    <i data-lucide=settings class="h-5 w-5"></i>
+            <!-- Navigation Tabs -->
+            <div class="export-nav">
+                <button class="export-nav__tab export-nav__tab--active" data-tab="configure" id="configure-tab">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
                     <span>Configure Report</span>
                 </button>
-                <button class=export-nav__tab data-tab=themes id=themes-tab>
-                    <i data-lucide=palette class="h-5 w-5"></i>
+                <button class="export-nav__tab" data-tab="themes" id="themes-tab">
+                    <i data-lucide="palette" class="w-5 h-5"></i>
                     <span>Theme Gallery</span>
                 </button>
-                <button class="export-nav__tab export-nav__tab--disabled" data-tab=marketplace id=marketplace-tab>
-                    <i data-lucide=store class="h-5 w-5"></i>
+                <button class="export-nav__tab export-nav__tab--disabled" data-tab="marketplace" id="marketplace-tab">
+                    <i data-lucide="store" class="w-5 h-5"></i>
                     <span>Marketplace</span>
-                    <span class=export-nav__badge>Soon</span>
+                    <span class="export-nav__badge">Soon</span>
                 </button>
-                <button class="export-nav__tab export-nav__tab--disabled" data-tab=ai-generator id=ai-generator-tab>
-                    <i data-lucide=sparkles class="h-5 w-5"></i>
+                <button class="export-nav__tab export-nav__tab--disabled" data-tab="ai-generator" id="ai-generator-tab">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
                     <span>AI Generator</span>
-                    <span class=export-nav__badge>Soon</span>
+                    <span class="export-nav__badge">Soon</span>
                 </button>
             </div>
 
-            
-            <div class=export-content>
-                
-                <div class="export-tab-content export-tab-content--active" id=configure-content>
-                    <div class=export-hub>
-                        
-                        <div class=export-step>
-                            <div class=export-step__header>
-                                <span class=export-step__number>1</span>
-                                <h3 class=export-step__title>Select Assessments</h3>
+            <!-- Tab Content -->
+            <div class="export-content">
+                <!-- Configure Report Tab -->
+                <div class="export-tab-content export-tab-content--active" id="configure-content">
+                    <div class="export-hub">
+                        <!-- Step 1: Select Assessments -->
+                        <div class="export-step">
+                            <div class="export-step__header">
+                                <span class="export-step__number">1</span>
+                                <h3 class="export-step__title">Select Assessments</h3>
                             </div>
-                            <div class=export-step__content>
-                                <div id=assessment-selector>
-                                    
-                                    <p class=text-gray-400>Loading assessments...</p>
+                            <div class="export-step__content">
+                                <div id="assessment-selector">
+                                    <!-- Assessment selection UI will be dynamically populated here -->
+                                    <p class="text-gray-400">Loading assessments...</p>
                                 </div>
                             </div>
                         </div>
 
-                        
-                        <div class=export-step>
-                            <div class=export-step__header>
-                                <span class=export-step__number>2</span>
-                                <h3 class=export-step__title>Choose Report Type &amp; Sections</h3>
+                        <!-- Step 2: Choose Report Type & Sections -->
+                        <div class="export-step">
+                            <div class="export-step__header">
+                                <span class="export-step__number">2</span>
+                                <h3 class="export-step__title">Choose Report Type &amp; Sections</h3>
                             </div>
-                            <div class=export-step__content>
-                                <div class=export-choice-container>
-                                    <div class=export-choice-section>
-                                        <h4 class=export-choice-title>📋 Quick Select Template</h4>
-                                        <p class=export-choice-subtitle>Choose a pre-built template for a standard report.</p>
+                            <div class="export-step__content">
+                                <div class="export-choice-container">
+                                    <div class="export-choice-section">
+                                        <h4 class="export-choice-title">📋 Quick Select Template</h4>
+                                        <p class="export-choice-subtitle">Choose a pre-built template for a standard report.</p>
                                         
                                         <div class="template-selector template-selector--quick-select">
-                                            <div class=template-card data-template=summary>
-                                                <i data-lucide=file-text class=template-card__icon></i>
-                                                <h4 class=template-card__title>Executive Summary</h4>
-                                                <p class=template-card__description>High-level overview with scores and risks. Ideal for management.</p>
-                                                <span class=template-card__status-badge>PDF</span>
+                                            <div class="template-card" data-template="summary">
+                                                <i data-lucide="file-text" class="template-card__icon"></i>
+                                                <h4 class="template-card__title">Executive Summary</h4>
+                                                <p class="template-card__description">High-level overview with scores and risks. Ideal for management.</p>
+                                                <span class="template-card__status-badge">PDF</span>
                                             </div>
-                                            <div class=template-card data-template=detailed>
-                                                <i data-lucide=file-sliders class=template-card__icon></i>
-                                                <h4 class=template-card__title>Detailed Technical Report</h4>
-                                                <p class=template-card__description>In-depth breakdown of all criteria, justifications, and recommendations.</p>
-                                                <span class=template-card__status-badge>PDF</span>
+                                            <div class="template-card" data-template="detailed">
+                                                <i data-lucide="file-sliders" class="template-card__icon"></i>
+                                                <h4 class="template-card__title">Detailed Technical Report</h4>
+                                                <p class="template-card__description">In-depth breakdown of all criteria, justifications, and recommendations.</p>
+                                                <span class="template-card__status-badge">PDF</span>
                                             </div>
-                                            <div class=template-card data-template=comparison>
-                                                <i data-lucide=columns class=template-card__icon></i>
-                                                <h4 class=template-card__title>Comparison Report</h4>
-                                                <p class=template-card__description>Side-by-side comparison of selected tools. Requires 2+ tools.</p>
-                                                <span class=template-card__status-badge>PDF</span>
+                                            <div class="template-card" data-template="comparison">
+                                                <i data-lucide="columns" class="template-card__icon"></i>
+                                                <h4 class="template-card__title">Comparison Report</h4>
+                                                <p class="template-card__description">Side-by-side comparison of selected tools. Requires 2+ tools.</p>
+                                                <span class="template-card__status-badge">PDF</span>
                                             </div>
-                                            <div class=template-card data-template=premium>
-                                                <i data-lucide=gem class=template-card__icon></i>
-                                                <h4 class=template-card__title>Premium Report</h4>
-                                                <p class=template-card__description>A visually rich report with advanced analytics for stakeholders.</p>
-                                                <span class=template-card__status-badge>Premium</span>
+                                            <div class="template-card" data-template="premium">
+                                                <i data-lucide="gem" class="template-card__icon"></i>
+                                                <h4 class="template-card__title">Premium Report</h4>
+                                                <p class="template-card__description">A visually rich report with advanced analytics for stakeholders.</p>
+                                                <span class="template-card__status-badge">Premium</span>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class=export-divider></div>
+                                    <div class="export-divider"></div>
                                     
-                                    <div class=export-choice-section>
-                                        <h4 class=export-choice-title>⚙️ Customize Sections</h4>
-                                        <p class=export-choice-subtitle>Hand-pick specific sections to build a custom report.</p>
+                                    <div class="export-choice-section">
+                                        <h4 class="export-choice-title">⚙️ Customize Sections</h4>
+                                        <p class="export-choice-subtitle">Hand-pick specific sections to build a custom report.</p>
                                         
-                                        <div class=custom-sections>
-                                            <div class=custom-notice id=custom-notice>
+                                        <div class="custom-sections">
+                                            <div class="custom-notice" id="custom-notice">
                                                 Select sections below to create a custom report
                                             </div>
                                             
-                                            <div class=mix-match-selector>
-                                                <label class=mix-match-selector__section-toggle><input type=checkbox data-section=summary> Executive Summary</label>
-                                                <label class=mix-match-selector__section-toggle><input type=checkbox data-section=detailed> Detailed Breakdown</label>
-                                                <label class=mix-match-selector__section-toggle><input type=checkbox data-section=recommendations> Recommendations</label>
-                                                <label class=mix-match-selector__section-toggle><input type=checkbox data-section=comparison> Comparison Table</label>
+                                            <div class="mix-match-selector">
+                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="summary"> Executive Summary</label>
+                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
+                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="recommendations"> Recommendations</label>
+                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="comparison"> Comparison Table</label>
                                             </div>
                                         </div>
                                     </div>
@@ -136,235 +147,235 @@
                             </div>
                         </div>
 
-                        
-                        <div class=export-step>
-                            <div class=export-step__header>
-                                <span class=export-step__number>3</span>
-                                <h3 class=export-step__title>Preview</h3>
+                        <!-- Step 3: Preview -->
+                        <div class="export-step">
+                            <div class="export-step__header">
+                                <span class="export-step__number">3</span>
+                                <h3 class="export-step__title">Preview</h3>
                             </div>
-                            <div class=export-step__content>
-                                <div class=selected-theme-indicator id=selected-theme-indicator>
-                                    🎨 Theme: <span id=selected-theme-name>Professional Theme</span>
+                            <div class="export-step__content">
+                                <div class="selected-theme-indicator" id="selected-theme-indicator">
+                                    🎨 Theme: <span id="selected-theme-name">Professional Theme</span>
                                 </div>
-                                <div class="export-mode-indicator template" id=mode-indicator>
+                                <div class="export-mode-indicator template" id="mode-indicator">
                                     📋 Using Executive Summary Template
                                 </div>
                                 
-                                <div class=export-preview-panel>
-                                    <div class=export-preview-title>Your Report Will Include</div>
-                                    <div id=preview-sections>
-                                        
-                                        <div class=preview-item>✓ Executive Summary</div>
+                                <div class="export-preview-panel">
+                                    <div class="export-preview-title">Your Report Will Include</div>
+                                    <div id="preview-sections">
+                                        <!-- Dynamic sections will be inserted here -->
+                                        <div class="preview-item">✓ Executive Summary</div>
                                     </div>
-                                    <div class=export-preview-status>
+                                    <div class="export-preview-status">
                                         <strong>Executive Summary Template</strong> • Estimated length: 3-4 pages
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        
-                        <div class=export-step>
-                            <div class=export-step__header>
-                                <span class=export-step__number>4</span>
-                                <h3 class=export-step__title>Generate &amp; Download</h3>
+                        <!-- Step 4: Generate -->
+                        <div class="export-step">
+                            <div class="export-step__header">
+                                <span class="export-step__number">4</span>
+                                <h3 class="export-step__title">Generate &amp; Download</h3>
                             </div>
-                            <div class=export-step__content>
-                                <button id=previewReportBtn class="btn btn-primary w-full" disabled>
-                                    <i data-lucide=eye class="h-5 mr-2 w-5"></i>
+                            <div class="export-step__content">
+                                <button id="previewReportBtn" class="btn btn-primary w-full" disabled="">
+                                    <i data-lucide="eye" class="w-5 h-5 mr-2"></i>
                                     <span>Preview Report</span>
                                 </button>
-                                <p id=generateHelpText class="mt-2 text-gray-400">Please select at least one assessment and a template or custom sections.</p>
+                                <p id="generateHelpText" class="text-gray-400 mt-2">Please select at least one assessment and a template or custom sections.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                
-                <div class=export-tab-content id=themes-content>
-                    <div class=theme-gallery-layout>
-                        <div class=theme-gallery-main>
-                            <div class=theme-gallery-header>
-                                <h3 class=theme-gallery__title>Choose Your Theme</h3>
-                                <p class=theme-gallery__subtitle>Select a visual style that will be applied to your report content</p>
+                <!-- Theme Gallery Tab -->
+                <div class="export-tab-content" id="themes-content">
+                    <div class="theme-gallery-layout">
+                        <div class="theme-gallery-main">
+                            <div class="theme-gallery-header">
+                                <h3 class="theme-gallery__title">Choose Your Theme</h3>
+                                <p class="theme-gallery__subtitle">Select a visual style that will be applied to your report content</p>
                             </div>
                             
-                            <div class=theme-gallery>
-                                <div class="theme-card theme-card--selected" data-theme=theme-professional>
+                            <div class="theme-gallery">
+                                <div class="theme-card theme-card--selected" data-theme="theme-professional">
                                     <div class="theme-card__preview theme-card__preview--professional">
-                                        <div class=theme-card__preview-header></div>
-                                        <div class=theme-card__preview-content>
+                                        <div class="theme-card__preview-header"></div>
+                                        <div class="theme-card__preview-content">
                                             <div class="theme-card__preview-bar theme-card__preview-bar--primary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--secondary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--tertiary"></div>
                                         </div>
                                     </div>
-                                    <div class=theme-card__info>
-                                        <div class=theme-card__header>
-                                            <h4 class=theme-card__name>Professional</h4>
+                                    <div class="theme-card__info">
+                                        <div class="theme-card__header">
+                                            <h4 class="theme-card__name">Professional</h4>
                                             <span class="theme-card__badge theme-card__badge--free">Free</span>
                                         </div>
-                                        <p class=theme-card__description>Clean, corporate design with blue accents and professional typography</p>
-                                        <div class=theme-card__features>
-                                            <span class=theme-card__feature>Corporate</span>
-                                            <span class=theme-card__feature>Clean</span>
-                                            <span class=theme-card__feature>Print Ready</span>
+                                        <p class="theme-card__description">Clean, corporate design with blue accents and professional typography</p>
+                                        <div class="theme-card__features">
+                                            <span class="theme-card__feature">Corporate</span>
+                                            <span class="theme-card__feature">Clean</span>
+                                            <span class="theme-card__feature">Print Ready</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class=theme-card data-theme=theme-executive>
+                                <div class="theme-card" data-theme="theme-executive">
                                     <div class="theme-card__preview theme-card__preview--executive">
-                                        <div class=theme-card__preview-header></div>
-                                        <div class=theme-card__preview-content>
+                                        <div class="theme-card__preview-header"></div>
+                                        <div class="theme-card__preview-content">
                                             <div class="theme-card__preview-bar theme-card__preview-bar--primary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--secondary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--tertiary"></div>
                                         </div>
                                     </div>
-                                    <div class=theme-card__info>
-                                        <div class=theme-card__header>
-                                            <h4 class=theme-card__name>Executive</h4>
+                                    <div class="theme-card__info">
+                                        <div class="theme-card__header">
+                                            <h4 class="theme-card__name">Executive</h4>
                                             <span class="theme-card__badge theme-card__badge--free">Free</span>
                                         </div>
-                                        <p class=theme-card__description>Sophisticated dark blue and gold design for high-level presentations</p>
-                                        <div class=theme-card__features>
-                                            <span class=theme-card__feature>Sophisticated</span>
-                                            <span class=theme-card__feature>Premium Look</span>
-                                            <span class=theme-card__feature>Executive</span>
+                                        <p class="theme-card__description">Sophisticated dark blue and gold design for high-level presentations</p>
+                                        <div class="theme-card__features">
+                                            <span class="theme-card__feature">Sophisticated</span>
+                                            <span class="theme-card__feature">Premium Look</span>
+                                            <span class="theme-card__feature">Executive</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class=theme-card data-theme=theme-modern>
+                                <div class="theme-card" data-theme="theme-modern">
                                     <div class="theme-card__preview theme-card__preview--modern">
-                                        <div class=theme-card__preview-header></div>
-                                        <div class=theme-card__preview-content>
+                                        <div class="theme-card__preview-header"></div>
+                                        <div class="theme-card__preview-content">
                                             <div class="theme-card__preview-bar theme-card__preview-bar--primary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--secondary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--tertiary"></div>
                                         </div>
                                     </div>
-                                    <div class=theme-card__info>
-                                        <div class=theme-card__header>
-                                            <h4 class=theme-card__name>Modern</h4>
+                                    <div class="theme-card__info">
+                                        <div class="theme-card__header">
+                                            <h4 class="theme-card__name">Modern</h4>
                                             <span class="theme-card__badge theme-card__badge--free">Free</span>
                                         </div>
-                                        <p class=theme-card__description>Vibrant purple and teal design with gradients and modern effects</p>
-                                        <div class=theme-card__features>
-                                            <span class=theme-card__feature>Vibrant</span>
-                                            <span class=theme-card__feature>Gradients</span>
-                                            <span class=theme-card__feature>Modern</span>
+                                        <p class="theme-card__description">Vibrant purple and teal design with gradients and modern effects</p>
+                                        <div class="theme-card__features">
+                                            <span class="theme-card__feature">Vibrant</span>
+                                            <span class="theme-card__feature">Gradients</span>
+                                            <span class="theme-card__feature">Modern</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class=theme-card data-theme=theme-dark>
+                                <div class="theme-card" data-theme="theme-dark">
                                     <div class="theme-card__preview theme-card__preview--dark">
-                                        <div class=theme-card__preview-header></div>
-                                        <div class=theme-card__preview-content>
+                                        <div class="theme-card__preview-header"></div>
+                                        <div class="theme-card__preview-content">
                                             <div class="theme-card__preview-bar theme-card__preview-bar--primary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--secondary"></div>
                                             <div class="theme-card__preview-bar theme-card__preview-bar--tertiary"></div>
                                         </div>
                                     </div>
-                                    <div class=theme-card__info>
-                                        <div class=theme-card__header>
-                                            <h4 class=theme-card__name>Dark</h4>
+                                    <div class="theme-card__info">
+                                        <div class="theme-card__header">
+                                            <h4 class="theme-card__name">Dark</h4>
                                             <span class="theme-card__badge theme-card__badge--free">Free</span>
                                         </div>
-                                        <p class=theme-card__description>Elegant dark mode with purple accents and glowing effects</p>
-                                        <div class=theme-card__features>
-                                            <span class=theme-card__feature>Dark Mode</span>
-                                            <span class=theme-card__feature>Glowing</span>
-                                            <span class=theme-card__feature>Technical</span>
+                                        <p class="theme-card__description">Elegant dark mode with purple accents and glowing effects</p>
+                                        <div class="theme-card__features">
+                                            <span class="theme-card__feature">Dark Mode</span>
+                                            <span class="theme-card__feature">Glowing</span>
+                                            <span class="theme-card__feature">Technical</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class=theme-gallery-sidebar>
-                            <div class=theme-preview-panel>
-                                <div class=theme-preview-panel__header>
-                                    <h4 class=theme-preview-panel__title>Live Preview</h4>
-                                    <span class=theme-preview-panel__theme id=current-theme-name>Professional Theme</span>
+                        <div class="theme-gallery-sidebar">
+                            <div class="theme-preview-panel">
+                                <div class="theme-preview-panel__header">
+                                    <h4 class="theme-preview-panel__title">Live Preview</h4>
+                                    <span class="theme-preview-panel__theme" id="current-theme-name">Professional Theme</span>
                                 </div>
-                                <div class=theme-preview-panel__content>
-                                    <div class=theme-preview-mock id=theme-preview-mock>
-                                        <div class=theme-preview-mock__header>
-                                            <div class=theme-preview-mock__title>AI Risk Assessment Report</div>
-                                            <div class=theme-preview-mock__subtitle>Microsoft Copilot</div>
+                                <div class="theme-preview-panel__content">
+                                    <div class="theme-preview-mock" id="theme-preview-mock">
+                                        <div class="theme-preview-mock__header">
+                                            <div class="theme-preview-mock__title">AI Risk Assessment Report</div>
+                                            <div class="theme-preview-mock__subtitle">Microsoft Copilot</div>
                                         </div>
-                                        <div class=theme-preview-mock__body>
-                                            <div class=theme-preview-mock__section>
-                                                <div class=theme-preview-mock__section-title>Executive Summary</div>
-                                                <div class=theme-preview-mock__content-lines>
-                                                    <div class=theme-preview-mock__line></div>
+                                        <div class="theme-preview-mock__body">
+                                            <div class="theme-preview-mock__section">
+                                                <div class="theme-preview-mock__section-title">Executive Summary</div>
+                                                <div class="theme-preview-mock__content-lines">
+                                                    <div class="theme-preview-mock__line"></div>
                                                     <div class="theme-preview-mock__line theme-preview-mock__line--short"></div>
-                                                    <div class=theme-preview-mock__line></div>
+                                                    <div class="theme-preview-mock__line"></div>
                                                 </div>
                                             </div>
-                                            <div class=theme-preview-mock__section>
-                                                <div class=theme-preview-mock__section-title>Risk Score</div>
-                                                <div class=theme-preview-mock__score>85/100</div>
+                                            <div class="theme-preview-mock__section">
+                                                <div class="theme-preview-mock__section-title">Risk Score</div>
+                                                <div class="theme-preview-mock__score">85/100</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class=theme-preview-panel__actions>
-                                    <button class="btn btn-secondary btn-sm" id=apply-theme-btn>Apply Theme</button>
-                                    <button class="btn btn-primary btn-sm" id=preview-with-theme-btn>Preview Report</button>
+                                <div class="theme-preview-panel__actions">
+                                    <button class="btn btn-secondary btn-sm" id="apply-theme-btn">Apply Theme</button>
+                                    <button class="btn btn-primary btn-sm" id="preview-with-theme-btn">Preview Report</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                
-                <div class=export-tab-content id=marketplace-content>
-                    <div class=coming-soon>
-                        <div class=coming-soon__icon>
-                            <i data-lucide=store class="h-16 w-16"></i>
+                <!-- Marketplace Tab (Coming Soon) -->
+                <div class="export-tab-content" id="marketplace-content">
+                    <div class="coming-soon">
+                        <div class="coming-soon__icon">
+                            <i data-lucide="store" class="w-16 h-16"></i>
                         </div>
-                        <h3 class=coming-soon__title>Theme Marketplace</h3>
-                        <p class=coming-soon__description>Browse and purchase premium themes created by our community of designers. Coming soon!</p>
-                        <div class=coming-soon__features>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=palette class="h-5 w-5"></i>
+                        <h3 class="coming-soon__title">Theme Marketplace</h3>
+                        <p class="coming-soon__description">Browse and purchase premium themes created by our community of designers. Coming soon!</p>
+                        <div class="coming-soon__features">
+                            <div class="coming-soon__feature">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
                                 <span>Premium Themes</span>
                             </div>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=users class="h-5 w-5"></i>
+                            <div class="coming-soon__feature">
+                                <i data-lucide="users" class="w-5 h-5"></i>
                                 <span>Community Designs</span>
                             </div>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=download class="h-5 w-5"></i>
+                            <div class="coming-soon__feature">
+                                <i data-lucide="download" class="w-5 h-5"></i>
                                 <span>Instant Download</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                
-                <div class=export-tab-content id=ai-generator-content>
-                    <div class=coming-soon>
-                        <div class=coming-soon__icon>
-                            <i data-lucide=sparkles class="h-16 w-16"></i>
+                <!-- AI Generator Tab (Coming Soon) -->
+                <div class="export-tab-content" id="ai-generator-content">
+                    <div class="coming-soon">
+                        <div class="coming-soon__icon">
+                            <i data-lucide="sparkles" class="w-16 h-16"></i>
                         </div>
-                        <h3 class=coming-soon__title>AI Theme Generator</h3>
-                        <p class=coming-soon__description>Generate custom themes using AI based on your brand colors, industry, and preferences. Coming soon!</p>
-                        <div class=coming-soon__features>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=palette class="h-5 w-5"></i>
+                        <h3 class="coming-soon__title">AI Theme Generator</h3>
+                        <p class="coming-soon__description">Generate custom themes using AI based on your brand colors, industry, and preferences. Coming soon!</p>
+                        <div class="coming-soon__features">
+                            <div class="coming-soon__feature">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
                                 <span>Brand Colors</span>
                             </div>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=zap class="h-5 w-5"></i>
+                            <div class="coming-soon__feature">
+                                <i data-lucide="zap" class="w-5 h-5"></i>
                                 <span>AI Powered</span>
                             </div>
-                            <div class=coming-soon__feature>
-                                <i data-lucide=settings class="h-5 w-5"></i>
+                            <div class="coming-soon__feature">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
                                 <span>Customizable</span>
                             </div>
                         </div>
@@ -374,6 +385,7 @@
         </div>
     </div>
 
-    
-    <script type=module src=/export.b50bc107.js></script>
+    <!-- Parcel will bundle and inject all necessary scripts here -->
+    <script type="module" src="/export.85d8833b.js"></script>
 
+</body></html>
