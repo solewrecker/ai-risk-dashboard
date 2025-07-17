@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build docs/index.html --dist-dir dist"
+    "build": "parcel build docs/index.html --dist-dir dist --public-url /"
   },
   "repository": {
     "type": "git",
