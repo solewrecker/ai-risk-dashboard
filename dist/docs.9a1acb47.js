@@ -160,11 +160,11 @@
       });
     }
   }
-})({"7YnDr":[function(require,module,exports,__globalThis) {
+})({"6IEMQ":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
-var HMR_SERVER_PORT = 65124;
+var HMR_SERVER_PORT = 1234;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "439701173a9199ea";
 var HMR_USE_SSE = false;
@@ -851,9 +851,8 @@ function addEventListeners() {
         e.stopPropagation(); // Prevent body click from hiding menu immediately
     // Results.toggleExportMenu(); // REMOVE: No longer exists
     });
-    document.getElementById('exportJsonBtn')?.addEventListener('click', _resultsJs.exportAssessmentJSON);
-    document.getElementById('exportFreePdfBtn')?.addEventListener('click', _resultsJs.exportFreePDF);
-    document.getElementById('exportPremiumPdfBtn')?.addEventListener('click', _resultsJs.exportPremiumPDF);
+// document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
+// document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
 // Add other export buttons if they exist, e.g., exportHtmlBtn
 // Global listeners
 // REMOVE: Results.hideExportMenu, as it no longer exists
@@ -1642,6 +1641,6 @@ function getScoreDescription(score, level, toolName) {
  // All old export functions will be removed from this file.
  // New export functionality is handled by docs/js/dashboard/export.js 
 
-},{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["7YnDr","27cw3"], "27cw3", "parcelRequire4b35", {})
+},{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["6IEMQ","27cw3"], "27cw3", "parcelRequire4b35", {})
 
 //# sourceMappingURL=docs.9a1acb47.js.map

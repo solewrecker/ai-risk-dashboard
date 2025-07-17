@@ -187,9 +187,8 @@ function addEventListeners() {
         e.stopPropagation(); // Prevent body click from hiding menu immediately
         // Results.toggleExportMenu(); // REMOVE: No longer exists
     });
-    document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
-    document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
-    document.getElementById('exportPremiumPdfBtn')?.addEventListener('click', Results.exportPremiumPDF);
+    // document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
+    // document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
     // Add other export buttons if they exist, e.g., exportHtmlBtn
     
     // Global listeners
@@ -221,4 +220,4 @@ function initialize() {
     addEventListeners();
 }
 
-document.addEventListener('DOMContentLoaded', initialize); 
+document.addEventListener('DOMContentLoaded', initialize);
