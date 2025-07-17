@@ -6,12 +6,14 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build src/main.js --dist-dir dist"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solewrecker/ai-risk-dashboard.git"
   },
+  "source": "src/main.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
