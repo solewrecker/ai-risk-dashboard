@@ -711,6 +711,8 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
     const reportContentEl = document.getElementById('report-container');
     reportContentEl.innerHTML = '<div class="loader"></div> <p>Loading report...</p>';
     try {
+        // Load the selected theme CSS dynamically
+        loadThemeCSS(selectedTheme || 'theme-professional');
         const templateData = prepareTemplateData(primaryAssessment, selectedData, sectionsToGenerate);
         // Get report configuration
         const config = (0, _templatesJs.reportConfigs)[selectedTemplate] || (0, _templatesJs.reportConfigs)['executive'];
@@ -736,12 +738,30 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
                 sectionsHtml += renderComparisonTableSection(templateData);
                 break;
         }
-        // Use the unified base template with theme support
-        const template = (0, _handlebarsDefault.default).compile((0, _templatesJs.baseTemplate));
+        // Create a simplified template for injecting into existing page
+        const reportTemplate = `
+            <header class="report-header">
+                <div class="report-header__content">
+                    <h1 class="report-header__title">{{reportTitle}}</h1>
+                    <div class="report-header__tool-highlight">
+                        <h2 class="report-header__tool-name report-header__tool-name--centered">{{toolName}}</h2>
+                        <p class="report-header__tool-subtitle">{{toolSubtitle}}</p>
+                    </div>
+                    <div class="report-header__meta">
+                        <span>\u{1F4C5} Report Date: {{reportDate}}</span>
+                        <span>\u{1F50D} Assessment ID: {{assessmentIdShort}}</span>
+                        <span>\u{1F464} Assessed by: {{assessedBy}}</span>
+                    </div>
+                </div>
+            </header>
+            <main class="report-main">
+                {{{sectionsHtml}}}
+            </main>
+        `;
+        const template = (0, _handlebarsDefault.default).compile(reportTemplate);
         const fullReportHtml = template({
             ...templateData,
             reportTitle: config.title,
-            selectedTheme: selectedTheme || 'theme-professional',
             sectionsHtml
         });
         console.log('Final HTML to be injected:', fullReportHtml);
@@ -900,6 +920,25 @@ async function createHtml(reportContentEl, templateData, selectedTheme) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+// Function to dynamically load theme CSS by enabling/disabling stylesheet links
+function loadThemeCSS(themeName) {
+    // Disable all theme stylesheets
+    const allThemeLinks = document.querySelectorAll('link[data-theme]');
+    allThemeLinks.forEach((link)=>{
+        link.disabled = true;
+    });
+    // Enable the selected theme stylesheet
+    const selectedThemeLink = document.querySelector(`link[data-theme="${themeName}"]`);
+    if (selectedThemeLink) {
+        selectedThemeLink.disabled = false;
+        console.log(`Theme CSS enabled: ${themeName}`);
+    } else {
+        console.warn(`Theme stylesheet not found: ${themeName}, falling back to CSS custom properties`);
+        // Fallback: Apply theme using CSS custom properties
+        updateThemeCSS(themeName);
+    }
+    return Promise.resolve();
 }
 // Function to dynamically update theme CSS using CSS custom properties
 function updateThemeCSS(themeName) {

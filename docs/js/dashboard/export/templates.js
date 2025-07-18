@@ -8,7 +8,10 @@ export const baseTemplate = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{reportTitle}} - {{toolName}}</title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pages/report.css">
+    <link rel="stylesheet" href="/css/components/report-base.css">
+    <link rel="stylesheet" href="/css/components/report-header.css">
+    <link rel="stylesheet" href="/css/components/report-cards.css">
+    <link rel="stylesheet" href="/css/components/report-sections.css">
     <link id="theme-stylesheet" rel="stylesheet" href="/css/themes/{{selectedTheme}}.css">
 </head>
 <body>

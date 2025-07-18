@@ -1,0 +1,137 @@
+/* === REPORT CARDS COMPONENT === */
+/* Card components for insights, breakdowns, and recommendations */
+
+/* === INSIGHTS GRID (BEM) === */
+.report-insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.report-insight-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.report-insight-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.report-insight-card__icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--risk-color);
+}
+
+.report-insight-card__content {
+    flex-grow: 1;
+}
+
+.report-insight-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.report-insight-card__value {
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* === BREAKDOWN CATEGORIES (BEM) === */
+.report-breakdown-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.report-breakdown-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.report-breakdown-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.report-breakdown-card__header {
+    background: var(--risk-color-light);
+    color: var(--risk-color);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-breakdown-card__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.report-breakdown-card__score {
+    font-weight: 700;
+    color: var(--risk-color);
+}
+
+.report-breakdown-card__content {
+    padding: 1.5rem;
+}
+
+.report-breakdown-card__item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.report-breakdown-card__item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.report-breakdown-card__item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.report-breakdown-card__item-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.report-breakdown-card__note {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* Media Queries for Cards */
+@media (max-width: 768px) {
+    .report-breakdown-categories {
+        grid-template-columns: 1fr;
+    }
+    
+    .report-insights-grid {
+        grid-template-columns: 1fr;
+    }
+}

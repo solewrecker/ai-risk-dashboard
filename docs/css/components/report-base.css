@@ -1,0 +1,83 @@
+/* === REPORT BASE COMPONENTS === */
+/* Base styles and variables for all report components */
+
+/* === BASE STYLES === */
+:root {
+    --risk-color: #3b82f6;
+    --risk-degrees: 180deg;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #1e293b; /* Dark text for light background */
+    background: #f8fafc; /* Light background */
+}
+
+.report-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.report-main {
+    padding: 2rem;
+}
+
+/* Risk Level Color Variables */
+.risk-low {
+    --risk-color: #10b981;
+    --risk-color-light: #34d399;
+}
+
+.risk-medium {
+    --risk-color: #f59e0b;
+    --risk-color-light: #fbbf24;
+}
+
+.risk-high {
+    --risk-color: #ef4444;
+    --risk-color-light: #f87171;
+}
+
+.risk-critical {
+    --risk-color: #dc2626;
+    --risk-color-light: #ef4444;
+}
+
+/* === REPORT COMPONENTS === */
+.report-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.report-badge--risk-low {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+.report-badge--risk-medium {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+.report-badge--risk-high {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
+
+.report-badge--risk-critical {
+    background-color: var(--risk-color-light);
+    color: var(--risk-color);
+}
