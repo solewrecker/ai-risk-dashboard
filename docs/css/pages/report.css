@@ -77,16 +77,15 @@ body {
     border-radius: 8px;
     margin: 1.5rem auto; /* Center highlight block */
     max-width: 400px; /* Limit width */
+    display: flex;
+    justify-content: center;
+}
+
+.report-header__tool-name--centered {
+    justify-content: center;
 }
 
 .report-header__tool-name {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
 
 .summary-section__title svg {
     color: var(--risk-color);
@@ -196,6 +195,38 @@ body {
     border: 1px solid #e2e8f0;
 }
 
+.report-actions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.report-actions button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-actions button:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.report-actions button:active {
+    background-color: #1e40af;
+    transform: translateY(0);
+}
+
 .recommendations-section__header {
     margin-bottom: 1.5rem;
 }
@@ -266,142 +297,9 @@ body {
     line-height: 1.6;
 }
 
-/* === BREAKDOWN CATEGORIES (BEM) === */
-.report-breakdown-categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
+/* Duplicate breakdown categories section removed - already defined above */
 
-.report-breakdown-card {
-    background: #ffffff; /* White background for breakdown cards */
-    border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    transition: all 0.2s ease;
-}
-
-.report-breakdown-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-}
-
-.report-breakdown-card__header {
-    background: var(--risk-color-light);
-    color: var(--risk-color);
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.report-breakdown-card__title {
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.report-breakdown-card__score {
-    font-weight: 700;
-    color: var(--risk-color);
-}
-
-.report-breakdown-card__content {
-    padding: 1.5rem;
-}
-
-.report-breakdown-card__item {
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-.report-breakdown-card__item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.report-breakdown-card__item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.report-breakdown-card__item-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1e293b; /* Dark slate text */
-}
-
-.report-breakdown-card__note {
-    font-size: 0.85rem;
-    color: #475569; /* Slate 600 */
-    line-height: 1.5;
-}
-
-/* === DETAILED BREAKDOWN SECTION (BEM) === */
-.detailed-breakdown-section {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-}
-
-.detailed-breakdown-section__header {
-    margin-bottom: 1.5rem;
-}
-
-.detailed-breakdown-section__title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.detailed-breakdown-section__title svg {
-    color: #ef4444; /* Red color for shield-alert */
-}
-
-.detailed-breakdown-section__categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-/* Media Queries for Detailed Breakdown Section */
-@media (max-width: 768px) {
-    .detailed-breakdown-section__categories-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* === SUMMARY SECTION (BEM) === */
-.summary-section {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-}
-
-.summary-section__header {
-    margin-bottom: 1.5rem;
-}
-
-.summary-section__title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+/* Duplicate detailed breakdown section removed - already defined above */
 
 .summary-section__title svg {
     color: var(--risk-color);
@@ -872,11 +770,7 @@ body {
 .report-score-card__number.risk-medium, .report-score-card__label.risk-medium { color: var(--risk-color); }
 .report-score-card__number.risk-low, .report-score-card__label.risk-low { color: var(--risk-color); }
 
-@keyframes pulse {
-    0% { transform: scale(0.8); opacity: 0; }
-    50% { transform: scale(1.1); opacity: 0.2; }
-    100% { transform: scale(0.8); opacity: 0; }
-} 
+/* @keyframes pulse removed temporarily for debugging */ 
 
 /* === RESPONSIVE STYLES === */
 @media (max-width: 1024px) {
@@ -1344,74 +1238,7 @@ body {
     line-height: 1.5;
 }
 
-/* === RECOMMENDATIONS (BEM) === */
-.report-recommendations {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #f8fafc; /* Light background */
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-}
-
-.report-recommendations__heading {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1e293b; /* Dark slate text */
-    margin-bottom: 1.5rem;
-    position: relative;
-    padding-left: 2.5rem; /* Space for icon */
-}
-
-.report-recommendations__heading::before {
-    content: '✨'; /* Sparkle icon */
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.5rem;
-}
-
-.report-recommendations__list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.report-recommendations__item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-.report-recommendations__item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.report-recommendations__bullet {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--risk-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-right: 1rem;
-    margin-top: 0.25rem; /* Align with text */
-}
-
-.report-recommendations__text {
-    font-size: 0.95rem;
-    color: #475569; /* Slate 600 */
-    line-height: 1.6;
-}
+/* Duplicate recommendations section removed - already defined above */
 
 /* === BREAKDOWN CATEGORIES (BEM) === */
 .report-breakdown-categories {
@@ -1528,17 +1355,4 @@ body {
     }
 }
 
-/* === SUMMARY SECTION (BEM) === */
-.summary-section {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-}
-
-.summary-section__header {
-    margin-bottom: 1.5rem;
-}
-
-.summary-section__title {
+/* Duplicate section removed - summary section already defined above */

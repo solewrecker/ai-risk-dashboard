@@ -2,9 +2,8 @@
 // Handles user authentication, session management, and Supabase client initialization.
 
 // --- Configuration ---
-const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-export let supabase;
+import { supabase } from '../supabase-client.js';
+export { supabase };
 
 // --- State ---
 let currentUser = null;
@@ -12,18 +11,13 @@ let isAdmin = false;
 
 // --- Public Functions ---
 export function initializeSupabase(onAuthStateChange) {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized.');
-        
-        supabase.auth.onAuthStateChange((event, session) => {
-            currentUser = session?.user || null;
-            isAdmin = session?.user?.user_metadata?.role === 'admin';
-            onAuthStateChange(); // Callback to update UI
-        });
-    } else {
-        console.error('Supabase client not found.');
-    }
+    console.log('Supabase client initialized.');
+    
+    supabase.auth.onAuthStateChange((event, session) => {
+        currentUser = session?.user || null;
+        isAdmin = session?.user?.user_metadata?.role === 'admin';
+        onAuthStateChange(); // Callback to update UI
+    });
 }
 
 export async function signInUser() {
@@ -119,4 +113,4 @@ export function switchAuthTab(tab) {
     document.getElementById('signUpTab').classList.toggle('active', tab === 'signup');
     document.getElementById('signInForm').classList.toggle('active', tab === 'signin');
     document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
-} 
+}

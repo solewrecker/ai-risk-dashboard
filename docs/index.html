@@ -12,34 +12,7 @@
     <!-- Add Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     
-    <!-- Add PDF Template System (conditional loading) -->
-    <script>
-        // Try to load PDF template system, but don't break if it fails
-        const templateScript = document.createElement('script');
-        templateScript.src = './templates/pdf-templates.js';
-        templateScript.onerror = function() {
-            console.warn('PDF template system not available - using fallback');
-            window.PDFTemplateManager = null;
-        };
-        templateScript.onload = function() {
-            console.log('✅ PDF Template System loaded successfully');
-        };
-        document.head.appendChild(templateScript);
-    </script>
-
-    <!-- Add New Template Binding System -->
-    <script>
-        // Load the new template binding system
-        const bindingScript = document.createElement('script');
-        bindingScript.src = './templates/template-binding.js';
-        bindingScript.onload = function() {
-            console.log('✅ Template Binding System loaded successfully');
-        };
-        bindingScript.onerror = function() {
-            console.warn('Template binding system failed to load');
-        };
-        document.head.appendChild(bindingScript);
-    </script>
+    <!-- Export functionality moved to export.html -->
     
     <link rel="stylesheet" href="./css/style.css">
 </head>
@@ -306,82 +279,9 @@
                             </div>
                         </div>
                         <div class="btn-group mt-6">
-                            <div style="position: relative; display: inline-block;">
-                                <button type="button" class="btn btn-secondary" id="exportMainBtn">
-                                    <i data-lucide="download" class="w-4 h-4"></i> Export Options
-                                </button>
-                                <div id="exportMenu" style="
-                                    display: none;
-                                    position: absolute;
-                                    bottom: 100%;
-                                    left: 0;
-                                    background: white;
-                                    border: 1px solid #e2e8f0;
-                                    border-radius: 0.5rem;
-                                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-                                    z-index: 9999;
-                                    min-width: 220px;
-                                    margin-bottom: 0.5rem;
-                                    max-height: 300px;
-                                    overflow-y: auto;
-                                ">
-                                    <button type="button" class="export-option" id="exportFreePdfBtn" style="
-                                        display: block;
-                                        width: 100%;
-                                        padding: 0.75rem 1rem;
-                                        border: none;
-                                        background: none;
-                                        text-align: left;
-                                        cursor: pointer;
-                                        border-bottom: 1px solid #e2e8f0;
-                                        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-                                    ">
-                                        <i data-lucide="file-text" class="w-4 h-4"></i> <strong>Free Professional PDF</strong><br>
-                                        <small style="color: #166534;">Basic template • Risk score • Categories</small>
-                                    </button>
-
-                                    <button type="button" class="export-option" id="exportPremiumPdfBtn" style="
-                                        display: block;
-                                        width: 100%;
-                                        padding: 0.75rem 1rem;
-                                        border: none;
-                                        background: none;
-                                        text-align: left;
-                                        cursor: pointer;
-                                        border-bottom: 1px solid #e2e8f0;
-                                        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                                    ">
-                                        <i data-lucide="star" class="w-4 h-4"></i> <strong>Enterprise PDF</strong> <span style="background: #f59e0b; color: white; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem;">PRO</span><br>
-                                        <small style="color: #92400e;">Detailed breakdown • Justifications • Compliance</small>
-                                    </button>
-
-                                    <button type="button" class="export-option" id="exportHtmlBtn" style="
-                                        display: block;
-                                        width: 100%;
-                                        padding: 0.75rem 1rem;
-                                        border: none;
-                                        background: none;
-                                        text-align: left;
-                                        cursor: pointer;
-                                        border-bottom: 1px solid #e2e8f0;
-                                    ">
-                                        <i data-lucide="globe" class="w-4 h-4"></i> <strong>HTML Report</strong><br>
-                                        <small style="color: #64748b;">Viewable in browser</small>
-                                    </button>
-                                    <button type="button" class="export-option" id="exportJsonBtn" style="
-                                        display: block;
-                                        width: 100%;
-                                        padding: 0.75rem 1rem;
-                                        border: none;
-                                        background: none;
-                                        text-align: left;
-                                        cursor: pointer;
-                                    ">
-                                        <i data-lucide="code" class="w-4 h-4"></i> <strong>JSON Data</strong><br>
-                                        <small style="color: #64748b;">Raw assessment data</small>
-                                    </button>
-                                </div>
-                            </div>
+                            <a href="export.html" class="btn btn-secondary">
+                                <i data-lucide="download" class="w-4 h-4"></i> Export Report
+                            </a>
                             <button type="button" class="btn btn-primary" id="newAssessmentBtn">
                                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> New Assessment
                             </button>

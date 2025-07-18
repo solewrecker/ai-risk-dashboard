@@ -668,7 +668,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"95xI8":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-var _supabaseJs = require("@supabase/supabase-js");
+var _supabaseClientJs = require("../../supabase-client.js");
 var _handlebars = require("handlebars");
 var _handlebarsDefault = parcelHelpers.interopDefault(_handlebars);
 var _jspdf = require("jspdf");
@@ -682,16 +682,32 @@ var _templatesJs = require("./templates.js");
 (0, _handlebarsDefault.default).registerHelper('toLowerCase', function(str) {
     return str.toLowerCase();
 });
+console.log('report-preview.js loaded');
 document.addEventListener('DOMContentLoaded', ()=>{
-    const reportDataString = sessionStorage.getItem('reportData');
+    console.log('DOMContentLoaded event fired.');
+    const reportDataString = localStorage.getItem('reportData');
+    console.log('Report data string from sessionStorage:', reportDataString);
     if (!reportDataString) {
         document.getElementById('report-container').innerHTML = '<p>No report data found. Please generate a report first.</p>';
         return;
     }
-    const reportData = JSON.parse(reportDataString);
-    renderReport(reportData);
+    try {
+        const reportData = JSON.parse(reportDataString);
+        console.log('Parsed report data:', reportData);
+        renderReport(reportData);
+    } catch (error) {
+        console.error('Failed to parse report data:', error);
+        document.getElementById('report-container').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
+    }
 });
 async function renderReport({ primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme }) {
+    console.log('renderReport function called with:', {
+        primaryAssessment,
+        selectedData,
+        sectionsToGenerate,
+        selectedTemplate,
+        selectedTheme
+    });
     const reportContentEl = document.getElementById('report-container');
     reportContentEl.innerHTML = '<div class="loader"></div> <p>Loading report...</p>';
     try {
@@ -728,12 +744,11 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
             selectedTheme: selectedTheme || 'theme-professional',
             sectionsHtml
         });
+        console.log('Final HTML to be injected:', fullReportHtml);
         reportContentEl.innerHTML = fullReportHtml;
         (0, _lucide.createIcons)({
             icons: (0, _lucide.icons)
         });
-        // Update theme CSS dynamically
-        updateThemeCSS(selectedTheme || 'theme-professional');
         // Render functions for sections
         function renderSummarySection(data) {
             const template = (0, _handlebarsDefault.default).compile((0, _templatesJs.summarySectionTemplate));
@@ -845,18 +860,16 @@ async function createPdf(reportContentEl) {
     pdf.save('ai-risk-assessment-report.pdf');
 }
 async function createHtml(reportContentEl, templateData, selectedTheme) {
+    const themeName = selectedTheme || 'theme-professional';
     const cssPromises = [
-        fetch('./css/style.css').then((res)=>res.text()),
-        fetch('./css/pages/report.css').then((res)=>res.text()),
-        fetch('./css/themes/theme-base.css').then((res)=>res.text())
+        fetch('/css/style.css').then((res)=>res.text()),
+        fetch(`/css/themes/${themeName}.css`).then((res)=>res.text()),
+        fetch('/css/pages/report.css').then((res)=>res.text()),
+        fetch('/css/themes/theme-base.css').then((res)=>res.text())
     ];
-    // Add the selected theme CSS
-    const themeFile = selectedTheme || 'theme-professional';
-    cssPromises.push(fetch(`./css/themes/${themeFile}.css`).then((res)=>res.text()));
-    const cssContents = await Promise.all(cssPromises);
-    const html = reportContentEl.innerHTML;
-    const blob = new Blob([
-        `
+    const cssContents = await Promise.all(cssPromises.map((p)=>p.catch((e)=>console.error(e) || '')));
+    const reportHtml = reportContentEl.innerHTML;
+    const fullHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -868,17 +881,21 @@ async function createHtml(reportContentEl, templateData, selectedTheme) {
             </style>
         </head>
         <body>
-            ${html}
+            <div id="report-container" class="report-container">
+                 ${reportHtml}
+            </div>
         </body>
         </html>
-    `
+    `;
+    const blob = new Blob([
+        fullHtml
     ], {
         type: 'text/html'
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ai-risk-assessment-report.html`;
+    a.download = `${templateData.toolName}-risk-assessment-report.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -921,36 +938,6 @@ function updateThemeCSS(themeName) {
     });
 }
 
-},{"@supabase/supabase-js":"gKVA2","handlebars":"9pFby","jspdf":"b6g54","html2canvas":"jgq02","qrcode":"9Qtts","lucide":"hPBbM","./templates.js":"9q6Gb","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}]},["5zoj0","95xI8"], "95xI8", "parcelRequire4b35", {})
+},{"../../supabase-client.js":"eoCsO","handlebars":"9pFby","jspdf":"b6g54","html2canvas":"jgq02","qrcode":"9Qtts","lucide":"hPBbM","./templates.js":"9q6Gb","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["5zoj0","95xI8"], "95xI8", "parcelRequire4b35", {})
 
 //# sourceMappingURL=report-preview.d60c1c7b.js.map

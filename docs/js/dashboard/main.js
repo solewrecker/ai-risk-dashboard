@@ -2,8 +2,8 @@
 // Main entry point for the dashboard application.
 // Initializes the app, loads modules, and coordinates everything.
 
-import { initAuth, checkAuth, getIsAdmin, getCurrentUser } from './auth.js';
-import { initAssessments, loadAssessments, viewAssessment, deleteAssessment as deleteAssessmentFn, filterAssessmentsLegacy, clearAllFiltersLegacy } from './assessments.js';
+import { checkAuth, getIsAdmin, getCurrentUser } from './auth.js';
+import { loadAssessments, viewAssessment, deleteAssessment as deleteAssessmentFn, filterAssessmentsLegacy, clearAllFiltersLegacy } from './assessments.js';
 import { initImport, handleFileSelect, processImport } from './import.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 import { AchievementsManager } from './achievements.js';
@@ -11,8 +11,7 @@ import { updateTierBadge, setupEventListeners, closeBanner, switchTab } from './
 import { injectDashboardAdminUI } from './admin-ui.js';
 import { initCompareTools, setupEventListeners as setupCompareEventListeners } from './compare.js';
 
-const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
+import { supabase } from '../supabase-client.js';
 
 let currentTab = 'dashboard';
 
@@ -37,12 +36,10 @@ window.processImport = processImport;
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
     
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('Supabase client initialized');
+        console.log('Supabase client initialized');
     
-    initAuth(supabaseClient);
-    initAssessments(supabaseClient);
-    initImport(supabaseClient);
+
+    initImport(supabase);
 
     const isAuthenticated = await checkAuth();
     
@@ -142,4 +139,4 @@ async function initializeDashboard() {
             `;
         }
     }
-} 
+}

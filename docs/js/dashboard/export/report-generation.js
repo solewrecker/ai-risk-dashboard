@@ -1,17 +1,12 @@
 // docs/js/dashboard/export/report-generation.js
 
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../supabase-client.js';
 import Handlebars from 'handlebars';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode'; // Using the 'qrcode' package
 import { createIcons, icons } from 'lucide';
 import { baseTemplate, summarySectionTemplate, detailedBreakdownSectionTemplate, recommendationsSectionTemplate, comparisonTableSectionTemplate, complianceSectionTemplate, premiumFeaturesTemplate, reportConfigs } from './templates.js';
-
-// Supabase Client (might be imported from a shared API module later)
-const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Removed: waitUntilHandlebarsIsReady, no longer needed with Parcel bundling
 
@@ -120,7 +115,7 @@ export async function prepareReportData(selectedAssessmentIds, allAssessments, q
             selectedTemplate,
             selectedTheme
         };
-        sessionStorage.setItem('reportData', JSON.stringify(reportData));
+        localStorage.setItem('reportData', JSON.stringify(reportData));
 
         // Open the preview page in a new tab
         window.open('report-preview.html', '_blank');

@@ -7,7 +7,9 @@ export const baseTemplate = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{reportTitle}} - {{toolName}}</title>
-    <!-- Theme CSS variables will be applied dynamically via JavaScript -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/pages/report.css">
+    <link id="theme-stylesheet" rel="stylesheet" href="/css/themes/{{selectedTheme}}.css">
 </head>
 <body>
     <div class="report-container">
@@ -15,7 +17,7 @@ export const baseTemplate = `<!DOCTYPE html>
             <div class="report-header__content">
                 <h1 class="report-header__title">{{reportTitle}}</h1>
                 <div class="report-header__tool-highlight">
-                    <h2 class="report-header__tool-name">{{toolName}}</h2>
+                    <h2 class="report-header__tool-name report-header__tool-name--centered">{{toolName}}</h2>
                     <p class="report-header__tool-subtitle">{{toolSubtitle}}</p>
                 </div>
                 <div class="report-header__meta">

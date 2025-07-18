@@ -678,8 +678,7 @@ var _achievementsJs = require("./achievements.js");
 var _uiJs = require("./ui.js");
 var _adminUiJs = require("./admin-ui.js");
 var _compareJs = require("./compare.js");
-const SUPABASE_URL = "https://lgybmsziqjdmmxdiyils.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg";
+var _supabaseClientJs = require("../supabase-client.js");
 let currentTab = 'dashboard';
 // Make functions available globally BEFORE DOMContentLoaded
 // so that inline onclick handlers in the HTML can call them immediately
@@ -698,11 +697,8 @@ window.handleFileSelect = (0, _importJs.handleFileSelect);
 window.processImport = (0, _importJs.processImport);
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('Supabase client initialized');
-    (0, _authJs.initAuth)(supabaseClient);
-    (0, _assessmentsJs.initAssessments)(supabaseClient);
-    (0, _importJs.initImport)(supabaseClient);
+    (0, _importJs.initImport)((0, _supabaseClientJs.supabase));
     const isAuthenticated = await (0, _authJs.checkAuth)();
     if (isAuthenticated) await initializeDashboard();
     else {
@@ -779,13 +775,11 @@ async function initializeDashboard() {
     }
 }
 
-},{"./auth.js":"2bucD","./assessments.js":"9eYtm","./import.js":"8JRbO","./gamification.js":"lUSAA","./achievements.js":"fPGsB","./ui.js":"lhVUw","./admin-ui.js":"llSGL","./compare.js":"7DPt1"}],"2bucD":[function(require,module,exports,__globalThis) {
+},{"./auth.js":"2bucD","./assessments.js":"9eYtm","./import.js":"8JRbO","./gamification.js":"lUSAA","./achievements.js":"fPGsB","./ui.js":"lhVUw","./admin-ui.js":"llSGL","./compare.js":"7DPt1","../supabase-client.js":"eoCsO"}],"2bucD":[function(require,module,exports,__globalThis) {
 // js/dashboard/auth.js
 // Handles user authentication, session management, and login UI. 
-// This will be initialized in main.js
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "initAuth", ()=>initAuth);
 parcelHelpers.export(exports, "checkAuth", ()=>checkAuth);
 parcelHelpers.export(exports, "showLoginSection", ()=>showLoginSection);
 parcelHelpers.export(exports, "getCurrentUser", ()=>getCurrentUser);
@@ -793,17 +787,14 @@ parcelHelpers.export(exports, "getIsAdmin", ()=>getIsAdmin);
 parcelHelpers.export(exports, "getUserTier", ()=>getUserTier);
 parcelHelpers.export(exports, "getIsEnterprise", ()=>getIsEnterprise);
 parcelHelpers.export(exports, "getIsFree", ()=>getIsFree);
-let supabaseClient = null;
+var _supabaseClientJs = require("../supabase-client.js");
 // State variables
 let currentUser = null;
 let isAdmin = false;
 let userTier = 'free';
-function initAuth(client) {
-    supabaseClient = client;
-}
 async function checkAuth() {
     try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await (0, _supabaseClientJs.supabase).auth.getSession();
         if (session) {
             currentUser = session.user;
             // Determine user tier
@@ -853,42 +844,11 @@ function getIsFree() {
     return userTier === 'free';
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"9eYtm":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"9eYtm":[function(require,module,exports,__globalThis) {
 // js/dashboard/assessments.js
 // Handles fetching, rendering, filtering, and managing assessments. 
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "initAssessments", ()=>initAssessments);
 parcelHelpers.export(exports, "getAssessments", ()=>getAssessments);
 parcelHelpers.export(exports, "loadAssessments", ()=>loadAssessments);
 parcelHelpers.export(exports, "viewAssessment", ()=>viewAssessment);
@@ -898,14 +858,11 @@ parcelHelpers.export(exports, "filterAssessmentsLegacy", ()=>filterAssessmentsLe
 parcelHelpers.export(exports, "filterAssessments", ()=>filterAssessments);
 parcelHelpers.export(exports, "clearAllFiltersLegacy", ()=>clearAllFiltersLegacy);
 parcelHelpers.export(exports, "clearAllFilters", ()=>clearAllFilters);
+var _supabaseClientJs = require("../supabase-client.js");
 var _authJs = require("./auth.js");
 var _gamificationJs = require("./gamification.js");
-let supabaseClient = null;
 let assessments = [];
 let expandedAssessmentId = null;
-function initAssessments(client) {
-    supabaseClient = client;
-}
 function getAssessments() {
     return assessments;
 }
@@ -931,7 +888,7 @@ async function loadAssessments() {
         return;
     }
     try {
-        const query = supabaseClient.from('assessments').select('*').order('created_at', {
+        const query = (0, _supabaseClientJs.supabase).from('assessments').select('*').order('created_at', {
             ascending: false
         });
         if (!(0, _authJs.getIsAdmin)()) query.eq('user_id', user.id);
@@ -1350,7 +1307,7 @@ async function deleteAssessment(id) {
     }
     if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) return;
     try {
-        const { error } = await supabaseClient.from('assessments').delete().eq('id', id);
+        const { error } = await (0, _supabaseClientJs.supabase).from('assessments').delete().eq('id', id);
         if (error) throw error;
         loadAssessments();
     // Optionally, show a success message
@@ -1646,7 +1603,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 });
 
-},{"./auth.js":"2bucD","./gamification.js":"lUSAA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"lUSAA":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","./auth.js":"2bucD","./gamification.js":"lUSAA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"lUSAA":[function(require,module,exports,__globalThis) {
 // js/dashboard/gamification.js
 // Handles all gamification features, such as achievements,
 // progress tracking, and rewards. 

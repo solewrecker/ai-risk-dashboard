@@ -157,6 +157,9 @@ function simulateAnalysisSteps(callback) {
     }, 600);
 }
 
+// --- Export Functions ---
+// Export functionality moved to export.html page
+
 // --- Initialization ---
 function addEventListeners() {
     // Auth
@@ -183,21 +186,8 @@ function addEventListeners() {
     });
     */
 
-    document.getElementById('exportMainBtn')?.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent body click from hiding menu immediately
-        // Results.toggleExportMenu(); // REMOVE: No longer exists
-    });
-    // document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
-    // document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
-    // Add other export buttons if they exist, e.g., exportHtmlBtn
-    
-    // Global listeners
-    // REMOVE: Results.hideExportMenu, as it no longer exists
-    // document.body.addEventListener('click', (e) => {
-    //     if (!document.getElementById('exportMenu')?.contains(e.target) && !document.getElementById('exportMainBtn')?.contains(e.target)) {
-    //         Results.hideExportMenu();
-    //     }
-    // });
+    // Export functionality moved to export.html page
+    // The export button now links directly to export.html
 }
 
 function initialize() {

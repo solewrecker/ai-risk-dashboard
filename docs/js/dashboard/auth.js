@@ -1,21 +1,18 @@
 // js/dashboard/auth.js
 // Handles user authentication, session management, and login UI. 
 
-// This will be initialized in main.js
-let supabaseClient = null;
+import { supabase } from '../supabase-client.js';
 
 // State variables
 let currentUser = null;
 let isAdmin = false;
 let userTier = 'free';
 
-export function initAuth(client) {
-    supabaseClient = client;
-}
+
 
 export async function checkAuth() {
     try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
             currentUser = session.user;
@@ -71,4 +68,4 @@ export function getIsEnterprise() {
 
 export function getIsFree() {
     return userTier === 'free';
-} 
+}

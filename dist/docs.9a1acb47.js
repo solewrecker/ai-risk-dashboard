@@ -826,6 +826,8 @@ function simulateAnalysisSteps(callback) {
         }
     }, 600);
 }
+// --- Export Functions ---
+// Export functionality moved to export.html page
 // --- Initialization ---
 function addEventListeners() {
     // Auth
@@ -840,27 +842,15 @@ function addEventListeners() {
     document.getElementById('prevStepBtn2')?.addEventListener('click', _uiJs.prevStep);
     // Results and Exports
     document.getElementById('newAssessmentBtn')?.addEventListener('click', _uiJs.startNewAssessment);
-    // The dynamic save button and its handler are no longer needed
-    /*
+// The dynamic save button and its handler are no longer needed
+/*
     document.querySelector('.form-content').addEventListener('click', (e) => {
         if (e.target.matches('#saveToDbBtn') || e.target.closest('#saveToDbBtn')) {
             handleSaveToDatabase();
         }
     });
-    */ document.getElementById('exportMainBtn')?.addEventListener('click', (e)=>{
-        e.stopPropagation(); // Prevent body click from hiding menu immediately
-    // Results.toggleExportMenu(); // REMOVE: No longer exists
-    });
-// document.getElementById('exportJsonBtn')?.addEventListener('click', Results.exportAssessmentJSON);
-// document.getElementById('exportFreePdfBtn')?.addEventListener('click', Results.exportFreePDF);
-// Add other export buttons if they exist, e.g., exportHtmlBtn
-// Global listeners
-// REMOVE: Results.hideExportMenu, as it no longer exists
-// document.body.addEventListener('click', (e) => {
-//     if (!document.getElementById('exportMenu')?.contains(e.target) && !document.getElementById('exportMainBtn')?.contains(e.target)) {
-//         Results.hideExportMenu();
-//     }
-// });
+    */ // Export functionality moved to export.html page
+// The export button now links directly to export.html
 }
 function initialize() {
     // Event Listeners
@@ -887,7 +877,7 @@ document.addEventListener('DOMContentLoaded', initialize);
 // --- Configuration ---
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "supabase", ()=>supabase);
+parcelHelpers.export(exports, "supabase", ()=>(0, _supabaseClientJs.supabase));
 // --- Public Functions ---
 parcelHelpers.export(exports, "initializeSupabase", ()=>initializeSupabase);
 parcelHelpers.export(exports, "signInUser", ()=>signInUser);
@@ -901,22 +891,17 @@ parcelHelpers.export(exports, "getIsFree", ()=>getIsFree);
 parcelHelpers.export(exports, "showAuthModal", ()=>showAuthModal);
 parcelHelpers.export(exports, "closeAuthModal", ()=>closeAuthModal);
 parcelHelpers.export(exports, "switchAuthTab", ()=>switchAuthTab);
-const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-let supabase;
+var _supabaseClientJs = require("../supabase-client.js");
 // --- State ---
 let currentUser = null;
 let isAdmin = false;
 function initializeSupabase(onAuthStateChange) {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized.');
-        supabase.auth.onAuthStateChange((event, session)=>{
-            currentUser = session?.user || null;
-            isAdmin = session?.user?.user_metadata?.role === 'admin';
-            onAuthStateChange(); // Callback to update UI
-        });
-    } else console.error('Supabase client not found.');
+    console.log('Supabase client initialized.');
+    (0, _supabaseClientJs.supabase).auth.onAuthStateChange((event, session)=>{
+        currentUser = session?.user || null;
+        isAdmin = session?.user?.user_metadata?.role === 'admin';
+        onAuthStateChange(); // Callback to update UI
+    });
 }
 async function signInUser() {
     const email = document.getElementById('signInEmail').value;
@@ -926,7 +911,7 @@ async function signInUser() {
         return;
     }
     try {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error } = await (0, _supabaseClientJs.supabase).auth.signInWithPassword({
             email,
             password
         });
@@ -947,7 +932,7 @@ async function signUpUser() {
         return;
     }
     try {
-        const { error } = await supabase.auth.signUp({
+        const { error } = await (0, _supabaseClientJs.supabase).auth.signUp({
             email,
             password,
             options: {
@@ -966,7 +951,7 @@ async function signUpUser() {
 }
 async function signOut() {
     try {
-        const { error } = await supabase.auth.signOut();
+        const { error } = await (0, _supabaseClientJs.supabase).auth.signOut();
         if (error) throw error;
         alert('Signed out successfully');
     } catch (error) {
@@ -1004,37 +989,7 @@ function switchAuthTab(tab) {
     document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"aNoDE":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"aNoDE":[function(require,module,exports,__globalThis) {
 // js/assessment/ui.js
 // Handles UI updates, step navigation, and general DOM manipulation.
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1473,37 +1428,41 @@ function displayResults(results) {
     const fullToolName = toolVersion ? `${toolName} (${toolVersion})` : toolName;
     // Build the results HTML
     const resultsHTML = `
-        <!-- Main Score Card -->
-        <div class="main-score-card risk-${riskLevel.toLowerCase()}">
-            <div class="tool-title" style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">${fullToolName}</div>
-            <div class="score-section">
-                <div id="mainScore" class="score-number">${finalScore}</div>
-                <div id="riskLevel" class="score-label">${riskLevel}</div>
-            </div>
-            <div id="scoreDescription" class="score-description">
-                <p>${getScoreDescription(finalScore, riskLevel, toolName)}</p>
-                <div id="dataSource" class="data-source ${source}">
-                    ${source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis'}
+        <div class="results-layout">
+            <!-- Main Score Card -->
+            <div class="main-score-card risk-${riskLevel.toLowerCase()}">
+                <div class="tool-title" style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">${fullToolName}</div>
+                <div class="score-section">
+                    <div id="mainScore" class="score-number">${finalScore}</div>
+                    <div id="riskLevel" class="score-label">${riskLevel}</div>
+                </div>
+                <div id="scoreDescription" class="score-description">
+                    <p>${getScoreDescription(finalScore, riskLevel, toolName)}</p>
+                    <div id="dataSource" class="data-source ${source}">
+                        ${source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis'}
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Insights Grid -->
-        <div id="insightsGrid" class="insights-grid">
-            <!-- Insight cards will be populated here -->
-        </div>
-        
-        <!-- Recommendations Section -->
-        <div class="recommendations-section">
-            <h3>Recommendations</h3>
-            <ul id="recommendationsList" class="recommendations-list">
-                <!-- Recommendations will be populated here -->
-            </ul>
-        </div>
-        
-        <!-- Detailed Breakdown -->
-        <div id="detailedBreakdown" class="detailed-breakdown-section">
-            <!-- Detailed breakdown will be populated here -->
+            
+            <!-- Insights Grid -->
+            <div id="insightsGrid" class="insights-grid">
+                <!-- Insight cards will be populated here -->
+            </div>
+            
+            <!-- Recommendations Section -->
+            <div class="recommendations-section">
+                <div class="recommendations-section__header">
+                    <h3 class="recommendations-section__title">Recommendations</h3>
+                </div>
+                <ul id="recommendationsList" class="recommendations-section__grid">
+                    <!-- Recommendations will be populated here -->
+                </ul>
+            </div>
+            
+            <!-- Detailed Breakdown -->
+            <div id="detailedBreakdown" class="detailed-breakdown-section">
+                <!-- Detailed breakdown will be populated here -->
+            </div>
         </div>
     `;
     resultsContainer.innerHTML = resultsHTML;
@@ -1586,12 +1545,14 @@ function renderDetailedBreakdown(breakdownData) {
     const details = breakdownData?.assessment_details;
     if (!details || typeof details !== 'object' || Object.keys(details).length === 0) {
         container.innerHTML = `
-            <h3>Detailed Breakdown</h3>
+            <div class="detailed-breakdown-section__header">
+                <h3 class="detailed-breakdown-section__title">Detailed Breakdown</h3>
+            </div>
             <p class="no-breakdown">No detailed breakdown available for this assessment.</p>
         `;
         return;
     }
-    let html = '<h3>Detailed Breakdown</h3><div class="breakdown-categories">';
+    let html = '<div class="detailed-breakdown-section__header"><h3 class="detailed-breakdown-section__title">Detailed Breakdown</h3></div><div class="detailed-breakdown-section__categories-grid">';
     for (const [categoryName, categoryObject] of Object.entries(details)){
         if (!categoryObject || typeof categoryObject !== 'object') continue;
         html += `
@@ -1639,7 +1600,7 @@ function getScoreDescription(score, level, toolName) {
     return description;
 } // --- Export Functions ---
  // All old export functions will be removed from this file.
- // New export functionality is handled by docs/js/dashboard/export.js 
+ // New export functionality is handled by docs/js/dashboard/export.js
 
 },{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["6IEMQ","27cw3"], "27cw3", "parcelRequire4b35", {})
 

@@ -23,37 +23,41 @@ export function displayResults(results) {
 
     // Build the results HTML
     const resultsHTML = `
-        <!-- Main Score Card -->
-        <div class="main-score-card risk-${riskLevel.toLowerCase()}">
-            <div class="tool-title" style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">${fullToolName}</div>
-            <div class="score-section">
-                <div id="mainScore" class="score-number">${finalScore}</div>
-                <div id="riskLevel" class="score-label">${riskLevel}</div>
-            </div>
-            <div id="scoreDescription" class="score-description">
-                <p>${getScoreDescription(finalScore, riskLevel, toolName)}</p>
-                <div id="dataSource" class="data-source ${source}">
-                    ${source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis'}
+        <div class="results-layout">
+            <!-- Main Score Card -->
+            <div class="main-score-card risk-${riskLevel.toLowerCase()}">
+                <div class="tool-title" style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem;">${fullToolName}</div>
+                <div class="score-section">
+                    <div id="mainScore" class="score-number">${finalScore}</div>
+                    <div id="riskLevel" class="score-label">${riskLevel}</div>
+                </div>
+                <div id="scoreDescription" class="score-description">
+                    <p>${getScoreDescription(finalScore, riskLevel, toolName)}</p>
+                    <div id="dataSource" class="data-source ${source}">
+                        ${source === 'database' ? 'Based on Verified Assessment' : 'Based on Heuristic Analysis'}
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Insights Grid -->
-        <div id="insightsGrid" class="insights-grid">
-            <!-- Insight cards will be populated here -->
-        </div>
-        
-        <!-- Recommendations Section -->
-        <div class="recommendations-section">
-            <h3>Recommendations</h3>
-            <ul id="recommendationsList" class="recommendations-list">
-                <!-- Recommendations will be populated here -->
-            </ul>
-        </div>
-        
-        <!-- Detailed Breakdown -->
-        <div id="detailedBreakdown" class="detailed-breakdown-section">
-            <!-- Detailed breakdown will be populated here -->
+            
+            <!-- Insights Grid -->
+            <div id="insightsGrid" class="insights-grid">
+                <!-- Insight cards will be populated here -->
+            </div>
+            
+            <!-- Recommendations Section -->
+            <div class="recommendations-section">
+                <div class="recommendations-section__header">
+                    <h3 class="recommendations-section__title">Recommendations</h3>
+                </div>
+                <ul id="recommendationsList" class="recommendations-section__grid">
+                    <!-- Recommendations will be populated here -->
+                </ul>
+            </div>
+            
+            <!-- Detailed Breakdown -->
+            <div id="detailedBreakdown" class="detailed-breakdown-section">
+                <!-- Detailed breakdown will be populated here -->
+            </div>
         </div>
     `;
 
@@ -135,13 +139,15 @@ function renderDetailedBreakdown(breakdownData) {
 
     if (!details || typeof details !== 'object' || Object.keys(details).length === 0) {
         container.innerHTML = `
-            <h3>Detailed Breakdown</h3>
+            <div class="detailed-breakdown-section__header">
+                <h3 class="detailed-breakdown-section__title">Detailed Breakdown</h3>
+            </div>
             <p class="no-breakdown">No detailed breakdown available for this assessment.</p>
         `;
         return;
     }
 
-    let html = '<h3>Detailed Breakdown</h3><div class="breakdown-categories">';
+    let html = '<div class="detailed-breakdown-section__header"><h3 class="detailed-breakdown-section__title">Detailed Breakdown</h3></div><div class="detailed-breakdown-section__categories-grid">';
 
     for (const [categoryName, categoryObject] of Object.entries(details)) {
         if (!categoryObject || typeof categoryObject !== 'object') continue;
@@ -210,4 +216,4 @@ function getScoreDescription(score, level, toolName) {
 
 // --- Export Functions ---
 // All old export functions will be removed from this file.
-// New export functionality is handled by docs/js/dashboard/export.js 
+// New export functionality is handled by docs/js/dashboard/export.js

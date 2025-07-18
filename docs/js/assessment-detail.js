@@ -1,9 +1,6 @@
 // js/assessment-detail.js
 
-// Supabase Connection (replace with your details)
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+import { supabase } from './supabase-client.js';
 
 const loadingState = document.getElementById('loading-state');
 const resultsContent = document.getElementById('resultsContent');
@@ -140,4 +137,4 @@ function getRiskSummary(riskLevel) {
         default:
             return 'The risk level could not be determined.';
     }
-} 
+}

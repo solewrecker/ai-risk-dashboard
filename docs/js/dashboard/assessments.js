@@ -1,16 +1,12 @@
 // js/dashboard/assessments.js
 // Handles fetching, rendering, filtering, and managing assessments. 
 
+import { supabase } from '../supabase-client.js';
 import { getIsAdmin, getCurrentUser } from './auth.js';
 import { updateDashboardStats, updateProgressTracking } from './gamification.js';
 
-let supabaseClient = null;
 let assessments = [];
 let expandedAssessmentId = null;
-
-export function initAssessments(client) {
-    supabaseClient = client;
-}
 
 export function getAssessments() {
     return assessments;
@@ -44,7 +40,7 @@ export async function loadAssessments() {
     }
 
     try {
-        const query = supabaseClient
+        const query = supabase
             .from('assessments')
             .select('*')
             .order('created_at', { ascending: false });
@@ -541,7 +537,7 @@ export async function deleteAssessment(id) {
         return;
     }
     try {
-        const { error } = await supabaseClient
+        const { error } = await supabase
             .from('assessments')
             .delete()
             .eq('id', id);
@@ -906,4 +902,4 @@ document.addEventListener('DOMContentLoaded', () => {
             // Implement filter functionality
         });
     }
-}); 
+});

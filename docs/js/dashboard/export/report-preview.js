@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../supabase-client.js';
 import Handlebars from 'handlebars';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -21,18 +21,28 @@ Handlebars.registerHelper('toLowerCase', function(str) {
   return str.toLowerCase();
 });
 
+console.log('report-preview.js loaded');
 document.addEventListener('DOMContentLoaded', () => {
-    const reportDataString = sessionStorage.getItem('reportData');
+    console.log('DOMContentLoaded event fired.');
+    const reportDataString = localStorage.getItem('reportData');
+    console.log('Report data string from sessionStorage:', reportDataString);
     if (!reportDataString) {
         document.getElementById('report-container').innerHTML = '<p>No report data found. Please generate a report first.</p>';
         return;
     }
 
-    const reportData = JSON.parse(reportDataString);
-    renderReport(reportData);
+    try {
+        const reportData = JSON.parse(reportDataString);
+        console.log('Parsed report data:', reportData);
+        renderReport(reportData);
+    } catch (error) {
+        console.error('Failed to parse report data:', error);
+        document.getElementById('report-container').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
+    }
 });
 
 async function renderReport({ primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme }) {
+    console.log('renderReport function called with:', { primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme });
     const reportContentEl = document.getElementById('report-container');
     reportContentEl.innerHTML = '<div class="loader"></div> <p>Loading report...</p>';
 
@@ -78,11 +88,11 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
              sectionsHtml 
          });
 
+        console.log('Final HTML to be injected:', fullReportHtml);
         reportContentEl.innerHTML = fullReportHtml;
         createIcons({ icons });
         
-        // Update theme CSS dynamically
-        updateThemeCSS(selectedTheme || 'theme-professional');
+
 
         // Render functions for sections
         function renderSummarySection(data) {
@@ -196,20 +206,18 @@ async function createPdf(reportContentEl) {
 }
 
 async function createHtml(reportContentEl, templateData, selectedTheme) {
+    const themeName = selectedTheme || 'theme-professional';
     const cssPromises = [
-        fetch('./css/style.css').then(res => res.text()),
-        fetch('./css/pages/report.css').then(res => res.text()),
-        fetch('./css/themes/theme-base.css').then(res => res.text())
+        fetch('/css/style.css').then(res => res.text()),
+        fetch(`/css/themes/${themeName}.css`).then(res => res.text()),
+        fetch('/css/pages/report.css').then(res => res.text()),
+        fetch('/css/themes/theme-base.css').then(res => res.text())
     ];
 
-    // Add the selected theme CSS
-    const themeFile = selectedTheme || 'theme-professional';
-    cssPromises.push(fetch(`./css/themes/${themeFile}.css`).then(res => res.text()));
+    const cssContents = await Promise.all(cssPromises.map(p => p.catch(e => console.error(e) || '')));
 
-    const cssContents = await Promise.all(cssPromises);
-
-    const html = reportContentEl.innerHTML;
-    const blob = new Blob([`
+    const reportHtml = reportContentEl.innerHTML;
+    const fullHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -221,15 +229,18 @@ async function createHtml(reportContentEl, templateData, selectedTheme) {
             </style>
         </head>
         <body>
-            ${html}
+            <div id="report-container" class="report-container">
+                 ${reportHtml}
+            </div>
         </body>
         </html>
-    `], { type: 'text/html' });
+    `;
 
+    const blob = new Blob([fullHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ai-risk-assessment-report.html`;
+    a.download = `${templateData.toolName}-risk-assessment-report.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
