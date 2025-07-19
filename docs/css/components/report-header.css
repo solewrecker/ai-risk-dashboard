@@ -44,27 +44,33 @@
 
 .report-header__tool-highlight {
     background: rgba(255, 255, 255, 0.15);
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1.5rem auto;
-    max-width: 400px;
-    display: flex;
-    justify-content: center;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 500px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .report-header__tool-name {
     font-size: 1.75rem;
     font-weight: 700;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    color: white;
+    text-align: center;
 }
 
 .report-header__tool-name--centered {
-    justify-content: center;
+    text-align: center;
 }
 
 .report-header__tool-subtitle {
     font-size: 1rem;
     opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    margin: 0;
 }
 
 .report-header__meta {

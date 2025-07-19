@@ -1,0 +1,863 @@
+/* ==========================================================================
+   AI THEME GENERATOR TEMPLATE
+   ==========================================================================
+   
+   INSTRUCTIONS FOR AI THEME GENERATION:
+   
+   1. This template contains ALL components and containers used in the app
+   2. Replace ALL CSS custom properties (--theme-*) with your theme colors
+   3. Maintain BEM naming conventions (block__element--modifier)
+   4. Focus ONLY on colors, backgrounds, borders, and typography
+   5. DO NOT modify layout properties (display, flex, grid, positioning)
+   6. Ensure proper contrast ratios for accessibility
+   7. Test with both light and dark color schemes
+   
+   THEME STRUCTURE:
+   - Dashboard Components (sidebar, navigation, cards)
+   - Report Components (header, sections, cards)
+   - Form Components (inputs, buttons, selectors)
+   - Interactive Elements (hover states, focus states)
+   
+   BEM NAMING CONVENTION:
+   - Block: .component-name
+   - Element: .component-name__element-name  
+   - Modifier: .component-name--modifier-name
+   
+   JAVASCRIPT CONFIGURATION:
+   Add your theme to themeConfigs in templates.js:
+   'theme-yourname': {
+       name: 'Your Theme Name',
+       description: 'Theme description',
+       primaryColor: '#your-primary-color',
+       category: 'business|premium|creative|modern'
+   }
+   
+========================================================================== */
+
+/* === THEME VARIABLES === */
+:root {
+  /* === PRIMARY COLORS === */
+  --theme-primary-start: #4c1d95;        /* Primary gradient start */
+  --theme-primary-end: #8b5cf6;          /* Primary gradient end */
+  --theme-accent: #3b82f6;               /* Accent color for highlights */
+  --theme-accent-secondary: #10b981;     /* Secondary accent */
+  
+  /* === BACKGROUND COLORS === */
+  --theme-background: #ffffff;           /* Main background */
+  --theme-card-background: #f8fafc;      /* Card backgrounds */
+  --theme-sidebar-background: #1f2937;   /* Sidebar background */
+  --theme-header-background: linear-gradient(135deg, var(--theme-primary-start) 0%, var(--theme-primary-end) 100%);
+  
+  /* === TEXT COLORS === */
+  --theme-text-primary: #1e293b;         /* Primary text */
+  --theme-text-secondary: #64748b;       /* Secondary text */
+  --theme-text-accent: #3b82f6;          /* Accent text */
+  --theme-header-text: #ffffff;          /* Header text */
+  --theme-sidebar-text: #e5e7eb;         /* Sidebar text */
+  
+  /* === BORDER COLORS === */
+  --theme-border: #e2e8f0;               /* Default borders */
+  --theme-border-accent: #3b82f6;        /* Accent borders */
+  --theme-border-hover: #cbd5e1;         /* Hover borders */
+  
+  /* === RISK LEVEL COLORS === */
+  --theme-risk-low: #10b981;             /* Low risk - green */
+  --theme-risk-medium: #f59e0b;          /* Medium risk - yellow */
+  --theme-risk-high: #ef4444;            /* High risk - orange */
+  --theme-risk-critical: #dc2626;        /* Critical risk - red */
+  
+  /* === INTERACTIVE STATES === */
+  --theme-hover-background: #f1f5f9;     /* Hover background */
+  --theme-active-background: #e2e8f0;    /* Active background */
+  --theme-focus-ring: #3b82f6;           /* Focus ring color */
+  
+  /* === TYPOGRAPHY === */
+  --theme-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --theme-font-weight-normal: 400;
+  --theme-font-weight-medium: 500;
+  --theme-font-weight-semibold: 600;
+  --theme-font-weight-bold: 700;
+  
+  /* === SHADOWS === */
+  --theme-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --theme-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --theme-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --theme-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* === DASHBOARD COMPONENTS === */
+
+/* === BODY & LAYOUT === */
+body.dashboard-page {
+  background-color: var(--theme-background);
+  color: var(--theme-text-primary);
+  font-family: var(--theme-font-family);
+}
+
+.flex-1 {
+  /* Main content area - layout handled by framework */
+}
+
+/* === SIDEBAR === */
+.w-64.bg-gray-800 {
+  background-color: var(--theme-sidebar-background);
+}
+
+h1.text-xl.font-bold {
+  color: var(--theme-sidebar-text);
+}
+
+span#tierBadge {
+  background-color: var(--theme-accent);
+  color: var(--theme-header-text);
+}
+
+/* === PROGRESS BAR === */
+.p-3.bg-gray-700 {
+  background-color: var(--theme-card-background);
+}
+
+#progressBar {
+  background-color: var(--theme-accent);
+}
+
+/* === NAVIGATION === */
+nav .nav-btn {
+  color: var(--theme-text-secondary);
+}
+
+nav .nav-btn:hover {
+  background-color: var(--theme-hover-background);
+  color: var(--theme-text-primary);
+}
+
+nav .nav-btn.bg-blue-600 {
+  background-color: var(--theme-accent);
+  color: var(--theme-header-text);
+}
+
+/* === MAIN CONTENT HEADER === */
+.mb-8 h2 {
+  color: var(--theme-text-primary);
+}
+
+.mb-8 p {
+  color: var(--theme-text-secondary);
+}
+
+/* === BUTTONS === */
+.flex.items-center.space-x-4 > button.flex {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+}
+
+.flex.items-center.space-x-4 > button.flex:hover {
+  background-color: var(--theme-hover-background);
+  border-color: var(--theme-border-hover);
+}
+
+/* === STAT CARDS === */
+.grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 .bg-gray-800 {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+}
+
+.grid .p-2 {
+  background-color: var(--theme-accent);
+}
+
+.grid h3 {
+  color: var(--theme-text-primary);
+}
+
+.grid p {
+  color: var(--theme-text-secondary);
+}
+
+/* === ASSESSMENT LIST === */
+.assessment-list {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+}
+
+.assessment-list-title {
+  color: var(--theme-text-primary);
+}
+
+.assessment-list-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+/* === ASSESSMENT ITEMS === */
+.assessment-item {
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+}
+
+.assessment-item:hover {
+  background: var(--theme-hover-background);
+  border-color: var(--theme-border-accent);
+}
+
+.assessment-icon {
+  background-color: var(--theme-card-background);
+}
+
+.assessment-risk-indicator.bg-green-500 { 
+  background-color: var(--theme-risk-low); 
+}
+
+.assessment-risk-indicator.bg-yellow-500 { 
+  background-color: var(--theme-risk-medium); 
+}
+
+.assessment-risk-indicator.bg-red-500 { 
+  background-color: var(--theme-risk-high); 
+}
+
+.assessment-risk-indicator.bg-purple-500 { 
+  background-color: var(--theme-risk-critical); 
+}
+
+.assessment-risk-indicator { 
+  border-color: var(--theme-background); 
+}
+
+.assessment-name {
+  color: var(--theme-text-primary);
+}
+
+.assessment-meta {
+  color: var(--theme-text-secondary);
+}
+
+.assessment-meta-divider {
+  color: var(--theme-text-secondary);
+}
+
+/* === SCORE BOX === */
+.assessment-score {
+  background: var(--theme-card-background);
+  border-color: var(--theme-border);
+}
+
+.score-label {
+  color: var(--theme-text-secondary);
+}
+
+.score-value.risk-low { color: var(--theme-risk-low); }
+.score-value.risk-medium { color: var(--theme-risk-medium); }
+.score-value.risk-high { color: var(--theme-risk-high); }
+.score-value.risk-critical { color: var(--theme-risk-critical); }
+
+/* === ACTION BUTTONS === */
+.action-button {
+  background: var(--theme-card-background);
+  border-color: var(--theme-border);
+  color: var(--theme-text-secondary);
+}
+
+.action-button:hover {
+  background-color: var(--theme-hover-background);
+  color: var(--theme-text-primary);
+}
+
+.view-all-link {
+  color: var(--theme-text-accent);
+}
+
+.view-all-link:hover {
+  background-color: var(--theme-hover-background);
+}
+
+/* === HEADER ACTION BUTTONS === */
+.assessment-list-actions .icon-button {
+  background-color: var(--theme-card-background);
+  color: var(--theme-text-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+.assessment-list-actions .icon-button:hover {
+  background-color: var(--theme-accent);
+  color: var(--theme-header-text);
+}
+
+.assessment-list-actions .export-button {
+  background-color: var(--theme-accent);
+  color: var(--theme-header-text);
+}
+
+.assessment-list-actions .export-button:hover {
+  opacity: 0.8;
+}
+
+/* === REPORT COMPONENTS === */
+
+/* === REPORT CONTAINER === */
+.report-container {
+  background: var(--theme-background);
+  box-shadow: var(--theme-shadow-lg);
+  font-family: var(--theme-font-family);
+  color: var(--theme-text-primary);
+}
+
+/* === REPORT HEADER === */
+.report-header {
+  background: var(--theme-header-background);
+  color: var(--theme-header-text);
+}
+
+.report-header__content {
+  /* Layout handled by base styles */
+}
+
+.report-header__title {
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.report-header__tool-highlight {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.report-header__tool-name {
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.report-header__tool-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.report-header__meta {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--theme-header-text);
+}
+
+/* === REPORT MAIN === */
+.report-main {
+  background: var(--theme-background);
+}
+
+.report-main__content {
+  background: var(--theme-background);
+}
+
+/* === SUMMARY SECTION === */
+.summary-section {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+  color: var(--theme-header-text);
+  box-shadow: var(--theme-shadow-xl);
+}
+
+.summary-section__score-display--low {
+  background: linear-gradient(135deg, var(--theme-risk-low) 0%, #34d399 100%);
+}
+
+.summary-section__score-display--medium {
+  background: linear-gradient(135deg, var(--theme-risk-medium) 0%, #fbbf24 100%);
+}
+
+.summary-section__score-display--high {
+  background: linear-gradient(135deg, var(--theme-risk-high) 0%, #f87171 100%);
+}
+
+.summary-section__score-display--critical {
+  background: linear-gradient(135deg, var(--theme-risk-critical) 0%, #ef4444 100%);
+}
+
+.summary-section__score-number {
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.summary-section__score-total {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-section__risk-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.summary-section__risk-description {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-section__insight-item {
+  background: var(--theme-card-background);
+  border-left: 4px solid var(--theme-accent);
+}
+
+.summary-section__insight-title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.summary-section__insight-text {
+  color: var(--theme-text-secondary);
+}
+
+.summary-section__findings-list {
+  color: var(--theme-text-secondary);
+}
+
+.summary-section__finding-item {
+  color: var(--theme-text-secondary);
+}
+
+/* === DETAILED BREAKDOWN SECTION === */
+.detailed-breakdown-section {
+  background: var(--theme-background);
+}
+
+.detailed-breakdown-section__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.detailed-breakdown-card {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow-md);
+}
+
+.detailed-breakdown-card:hover {
+  box-shadow: var(--theme-shadow-lg);
+  border-color: var(--theme-border-accent);
+}
+
+.detailed-breakdown-card--low {
+  border-left: 4px solid var(--theme-risk-low);
+}
+
+.detailed-breakdown-card--medium {
+  border-left: 4px solid var(--theme-risk-medium);
+}
+
+.detailed-breakdown-card--high {
+  border-left: 4px solid var(--theme-risk-high);
+}
+
+.detailed-breakdown-card--critical {
+  border-left: 4px solid var(--theme-risk-critical);
+}
+
+.detailed-breakdown-card__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-semibold);
+}
+
+.detailed-breakdown-card__score {
+  background: var(--theme-accent);
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.detailed-breakdown-card__score--low {
+  background: var(--theme-risk-low);
+}
+
+.detailed-breakdown-card__score--medium {
+  background: var(--theme-risk-medium);
+}
+
+.detailed-breakdown-card__score--high {
+  background: var(--theme-risk-high);
+}
+
+.detailed-breakdown-card__score--critical {
+  background: var(--theme-risk-critical);
+}
+
+.detailed-breakdown-card__description {
+  color: var(--theme-text-secondary);
+}
+
+.detailed-breakdown-card__criterion-title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.detailed-breakdown-card__criterion-score {
+  color: var(--theme-accent);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.detailed-breakdown-card__criterion-text {
+  color: var(--theme-text-secondary);
+}
+
+/* === RECOMMENDATIONS SECTION === */
+.recommendations-section {
+  background: var(--theme-background);
+}
+
+.recommendations-section__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.recommendations-item {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow-sm);
+}
+
+.recommendations-item:hover {
+  box-shadow: var(--theme-shadow-md);
+  border-color: var(--theme-border-accent);
+}
+
+.recommendations-item--high {
+  border-left: 4px solid var(--theme-risk-high);
+}
+
+.recommendations-item--medium {
+  border-left: 4px solid var(--theme-risk-medium);
+}
+
+.recommendations-item--low {
+  border-left: 4px solid var(--theme-risk-low);
+}
+
+.recommendations-item__priority {
+  background: var(--theme-accent);
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.recommendations-item__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-semibold);
+}
+
+.recommendations-item__description {
+  color: var(--theme-text-secondary);
+}
+
+/* === COMPLIANCE SECTION === */
+.compliance-section {
+  background: var(--theme-background);
+}
+
+.compliance-section__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.compliance-item {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow-sm);
+}
+
+.compliance-item:hover {
+  box-shadow: var(--theme-shadow-md);
+  border-color: var(--theme-border-accent);
+}
+
+.compliance-item--compliant {
+  border-left: 4px solid var(--theme-risk-low);
+}
+
+.compliance-item--partial {
+  border-left: 4px solid var(--theme-risk-medium);
+}
+
+.compliance-item--non-compliant {
+  border-left: 4px solid var(--theme-risk-high);
+}
+
+.compliance-item__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-semibold);
+}
+
+.compliance-item__status {
+  color: var(--theme-text-secondary);
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.compliance-item__description {
+  color: var(--theme-text-secondary);
+}
+
+/* === COMPARISON SECTION === */
+.comparison-section {
+  background: var(--theme-background);
+}
+
+.comparison-section__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.comparison-table {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+}
+
+.comparison-table__header {
+  background: var(--theme-accent);
+  color: var(--theme-header-text);
+  font-weight: var(--theme-font-weight-semibold);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.comparison-table__row {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.comparison-table__row:hover {
+  background: var(--theme-hover-background);
+}
+
+.comparison-table__cell {
+  color: var(--theme-text-primary);
+  border-right: 1px solid var(--theme-border);
+}
+
+.comparison-table__cell--name {
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.comparison-table__cell--score {
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.comparison-table__cell--low {
+  color: var(--theme-risk-low);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.comparison-table__cell--medium {
+  color: var(--theme-risk-medium);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.comparison-table__cell--high {
+  color: var(--theme-risk-high);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.comparison-table__cell--critical {
+  color: var(--theme-risk-critical);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+/* === PREMIUM FEATURES SECTION === */
+.premium-features-section {
+  background: var(--theme-background);
+}
+
+.premium-features-section__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-bold);
+}
+
+.premium-feature {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow-sm);
+}
+
+.premium-feature:hover {
+  box-shadow: var(--theme-shadow-md);
+  border-color: var(--theme-border-accent);
+}
+
+.premium-feature__icon {
+  background: var(--theme-accent);
+  color: var(--theme-header-text);
+}
+
+.premium-feature__title {
+  color: var(--theme-text-primary);
+  font-weight: var(--theme-font-weight-semibold);
+}
+
+.premium-feature__description {
+  color: var(--theme-text-secondary);
+}
+
+/* === FORM COMPONENTS === */
+
+/* === INPUT FIELDS === */
+.form-input {
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+.form-input:focus {
+  border-color: var(--theme-focus-ring);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:hover {
+  border-color: var(--theme-border-hover);
+}
+
+/* === SELECT DROPDOWNS === */
+.form-select {
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+.form-select:focus {
+  border-color: var(--theme-focus-ring);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* === BUTTONS === */
+.btn-primary {
+  background: var(--theme-accent);
+  color: var(--theme-header-text);
+  border: 1px solid var(--theme-accent);
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.btn-primary:hover {
+  background: var(--theme-primary-start);
+  border-color: var(--theme-primary-start);
+}
+
+.btn-secondary {
+  background: var(--theme-card-background);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.btn-secondary:hover {
+  background: var(--theme-hover-background);
+  border-color: var(--theme-border-hover);
+}
+
+.btn-danger {
+  background: var(--theme-risk-high);
+  color: var(--theme-header-text);
+  border: 1px solid var(--theme-risk-high);
+  font-weight: var(--theme-font-weight-medium);
+}
+
+.btn-danger:hover {
+  background: var(--theme-risk-critical);
+  border-color: var(--theme-risk-critical);
+}
+
+/* === INTERACTIVE STATES === */
+
+/* === FOCUS STATES === */
+*:focus {
+  outline: 2px solid var(--theme-focus-ring);
+  outline-offset: 2px;
+}
+
+/* === LOADING STATES === */
+.loading {
+  background: var(--theme-card-background);
+  color: var(--theme-text-secondary);
+}
+
+.loader {
+  border-color: var(--theme-border);
+  border-top-color: var(--theme-accent);
+}
+
+/* === ERROR STATES === */
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--theme-risk-high);
+  color: var(--theme-risk-high);
+}
+
+/* === SUCCESS STATES === */
+.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--theme-risk-low);
+  color: var(--theme-risk-low);
+}
+
+/* === WARNING STATES === */
+.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--theme-risk-medium);
+  color: var(--theme-risk-medium);
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .report-header__meta {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .summary-section__score-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .detailed-breakdown-section__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .recommendations-section__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .compliance-section__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === PRINT STYLES === */
+@media print {
+  .report-container {
+    box-shadow: none;
+    max-width: none;
+  }
+  
+  .report-header {
+    background: var(--theme-text-primary) !important;
+    color: var(--theme-background) !important;
+  }
+  
+  .action-button,
+  .export-button {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   END OF TEMPLATE
+   ==========================================================================
+   
+   USAGE INSTRUCTIONS:
+   
+   1. Save this file as 'theme-[yourthemename].css' in the themes folder
+   2. Replace all --theme-* variables with your colors
+   3. Test with different content types and screen sizes
+   4. Add to themeConfigs in templates.js
+   5. Ensure accessibility compliance (WCAG 2.1 AA)
+   
+   EXAMPLE THEME REGISTRATION:
+   
+   In docs/js/dashboard/export/templates.js, add:
+   
+   'theme-ocean': {
+       name: 'Ocean Blue',
+       description: 'Calming blue tones inspired by the ocean',
+       primaryColor: '#0ea5e9',
+       category: 'business'
+   }
+   
+========================================================================== */

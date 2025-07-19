@@ -688,7 +688,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const reportDataString = localStorage.getItem('reportData');
     console.log('Report data string from sessionStorage:', reportDataString);
     if (!reportDataString) {
-        document.getElementById('report-container').innerHTML = '<p>No report data found. Please generate a report first.</p>';
+        document.getElementById('report-main').innerHTML = '<p>No report data found. Please generate a report first.</p>';
         return;
     }
     try {
@@ -697,7 +697,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         renderReport(reportData);
     } catch (error) {
         console.error('Failed to parse report data:', error);
-        document.getElementById('report-container').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
+        document.getElementById('report-main').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
     }
 });
 async function renderReport({ primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme }) {
@@ -708,7 +708,7 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
         selectedTemplate,
         selectedTheme
     });
-    const reportContentEl = document.getElementById('report-container');
+    const reportContentEl = document.getElementById('report-main');
     reportContentEl.innerHTML = '<div class="loader"></div> <p>Loading report...</p>';
     try {
         // Load the selected theme CSS dynamically
@@ -738,27 +738,7 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
                 sectionsHtml += renderComparisonTableSection(templateData);
                 break;
         }
-        // Create a simplified template for injecting into existing page
-        const reportTemplate = `
-            <header class="report-header">
-                <div class="report-header__content">
-                    <h1 class="report-header__title">{{reportTitle}}</h1>
-                    <div class="report-header__tool-highlight">
-                        <h2 class="report-header__tool-name report-header__tool-name--centered">{{toolName}}</h2>
-                        <p class="report-header__tool-subtitle">{{toolSubtitle}}</p>
-                    </div>
-                    <div class="report-header__meta">
-                        <span>\u{1F4C5} Report Date: {{reportDate}}</span>
-                        <span>\u{1F50D} Assessment ID: {{assessmentIdShort}}</span>
-                        <span>\u{1F464} Assessed by: {{assessedBy}}</span>
-                    </div>
-                </div>
-            </header>
-            <main class="report-main">
-                {{{sectionsHtml}}}
-            </main>
-        `;
-        const template = (0, _handlebarsDefault.default).compile(reportTemplate);
+        const template = (0, _handlebarsDefault.default).compile((0, _templatesJs.baseTemplate));
         const fullReportHtml = template({
             ...templateData,
             reportTitle: config.title,

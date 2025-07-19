@@ -1,0 +1,4 @@
+.report-main__content {
+    padding: 2rem;
+    background: var(--theme-section-background, #ffffff);
+}

@@ -12,6 +12,7 @@ export const baseTemplate = `<!DOCTYPE html>
     <link rel="stylesheet" href="/css/components/report-header.css">
     <link rel="stylesheet" href="/css/components/report-cards.css">
     <link rel="stylesheet" href="/css/components/report-sections.css">
+    <link rel="stylesheet" href="/css/components/report-main.css">
     <link id="theme-stylesheet" rel="stylesheet" href="/css/themes/{{selectedTheme}}.css">
 </head>
 <body>
@@ -31,7 +32,9 @@ export const baseTemplate = `<!DOCTYPE html>
             </div>
         </header>
         <main class="report-main">
-            {{{sectionsHtml}}}
+            <div class="report-main__content">
+                {{{sectionsHtml}}}
+            </div>
         </main>
     </div>
 </body>

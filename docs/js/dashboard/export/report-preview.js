@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportDataString = localStorage.getItem('reportData');
     console.log('Report data string from sessionStorage:', reportDataString);
     if (!reportDataString) {
-        document.getElementById('report-container').innerHTML = '<p>No report data found. Please generate a report first.</p>';
+        document.getElementById('report-main').innerHTML = '<p>No report data found. Please generate a report first.</p>';
         return;
     }
 
@@ -37,13 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderReport(reportData);
     } catch (error) {
         console.error('Failed to parse report data:', error);
-        document.getElementById('report-container').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
+        document.getElementById('report-main').innerHTML = '<p>Error: Could not parse report data. Please try again.</p>';
     }
 });
 
 async function renderReport({ primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme }) {
     console.log('renderReport function called with:', { primaryAssessment, selectedData, sectionsToGenerate, selectedTemplate, selectedTheme });
-    const reportContentEl = document.getElementById('report-container');
+    const reportContentEl = document.getElementById('report-main');
     reportContentEl.innerHTML = '<div class="loader"></div> <p>Loading report...</p>';
 
     try {
@@ -81,29 +81,8 @@ async function renderReport({ primaryAssessment, selectedData, sectionsToGenerat
             }
         }
         
-        // Create a simplified template for injecting into existing page
-        const reportTemplate = `
-            <header class="report-header">
-                <div class="report-header__content">
-                    <h1 class="report-header__title">{{reportTitle}}</h1>
-                    <div class="report-header__tool-highlight">
-                        <h2 class="report-header__tool-name report-header__tool-name--centered">{{toolName}}</h2>
-                        <p class="report-header__tool-subtitle">{{toolSubtitle}}</p>
-                    </div>
-                    <div class="report-header__meta">
-                        <span>📅 Report Date: {{reportDate}}</span>
-                        <span>🔍 Assessment ID: {{assessmentIdShort}}</span>
-                        <span>👤 Assessed by: {{assessedBy}}</span>
-                    </div>
-                </div>
-            </header>
-            <main class="report-main">
-                {{{sectionsHtml}}}
-            </main>
-        `;
-        
-        const template = Handlebars.compile(reportTemplate);
-         
+        const template = Handlebars.compile(baseTemplate);
+          
          const fullReportHtml = template({ 
              ...templateData, 
              reportTitle: config.title,
