@@ -19,13 +19,7 @@ async function startAssessment() {
 
     if (toolData) {
         console.log('toolData from DB:', toolData); // Debug log
-        // Ensure compliance_certifications is always an array of key-value strings
-        let certs = [];
-        if (Array.isArray(toolData.compliance_certifications)) {
-            certs = toolData.compliance_certifications;
-        } else if (toolData.compliance_certifications && typeof toolData.compliance_certifications === 'object') {
-            certs = Object.entries(toolData.compliance_certifications).map(([key, value]) => `${key}: ${value}`);
-        }
+
         currentAssessment = {
             formData: formData,
             finalScore: toolData.total_score,
@@ -44,9 +38,8 @@ async function startAssessment() {
             assessment_notes: toolData.assessment_notes || null,
             azure_permissions: toolData.azure_permissions || null,
             sources: toolData.sources || null,
-            // compliance_certifications is handled in API.saveToDatabase for the root level, 
-            // but we ensure detailedAssessment.compliance_certifications is present for assessment_data
-            compliance_certifications: toolData.compliance_certifications // Keep the object structure from ai_tools for detailedAssessment
+            // Pass the raw compliance_certifications object; it will be handled by the API module
+            compliance_certifications: toolData.compliance_certifications
         };
     } else {
         // Generate heuristic score

@@ -13,6 +13,7 @@ export const baseTemplate = `<!DOCTYPE html>
     <link rel="stylesheet" href="/css/components/report-cards.css">
     <link rel="stylesheet" href="/css/components/report-sections.css">
     <link rel="stylesheet" href="/css/components/report-main.css">
+    <link rel="stylesheet" href="/css/components/report-footer.css">
     <link id="theme-stylesheet" rel="stylesheet" href="/css/themes/{{selectedTheme}}.css">
 </head>
 <body>
@@ -36,6 +37,7 @@ export const baseTemplate = `<!DOCTYPE html>
                 {{{sectionsHtml}}}
             </div>
         </main>
+        {{{footerHtml}}}
     </div>
 </body>
 </html>`;
@@ -203,6 +205,93 @@ export const premiumFeaturesTemplate = `<section class="premium-features-section
         </div>
     </div>
 </section>`;
+
+// Footer template with legal disclaimers and documentation tier
+export const footerTemplate = `<footer class="report-footer">
+    <div class="report-footer__content">
+        <div class="report-footer__section">
+            <h3 class="report-footer__title">📋 Assessment Sources</h3>
+            <div class="report-footer__sources">
+                {{#if sources}}
+                    {{#each sources}}
+                    <div class="source-item">
+                        <span class="source-item__type">{{type}}</span>
+                        <span class="source-item__description">{{description}}</span>
+                        {{#if url}}<a href="{{url}}" class="source-item__link" target="_blank">View Source</a>{{/if}}
+                    </div>
+                    {{/each}}
+                {{else}}
+                    <p class="report-footer__text">Assessment based on publicly available information and vendor documentation.</p>
+                {{/if}}
+            </div>
+        </div>
+        
+        {{#if azurePermissions}}
+        <div class="report-footer__section">
+            <h3 class="report-footer__title">☁️ Azure Integration & Restrictions</h3>
+            <div class="azure-permissions">
+                {{#if azurePermissions.recommended_restrictions}}
+                <div class="azure-permissions__item">
+                    <h4 class="azure-permissions__subtitle">Recommended Restrictions</h4>
+                    <ul class="azure-permissions__list">
+                        {{#each azurePermissions.recommended_restrictions}}
+                        <li class="azure-permissions__restriction">{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/if}}
+                
+                {{#if azurePermissions.conditional_access}}
+                <div class="azure-permissions__item">
+                    <h4 class="azure-permissions__subtitle">Conditional Access Requirements</h4>
+                    <p class="azure-permissions__text">{{azurePermissions.conditional_access}}</p>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        {{/if}}
+        
+        <div class="report-footer__section">
+            <h3 class="report-footer__title">📊 Documentation Tier</h3>
+            <div class="documentation-tier">
+                <div class="documentation-tier__badge documentation-tier__badge--{{#contains documentationTier 'Public'}}public{{else}}{{#contains documentationTier 'Vendor'}}vendor{{else}}comprehensive{{/contains}}{{/contains}}">
+                    {{documentationTier}}
+                </div>
+                <p class="documentation-tier__description">{{assessmentNotes}}</p>
+            </div>
+        </div>
+        
+        <div class="report-footer__section report-footer__section--legal">
+            <h3 class="report-footer__title">⚖️ Legal Disclaimer</h3>
+            <div class="legal-disclaimer">
+                <p class="legal-disclaimer__text">
+                    <strong>Important:</strong> This assessment is provided for informational purposes only and should not be considered as legal, compliance, or security advice. Organizations should conduct their own due diligence and consult with qualified professionals before making decisions based on this assessment.
+                </p>
+                <p class="legal-disclaimer__text">
+                    The information contained in this report is based on publicly available sources and vendor-provided documentation as of the assessment date. Security postures and compliance statuses may change over time. Users are advised to verify current information directly with vendors.
+                </p>
+                <p class="legal-disclaimer__text">
+                    <strong>Limitation of Liability:</strong> The AI Security Council and its contributors shall not be liable for any damages arising from the use of this assessment or any decisions made based on its contents.
+                </p>
+            </div>
+        </div>
+        
+        <div class="report-footer__meta">
+            <div class="report-footer__generated">
+                <span class="report-footer__label">Generated:</span>
+                <span class="report-footer__value">{{reportDate}}</span>
+            </div>
+            <div class="report-footer__assessed-by">
+                <span class="report-footer__label">Assessed by:</span>
+                <span class="report-footer__value">{{assessedBy}}</span>
+            </div>
+            <div class="report-footer__id">
+                <span class="report-footer__label">Assessment ID:</span>
+                <span class="report-footer__value">{{assessmentIdShort}}</span>
+            </div>
+        </div>
+    </div>
+</footer>`;
 
 // Report type configurations
 export const reportConfigs = {

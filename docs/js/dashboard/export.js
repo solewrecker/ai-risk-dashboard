@@ -186,6 +186,12 @@ function initializeThemeGallery() {
             headerColor: '#111827',
             scoreColor: '#a855f7',
             scoreBg: '#1f2937'
+        },
+        'theme-default': {
+            name: 'Default Theme',
+            headerColor: '#3b82f6',
+            scoreColor: '#3b82f6',
+            scoreBg: '#eff6ff'
         }
     };
 

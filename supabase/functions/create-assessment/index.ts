@@ -48,7 +48,7 @@ ${framework}
 ---
 
 **Output Instructions:**
-Based on your research and the framework above, fill out the following JSON object completely. Provide a score and a detailed justification for every single criterion. The total scores must be calculated correctly. The final output must be ONLY the JSON object, with no other text or explanations.
+Based on your research and the framework above, fill out the following JSON object completely. Provide a score and a detailed justification for every single criterion. The total scores must be calculated correctly. For the \`compliance_certifications\` field, you MUST return an array of objects, where each object has the keys 'name', 'status', 'details', 'evidence', 'limitations', and 'last_verified'. Do not simplify this into an array of strings. The final output must be ONLY the JSON object, with no other text or explanations.
 
 **JSON To Fill:**
 ${JSON.stringify(jsonTemplate, null, 2)}
@@ -66,120 +66,83 @@ ${JSON.stringify(jsonTemplate, null, 2)}
         throw new Error("AI did not return a response.");
     }
 
-    const assessmentJson = JSON.parse(aiResponse);
+    let assessmentJson = JSON.parse(aiResponse);
 
-    // --- Map AI response to the 'ai_tools' table schema ---
-    const newToolData = {
-      name: assessmentJson.tool_name,
-      category: assessmentJson.primary_use_case || "General",
-      total_score: assessmentJson.final_risk_score,
-      risk_level: assessmentJson.final_risk_category,
-      data_storage_score: assessmentJson.assessment_details.data_storage_and_security.category_score,
-      training_usage_score: assessmentJson.assessment_details.training_data_usage.category_score,
-      access_controls_score: assessmentJson.assessment_details.access_controls.category_score,
-      compliance_score: assessmentJson.assessment_details.compliance_and_legal_risk.category_score,
-      vendor_transparency_score: assessmentJson.assessment_details.vendor_transparency.category_score,
-      
-      // Build the breakdown object with scores and subscores
-      breakdown: {
-        scores: {
-          dataStorage: assessmentJson.assessment_details.data_storage_and_security.category_score,
-          trainingUsage: assessmentJson.assessment_details.training_data_usage.category_score,
-          accessControls: assessmentJson.assessment_details.access_controls.category_score,
-          complianceRisk: assessmentJson.assessment_details.compliance_and_legal_risk.category_score,
-          vendorTransparency: assessmentJson.assessment_details.vendor_transparency.category_score
+    // Filter out 'SOC_2: Type II' from compliance_certifications
+    if (assessmentJson.compliance_certifications && Array.isArray(assessmentJson.compliance_certifications)) {
+      assessmentJson.compliance_certifications = assessmentJson.compliance_certifications.filter(cert => 
+        !(cert.name === 'SOC_2' && cert.status === 'Type II')
+      );
+    }
+    // Ensure compliance_certifications is not duplicated within detailedAssessment if detailedAssessment is the full assessmentJson
+    let detailedAssessmentToStore = assessmentJson.detailed_assessment;
+    if (!detailedAssessmentToStore) {
+      // If detailed_assessment is not present, use the entire assessmentJson
+      detailedAssessmentToStore = { ...assessmentJson }; // Create a copy to avoid modifying original
+    }
+    // Ensure compliance_certifications is always removed from detailedAssessmentToStore
+    delete detailedAssessmentToStore.compliance_certifications;
+
+    // --- Map AI response to the 'assessments' table schema ---
+    const userId = (await supabaseClient.auth.getUser()).data.user?.id;
+    const newToolData: any = {
+      user_id: userId,
+      is_public: false,
+      name: assessmentJson.tool_name || assessmentJson.name,
+      vendor: assessmentJson.vendor,
+      total_score: assessmentJson.final_risk_score || assessmentJson.total_score,
+      risk_level: assessmentJson.final_risk_category || assessmentJson.risk_level,
+      data_storage_score: assessmentJson.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || assessmentJson.data_storage_score,
+      training_usage_score: assessmentJson.detailed_assessment?.assessment_details?.training_data_usage?.category_score || assessmentJson.training_usage_score,
+      access_controls_score: assessmentJson.detailed_assessment?.assessment_details?.access_controls?.category_score || assessmentJson.access_controls_score,
+      compliance_score: assessmentJson.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || assessmentJson.compliance_score,
+      vendor_transparency_score: assessmentJson.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || assessmentJson.vendor_transparency_score,
+      category: assessmentJson.category,
+      data_classification: assessmentJson.data_classification,
+      license_type: assessmentJson.license_type,
+      primary_use_case: assessmentJson.primary_use_case,
+      assessed_by: assessmentJson.assessed_by,
+      confidence: assessmentJson.confidence,
+      documentation_tier: assessmentJson.documentation_tier,
+      assessment_notes: assessmentJson.assessment_notes,
+      azure_permissions: assessmentJson.azure_permissions,
+      compliance_certifications: assessmentJson.compliance_certifications,
+      sources: assessmentJson.sources,
+      assessment_data: {
+        source: "ai_generated",
+        sources: assessmentJson.sources,
+        category: assessmentJson.category,
+        formData: {
+          useCase: assessmentJson.primary_use_case,
+          toolName: assessmentJson.tool_name || assessmentJson.name,
+          toolVersion: assessmentJson.license_type,
+          toolCategory: assessmentJson.category,
+          dataClassification: assessmentJson.data_classification
         },
-        subScores: {
-          dataStorage: {
-            geographic: {
-              score: assessmentJson.assessment_details.data_storage_and_security.criteria.geographic_control.score,
-              note: assessmentJson.assessment_details.data_storage_and_security.criteria.geographic_control.justification
-            },
-            encryption: {
-              score: assessmentJson.assessment_details.data_storage_and_security.criteria.encryption_standards.score,
-              note: assessmentJson.assessment_details.data_storage_and_security.criteria.encryption_standards.justification
-            },
-            retention: {
-              score: assessmentJson.assessment_details.data_storage_and_security.criteria.data_retention.score,
-              note: assessmentJson.assessment_details.data_storage_and_security.criteria.data_retention.justification
-            }
-          },
-          trainingUsage: {
-            training: {
-              score: assessmentJson.assessment_details.training_data_usage.criteria.model_training.score,
-              note: assessmentJson.assessment_details.training_data_usage.criteria.model_training.justification
-            },
-            sharing: {
-              score: assessmentJson.assessment_details.training_data_usage.criteria.data_sharing.score,
-              note: assessmentJson.assessment_details.training_data_usage.criteria.data_sharing.justification
-            }
-          },
-          accessControls: {
-            admin: {
-              score: assessmentJson.assessment_details.access_controls.criteria.admin_management.score,
-              note: assessmentJson.assessment_details.access_controls.criteria.admin_management.justification
-            },
-            audit: {
-              score: assessmentJson.assessment_details.access_controls.criteria.audit_capabilities.score,
-              note: assessmentJson.assessment_details.access_controls.criteria.audit_capabilities.justification
-            },
-            integration: {
-              score: assessmentJson.assessment_details.access_controls.criteria.integration.score,
-              note: assessmentJson.assessment_details.access_controls.criteria.integration.justification
-            }
-          },
-          complianceRisk: {
-            violations: {
-              score: assessmentJson.assessment_details.compliance_and_legal_risk.criteria.regulatory_violations.score,
-              note: assessmentJson.assessment_details.compliance_and_legal_risk.criteria.regulatory_violations.justification
-            },
-            transparency: {
-              score: assessmentJson.assessment_details.compliance_and_legal_risk.criteria.data_processing_transparency.score,
-              note: assessmentJson.assessment_details.compliance_and_legal_risk.criteria.data_processing_transparency.justification
-            }
-          },
-          vendorTransparency: {
-            score: {
-              score: assessmentJson.assessment_details.vendor_transparency.criteria.documentation_and_support.score,
-              note: assessmentJson.assessment_details.vendor_transparency.criteria.documentation_and_support.justification
-            }
+        breakdown: {
+          scores: {
+            dataStorage: assessmentJson.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || assessmentJson.data_storage_score,
+            trainingUsage: assessmentJson.detailed_assessment?.assessment_details?.training_data_usage?.category_score || assessmentJson.training_usage_score,
+            accessControls: assessmentJson.detailed_assessment?.assessment_details?.access_controls?.category_score || assessmentJson.access_controls_score,
+            complianceRisk: assessmentJson.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || assessmentJson.compliance_score,
+            vendorTransparency: assessmentJson.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || assessmentJson.vendor_transparency_score
           }
         },
-        compliance: assessmentJson.compliance || {
-          pci: "unknown",
-          sox: "unknown",
-          gdpr: "unknown",
-          hipaa: "unknown"
-        }
-      },
-      
-      // Build the details object with text summaries
-      details: {
-        dataStorage: `Geographic: ${assessmentJson.assessment_details.data_storage_and_security.criteria.geographic_control.justification} | Encryption: ${assessmentJson.assessment_details.data_storage_and_security.criteria.encryption_standards.justification} | Retention: ${assessmentJson.assessment_details.data_storage_and_security.criteria.data_retention.justification}`,
-        trainingUsage: `Training: ${assessmentJson.assessment_details.training_data_usage.criteria.model_training.justification} | Sharing: ${assessmentJson.assessment_details.training_data_usage.criteria.data_sharing.justification}`,
-        accessControls: `Admin: ${assessmentJson.assessment_details.access_controls.criteria.admin_management.justification} | Audit: ${assessmentJson.assessment_details.access_controls.criteria.audit_capabilities.justification} | Integration: ${assessmentJson.assessment_details.access_controls.criteria.integration.justification}`,
-        complianceRisk: `Violations: ${assessmentJson.assessment_details.compliance_and_legal_risk.criteria.regulatory_violations.justification} | Transparency: ${assessmentJson.assessment_details.compliance_and_legal_risk.criteria.data_processing_transparency.justification}`,
-        vendorTransparency: assessmentJson.assessment_details.vendor_transparency.criteria.documentation_and_support.justification
-      },
-      
-      // Additional fields
-      sources: assessmentJson.sources || [],
-      assessed_by: "AI Security Council",
-      confidence: assessmentJson.confidence || 0.85,
-      summary_and_recommendation: assessmentJson.summary_and_recommendation,
-      compliance_certifications: assessmentJson.compliance_certifications || [],
-      detailed_assessment: assessmentJson,
-      primary_use_case: assessmentJson.primary_use_case || assessmentJson.use_case_multiplier_applied?.use_case || "General",
-      data_classification: assessmentJson.data_classification || assessmentJson.use_case_multiplier_applied?.data_classification || "Standard",
-      vendor: assessmentJson.vendor || "",
-      license_type: assessmentJson.license_type || "Standard",
-      azure_permissions: assessmentJson.azure_permissions || null,
-      recommendations: assessmentJson.recommendations || []
+        riskLevel: assessmentJson.final_risk_category || assessmentJson.risk_level,
+        confidence: assessmentJson.confidence,
+        finalScore: assessmentJson.final_risk_score || assessmentJson.total_score,
+        assessed_by: assessmentJson.assessed_by,
+        recommendations: assessmentJson.recommendations,
+        assessment_notes: assessmentJson.assessment_notes,
+        primary_use_case: assessmentJson.primary_use_case,
+        azure_permissions: assessmentJson.azure_permissions,
+        detailedAssessment: detailedAssessmentToStore,
+    }
     };
 
     // --- Insert into 'ai_tools' table ---
     const { data, error } = await supabaseClient
-      .from("ai_tools")
+      .from("assessments")
       .insert(newToolData)
       .select()
       .single();
@@ -199,4 +162,4 @@ ${JSON.stringify(jsonTemplate, null, 2)}
       status: 500,
     });
   }
-}); 
+});

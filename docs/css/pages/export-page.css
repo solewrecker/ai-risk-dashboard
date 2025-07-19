@@ -6,6 +6,7 @@
 @import '../components/report-header.css';
 @import '../components/report-cards.css';
 @import '../components/report-sections.css';
+@import '../components/report-footer.css';
 
 /* === EXPORT-SPECIFIC STYLES === */
 /* === EXPORT PAGE IMPORTS === */

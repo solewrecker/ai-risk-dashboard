@@ -684,10 +684,6 @@ async function startAssessment() {
     let toolData = await _apiJs.getToolFromDatabase(formData);
     if (toolData) {
         console.log('toolData from DB:', toolData); // Debug log
-        // Ensure compliance_certifications is always an array of key-value strings
-        let certs = [];
-        if (Array.isArray(toolData.compliance_certifications)) certs = toolData.compliance_certifications;
-        else if (toolData.compliance_certifications && typeof toolData.compliance_certifications === 'object') certs = Object.entries(toolData.compliance_certifications).map(([key, value])=>`${key}: ${value}`);
         currentAssessment = {
             formData: formData,
             finalScore: toolData.total_score,
@@ -706,9 +702,8 @@ async function startAssessment() {
             assessment_notes: toolData.assessment_notes || null,
             azure_permissions: toolData.azure_permissions || null,
             sources: toolData.sources || null,
-            // compliance_certifications is handled in API.saveToDatabase for the root level, 
-            // but we ensure detailedAssessment.compliance_certifications is present for assessment_data
-            compliance_certifications: toolData.compliance_certifications // Keep the object structure from ai_tools for detailedAssessment
+            // Pass the raw compliance_certifications object; it will be handled by the API module
+            compliance_certifications: toolData.compliance_certifications
         };
     } else {
         // Generate heuristic score
@@ -1238,28 +1233,9 @@ async function saveToDatabase(assessment) {
         azure_permissions: assessment.azure_permissions || null,
         sources: assessment.sources || null,
         // Map compliance_certifications to an array of strings for the top-level column
-        compliance_certifications: assessment.compliance_certifications ? Object.keys(assessment.compliance_certifications).filter((key)=>assessment.compliance_certifications[key]?.status && assessment.compliance_certifications[key].status !== 'Not Applicable' && assessment.compliance_certifications[key].status !== 'No').map((key)=>`${key}: ${assessment.compliance_certifications[key].status}`) : [],
-        // Store the full assessment object in assessment_data, ensuring it includes all details
-        assessment_data: {
-            source: assessment.source,
-            formData: assessment.formData,
-            finalScore: assessment.finalScore,
-            riskLevel: assessment.riskLevel,
-            breakdown: assessment.breakdown,
-            recommendations: assessment.recommendations,
-            detailedAssessment: assessment.detailedAssessment,
-            // Ensure data_classification and category are populated within assessment_data
-            data_classification: assessment.data_classification || formData.dataClassification,
-            category: assessment.category || formData.toolCategory,
-            // Include other top-level fields from ai_tools if they are not already part of detailedAssessment
-            primary_use_case: assessment.primary_use_case || null,
-            assessed_by: assessment.assessed_by || null,
-            confidence: assessment.confidence || null,
-            documentation_tier: assessment.documentation_tier || null,
-            assessment_notes: assessment.assessment_notes || null,
-            azure_permissions: assessment.azure_permissions || null,
-            sources: assessment.sources || null
-        }
+        compliance_certifications: assessment.compliance_certifications || null,
+        // Store the full, original assessment object in assessment_data without duplication
+        assessment_data: assessment
     };
     try {
         const { data, error } = await (0, _authJs.supabase).from('assessments').insert([
