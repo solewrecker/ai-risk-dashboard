@@ -28,8 +28,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Copy .nojekyll file to dist
+        run: cp docs/.nojekyll dist/ || touch dist/.nojekyll
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
 
