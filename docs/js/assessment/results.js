@@ -18,8 +18,8 @@ export function displayResults(results) {
 
     const { formData, finalScore, riskLevel, source, recommendations, breakdown, detailedAssessment } = results;
     const toolName = formData.toolName || 'Unknown Tool';
-    const toolVersion = formData.toolVersion || '';
-    const fullToolName = toolVersion ? `${toolName} (${toolVersion})` : toolName;
+    const toolVersion = formData.toolVersion ? formData.toolVersion.charAt(0).toUpperCase() + formData.toolVersion.slice(1) : '';
+    const fullToolName = toolVersion ? `${toolName} <span class="tool-title__license-type">${toolVersion}</span>` : toolName;
 
     // Build the results HTML
     const resultsHTML = `
@@ -80,7 +80,7 @@ function renderInsights(breakdown) {
     const scores = breakdown?.scores || {};
     const insights = [
         { title: 'Data Storage & Security', score: scores.dataStorage, icon: 'database' },
-        { title: 'Training Data Usage', score: scores.trainingUsage, icon: 'robot' },
+        { title: 'Training Data Usage', score: scores.trainingUsage, icon: 'cpu' },
         { title: 'Access Controls', score: scores.accessControls, icon: 'key' },
         { title: 'Compliance & Legal', score: scores.complianceRisk, icon: 'gavel' },
         { title: 'Vendor Transparency', score: scores.vendorTransparency, icon: 'eye' }
@@ -204,13 +204,21 @@ function formatItemName(item) {
         .trim();
 }
 
-function getScoreDescription(score, level, toolName) {
+export function getScoreDescription(score, level, toolName) {
+    const risk = level;
     let description = '';
-    const risk = level.toLowerCase();
-    if (risk === 'critical') description = `<strong>Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a critical risk.`;
-    else if (risk === 'high') description = `<strong>Requires Review.</strong> With a score of ${score}, ${toolName} poses a high risk.`;
-    else if (risk === 'medium') description = `<strong>Use With Caution.</strong> With a score of ${score}, ${toolName} presents a medium risk.`;
-    else description = `<strong>Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered low risk.`;
+
+    // Capitalize the first letter of the risk level
+    const capitalizedRisk = risk.charAt(0).toUpperCase() + risk.slice(1);
+
+    // Apply specific styling based on risk level
+    const riskClass = `risk-level-display risk-level-display--${risk}`;
+
+    if (risk === 'critical') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a ${risk} risk.`;
+    else if (risk === 'high') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Requires Review.</strong> With a score of ${score}, ${toolName} poses a ${risk} risk.`;
+    else if (risk === 'medium') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Use With Caution.</strong> With a score of ${score}, ${toolName} presents a ${risk} risk.`;
+    else description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered ${risk} risk.`;
+    
     return description;
 }
 

@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Template Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #f8f9fa;
+            --accent-color: #28a745;
+            --text-color: #333;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+            --hover-color: #e9ecef;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .marketplace-header {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .marketplace-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .marketplace-header p {
+            font-size: 18px;
+            color: var(--light-text);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-filter-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .tag-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tag:hover, .tag.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .template-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-thumbnail {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .template-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .template-card:hover .template-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .template-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .template-info {
+            padding: 15px;
+        }
+
+        .template-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+
+        .template-description {
+            font-size: 14px;
+            color: var(--light-text);
+            margin: 0 0 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .template-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .template-author {
+            color: var(--light-text);
+        }
+
+        .template-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .stars {
+            color: #ffc107;
+            margin-right: 5px;
+        }
+
+        .template-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .template-tag {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .template-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--hover-color);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 5px;
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-item:hover, .pagination-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            max-width: 900px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 100px);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--light-text);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .template-preview {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preview-image {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .preview-details {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .preview-description {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .preview-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 14px;
+            color: var(--light-text);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 500;
+        }
+
+        .preview-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            padding: 20px 0;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .features-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .feature-icon {
+            color: var(--accent-color);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--secondary-color);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .reviewer {
+            font-weight: 500;
+        }
+
+        .review-date {
+            color: var(--light-text);
+            font-size: 14px;
+        }
+
+        .review-rating {
+            margin-bottom: 10px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .templates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .filter-options {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: 20px;
+                max-height: calc(100vh - 40px);
+            }
+
+            .template-preview {
+                flex-direction: column;
+            }
+
+            .preview-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .template-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-outline {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">Report System</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="user-guide.html">User Guide</a>
+                <a href="theme-marketplace.html">Themes</a>
+                <a href="template-marketplace.html" class="active">Templates</a>
+                <a href="monitoring-dashboard.html">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="marketplace-header">
+            <h1>Report Template Marketplace</h1>
+            <p>Discover and use professional report templates designed for various business needs</p>
+        </div>
+
+        <div class="search-filter-container">
+            <div class="search-box">
+                <input type="text" placeholder="Search templates..." id="template-search">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label for="category-filter">Category</label>
+                    <select id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="executive">Executive Reports</option>
+                        <option value="detailed">Detailed Reports</option>
+                        <option value="risk">Risk Assessment</option>
+                        <option value="financial">Financial Reports</option>
+                        <option value="project">Project Reports</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sort-filter">Sort By</label>
+                    <select id="sort-filter">
+                        <option value="popular">Most Popular</option>
+                        <option value="newest">Newest First</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="name">Name (A-Z)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="price-filter">Price</label>
+                    <select id="price-filter">
+                        <option value="all">All Prices</option>
+                        <option value="free">Free</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tag-filters">
+                <div class="tag active">All</div>
+                <div class="tag">Executive</div>
+                <div class="tag">Detailed</div>
+                <div class="tag">Risk</div>
+                <div class="tag">Financial</div>
+                <div class="tag">Project</div>
+                <div class="tag">Compliance</div>
+                <div class="tag">Technical</div>
+            </div>
+        </div>
+
+        <div class="templates-grid">
+            <!-- Template Card 1 -->
+            <div class="template-card" data-template-id="executive-summary">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Executive+Summary" alt="Executive Summary Template">
+                    <div class="template-badge">Popular</div>
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Executive Summary</h3>
+                    <p class="template-description">A concise summary for executives and stakeholders</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Executive</span>
+                        <span class="template-tag">Summary</span>
+                        <span class="template-tag">Overview</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By System</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>4.5</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">Install</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Card 2 -->
+            <div class="template-card" data-template-id="detailed-report">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Detailed+Report" alt="Detailed Report Template">
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Detailed Report</h3>
+                    <p class="template-description">A comprehensive report with detailed analysis</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Detailed</span>
+                        <span class="template-tag">Comprehensive</span>
+                        <span class="template-tag">Analysis</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By System</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span>4.0</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">Install</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Card 3 -->
+            <div class="template-card" data-template-id="risk-assessment">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Risk+Assessment" alt="Risk Assessment Template">
+                    <div class="template-badge">New</div>
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Risk Assessment</h3>
+                    <p class="template-description">A template focused on risk assessment and mitigation</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Risk</span>
+                        <span class="template-tag">Assessment</span>
+                        <span class="template-tag">Mitigation</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By System</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span>5.0</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">Install</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Card 4 -->
+            <div class="template-card" data-template-id="financial-report">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Financial+Report" alt="Financial Report Template">
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Financial Report</h3>
+                    <p class="template-description">Comprehensive financial reporting template with charts and tables</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Financial</span>
+                        <span class="template-tag">Charts</span>
+                        <span class="template-tag">Tables</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By FinancePro</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span>4.2</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">$9.99</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Card 5 -->
+            <div class="template-card" data-template-id="project-status">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Project+Status" alt="Project Status Template">
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Project Status Report</h3>
+                    <p class="template-description">Track and report project progress, milestones, and issues</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Project</span>
+                        <span class="template-tag">Status</span>
+                        <span class="template-tag">Timeline</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By ProjectMaster</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span>3.5</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">$4.99</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Card 6 -->
+            <div class="template-card" data-template-id="compliance-report">
+                <div class="template-thumbnail">
+                    <img src="https://via.placeholder.com/300x180?text=Compliance+Report" alt="Compliance Report Template">
+                    <div class="template-badge">Popular</div>
+                </div>
+                <div class="template-info">
+                    <h3 class="template-title">Compliance Report</h3>
+                    <p class="template-description">Document regulatory compliance status and findings</p>
+                    <div class="template-tags">
+                        <span class="template-tag">Compliance</span>
+                        <span class="template-tag">Regulatory</span>
+                        <span class="template-tag">Audit</span>
+                    </div>
+                    <div class="template-meta">
+                        <span class="template-author">By CompliancePro</span>
+                        <div class="template-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>4.7</span>
+                        </div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-outline preview-btn">Preview</button>
+                        <button class="btn btn-primary install-btn">$14.99</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <div class="pagination-item active">1</div>
+            <div class="pagination-item">2</div>
+            <div class="pagination-item">3</div>
+            <div class="pagination-item">4</div>
+            <div class="pagination-item">5</div>
+            <div class="pagination-item"><i class="fas fa-chevron-right"></i></div>
+        </div>
+    </div>
+
+    <!-- Template Detail Modal -->
+    <div class="modal" id="template-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-template-title">Template Title</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="template-preview">
+                    <div class="preview-image">
+                        <img id="modal-template-image" src="https://via.placeholder.com/600x400" alt="Template Preview">
+                    </div>
+                    <div class="preview-details">
+                        <p class="preview-description" id="modal-template-description">Template description goes here.</p>
+                        
+                        <div class="preview-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Author</span>
+                                <span class="meta-value" id="modal-template-author">Author Name</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Version</span>
+                                <span class="meta-value" id="modal-template-version">1.0.0</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Released</span>
+                                <span class="meta-value" id="modal-template-released">Jan 1, 2023</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Rating</span>
+                                <span class="meta-value" id="modal-template-rating">
+                                    <div class="stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    4.5 (120 reviews)
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-tags" id="modal-template-tags">
+                            <!-- Tags will be inserted here -->
+                        </div>
+                        
+                        <div class="preview-actions">
+                            <button class="btn btn-primary" id="modal-install-btn">Install</button>
+                            <button class="btn btn-outline">Add to Favorites</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="features">Features</div>
+                        <div class="tab" data-tab="preview">Live Preview</div>
+                        <div class="tab" data-tab="reviews">Reviews</div>
+                        <div class="tab" data-tab="compatibility">Compatibility</div>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="features">
+                            <ul class="features-list">
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Professionally designed layout optimized for readability</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Customizable sections to fit your specific reporting needs</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Built-in data visualization placeholders for charts and graphs</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Compatible with all available themes in the marketplace</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Export to PDF, HTML, and other formats</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="feature-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span>Regular updates and improvements</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-pane" id="preview">
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; text-align: center;">
+                                <p>Live preview is loading...</p>
+                                <p><i class="fas fa-spinner fa-spin" style="font-size: 24px; margin: 20px 0;"></i></p>
+                                <p>This feature will display an interactive preview of the template with sample data.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane" id="reviews">
+                            <div class="reviews-container">
+                                <div class="review">
+                                    <div class="review-header">
+                                        <span class="reviewer">John D.</span>
+                                        <span class="review-date">2 months ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p>Excellent template! Saved me hours of work and the design is very professional. Highly recommended.</p>
+                                </div>
+                                
+                                <div class="review">
+                                    <div class="review-header">
+                                        <span class="reviewer">Sarah M.</span>
+                                        <span class="review-date">1 month ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p>Great template overall. Would be perfect if it had more customization options for the charts section.</p>
+                                </div>
+                                
+                                <div class="review">
+                                    <div class="review-header">
+                                        <span class="reviewer">Michael T.</span>
+                                        <span class="review-date">3 weeks ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                    </div>
+                                    <p>This template has become my go-to for all client reports. The layout is clean and professional, and it's easy to customize.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane" id="compatibility">
+                            <div style="margin-bottom: 20px;">
+                                <h3>Compatible Themes</h3>
+                                <p>This template works with all themes in the marketplace, but is optimized for:</p>
+                                <ul>
+                                    <li>Modern Light</li>
+                                    <li>Corporate Blue</li>
+                                    <li>Minimal</li>
+                                    <li>Data Focused</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h3>System Requirements</h3>
+                                <ul>
+                                    <li>Report System v2.0 or higher</li>
+                                    <li>Modern browsers (Chrome, Firefox, Safari, Edge)</li>
+                                    <li>JavaScript enabled</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close-btn">Close</button>
+                <button class="btn btn-primary" id="modal-footer-install-btn">Install Template</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Template data (in a real app, this would come from an API)
+        const templates = {
+            'executive-summary': {
+                id: 'executive-summary',
+                title: 'Executive Summary',
+                description: 'A concise summary template designed for executives and stakeholders. Presents key information in a clear, scannable format with emphasis on conclusions and recommendations.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Executive+Summary',
+                author: 'System',
+                version: '1.0.0',
+                released: 'Jan 15, 2023',
+                rating: 4.5,
+                reviewCount: 87,
+                tags: ['Executive', 'Summary', 'Overview'],
+                price: 'Free',
+                features: [
+                    'Concise one-page summary section',
+                    'Key findings highlights',
+                    'Recommendation prioritization',
+                    'Visual data presentation',
+                    'Stakeholder action items',
+                    'Print-optimized layout'
+                ]
+            },
+            'detailed-report': {
+                id: 'detailed-report',
+                title: 'Detailed Report',
+                description: 'A comprehensive report template with sections for in-depth analysis, methodology, findings, and recommendations. Ideal for thorough documentation of complex projects or studies.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Detailed+Report',
+                author: 'System',
+                version: '1.0.0',
+                released: 'Jan 20, 2023',
+                rating: 4.0,
+                reviewCount: 62,
+                tags: ['Detailed', 'Comprehensive', 'Analysis'],
+                price: 'Free',
+                features: [
+                    'Structured table of contents',
+                    'Methodology documentation',
+                    'Detailed findings sections',
+                    'Analysis framework',
+                    'Appendix for supporting materials',
+                    'Citation and reference system'
+                ]
+            },
+            'risk-assessment': {
+                id: 'risk-assessment',
+                title: 'Risk Assessment',
+                description: 'A specialized template for identifying, analyzing, and prioritizing risks. Features risk matrices, mitigation strategies, and contingency planning sections.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Risk+Assessment',
+                author: 'System',
+                version: '1.0.0',
+                released: 'Feb 5, 2023',
+                rating: 5.0,
+                reviewCount: 41,
+                tags: ['Risk', 'Assessment', 'Mitigation'],
+                price: 'Free',
+                features: [
+                    'Risk matrix visualization',
+                    'Likelihood and impact assessment',
+                    'Risk categorization system',
+                    'Mitigation strategy framework',
+                    'Risk ownership tracking',
+                    'Contingency planning sections'
+                ]
+            },
+            'financial-report': {
+                id: 'financial-report',
+                title: 'Financial Report',
+                description: 'Comprehensive financial reporting template with sections for balance sheets, income statements, cash flow analysis, and financial projections. Includes pre-designed charts and tables.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Financial+Report',
+                author: 'FinancePro',
+                version: '2.1.0',
+                released: 'Mar 10, 2023',
+                rating: 4.2,
+                reviewCount: 56,
+                tags: ['Financial', 'Charts', 'Tables'],
+                price: '$9.99',
+                features: [
+                    'Financial statement templates',
+                    'Ratio analysis framework',
+                    'Trend visualization charts',
+                    'Budget comparison tools',
+                    'Financial KPI dashboard',
+                    'Customizable calculation formulas'
+                ]
+            },
+            'project-status': {
+                id: 'project-status',
+                title: 'Project Status Report',
+                description: 'Track and communicate project progress, milestones, issues, and resource allocation. Ideal for project managers and team leads to provide regular updates to stakeholders.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Project+Status',
+                author: 'ProjectMaster',
+                version: '1.5.0',
+                released: 'Apr 2, 2023',
+                rating: 3.5,
+                reviewCount: 38,
+                tags: ['Project', 'Status', 'Timeline'],
+                price: '$4.99',
+                features: [
+                    'Project timeline visualization',
+                    'Milestone tracking',
+                    'Issue and risk log',
+                    'Resource allocation summary',
+                    'Budget tracking',
+                    'Action item assignment'
+                ]
+            },
+            'compliance-report': {
+                id: 'compliance-report',
+                title: 'Compliance Report',
+                description: 'Document regulatory compliance status, audit findings, and remediation plans. Structured to meet requirements for various regulatory frameworks and internal compliance programs.',
+                thumbnail: 'https://via.placeholder.com/600x400?text=Compliance+Report',
+                author: 'CompliancePro',
+                version: '3.0.0',
+                released: 'May 15, 2023',
+                rating: 4.7,
+                reviewCount: 74,
+                tags: ['Compliance', 'Regulatory', 'Audit'],
+                price: '$14.99',
+                features: [
+                    'Regulatory requirement mapping',
+                    'Compliance status tracking',
+                    'Audit finding documentation',
+                    'Remediation planning framework',
+                    'Evidence documentation system',
+                    'Certification documentation'
+                ]
+            }
+        };
+
+        // Modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('template-modal');
+            const closeButtons = document.querySelectorAll('.modal-close, .modal-close-btn');
+            const previewButtons = document.querySelectorAll('.preview-btn');
+            const installButtons = document.querySelectorAll('.install-btn');
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            const modalInstallBtn = document.getElementById('modal-install-btn');
+            const modalFooterInstallBtn = document.getElementById('modal-footer-install-btn');
+            const tagFilters = document.querySelectorAll('.tag-filters .tag');
+
+            // Open modal with template details
+            previewButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const card = this.closest('.template-card');
+                    const templateId = card.dataset.templateId;
+                    openTemplateModal(templateId);
+                });
+            });
+
+            // Template card click also opens modal
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const templateId = this.dataset.templateId;
+                    openTemplateModal(templateId);
+                });
+            });
+
+            // Close modal
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and panes
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabPanes.forEach(p => p.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding pane
+                    this.classList.add('active');
+                    const tabId = this.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Install button functionality
+            installButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const card = this.closest('.template-card');
+                    const templateId = card.dataset.templateId;
+                    const template = templates[templateId];
+                    
+                    if (template.price === 'Free') {
+                        installTemplate(templateId);
+                    } else {
+                        // For paid templates, show purchase confirmation
+                        if (confirm(`Purchase ${template.title} for ${template.price}?`)) {
+                            // Simulate purchase process
+                            setTimeout(() => {
+                                alert(`Thank you for purchasing ${template.title}!`);
+                                installTemplate(templateId);
+                            }, 1000);
+                        }
+                    }
+                });
+            });
+
+            // Modal install buttons
+            modalInstallBtn.addEventListener('click', function() {
+                const templateId = this.dataset.templateId;
+                const template = templates[templateId];
+                
+                if (template.price === 'Free') {
+                    installTemplate(templateId);
+                } else {
+                    // For paid templates, show purchase confirmation
+                    if (confirm(`Purchase ${template.title} for ${template.price}?`)) {
+                        // Simulate purchase process
+                        setTimeout(() => {
+                            alert(`Thank you for purchasing ${template.title}!`);
+                            installTemplate(templateId);
+                        }, 1000);
+                    }
+                }
+            });
+
+            modalFooterInstallBtn.addEventListener('click', function() {
+                const templateId = modalInstallBtn.dataset.templateId;
+                const template = templates[templateId];
+                
+                if (template.price === 'Free') {
+                    installTemplate(templateId);
+                } else {
+                    // For paid templates, show purchase confirmation
+                    if (confirm(`Purchase ${template.title} for ${template.price}?`)) {
+                        // Simulate purchase process
+                        setTimeout(() => {
+                            alert(`Thank you for purchasing ${template.title}!`);
+                            installTemplate(templateId);
+                        }, 1000);
+                    }
+                }
+            });
+
+            // Tag filtering
+            tagFilters.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    // Toggle active class
+                    tagFilters.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter templates (in a real app, this would filter the displayed templates)
+                    const filterTag = this.textContent;
+                    console.log(`Filtering by tag: ${filterTag}`);
+                    
+                    // For demo purposes, just log the action
+                    if (filterTag === 'All') {
+                        document.querySelectorAll('.template-card').forEach(card => {
+                            card.style.display = 'block';
+                        });
+                    } else {
+                        document.querySelectorAll('.template-card').forEach(card => {
+                            const templateId = card.dataset.templateId;
+                            const template = templates[templateId];
+                            
+                            if (template && template.tags.includes(filterTag)) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Function to open template modal
+            function openTemplateModal(templateId) {
+                const template = templates[templateId];
+                if (!template) return;
+                
+                // Set modal content
+                document.getElementById('modal-template-title').textContent = template.title;
+                document.getElementById('modal-template-image').src = template.thumbnail;
+                document.getElementById('modal-template-description').textContent = template.description;
+                document.getElementById('modal-template-author').textContent = template.author;
+                document.getElementById('modal-template-version').textContent = template.version;
+                document.getElementById('modal-template-released').textContent = template.released;
+                
+                // Set tags
+                const tagsContainer = document.getElementById('modal-template-tags');
+                tagsContainer.innerHTML = '';
+                template.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'template-tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+                
+                // Set install button text based on price
+                modalInstallBtn.textContent = template.price === 'Free' ? 'Install' : `Purchase (${template.price})`;
+                modalFooterInstallBtn.textContent = template.price === 'Free' ? 'Install Template' : `Purchase (${template.price})`;
+                
+                // Store template ID for install button
+                modalInstallBtn.dataset.templateId = templateId;
+                
+                // Reset tabs
+                document.querySelector('.tab.active').classList.remove('active');
+                document.querySelector('.tab[data-tab="features"]').classList.add('active');
+                document.querySelector('.tab-pane.active').classList.remove('active');
+                document.getElementById('features').classList.add('active');
+                
+                // Show modal
+                modal.style.display = 'block';
+            }
+
+            // Function to install template
+            function installTemplate(templateId) {
+                const template = templates[templateId];
+                
+                // Simulate installation process
+                alert(`Installing ${template.title}...`);
+                
+                // In a real app, this would call the TemplateManager to install the template
+                setTimeout(() => {
+                    alert(`${template.title} has been successfully installed!`);
+                    modal.style.display = 'none';
+                    
+                    // Update UI to show installed state
+                    document.querySelectorAll(`.template-card[data-template-id="${templateId}"] .install-btn`).forEach(btn => {
+                        btn.textContent = 'Installed';
+                        btn.disabled = true;
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline');
+                    });
+                }, 1500);
+            }
+
+            // Search functionality
+            const searchInput = document.getElementById('template-search');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                document.querySelectorAll('.template-card').forEach(card => {
+                    const templateId = card.dataset.templateId;
+                    const template = templates[templateId];
+                    
+                    if (template) {
+                        const titleMatch = template.title.toLowerCase().includes(searchTerm);
+                        const descMatch = template.description.toLowerCase().includes(searchTerm);
+                        const tagMatch = template.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                        
+                        if (titleMatch || descMatch || tagMatch) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
+
+            // Category filter functionality
+            const categoryFilter = document.getElementById('category-filter');
+            categoryFilter.addEventListener('change', function() {
+                const category = this.value;
+                
+                if (category === 'all') {
+                    document.querySelectorAll('.template-card').forEach(card => {
+                        card.style.display = 'block';
+                    });
+                    return;
+                }
+                
+                document.querySelectorAll('.template-card').forEach(card => {
+                    const templateId = card.dataset.templateId;
+                    const template = templates[templateId];
+                    
+                    if (template) {
+                        const matchesCategory = template.tags.some(tag => tag.toLowerCase() === category);
+                        card.style.display = matchesCategory ? 'block' : 'none';
+                    }
+                });
+            });
+
+            // Price filter functionality
+            const priceFilter = document.getElementById('price-filter');
+            priceFilter.addEventListener('change', function() {
+                const priceOption = this.value;
+                
+                if (priceOption === 'all') {
+                    document.querySelectorAll('.template-card').forEach(card => {
+                        card.style.display = 'block';
+                    });
+                    return;
+                }
+                
+                document.querySelectorAll('.template-card').forEach(card => {
+                    const templateId = card.dataset.templateId;
+                    const template = templates[templateId];
+                    
+                    if (template) {
+                        const isFree = template.price === 'Free';
+                        card.style.display = 
+                            (priceOption === 'free' && isFree) || 
+                            (priceOption === 'paid' && !isFree) ? 'block' : 'none';
+                    }
+                });
+            });
+
+            // Sort functionality
+            const sortFilter = document.getElementById('sort-filter');
+            sortFilter.addEventListener('change', function() {
+                const sortOption = this.value;
+                const templateCards = Array.from(document.querySelectorAll('.template-card'));
+                const container = document.querySelector('.templates-grid');
+                
+                // Sort the cards based on the selected option
+                templateCards.sort((a, b) => {
+                    const templateA = templates[a.dataset.templateId];
+                    const templateB = templates[b.dataset.templateId];
+                    
+                    switch (sortOption) {
+                        case 'popular':
+                            return templateB.reviewCount - templateA.reviewCount;
+                        case 'newest':
+                            return new Date(templateB.released) - new Date(templateA.released);
+                        case 'rating':
+                            return templateB.rating - templateA.rating;
+                        case 'name':
+                            return templateA.title.localeCompare(templateB.title);
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Remove all cards from the container
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+                
+                // Add the sorted cards back to the container
+                templateCards.forEach(card => {
+                    container.appendChild(card);
+                });
+            });
+
+            // Pagination functionality (simplified for demo)
+            document.querySelectorAll('.pagination-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('active')) return;
+                    
+                    document.querySelector('.pagination-item.active').classList.remove('active');
+                    this.classList.add('active');
+                    
+                    // In a real app, this would load the next page of templates
+                    console.log(`Loading page ${this.textContent}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

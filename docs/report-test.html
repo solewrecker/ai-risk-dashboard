@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Test Page</title>
+    <!-- Base Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/themes/theme-base.css">
+    
+    <!-- Theme Base (Always Loaded) -->
+    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    
+    <!-- Theme Layouts -->
+    <link rel="stylesheet" href="./css/themes/layouts/single-layout.css" disabled>
+    <link rel="stylesheet" href="./css/themes/layouts/two-col-layout.css" disabled>
+    <link rel="stylesheet" href="./css/themes/layouts/three-col-layout.css" disabled>
+    
+    <!-- Theme Color Schemes -->
+    <link rel="stylesheet" href="./css/themes/color-schemes/corporate-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/minimal-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/dark-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/vibrant-colors.css" disabled>
+    
+    <!-- Main Theme Files -->
+    <link rel="stylesheet" href="./css/themes/theme-corporate.css" data-theme="theme-corporate" disabled>
+    <link rel="stylesheet" href="./css/themes/theme-minimal.css" data-theme="theme-minimal" disabled>
+    <link rel="stylesheet" href="./css/themes/theme-dark.css" data-theme="theme-dark" disabled>
+    <link rel="stylesheet" href="./css/themes/theme-vibrant.css" data-theme="theme-vibrant" disabled>
+    
+    <!-- Ensure the report container is created before any JavaScript runs -->
+    <script>
+        // Create the report container element if it doesn't exist
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!document.getElementById('report-main')) {
+                console.log('Creating report-main element');
+                const reportMain = document.createElement('div');
+                reportMain.id = 'report-main';
+                reportMain.style.minHeight = '100px';
+                document.body.appendChild(reportMain);
+            } else {
+                console.log('report-main element already exists');
+            }
+        });
+    </script>
+    
+    <style>
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .theme-selector h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .theme-selector select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .theme-selector button {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .theme-selector button:hover {
+            background: #3a5ce5;
+        }
+        
+        .report-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .report-actions button {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .report-actions button:hover {
+            background: #3a5ce5;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-selector">
+        <h3>Theme Selector</h3>
+        <select id="theme-select">
+            <option value="theme-corporate">Corporate</option>
+            <option value="theme-minimal">Minimal</option>
+            <option value="theme-dark">Dark</option>
+            <option value="theme-vibrant">Vibrant</option>
+        </select>
+        <button id="apply-theme">Apply Theme</button>
+    </div>
+    
+    <div id="report-main" style="min-height: 100px;"></div>
+    
+    <div class="report-actions">
+        <button id="download-pdf">Download as PDF</button>
+        <button id="download-html">Download as HTML</button>
+    </div>
+    
+    <script type="module">
+        import ReportPreview from './js/report/ReportPreview.js';
+        import testReportData from './js/report/test-data.js';
+        
+        // Function to get report data from multiple sources
+        function getReportData() {
+            // Try to get data from URL query parameter first
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (dataParam) {
+                try {
+                    return JSON.parse(decodeURIComponent(dataParam));
+                } catch (e) {
+                    console.error('Error parsing data from URL:', e);
+                }
+            }
+            
+            // Try to get data from localStorage as fallback
+            try {
+                const storedData = localStorage.getItem('reportData');
+                if (storedData) {
+                    return JSON.parse(storedData);
+                }
+            } catch (e) {
+                console.error('Error parsing data from localStorage:', e);
+            }
+            
+            // Use test data as final fallback
+            return testReportData;
+        }
+        
+        // Initialize report with the provided data
+        function initializeReport(reportData) {
+            // Make sure the report container exists
+            if (!document.getElementById('report-main')) {
+                console.error('Report container element not found!');
+                return;
+            }
+            
+            // Initialize the report preview with the correct container selector
+            const reportPreview = new ReportPreview({
+                containerSelector: '#report-main'
+            });
+            
+            // Initialize the report
+            reportPreview.init();
+            
+            // Set up theme selector
+            const themeSelect = document.getElementById('theme-select');
+            const applyThemeButton = document.getElementById('apply-theme');
+            
+            // Set initial theme selection
+            themeSelect.value = reportData.selectedTheme || 'theme-corporate';
+            
+            // Apply theme button click handler
+            applyThemeButton.addEventListener('click', () => {
+                const selectedTheme = themeSelect.value;
+                
+                // Update the report data with the new theme
+                reportData.selectedTheme = selectedTheme;
+                localStorage.setItem('reportData', JSON.stringify(reportData));
+                
+                // Re-render the report
+                reportPreview.init();
+            });
+        }
+        
+        // Listen for postMessage events from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'reportData') {
+                console.log('Received report data via postMessage');
+                localStorage.setItem('reportData', JSON.stringify(event.data.data));
+                initializeReport(event.data.data);
+            }
+        });
+        
+        // Ensure the DOM is fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get report data from available sources
+            const reportData = getReportData();
+            
+            // Store the data in localStorage for future use
+            localStorage.setItem('reportData', JSON.stringify(reportData));
+            
+            // Initialize the report with a slight delay to ensure DOM is ready
+            setTimeout(() => {
+                initializeReport(reportData);
+            }, 100); // Small delay to ensure DOM is fully ready
+        });
+    </script>
+</body>
+</html>

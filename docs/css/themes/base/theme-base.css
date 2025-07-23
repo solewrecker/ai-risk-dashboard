@@ -1,0 +1,246 @@
+/**
+ * theme-base.css
+ * 
+ * Base theme styles that are inherited by all themes.
+ * This file defines the core structure and layout.
+ */
+
+:root {
+  /* Base colors - will be overridden by color schemes */
+  --theme-background: #ffffff;
+  --theme-text-primary: #333333;
+  --theme-text-secondary: #666666;
+  --theme-accent: #3498db;
+  --theme-accent-secondary: #2980b9;
+  --theme-border: #e2e8f0;
+  --theme-section-background: #ffffff;
+  --theme-header-background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  --theme-header-text: #ffffff;
+  
+  /* Risk colors */
+  --theme-risk-low: #10b981;
+  --theme-risk-medium: #f59e0b;
+  --theme-risk-high: #ef4444;
+  --theme-risk-critical: #dc2626;
+  
+  /* Typography */
+  --theme-font-family: 'Arial', sans-serif;
+  --theme-font-size-base: 16px;
+  --theme-font-weight-normal: 400;
+  --theme-font-weight-medium: 500;
+  --theme-font-weight-bold: 700;
+  --theme-line-height: 1.5;
+  
+  /* Spacing */
+  --theme-spacing-xs: 0.25rem;
+  --theme-spacing-sm: 0.5rem;
+  --theme-spacing-md: 1rem;
+  --theme-spacing-lg: 2rem;
+  --theme-spacing-xl: 3rem;
+  
+  /* Shadows */
+  --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --theme-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --theme-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --theme-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  
+  /* Border radius */
+  --theme-border-radius-sm: 0.25rem;
+  --theme-border-radius-md: 0.5rem;
+  --theme-border-radius-lg: 1rem;
+}
+
+/* === REPORT CONTAINER === */
+.report-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--theme-background);
+  font-family: var(--theme-font-family);
+  font-size: var(--theme-font-size-base);
+  line-height: var(--theme-line-height);
+  color: var(--theme-text-primary);
+}
+
+/* === REPORT HEADER === */
+.report-header {
+  background: var(--theme-header-background);
+  color: var(--theme-header-text);
+  padding: var(--theme-spacing-xl) var(--theme-spacing-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.report-header__title {
+  font-size: 2.5rem;
+  font-weight: var(--theme-font-weight-bold);
+  margin-bottom: var(--theme-spacing-sm);
+}
+
+.report-header__subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: var(--theme-spacing-lg);
+}
+
+.report-header__tool-name {
+  font-size: 1.75rem;
+  font-weight: var(--theme-font-weight-bold);
+  margin-bottom: var(--theme-spacing-xs);
+}
+
+.report-header__tool-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.report-header__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--theme-spacing-lg);
+  padding-top: var(--theme-spacing-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: var(--theme-spacing-md);
+}
+
+/* === REPORT MAIN === */
+.report-main {
+  background: var(--theme-background);
+}
+
+.report-main__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--theme-spacing-lg);
+  background: var(--theme-section-background);
+}
+
+/* === SUMMARY SECTION === */
+.report-section__summary {
+  border-bottom: 1px solid var(--theme-border);
+  padding: var(--theme-spacing-xl) var(--theme-spacing-lg);
+  background: var(--theme-section-background);
+}
+
+.summary-section__score-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--theme-spacing-xl);
+  margin-bottom: var(--theme-spacing-lg);
+  align-items: center;
+}
+
+.summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+  color: var(--theme-header-text);
+  border-radius: var(--theme-border-radius-lg);
+  padding: var(--theme-spacing-lg);
+  text-align: center;
+  box-shadow: var(--theme-shadow-lg);
+  width: 180px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.summary-section__score-display--low {
+  background: linear-gradient(135deg, var(--theme-risk-low) 0%, #34d399 100%);
+}
+
+.summary-section__score-display--medium {
+  background: linear-gradient(135deg, var(--theme-risk-medium) 0%, #fbbf24 100%);
+}
+
+.summary-section__score-display--high {
+  background: linear-gradient(135deg, var(--theme-risk-high) 0%, #f87171 100%);
+}
+
+.summary-section__score-display--critical {
+  background: linear-gradient(135deg, var(--theme-risk-critical) 0%, #ef4444 100%);
+}
+
+.summary-section__score-number {
+  font-size: 4rem;
+  font-weight: var(--theme-font-weight-bold);
+  line-height: 1;
+}
+
+.summary-section__score-total {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-top: var(--theme-spacing-xs);
+}
+
+.summary-section__risk-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--theme-header-text);
+  padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+  border-radius: var(--theme-border-radius-sm);
+  font-size: 0.875rem;
+  font-weight: var(--theme-font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--theme-spacing-sm);
+}
+
+.summary-section__description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.summary-section__description-title {
+  font-size: 1.5rem;
+  font-weight: var(--theme-font-weight-bold);
+  margin-bottom: var(--theme-spacing-sm);
+  color: var(--theme-text-primary);
+}
+
+/* === RESPONSIVE STYLES === */
+@media (max-width: 768px) {
+  .report-header {
+    padding: var(--theme-spacing-lg) var(--theme-spacing-md);
+  }
+  
+  .report-header__title {
+    font-size: 2rem;
+  }
+  
+  .report-header__meta {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .summary-section__score-container {
+    grid-template-columns: 1fr;
+    gap: var(--theme-spacing-lg);
+    text-align: center;
+  }
+  
+  .summary-section__score-display {
+    margin: 0 auto;
+  }
+}
+
+/* === PRINT STYLES === */
+@media print {
+  .report-container {
+    max-width: none;
+    margin: 0;
+  }
+  
+  .report-header {
+    background: var(--theme-header-background) !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  .summary-section__score-display {
+    background: var(--theme-accent) !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}

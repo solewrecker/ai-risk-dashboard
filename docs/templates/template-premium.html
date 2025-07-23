@@ -3,48 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tool Security Assessment Report</title>
-    <link rel="stylesheet" href="../css/pages/default-export-page.css">
+    <title>{{name}} - AI Tool Security Assessment Report</title>
+    <link rel="stylesheet" href="../theming/theme-governor.css">
 </head>
 <body>
     <div class="container">
-        <!-- Report Header -->
-        <header class="report-header">
-            <div class="report-header__content">
-                <h1 class="report-header__title">AI Tool Security Assessment</h1>
-                <p class="report-header__subtitle">{{toolSubtitle}} - {{toolName}}</p>
-                <div class="report-header__meta">
-                    <div class="report-header__meta-item">
-                        <span>📊</span>
-                        <span>Assessment Date: {{reportDate}}</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>🏢</span>
-                        <span>Assessed by: AI Security Council</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>📋</span>
-                        <span>Category: Design & Creative</span>
-                    </div>
-                    <div class="report-header__meta-item">
-                        <span>🔒</span>
-                        <span>Data Classification: Financial</span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Template Name -->
-        <div class="template-name">
-            <h2 class="template-name__title">Premium Report</h2>
+        <!-- Header -->
+        <div class="header">
+            <h1>{{name}}</h1>
+            <p class="subtitle">AI Tool Security Assessment Report</p>
         </div>
 
-        <!-- Main content area for sections to be dynamically inserted -->
-        <main id="report-content">
-            {{{sectionsHtml}}}
-        </main>
+        <!-- Executive Summary -->
+        <div class="executive-summary">
+            <div class="risk-badge">{{risk_level}} RISK</div>
+            <h2>Executive Summary</h2>
+            <p style="margin: 15px 0; font-size: 1.1rem;">
+                <strong>{{assessment_data.summary_and_recommendation}}</strong>
+            </p>
 
+            <div class="tool-info">
+                <div class="info-card">
+                    <h3>Vendor</h3>
+                    <p>{{vendor}}</p>
+                </div>
+                <div class="info-card">
+                    <h3>License Type</h3>
+                    <p>{{assessment_data.license_type}}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Category</h3>
+                    <p>{{category}}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Data Classification</h3>
+                    <p>{{data_classification}}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Assessment Confidence</h3>
+                    <p>{{assessment_data.confidence}}%</p>
+                </div>
+                <div class="info-card">
+                    <h3>Documentation Tier</h3>
+                    <p>{{documentation_tier}}</p>
+                </div>
+            </div>
+        </div>
 
+        {{{sectionsHtml}}}
+
+        <!-- All Data Section (for debugging/verification) -->
+        <div class="all-data-section">
+            <h2>All Available Data</h2>
+            <h3>Top-Level Properties</h3>
+            <ul>
+                <li><strong>Name:</strong> {{name}}</li>
+                <li><strong>Vendor:</strong> {{vendor}}</li>
+                <li><strong>Risk Level:</strong> {{risk_level}}</li>
+                <li><strong>Total Score:</strong> {{total_score}}</li>
+                <li><strong>Data Storage Score:</strong> {{data_storage_score}}</li>
+                <li><strong>Training Usage Score:</strong> {{training_usage_score}}</li>
+                <li><strong>Access Controls Score:</strong> {{access_controls_score}}</li>
+                <li><strong>Compliance Score:</strong> {{compliance_score}}</li>
+                <li><strong>Vendor Transparency Score:</strong> {{vendor_transparency_score}}</li>
+                <li><strong>Category:</strong> {{category}}</li>
+                <li><strong>Data Classification:</strong> {{data_classification}}</li>
+                <li><strong>Is Public:</strong> {{is_public}}</li>
+                <li><strong>Primary Use Case:</strong> {{primary_use_case}}</li>
+                <li><strong>Assessed By:</strong> {{assessed_by}}</li>
+                <li><strong>Documentation Tier:</strong> {{documentation_tier}}</li>
+                <li><strong>Assessment Notes:</strong> {{assessment_notes}}</li>
+            </ul>
+            <h3>Data from `assessment_data`</h3>
+            <ul>
+                <li><strong>License Type:</strong> {{assessment_data.license_type}}</li>
+                <li><strong>Summary and Recommendation:</strong> {{assessment_data.summary_and_recommendation}}</li>
+                <li><strong>Compliance Summary:</strong> {{assessment_data.compliance_summary}}</li>
+                <li><strong>Final Risk Category:</strong> {{assessment_data.final_risk_category}}</li>
+                <li><strong>Final Score with Multiplier:</strong> {{assessment_data.final_score_with_multiplier}}</li>
+                <li><strong>Use Case Multiplier Applied:</strong> {{assessment_data.use_case_multiplier_applied}}</li>
+                <li><strong>Confidence:</strong> {{assessment_data.confidence}}</li>
+                <li><strong>Recommendations:</strong>
+                    <ul>
+                    {{#each assessment_data.recommendations}}
+                        <li>{{this}}</li>
+                    {{/each}}
+                    </ul>
+                </li>
+                <li><strong>Compliance Certifications:</strong> {{assessment_data.compliance_certifications}}</li>
+                <li><strong>Sources:</strong>
+                    <ul>
+                    {{#each assessment_data.sources}}
+                        <li><a href="{{this.url}}" target="_blank">{{this.name}}</a></li>
+                    {{/each}}
+                    </ul>
+                </li>
+                <li><strong>Azure Permissions:</strong> {{assessment_data.azure_permissions}}</li>
+                <li><strong>Detailed Assessment:</strong> <pre>{{JSONstringify assessment_data.detailed_assessment}}</pre></li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; {{currentYear}} AI Security Council. All rights reserved. | <a href="/">Back to Dashboard</a></p>
+        </div>
     </div>
 </body>
 </html>

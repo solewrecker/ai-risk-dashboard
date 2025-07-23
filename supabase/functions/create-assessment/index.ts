@@ -2,14 +2,107 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { OpenAI } from "https://esm.sh/openai@4.47.1";
 
-// The framework and template files will now be read inside the main handler
-// instead of being imported as modules.
+// Import your multiplier logic (you'll need to create this utility)
+// For now, I'll inline the multiplier logic
 
 console.log("Create Assessment function booting up...");
 
 const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
+
+// Apply the exact same multiplier logic as your frontend scoring.js
+function applyBackendMultipliers(assessmentJson: any, formData: any) {
+  const { dataClassification, useCase } = formData;
+  
+  // Constants from your scoring.js
+  const DATA_CLASSIFICATION_MULTIPLIERS = {
+    'phi': 1.4,
+    'financial': 1.3,
+    'trade-secrets': 1.25,
+    'pii': 1.2,
+    'public': 0.9
+  };
+
+  const USE_CASE_MULTIPLIERS = {
+    'legal-compliance': 1.3,
+    'finance-accounting': 1.2,
+    'hr-executive': 1.15,
+    'customer-support': 1.1,
+    'development': 0.95,
+    'marketing': 0.9,
+    'research': 1.0,
+    'general': 1.0
+  };
+  
+  // Get original scores
+  const baseScores = {
+    dataStorage: assessmentJson.data_storage_score || 0,
+    trainingUsage: assessmentJson.training_usage_score || 0,
+    accessControls: assessmentJson.access_controls_score || 0,
+    complianceRisk: assessmentJson.compliance_score || 0,
+    vendorTransparency: assessmentJson.vendor_transparency_score || 0
+  };
+
+  // Apply the EXACT same logic as applyClientSideMultipliers
+  const dataMultiplier = DATA_CLASSIFICATION_MULTIPLIERS[dataClassification] || 1.0;
+  baseScores.dataStorage = Math.round(baseScores.dataStorage * dataMultiplier);
+  baseScores.complianceRisk = Math.round(baseScores.complianceRisk * dataMultiplier);
+
+  const useCaseMultiplier = USE_CASE_MULTIPLIERS[useCase] || 1.0;
+  baseScores.complianceRisk = Math.round(baseScores.complianceRisk * useCaseMultiplier);
+  baseScores.accessControls = Math.round(baseScores.accessControls * useCaseMultiplier);
+
+  // Calculate total score (sum of all scores, not weighted average)
+  const totalScore = Object.values(baseScores).reduce((sum, score) => sum + score, 0);
+
+  // Update assessmentJson with multiplied scores
+  assessmentJson.data_storage_score = baseScores.dataStorage;
+  assessmentJson.training_usage_score = baseScores.trainingUsage;
+  assessmentJson.access_controls_score = baseScores.accessControls;
+  assessmentJson.compliance_score = baseScores.complianceRisk;
+  assessmentJson.vendor_transparency_score = baseScores.vendorTransparency;
+  assessmentJson.total_score = totalScore;
+
+  // Update detailed_assessment scores if they exist
+  if (assessmentJson.detailed_assessment?.assessment_details) {
+    const details = assessmentJson.detailed_assessment.assessment_details;
+    
+    if (details.data_storage_and_security) {
+      details.data_storage_and_security.category_score = baseScores.dataStorage;
+    }
+    if (details.training_data_usage) {
+      details.training_data_usage.category_score = baseScores.trainingUsage;
+    }
+    if (details.access_controls) {
+      details.access_controls.category_score = baseScores.accessControls;
+    }
+    if (details.compliance_and_legal_risk) {
+      details.compliance_and_legal_risk.category_score = baseScores.complianceRisk;
+    }
+    if (details.vendor_transparency) {
+      details.vendor_transparency.category_score = baseScores.vendorTransparency;
+    }
+  }
+
+  // Update risk level using your exact logic
+  if (assessmentJson.detailed_assessment) {
+    assessmentJson.detailed_assessment.final_risk_score = totalScore;
+    
+    // Use your exact risk level logic
+    if (totalScore >= 80) {
+      assessmentJson.detailed_assessment.final_risk_category = 'critical';
+    } else if (totalScore >= 60) {
+      assessmentJson.detailed_assessment.final_risk_category = 'high';
+    } else if (totalScore >= 35) {
+      assessmentJson.detailed_assessment.final_risk_category = 'medium';
+    } else {
+      assessmentJson.detailed_assessment.final_risk_category = 'low';
+    }
+  }
+  
+  return assessmentJson;
+}
 
 serve(async (req) => {
   try {
@@ -21,18 +114,24 @@ serve(async (req) => {
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      // Create client with auth header of the user that called the function.
-      // This way your row-level-security (RLS) policies are applied.
       { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
     );
 
-    const { app_name, use_case } = await req.json();
+    const { app_name, use_case, data_classification, tool_category } = await req.json();
     if (!app_name || !use_case) {
       return new Response(JSON.stringify({ error: "app_name and use_case are required" }), {
         headers: { "Content-Type": "application/json" },
         status: 400,
       });
     }
+
+    // Create form data object for multiplier application
+    const formData = {
+      toolName: app_name,
+      useCase: use_case,
+      dataClassification: data_classification || 'public',
+      toolCategory: tool_category || 'other'
+    };
 
     // --- AI Prompt Construction ---
     const prompt = `
@@ -68,20 +167,33 @@ ${JSON.stringify(jsonTemplate, null, 2)}
 
     let assessmentJson = JSON.parse(aiResponse);
 
+    // *** APPLY MULTIPLIERS HERE - BEFORE FILTERING ***
+    assessmentJson = applyBackendMultipliers(assessmentJson, formData);
+
     // Filter out 'SOC_2: Type II' from compliance_certifications
     if (assessmentJson.compliance_certifications && Array.isArray(assessmentJson.compliance_certifications)) {
       assessmentJson.compliance_certifications = assessmentJson.compliance_certifications.filter(cert => 
         !(cert.name === 'SOC_2' && cert.status === 'Type II')
       );
     }
-    // Ensure compliance_certifications is not duplicated within detailedAssessment if detailedAssessment is the full assessmentJson
+
     let detailedAssessmentToStore = assessmentJson.detailed_assessment;
-    if (!detailedAssessmentToStore) {
-      // If detailed_assessment is not present, use the entire assessmentJson
-      detailedAssessmentToStore = { ...assessmentJson }; // Create a copy to avoid modifying original
+    if (!detailedAssessmentToStore || typeof detailedAssessmentToStore !== 'object') {
+      detailedAssessmentToStore = {};
     }
-    // Ensure compliance_certifications is always removed from detailedAssessmentToStore
-    delete detailedAssessmentToStore.compliance_certifications;
+    if (detailedAssessmentToStore.compliance_certifications) {
+      delete detailedAssessmentToStore.compliance_certifications;
+    }
+
+    // Ensure summary_and_recommendation is within detailedAssessmentToStore
+    detailedAssessmentToStore.summary_and_recommendation = 
+      assessmentJson.summary_and_recommendation || 
+      assessmentJson.summary || 
+      assessmentJson.detailedAssessment?.summary_and_recommendation ||
+      assessmentJson.detailedAssessment?.summary || 
+      assessmentJson.detailedAssessment?.executive_summary ||
+      assessmentJson.executive_summary ||
+      'No summary provided.';
 
     // --- Map AI response to the 'assessments' table schema ---
     const userId = (await supabaseClient.auth.getUser()).data.user?.id;
@@ -90,13 +202,13 @@ ${JSON.stringify(jsonTemplate, null, 2)}
       is_public: false,
       name: assessmentJson.tool_name || assessmentJson.name,
       vendor: assessmentJson.vendor,
-      total_score: assessmentJson.final_risk_score || assessmentJson.total_score,
-      risk_level: assessmentJson.final_risk_category || assessmentJson.risk_level,
-      data_storage_score: assessmentJson.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || assessmentJson.data_storage_score,
-      training_usage_score: assessmentJson.detailed_assessment?.assessment_details?.training_data_usage?.category_score || assessmentJson.training_usage_score,
-      access_controls_score: assessmentJson.detailed_assessment?.assessment_details?.access_controls?.category_score || assessmentJson.access_controls_score,
-      compliance_score: assessmentJson.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || assessmentJson.compliance_score,
-      vendor_transparency_score: assessmentJson.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || assessmentJson.vendor_transparency_score,
+      total_score: assessmentJson.total_score || detailedAssessmentToStore.final_risk_score || null,
+      risk_level: detailedAssessmentToStore.final_risk_category || detailedAssessmentToStore.risk_level || 'UNKNOWN',
+      data_storage_score: assessmentJson.data_storage_score || detailedAssessmentToStore.assessment_details?.data_storage_and_security?.category_score || null,
+      training_usage_score: assessmentJson.training_usage_score || detailedAssessmentToStore.assessment_details?.training_data_usage?.category_score || null,
+      access_controls_score: assessmentJson.access_controls_score || detailedAssessmentToStore.assessment_details?.access_controls?.category_score || null,
+      compliance_score: assessmentJson.compliance_score || detailedAssessmentToStore.assessment_details?.compliance_and_legal_risk?.category_score || null,
+      vendor_transparency_score: assessmentJson.vendor_transparency_score || detailedAssessmentToStore.assessment_details?.vendor_transparency?.category_score || null,
       category: assessmentJson.category,
       data_classification: assessmentJson.data_classification,
       license_type: assessmentJson.license_type,
@@ -108,39 +220,24 @@ ${JSON.stringify(jsonTemplate, null, 2)}
       azure_permissions: assessmentJson.azure_permissions,
       compliance_certifications: assessmentJson.compliance_certifications,
       sources: assessmentJson.sources,
+      
       assessment_data: {
-        source: "ai_generated",
-        sources: assessmentJson.sources,
-        category: assessmentJson.category,
-        formData: {
-          useCase: assessmentJson.primary_use_case,
-          toolName: assessmentJson.tool_name || assessmentJson.name,
-          toolVersion: assessmentJson.license_type,
-          toolCategory: assessmentJson.category,
-          dataClassification: assessmentJson.data_classification
-        },
-        breakdown: {
+        formData: formData, // Use the formData object we created
+        breakdown: { 
           scores: {
-            dataStorage: assessmentJson.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || assessmentJson.data_storage_score,
-            trainingUsage: assessmentJson.detailed_assessment?.assessment_details?.training_data_usage?.category_score || assessmentJson.training_usage_score,
-            accessControls: assessmentJson.detailed_assessment?.assessment_details?.access_controls?.category_score || assessmentJson.access_controls_score,
-            complianceRisk: assessmentJson.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || assessmentJson.compliance_score,
-            vendorTransparency: assessmentJson.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || assessmentJson.vendor_transparency_score
+            dataStorage: assessmentJson.data_storage_score || 0,
+            trainingUsage: assessmentJson.training_usage_score || 0,
+            accessControls: assessmentJson.access_controls_score || 0,
+            complianceRisk: assessmentJson.compliance_score || 0,
+            vendorTransparency: assessmentJson.vendor_transparency_score || 0
           }
         },
-        riskLevel: assessmentJson.final_risk_category || assessmentJson.risk_level,
-        confidence: assessmentJson.confidence,
-        finalScore: assessmentJson.final_risk_score || assessmentJson.total_score,
-        assessed_by: assessmentJson.assessed_by,
         recommendations: assessmentJson.recommendations,
-        assessment_notes: assessmentJson.assessment_notes,
-        primary_use_case: assessmentJson.primary_use_case,
-        azure_permissions: assessmentJson.azure_permissions,
         detailedAssessment: detailedAssessmentToStore,
-    }
+      }
     };
 
-    // --- Insert into 'ai_tools' table ---
+    // --- Insert into 'assessments' table ---
     const { data, error } = await supabaseClient
       .from("assessments")
       .insert(newToolData)

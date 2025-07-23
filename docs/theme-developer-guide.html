@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme Developer Guide - AI Tool Risk Framework</title>
+  <link rel="stylesheet" href="./dist/export.ff053ac9.css">
+  <style>
+    :root {
+      --color-primary: #0066cc;
+      --color-primary-light: #e6f0fa;
+      --color-secondary: #ff6600;
+      --color-text: #333333;
+      --color-text-light: #666666;
+      --color-background: #ffffff;
+      --color-background-alt: #f5f5f5;
+      --color-border: #dddddd;
+      --color-border-light: #eeeeee;
+      --color-success: #00aa00;
+      --color-warning: #ffaa00;
+      --color-error: #cc0000;
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      --font-size-base: 16px;
+      --spacing-unit: 8px;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+      color: var(--color-text);
+      background-color: var(--color-background);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: calc(var(--spacing-unit) * 3);
+    }
+    
+    header {
+      background-color: var(--color-primary);
+      color: white;
+      padding: calc(var(--spacing-unit) * 4) 0;
+    }
+    
+    header .container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+    
+    header p {
+      margin: calc(var(--spacing-unit) * 2) 0 0;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    nav {
+      background-color: var(--color-background-alt);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      overflow-x: auto;
+    }
+    
+    nav li {
+      margin: 0;
+    }
+    
+    nav a {
+      display: block;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+      color: var(--color-text);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    nav a:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    nav a.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    
+    main {
+      padding: calc(var(--spacing-unit) * 4) 0;
+    }
+    
+    section {
+      margin-bottom: calc(var(--spacing-unit) * 6);
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      margin: 0 0 calc(var(--spacing-unit) * 3);
+      padding-bottom: calc(var(--spacing-unit) * 1);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    h3 {
+      font-size: 1.4rem;
+      margin: calc(var(--spacing-unit) * 4) 0 calc(var(--spacing-unit) * 2);
+    }
+    
+    h4 {
+      font-size: 1.2rem;
+      margin: calc(var(--spacing-unit) * 3) 0 calc(var(--spacing-unit) * 1);
+    }
+    
+    p {
+      margin: 0 0 calc(var(--spacing-unit) * 2);
+    }
+    
+    ul, ol {
+      margin: 0 0 calc(var(--spacing-unit) * 3);
+      padding-left: calc(var(--spacing-unit) * 4);
+    }
+    
+    li {
+      margin-bottom: calc(var(--spacing-unit) * 1);
+    }
+    
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      background-color: var(--color-background-alt);
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    
+    pre {
+      background-color: var(--color-background-alt);
+      padding: calc(var(--spacing-unit) * 2);
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 0 0 calc(var(--spacing-unit) * 3);
+    }
+    
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.9rem;
+      display: block;
+    }
+    
+    .note {
+      background-color: var(--color-primary-light);
+      border-left: 4px solid var(--color-primary);
+      padding: calc(var(--spacing-unit) * 2);
+      margin: calc(var(--spacing-unit) * 3) 0;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .warning {
+      background-color: #fff8e6;
+      border-left: 4px solid var(--color-warning);
+      padding: calc(var(--spacing-unit) * 2);
+      margin: calc(var(--spacing-unit) * 3) 0;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: calc(var(--spacing-unit) * 2) 0 calc(var(--spacing-unit) * 4);
+    }
+    
+    th, td {
+      padding: calc(var(--spacing-unit) * 1.5);
+      border: 1px solid var(--color-border);
+      text-align: left;
+    }
+    
+    th {
+      background-color: var(--color-background-alt);
+      font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+      background-color: var(--color-background-alt);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: calc(var(--spacing-unit) * 3);
+      margin: calc(var(--spacing-unit) * 3) 0;
+    }
+    
+    .card {
+      background-color: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: calc(var(--spacing-unit) * 3);
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .card h3 {
+      margin-top: 0;
+    }
+    
+    footer {
+      background-color: var(--color-background-alt);
+      border-top: 1px solid var(--color-border);
+      padding: calc(var(--spacing-unit) * 4) 0;
+      color: var(--color-text-light);
+    }
+    
+    .theme-preview {
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: calc(var(--spacing-unit) * 2);
+      margin: calc(var(--spacing-unit) * 3) 0;
+    }
+    
+    .theme-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: calc(var(--spacing-unit) * 2);
+      padding-bottom: calc(var(--spacing-unit) * 2);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .theme-preview-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: calc(var(--spacing-unit) * 2);
+    }
+    
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .color-swatch-box {
+      width: 100px;
+      height: 100px;
+      border-radius: 4px;
+      margin-bottom: calc(var(--spacing-unit) * 1);
+      border: 1px solid var(--color-border-light);
+    }
+    
+    .color-swatch-label {
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    .tabs {
+      margin: calc(var(--spacing-unit) * 3) 0;
+    }
+    
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .tabs-nav-item {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: -1px;
+      background-color: transparent;
+      color: var(--color-text);
+    }
+    
+    .tabs-nav-item.active {
+      background-color: var(--color-background);
+      border-color: var(--color-border);
+      color: var(--color-primary);
+    }
+    
+    .tabs-content {
+      padding: calc(var(--spacing-unit) * 3);
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .tabs-panel {
+      display: none;
+    }
+    
+    .tabs-panel.active {
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      h3 {
+        font-size: 1.3rem;
+      }
+      
+      .container {
+        padding: calc(var(--spacing-unit) * 2);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Theme Developer Guide</h1>
+      <p>Create custom themes for the AI Tool Risk Framework Report System</p>
+    </div>
+  </header>
+  
+  <nav>
+    <div class="container">
+      <ul>
+        <li><a href="#getting-started" class="active">Getting Started</a></li>
+        <li><a href="#theme-structure">Theme Structure</a></li>
+        <li><a href="#css-variables">CSS Variables</a></li>
+        <li><a href="#components">Components</a></li>
+        <li><a href="#validation">Validation</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#publishing">Publishing</a></li>
+        <li><a href="#api-reference">API Reference</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <main>
+    <div class="container">
+      <section id="getting-started">
+        <h2>Getting Started</h2>
+        <p>Welcome to the AI Tool Risk Framework Theme Developer Guide. This documentation will help you create custom themes for the report system.</p>
+        
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>Basic knowledge of HTML, CSS, and JavaScript</li>
+          <li>Familiarity with CSS variables (custom properties)</li>
+          <li>Understanding of the BEM methodology for CSS</li>
+          <li>A code editor of your choice</li>
+        </ul>
+        
+        <h3>Quick Start</h3>
+        <p>The fastest way to get started is to clone an existing theme and modify it:</p>
+        
+        <pre><code>// Clone the default theme
+const myTheme = {
+  id: 'my-custom-theme',
+  name: 'My Custom Theme',
+  description: 'A custom theme for the AI Tool Risk Framework',
+  author: 'Your Name',
+  version: '1.0.0',
+  cssFiles: [
+    './themes/my-custom-theme/main.css',
+    './themes/my-custom-theme/components.css'
+  ],
+  preview: './themes/my-custom-theme/preview.png',
+  variables: {
+    // Your custom CSS variables
+  }
+};
+
+// Register your theme
+themeRegistry.register(myTheme);</code></pre>
+        
+        <div class="note">
+          <p><strong>Note:</strong> All themes must follow the validation requirements to ensure compatibility with the report system.</p>
+        </div>
+      </section>
+      
+      <section id="theme-structure">
+        <h2>Theme Structure</h2>
+        <p>A theme consists of the following components:</p>
+        
+        <h3>Theme Manifest</h3>
+        <p>Every theme requires a manifest that defines its properties:</p>
+        
+        <pre><code>{
+  "id": "my-custom-theme",
+  "name": "My Custom Theme",
+  "description": "A custom theme for the AI Tool Risk Framework",
+  "author": "Your Name",
+  "version": "1.0.0",
+  "cssFiles": [
+    "./main.css",
+    "./components.css"
+  ],
+  "preview": "./preview.png",
+  "compatibleWith": ">=1.0.0",
+  "variables": {
+    "--color-primary": "#0066cc",
+    "--color-secondary": "#ff6600",
+    // Additional variables
+  }
+}</code></pre>
+        
+        <h3>File Structure</h3>
+        <p>A typical theme follows this file structure:</p>
+        
+        <pre><code>my-custom-theme/
+├── manifest.json     # Theme manifest
+├── main.css         # Core styles and variables
+├── components.css   # Component-specific styles
+├── preview.png      # Theme preview image
+└── README.md        # Documentation</code></pre>
+        
+        <h3>CSS Organization</h3>
+        <p>We recommend organizing your CSS using the BEM methodology:</p>
+        
+        <pre><code>/* Block */
+.report-card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+/* Element */
+.report-card__title {
+  color: var(--color-text);
+  font-size: var(--font-size-large);
+}
+
+/* Modifier */
+.report-card--highlighted {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}</code></pre>
+      </section>
+      
+      <section id="css-variables">
+        <h2>CSS Variables</h2>
+        <p>The theme system uses CSS variables (custom properties) to define the visual appearance of the report. Here are the required variables:</p>
+        
+        <h3>Colors</h3>
+        <div class="theme-preview">
+          <div class="theme-preview-header">
+            <h4>Color Palette</h4>
+          </div>
+          <div class="theme-preview-content">
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-primary);"></div>
+              <div class="color-swatch-label">--color-primary</div>
+            </div>
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-primary-light);"></div>
+              <div class="color-swatch-label">--color-primary-light</div>
+            </div>
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-secondary);"></div>
+              <div class="color-swatch-label">--color-secondary</div>
+            </div>
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-text);"></div>
+              <div class="color-swatch-label">--color-text</div>
+            </div>
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-background);"></div>
+              <div class="color-swatch-label">--color-background</div>
+            </div>
+            <div class="color-swatch">
+              <div class="color-swatch-box" style="background-color: var(--color-border);"></div>
+              <div class="color-swatch-label">--color-border</div>
+            </div>
+          </div>
+        </div>
+        
+        <h3>Required Variables</h3>
+        <p>The following CSS variables are required for all themes:</p>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Default Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--color-primary</code></td>
+              <td>Primary brand color</td>
+              <td><code>#0066cc</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-primary-light</code></td>
+              <td>Lighter version of primary color</td>
+              <td><code>#e6f0fa</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-secondary</code></td>
+              <td>Secondary accent color</td>
+              <td><code>#ff6600</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-text</code></td>
+              <td>Main text color</td>
+              <td><code>#333333</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-text-light</code></td>
+              <td>Secondary text color</td>
+              <td><code>#666666</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-background</code></td>
+              <td>Main background color</td>
+              <td><code>#ffffff</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-background-alt</code></td>
+              <td>Alternative background color</td>
+              <td><code>#f5f5f5</code></td>
+            </tr>
+            <tr>
+              <td><code>--color-border</code></td>
+              <td>Border color</td>
+              <td><code>#dddddd</code></td>
+            </tr>
+            <tr>
+              <td><code>--font-family</code></td>
+              <td>Main font family</td>
+              <td><code>system-ui, sans-serif</code></td>
+            </tr>
+            <tr>
+              <td><code>--font-size-base</code></td>
+              <td>Base font size</td>
+              <td><code>16px</code></td>
+            </tr>
+            <tr>
+              <td><code>--spacing-unit</code></td>
+              <td>Base spacing unit</td>
+              <td><code>8px</code></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h3>Optional Variables</h3>
+        <p>You can define additional variables to enhance your theme:</p>
+        
+        <pre><code>:root {
+  /* Additional colors */
+  --color-success: #00aa00;
+  --color-warning: #ffaa00;
+  --color-error: #cc0000;
+  
+  /* Typography */
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --line-height: 1.5;
+  
+  /* Spacing */
+  --spacing-xs: calc(var(--spacing-unit) * 0.5);
+  --spacing-sm: var(--spacing-unit);
+  --spacing-md: calc(var(--spacing-unit) * 2);
+  --spacing-lg: calc(var(--spacing-unit) * 3);
+  --spacing-xl: calc(var(--spacing-unit) * 4);
+  
+  /* Borders */
+  --border-radius: 4px;
+  --border-width: 1px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}</code></pre>
+      </section>
+      
+      <section id="components">
+        <h2>Components</h2>
+        <p>The report system includes several components that can be styled with your theme:</p>
+        
+        <div class="grid">
+          <div class="card">
+            <h3>Report Header</h3>
+            <p>The main header of the report, including title, logo, and metadata.</p>
+            <pre><code>.report-header {
+  /* Your styles */
+}</code></pre>
+          </div>
+          
+          <div class="card">
+            <h3>Risk Matrix</h3>
+            <p>The risk assessment matrix showing likelihood and impact.</p>
+            <pre><code>.risk-matrix {
+  /* Your styles */
+}</code></pre>
+          </div>
+          
+          <div class="card">
+            <h3>Data Tables</h3>
+            <p>Tables displaying structured data and analysis.</p>
+            <pre><code>.data-table {
+  /* Your styles */
+}</code></pre>
+          </div>
+          
+          <div class="card">
+            <h3>Charts</h3>
+            <p>Various chart types for data visualization.</p>
+            <pre><code>.chart-container {
+  /* Your styles */
+}</code></pre>
+          </div>
+          
+          <div class="card">
+            <h3>Action Items</h3>
+            <p>Lists of recommended actions and mitigations.</p>
+            <pre><code>.action-item {
+  /* Your styles */
+}</code></pre>
+          </div>
+          
+          <div class="card">
+            <h3>Appendices</h3>
+            <p>Additional information and references.</p>
+            <pre><code>.appendix {
+  /* Your styles */
+}</code></pre>
+          </div>
+        </div>
+        
+        <h3>Component States</h3>
+        <p>Remember to style different states of components:</p>
+        
+        <pre><code>/* Default state */
+.button {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: var(--border-width) solid var(--color-border);
+}
+
+/* Hover state */
+.button:hover {
+  background-color: var(--color-background-alt);
+}
+
+/* Active state */
+.button:active {
+  background-color: var(--color-primary-light);
+}
+
+/* Disabled state */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}</code></pre>
+      </section>
+      
+      <section id="validation">
+        <h2>Theme Validation</h2>
+        <p>All themes must pass validation to ensure compatibility with the report system. The <code>ThemeValidator</code> class checks for:</p>
+        
+        <h3>Required Files</h3>
+        <p>Your theme must include all required files:</p>
+        <ul>
+          <li><code>manifest.json</code> - Theme metadata</li>
+          <li>CSS files specified in the manifest</li>
+          <li><code>preview.png</code> - Theme preview image</li>
+        </ul>
+        
+        <h3>CSS Variables</h3>
+        <p>Your theme must define all required CSS variables:</p>
+        
+        <pre><code>// Example validation code
+const validator = new ThemeValidator();
+const validationResult = await validator.validateTheme(myTheme);
+
+if (validationResult.valid) {
+  console.log('Theme is valid!');
+} else {
+  console.error('Theme validation failed:', validationResult.errors);
+}</code></pre>
+        
+        <h3>Browser Compatibility</h3>
+        <p>Your theme should work in all supported browsers:</p>
+        <ul>
+          <li>Chrome (latest 2 versions)</li>
+          <li>Firefox (latest 2 versions)</li>
+          <li>Safari (latest 2 versions)</li>
+          <li>Edge (latest 2 versions)</li>
+        </ul>
+        
+        <h3>Performance</h3>
+        <p>Your theme should meet these performance criteria:</p>
+        <ul>
+          <li>CSS file size: < 100KB (combined)</li>
+          <li>No excessive CSS selectors (< 4000 selectors)</li>
+          <li>No performance-heavy animations</li>
+        </ul>
+      </section>
+      
+      <section id="testing">
+        <h2>Testing Your Theme</h2>
+        <p>Before publishing your theme, test it thoroughly:</p>
+        
+        <h3>Theme Preview</h3>
+        <p>Use the theme preview tool to see how your theme looks:</p>
+        
+        <pre><code>// Load your theme in the preview
+const preview = new ThemePreview();
+preview.loadTheme(myTheme);
+
+// Compare with other themes
+preview.compareThemes([defaultTheme, myTheme]);</code></pre>
+        
+        <h3>Visual Regression Testing</h3>
+        <p>Use visual regression testing to ensure your theme doesn't break existing layouts:</p>
+        
+        <pre><code>// Run visual regression tests
+const tester = new VisualRegressionTest();
+const results = await tester.runTests(myTheme);
+
+if (results.passed) {
+  console.log('All visual tests passed!');
+} else {
+  console.error('Visual tests failed:', results.failures);
+}</code></pre>
+        
+        <div class="tabs">
+          <div class="tabs-nav">
+            <button class="tabs-nav-item active" data-tab="tab1">Manual Testing</button>
+            <button class="tabs-nav-item" data-tab="tab2">Automated Testing</button>
+            <button class="tabs-nav-item" data-tab="tab3">Performance Testing</button>
+          </div>
+          <div class="tabs-content">
+            <div id="tab1" class="tabs-panel active">
+              <h4>Manual Testing Checklist</h4>
+              <ul>
+                <li>Check all components with your theme</li>
+                <li>Test responsive layouts (mobile, tablet, desktop)</li>
+                <li>Verify print layout</li>
+                <li>Check accessibility (color contrast, focus states)</li>
+                <li>Test with different content lengths</li>
+              </ul>
+            </div>
+            <div id="tab2" class="tabs-panel">
+              <h4>Automated Testing</h4>
+              <p>Use the provided test suite to automatically validate your theme:</p>
+              <pre><code>npm run test:theme -- --theme=my-custom-theme</code></pre>
+              <p>This will run tests for:</p>
+              <ul>
+                <li>CSS validation</li>
+                <li>Required variables</li>
+                <li>Component rendering</li>
+                <li>Accessibility compliance</li>
+              </ul>
+            </div>
+            <div id="tab3" class="tabs-panel">
+              <h4>Performance Testing</h4>
+              <p>Use the performance monitor to check your theme's performance:</p>
+              <pre><code>const monitor = new PerformanceMonitor();
+monitor.measureThemePerformance(myTheme);</code></pre>
+              <p>Key metrics to watch:</p>
+              <ul>
+                <li>Theme load time</li>
+                <li>Rendering performance</li>
+                <li>Memory usage</li>
+                <li>CSS parsing time</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="publishing">
+        <h2>Publishing Your Theme</h2>
+        <p>Once your theme is ready, you can publish it for others to use:</p>
+        
+        <h3>Packaging</h3>
+        <p>Package your theme as a ZIP file with the following structure:</p>
+        
+        <pre><code>my-custom-theme.zip
+├── manifest.json
+├── main.css
+├── components.css
+├── preview.png
+└── README.md</code></pre>
+        
+        <h3>Documentation</h3>
+        <p>Include a README.md file with:</p>
+        <ul>
+          <li>Theme name and description</li>
+          <li>Author information</li>
+          <li>Installation instructions</li>
+          <li>Customization options</li>
+          <li>License information</li>
+        </ul>
+        
+        <h3>Submission</h3>
+        <p>Submit your theme to the marketplace:</p>
+        <ol>
+          <li>Create an account on the theme marketplace</li>
+          <li>Upload your theme package</li>
+          <li>Provide metadata and description</li>
+          <li>Submit for review</li>
+        </ol>
+        
+        <div class="note">
+          <p><strong>Note:</strong> All themes undergo a review process to ensure quality and compatibility before being published to the marketplace.</p>
+        </div>
+      </section>
+      
+      <section id="api-reference">
+        <h2>API Reference</h2>
+        <p>Reference documentation for the theme system APIs:</p>
+        
+        <h3>ThemeRegistry</h3>
+        <p>Manages theme registration and retrieval:</p>
+        
+        <pre><code>// Register a theme
+themeRegistry.register(myTheme);
+
+// Get a theme by ID
+const theme = themeRegistry.getTheme('my-custom-theme');
+
+// Get all registered themes
+const allThemes = themeRegistry.getAllThemes();
+
+// Set active theme
+themeRegistry.setActiveTheme('my-custom-theme');
+
+// Get active theme
+const activeTheme = themeRegistry.getActiveTheme();</code></pre>
+        
+        <h3>ThemeLoader</h3>
+        <p>Handles loading theme CSS files:</p>
+        
+        <pre><code>// Initialize the loader
+const loader = new ThemeLoader();
+
+// Load a theme
+await loader.loadTheme('my-custom-theme');
+
+// Preload themes
+loader.preloadThemes(['theme-1', 'theme-2']);
+
+// Remove current theme
+loader.removeCurrentTheme();</code></pre>
+        
+        <h3>ThemeSwitcher</h3>
+        <p>Manages theme transitions:</p>
+        
+        <pre><code>// Initialize the switcher
+const switcher = new ThemeSwitcher();
+
+// Switch to a theme
+await switcher.switchTheme('my-custom-theme');
+
+// Create a theme switcher UI
+switcher.createThemeSwitcherUI(containerElement);</code></pre>
+        
+        <h3>ThemeValidator</h3>
+        <p>Validates theme compatibility:</p>
+        
+        <pre><code>// Initialize the validator
+const validator = new ThemeValidator();
+
+// Validate a theme
+const result = await validator.validateTheme(myTheme);
+
+// Check specific aspects
+await validator.validateRequiredFiles(myTheme);
+await validator.validateCssVariables(myTheme);
+await validator.validateBrowserCompatibility(myTheme);
+await validator.validatePerformance(myTheme);</code></pre>
+        
+        <h3>ThemeInstaller</h3>
+        <p>Handles theme installation:</p>
+        
+        <pre><code>// Initialize the installer
+const installer = new ThemeInstaller();
+
+// Install a theme
+await installer.installTheme(themePackage);
+
+// Remove a theme
+await installer.removeTheme('my-custom-theme');
+
+// Get installed themes
+const installedThemes = installer.getInstalledThemes();</code></pre>
+        
+        <h3>PerformanceMonitor</h3>
+        <p>Monitors theme performance:</p>
+        
+        <pre><code>// Initialize the monitor
+const monitor = new PerformanceMonitor();
+
+// Start measurement
+const marker = monitor.startMeasurement('themeLoad');
+
+// End measurement
+const result = monitor.endMeasurement(marker);
+
+// Create performance report
+const report = monitor.createReport();
+
+// Create performance dashboard
+monitor.createPerformanceDashboard(containerElement);</code></pre>
+      </section>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="container">
+      <p>AI Tool Risk Framework Report System - Theme Developer Guide</p>
+      <p>&copy; 2023 AI Tool Risk Framework. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    // Simple tabs functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle tab navigation
+      const tabButtons = document.querySelectorAll('.tabs-nav-item');
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Get the tab ID
+          const tabId = this.getAttribute('data-tab');
+          
+          // Remove active class from all buttons and panels
+          document.querySelectorAll('.tabs-nav-item').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          document.querySelectorAll('.tabs-panel').forEach(panel => {
+            panel.classList.remove('active');
+          });
+          
+          // Add active class to current button and panel
+          this.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Handle navigation highlighting
+      const navLinks = document.querySelectorAll('nav a');
+      const sections = document.querySelectorAll('section');
+      
+      function highlightNavigation() {
+        const scrollPosition = window.scrollY;
+        
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 100;
+          const sectionBottom = sectionTop + section.offsetHeight;
+          
+          if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+            const id = section.getAttribute('id');
+            
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === `#${id}`) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }
+      
+      window.addEventListener('scroll', highlightNavigation);
+      highlightNavigation();
+    });
+  </script>
+</body>
+</html>

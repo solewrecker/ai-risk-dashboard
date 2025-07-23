@@ -1,0 +1,188 @@
+/**
+ * Print theme component styles
+ */
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid var(--color-border);
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  background-color: transparent;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-light,
+.btn-dark {
+  color: var(--color-text);
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-warning,
+.btn-outline-info,
+.btn-outline-light,
+.btn-outline-dark {
+  color: var(--color-text);
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: var(--spacing-base);
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  background-clip: padding-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Alerts */
+.alert {
+  position: relative;
+  padding: var(--spacing-base);
+  margin-bottom: var(--spacing-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background-alt);
+  color: var(--color-text);
+}
+
+.alert-primary,
+.alert-secondary,
+.alert-success,
+.alert-danger,
+.alert-warning,
+.alert-info,
+.alert-light,
+.alert-dark {
+  background-color: var(--color-background-alt);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--border-radius-pill);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  background-color: var(--color-background-alt);
+}
+
+.badge-primary,
+.badge-secondary,
+.badge-success,
+.badge-danger,
+.badge-warning,
+.badge-info,
+.badge-light,
+.badge-dark {
+  color: var(--color-text);
+  background-color: var(--color-background-alt);
+  border-color: var(--color-border);
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  margin-bottom: var(--spacing-base);
+  color: var(--color-text);
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid var(--color-border);
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--color-border);
+  background-color: var(--color-background-alt);
+  font-weight: bold;
+}
+
+.table tbody + tbody {
+  border-top: 2px solid var(--color-border);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Print-specific component styles */
+@media print {
+  /* Hide interactive elements */
+  button, .btn, input[type="button"], input[type="submit"], input[type="reset"] {
+    display: none;
+  }
+  
+  /* Make sure form controls are visible but not interactive */
+  .form-control {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  /* Ensure tables print well */
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid var(--color-border);
+  }
+  
+  /* Ensure alerts are visible */
+  .alert {
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-base);
+    margin-bottom: var(--spacing-base);
+  }
+}

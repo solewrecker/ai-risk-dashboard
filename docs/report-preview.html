@@ -3,18 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
     <title>Report Preview</title>
+    
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Initialize Supabase Client -->
+    <script>
+        // Initialize the global Supabase client
+        window.createClient = window.supabase?.createClient;
+    </script>
+    
+    <!-- Add Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    
+    <!-- Base Styles -->
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/components/report-base.css">
-    <link rel="stylesheet" href="./css/components/report-header.css">
-    <link rel="stylesheet" href="./css/components/report-cards.css">
-    <link rel="stylesheet" href="./css/components/report-sections.css">
     <link rel="stylesheet" href="./css/themes/theme-base.css">
-    <link rel="stylesheet" href="./css/themes/theme-professional.css" data-theme="theme-professional" disabled>
-    <link rel="stylesheet" href="./css/themes/theme-modern.css" data-theme="theme-modern" disabled>
-    <link rel="stylesheet" href="./css/themes/theme-executive.css" data-theme="theme-executive" disabled>
+    
+    <!-- Theme Base (Always Loaded) -->
+    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    
+    <!-- Theme Layouts -->
+    <link rel="stylesheet" href="./css/themes/layouts/single-layout.css" disabled>
+    <link rel="stylesheet" href="./css/themes/layouts/two-col-layout.css" disabled>
+    <link rel="stylesheet" href="./css/themes/layouts/three-col-layout.css" disabled>
+    
+    <!-- Theme Color Schemes -->
+    <link rel="stylesheet" href="./css/themes/color-schemes/corporate-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/minimal-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/dark-colors.css" disabled>
+    <link rel="stylesheet" href="./css/themes/color-schemes/vibrant-colors.css" disabled>
+    
+    <!-- Main Theme Files -->
+    <link rel="stylesheet" href="./css/themes/theme-corporate.css" data-theme="theme-corporate" disabled>
+    <link rel="stylesheet" href="./css/themes/theme-minimal.css" data-theme="theme-minimal" disabled>
     <link rel="stylesheet" href="./css/themes/theme-dark.css" data-theme="theme-dark" disabled>
-
+    <link rel="stylesheet" href="./css/themes/theme-vibrant.css" data-theme="theme-vibrant" disabled>
 </head>
 <body>
     <div id="report-main"></div>
@@ -22,6 +48,8 @@
         <button id="download-pdf">Download as PDF</button>
         <button id="download-html">Download as HTML</button>
     </div>
-    <script type="module" src="./js/dashboard/export/report-preview.js"></script>
+    <!-- Include the ThemeConnector for compatibility with the dashboard theme system -->
+    <script type="module" src="./js/dashboard/export/themeConnector.js"></script>
+    <script type="module" src="./js/report/ReportPreview.js"></script>
 </body>
 </html>

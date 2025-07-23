@@ -506,6 +506,26 @@
   font-size: .75rem;
 }
 
+.theme-card__preview--governor {
+  background-color: #1e3a8a;
+}
+
+.theme-card__preview--governor .theme-card__preview-header {
+  background-color: #1d4ed8;
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--primary {
+  background-color: #d4af37;
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--secondary {
+  background-color: khaki;
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--tertiary {
+  background-color: #fff;
+}
+
 @media print {
   body {
     color: #000 !important;

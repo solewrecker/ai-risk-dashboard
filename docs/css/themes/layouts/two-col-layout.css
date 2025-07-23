@@ -1,0 +1,76 @@
+/**
+ * two-col-layout.css
+ * 
+ * Two-column layout for reports.
+ * This layout displays sections in two columns.
+ */
+
+.report-layout--two-col {
+  /* Base layout properties */
+  --layout-columns: 2;
+  --layout-gap: var(--theme-spacing-lg);
+}
+
+.report-layout--two-col .report-main__content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--layout-gap);
+}
+
+.report-layout--two-col .report-section {
+  background: var(--theme-section-background);
+  border-radius: var(--theme-border-radius-md);
+  box-shadow: var(--theme-shadow-sm);
+  padding: var(--theme-spacing-lg);
+  margin-bottom: var(--theme-spacing-lg);
+}
+
+.report-layout--two-col .report-section__title {
+  font-size: 1.5rem;
+  font-weight: var(--theme-font-weight-bold);
+  margin-bottom: var(--theme-spacing-md);
+  padding-bottom: var(--theme-spacing-sm);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+/* Ensure the summary section spans the full width */
+.report-layout--two-col .report-section__summary {
+  grid-column: 1 / -1;
+}
+
+/* Specific section placements */
+.report-layout--two-col .report-section__risk-assessment {
+  grid-column: 1 / 2;
+}
+
+.report-layout--two-col .report-section__recommendations {
+  grid-column: 2 / 3;
+}
+
+.report-layout--two-col .report-section__details {
+  grid-column: 1 / -1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .report-layout--two-col .report-main__content {
+    grid-template-columns: 1fr;
+  }
+  
+  .report-layout--two-col .report-section__risk-assessment,
+  .report-layout--two-col .report-section__recommendations {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Print styles */
+@media print {
+  .report-layout--two-col .report-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .report-layout--two-col .report-main__content {
+    display: block;
+  }
+}

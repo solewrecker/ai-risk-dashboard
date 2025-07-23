@@ -1,0 +1,165 @@
+/**
+ * vibrant-colors.css
+ * 
+ * Vibrant color scheme for reports.
+ * Bold, colorful palette with high contrast elements.
+ */
+
+.theme-color--vibrant {
+  /* Primary colors */
+  --theme-background: #ffffff;
+  --theme-text-primary: #1a202c;
+  --theme-text-secondary: #4a5568;
+  --theme-accent: #8b5cf6;
+  --theme-accent-secondary: #6d28d9;
+  --theme-border: #e2e8f0;
+  --theme-section-background: #ffffff;
+  --theme-header-background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --theme-header-text: #ffffff;
+  
+  /* Risk colors */
+  --theme-risk-low: #10b981;
+  --theme-risk-medium: #f59e0b;
+  --theme-risk-high: #ef4444;
+  --theme-risk-critical: #dc2626;
+  
+  /* Component colors */
+  --theme-chart-primary: #8b5cf6;
+  --theme-chart-secondary: #ec4899;
+  --theme-chart-tertiary: #06b6d4;
+  --theme-chart-quaternary: #f59e0b;
+  
+  /* Table colors */
+  --theme-table-header-bg: #f8fafc;
+  --theme-table-header-text: #1a202c;
+  --theme-table-border: #e2e8f0;
+  --theme-table-row-alt: #f8fafc;
+  
+  /* Button colors */
+  --theme-button-primary-bg: #8b5cf6;
+  --theme-button-primary-text: #ffffff;
+  --theme-button-secondary-bg: #e2e8f0;
+  --theme-button-secondary-text: #1a202c;
+  
+  /* Card colors */
+  --theme-card-background: #ffffff;
+  --theme-card-border: #e2e8f0;
+  --theme-card-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Specific component styling for vibrant theme */
+.theme-color--vibrant .report-header {
+  background: var(--theme-header-background);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-color--vibrant .report-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.3), transparent 70%);
+  pointer-events: none;
+}
+
+.theme-color--vibrant .report-section__title {
+  color: var(--theme-accent);
+  font-weight: 700;
+}
+
+.theme-color--vibrant .summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-color--vibrant .summary-section__score-display::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+/* Risk level specific colors */
+.theme-color--vibrant .risk-level--low {
+  color: var(--theme-risk-low);
+  font-weight: 600;
+}
+
+.theme-color--vibrant .risk-level--medium {
+  color: var(--theme-risk-medium);
+  font-weight: 600;
+}
+
+.theme-color--vibrant .risk-level--high {
+  color: var(--theme-risk-high);
+  font-weight: 600;
+}
+
+.theme-color--vibrant .risk-level--critical {
+  color: var(--theme-risk-critical);
+  font-weight: 600;
+}
+
+/* Background variants */
+.theme-color--vibrant .bg-risk-level--low {
+  background-color: var(--theme-risk-low);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.theme-color--vibrant .bg-risk-level--medium {
+  background-color: var(--theme-risk-medium);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.theme-color--vibrant .bg-risk-level--high {
+  background-color: var(--theme-risk-high);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.theme-color--vibrant .bg-risk-level--critical {
+  background-color: var(--theme-risk-critical);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Additional vibrant-specific styles */
+.theme-color--vibrant .report-section {
+  border-radius: var(--theme-border-radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+  overflow: hidden;
+}
+
+.theme-color--vibrant .report-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-secondary));
+}
+
+.theme-color--vibrant a {
+  color: var(--theme-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.theme-color--vibrant a:hover {
+  color: var(--theme-accent-secondary);
+  text-decoration: underline;
+}

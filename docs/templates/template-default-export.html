@@ -12,23 +12,23 @@
         <header class="report-header">
             <div class="report-header__content">
                 <h1 class="report-header__title">AI Tool Security Assessment</h1>
-                <p class="report-header__subtitle">Microsoft Copilot - Microsoft Corporation</p>
+                <p class="report-header__subtitle">{{toolName}} - {{vendor}}</p>
                 <div class="report-header__meta">
                     <div class="report-header__meta-item">
                         <span>📊</span>
-                        <span>Assessment Date: July 13, 2025</span>
+                        <span>Assessment Date: {{reportDate}}</span>
                     </div>
                     <div class="report-header__meta-item">
                         <span>🏢</span>
-                        <span>Assessed by: AI Security Council</span>
+                        <span>Assessed by: {{assessedBy}}</span>
                     </div>
                     <div class="report-header__meta-item">
                         <span>📋</span>
-                        <span>Category: Design & Creative</span>
+                        <span>Category: {{category}}</span>
                     </div>
                     <div class="report-header__meta-item">
                         <span>🔒</span>
-                        <span>Data Classification: Financial</span>
+                        <span>Data Classification: {{dataClassification}}</span>
                     </div>
                 </div>
             </div>
@@ -36,12 +36,13 @@
 
         <!-- Main content area for sections to be dynamically inserted -->
         <main id="report-content">
+            {{{sectionsHtml}}}
             <!-- Executive Summary -->
             <section class="executive-summary">
                 <div class="executive-summary__header">
                     <h2 class="executive-summary__title">Executive Summary</h2>
                     <div class="executive-summary__score">
-                        <span class="executive-summary__score-value">78</span>
+                        <span class="executive-summary__score-value">{{overallScore}}</span>
                         <div class="executive-summary__score-label">Overall Score</div>
                     </div>
                 </div>
@@ -49,23 +50,23 @@
                 <div class="executive-summary__content">
                     <div>
                         <h3 style="margin-bottom: 15px; color: #2c3e50;">Risk Assessment</h3>
-                        <div class="risk-badge risk-badge--high">
-                            ⚠️ High Risk
+                        <div class="risk-badge risk-badge--{{riskLevelLower}}">
+                            ⚠️ {{riskLevel}} Risk
                         </div>
                         <p style="margin-top: 15px; color: #555; line-height: 1.7;">
-                            HIGH RISK tool unsuitable for business use due to lack of enterprise controls, unclear training data policies for free version, and missing compliance certifications. Recommend blocking for sensitive data and consider enterprise alternative.
+                            {{summaryText}}
                         </p>
                     </div>
                     <div>
                         <h3 style="margin-bottom: 15px; color: #2c3e50;">Primary Use Case</h3>
                         <p style="color: #555; line-height: 1.7;">
-                            General productivity assistance and content generation
+                            {{primaryUseCase}}
                         </p>
                         <h3 style="margin-top: 20px; margin-bottom: 15px; color: #2c3e50;">Confidence Level</h3>
                         <div style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div style="background: #3498db; height: 100%; width: 60%; border-radius: 4px;"></div>
+                            <div style="background: #3498db; height: 100%; width: {{confidence}}%; border-radius: 4px;"></div>
                         </div>
-                        <p style="margin-top: 5px; font-size: 0.9rem; color: #7f8c8d;">60% Confidence</p>
+                        <p style="margin-top: 5px; font-size: 0.9rem; color: #7f8c8d;">{{confidence}}% Confidence</p>
                     </div>
                 </div>
             </section>

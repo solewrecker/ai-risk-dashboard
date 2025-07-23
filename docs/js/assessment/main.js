@@ -1,7 +1,4 @@
-// js/assessment/main.js
-// Main entry point for the assessment tool.
-// Orchestrates all modules and handles the main application state.
-
+// js/assessment/main.js - Fixed version
 import * as Auth from './auth.js';
 import * as UI from './ui.js';
 import * as API from './api.js';
@@ -10,148 +7,212 @@ import * as Results from './results.js';
 
 // --- State ---
 let currentAssessment = {};
+let analysisInterval = null; // Track interval for cleanup
 
 // --- Core Functions ---
 async function startAssessment() {
-    UI.showStep(3); // Show loading/analysis step
-    const formData = getFormData();
-    let toolData = await API.getToolFromDatabase(formData);
+    try {
+        UI.showStep(3); // Show loading/analysis step
+        const formData = getFormData();
+        
+        // Validate form data
+        if (!formData.toolName?.trim()) {
+            throw new Error('Tool name is required');
+        }
+        
+        let toolData = await API.getToolFromDatabase(formData);
 
-    if (toolData) {
-        console.log('toolData from DB:', toolData); // Debug log
-
-        currentAssessment = {
-            formData: formData,
-            finalScore: toolData.total_score,
-            riskLevel: toolData.risk_level,
-            source: 'database',
-            breakdown: toolData.breakdown,
-            recommendations: toolData.recommendations,
-            detailedAssessment: toolData.detailed_assessment,
-            // Add new fields from ai_tools
-            vendor: toolData.vendor || null,
-            license_type: toolData.license_type || null,
-            primary_use_case: toolData.primary_use_case || null,
-            assessed_by: toolData.assessed_by || null,
-            confidence: toolData.confidence || null,
-            documentation_tier: toolData.documentation_tier || null,
-            assessment_notes: toolData.assessment_notes || null,
-            azure_permissions: toolData.azure_permissions || null,
-            sources: toolData.sources || null,
-            // Pass the raw compliance_certifications object; it will be handled by the API module
-            compliance_certifications: toolData.compliance_certifications
-        };
-    } else {
-        // Generate heuristic score
-        const baseScore = Scoring.generateHeuristicScore(formData);
-        const finalScore = Scoring.applyMultipliers(baseScore, formData);
-        currentAssessment = {
-            formData: formData,
-            finalScore: finalScore,
-            riskLevel: Scoring.getRiskLevel(finalScore),
-            source: 'heuristic',
-            breakdown: { scores: { /* Basic heuristic scores could go here */ } },
-            recommendations: Scoring.generateRecommendations(finalScore, formData),
-            // For heuristic, create a placeholder for detailedAssessment.compliance_certifications as an object
-            detailedAssessment: {
-                compliance_certifications: {
-                    "HIPAA": { "status": "Not Applicable" },
-                    "GDPR": { "status": "Not Applicable" },
-                    "SOC_2": { "status": "No" },
-                    "ISO_27001": { "status": "No" },
-                    "PCI_DSS": { "status": "Not Applicable" },
-                    "CCPA": { "status": "Not Applicable" },
-                    "FedRAMP": { "status": "Not Applicable" }
-                }
-            },
-            // Initialize other new fields for heuristic assessments
-            vendor: null,
-            license_type: null,
-            primary_use_case: null,
-            assessed_by: null,
-            confidence: null,
-            documentation_tier: null,
-            assessment_notes: null,
-            azure_permissions: null,
-            sources: null
-        };
-    }
-
-    simulateAnalysisSteps(async () => {
-        // --- Auto-save to database ---
-        console.log('Automatically saving assessment to database...');
-        const { data: savedData, error: saveError } = await API.saveToDatabase(currentAssessment);
-        if (saveError) {
-            console.error('Auto-save failed:', saveError);
-            UI.showMessage(`Could not save assessment to your history: ${saveError.message}`, 'error');
+        if (toolData) {
+            console.log('toolData from DB (after multipliers applied):', toolData);
+            currentAssessment = createDatabaseAssessment(toolData, formData);
         } else {
-            console.log('Auto-save successful:', savedData);
+            currentAssessment = createHeuristicAssessment(formData);
         }
 
-        // --- Show Results ---
-        UI.showStep(4);
-        Results.displayResults(currentAssessment);
-    });
+        await simulateAnalysisSteps(async () => {
+            try {
+                // Auto-save to database
+                console.log('Automatically saving assessment to database...');
+                console.log('Assessment data being saved:', currentAssessment);
+                const { data: savedData, error: saveError } = await API.saveToDatabase(currentAssessment);
+                
+                if (saveError) {
+                    console.error('Auto-save failed:', saveError);
+                    if (saveError.code !== 'DUPLICATE_ENTRY') {
+                        UI.showMessage(`Could not save assessment: ${saveError.message}`, 'warning');
+                    }
+                } else {
+                    console.log('Auto-save successful:', savedData);
+                }
+
+                // Show Results regardless of save status
+                UI.showStep(4);
+                Results.displayResults(currentAssessment);
+            } catch (error) {
+                console.error('Error in post-analysis phase:', error);
+                UI.showMessage('Assessment completed but could not be saved', 'warning');
+                UI.showStep(4);
+                Results.displayResults(currentAssessment);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error starting assessment:', error);
+        UI.showMessage(`Assessment failed: ${error.message}`, 'error');
+        UI.showStep(2); // Go back to form
+    }
 }
 
-// This function is no longer needed with auto-saving
-/*
-async function handleSaveToDatabase() {
-    if (!Auth.getIsAdmin()) {
-        UI.showMessage('You must be an admin to save assessments.', 'error');
-        return;
-    }
-    if (!currentAssessment || !currentAssessment.results) {
-        UI.showMessage('No assessment results to save.', 'error');
-        return;
+function createDatabaseAssessment(toolData, formData) {
+    // toolData.total_score is already the recalculated score from applyClientSideMultipliers
+    // toolData.breakdown.scores contains the recalculated individual scores
+    
+    return {
+        formData: formData,
+        finalScore: toolData.total_score, // This is the recalculated total score
+        riskLevel: Scoring.getRiskLevel(toolData.total_score),
+        source: 'database',
+        
+        // Use the recalculated breakdown from applyClientSideMultipliers
+        breakdown: toolData.breakdown || { 
+            scores: {
+                dataStorage: toolData.data_storage_score || 0,
+                trainingUsage: toolData.training_usage_score || 0,
+                accessControls: toolData.access_controls_score || 0,
+                complianceRisk: toolData.compliance_score || 0,
+                vendorTransparency: toolData.vendor_transparency_score || 0
+            }
+        },
+        recommendations: toolData.recommendations || [],
+        
+        // Additional database fields
+        vendor: toolData.vendor || null,
+        license_type: toolData.license_type || null,
+        primary_use_case: toolData.primary_use_case || null,
+        assessed_by: toolData.assessed_by || null,
+        confidence: toolData.confidence || null,
+        documentation_tier: toolData.documentation_tier || null,
+        assessment_notes: toolData.assessment_notes || null,
+        azure_permissions: toolData.azure_permissions || null,
+        sources: toolData.sources || null,
+        summary_and_recommendation: toolData.summary_and_recommendation || null,
+        compliance_certifications: toolData.compliance_certifications || [],
+        
+        // Standardize detailed assessment structure
+        detailedAssessment: normalizeDetailedAssessment(toolData.detailed_assessment),
+    };
+}
+
+function createHeuristicAssessment(formData) {
+    const baseScore = Scoring.generateHeuristicScore(formData);
+    const finalScore = Scoring.applyMultipliers(baseScore, formData);
+    const riskLevel = Scoring.getRiskLevel(finalScore);
+    
+    return {
+        formData: formData,
+        finalScore: finalScore,
+        riskLevel: riskLevel,
+        source: 'heuristic',
+        breakdown: { 
+            scores: {
+                dataStorage: Math.round(finalScore * 0.2),
+                trainingUsage: Math.round(finalScore * 0.25),
+                accessControls: Math.round(finalScore * 0.2),
+                complianceRisk: Math.round(finalScore * 0.2),
+                vendorTransparency: Math.round(finalScore * 0.15)
+            }
+        },
+        recommendations: Scoring.generateRecommendations(finalScore, formData),
+        
+        // Initialize other fields for consistency
+        vendor: null,
+        license_type: license_type,
+        primary_use_case: null,
+        assessed_by: 'Heuristic Analysis',
+        confidence: 'Medium',
+        documentation_tier: 'Basic',
+        assessment_notes: 'Generated using heuristic analysis based on tool category and data classification.',
+        azure_permissions: null,
+        sources: null,
+        summary_and_recommendation: generateHeuristicSummary(riskLevel, formData.toolName),
+        compliance_certifications: [],
+        detailedAssessment: {
+            final_risk_score: finalScore,
+            final_risk_category: riskLevel,
+            assessment_details: {}
+        }
+    };
+}
+
+function normalizeDetailedAssessment(detailedAssessment) {
+    if (!detailedAssessment || typeof detailedAssessment !== 'object') {
+        return {
+            assessment_details: {}
+        };
     }
     
-    UI.showMessage('Saving...', 'info');
-    const { data, error } = await API.saveToDatabase(currentAssessment);
-
-    if (error) {
-        UI.showMessage(`Error: ${error.message}`, 'error');
-    } else {
-        UI.showMessage('Assessment saved successfully!', 'success');
-    }
+    // Ensure consistent structure
+    return {
+        ...detailedAssessment,
+        assessment_details: detailedAssessment.assessment_details || {}
+    };
 }
-*/
+
+function generateHeuristicSummary(riskLevel, toolName) {
+    const riskLower = riskLevel.toLowerCase();
+    if (riskLower === 'critical' || riskLower === 'high') {
+        return `High-risk assessment for ${toolName} based on heuristic analysis. Review required before deployment.`;
+    }
+    return `${toolName} assessment completed using heuristic analysis. Standard security practices recommended.`;
+}
 
 // --- Helper Functions ---
 function getFormData() {
     const form = document.getElementById('assessmentForm');
+    if (!form) {
+        throw new Error('Assessment form not found');
+    }
+    
     const formData = new FormData(form);
     return {
-        toolName: formData.get('toolName'),
-        toolVersion: formData.get('toolVersion'),
-        toolCategory: formData.get('toolCategory'),
-        dataClassification: formData.get('dataClassification'),
-        useCase: formData.get('useCase')
+        toolName: formData.get('toolName')?.trim() || '',
+        toolVersion: formData.get('toolVersion')?.trim() || '',
+        toolCategory: formData.get('toolCategory') || '',
+        dataClassification: formData.get('dataClassification') || '',
+        useCase: formData.get('useCase') || 'general'
     };
 }
 
 function simulateAnalysisSteps(callback) {
-    const steps = [
-        "Analyzing tool policies...",
-        "Assessing data handling protocols...",
-        "Evaluating vendor reputation...",
-        "Cross-referencing compliance databases...",
-        "Finalizing risk score..."
-    ];
-    let index = 0;
-    const interval = setInterval(() => {
-        if (index < steps.length) {
-            document.getElementById('analysisStatus').textContent = steps[index];
-            index++;
-        } else {
-            clearInterval(interval);
-            callback();
+    return new Promise((resolve) => {
+        const steps = [
+            "Analyzing tool policies...",
+            "Assessing data handling protocols...",
+            "Evaluating vendor reputation...",
+            "Cross-referencing compliance databases...",
+            "Finalizing risk score..."
+        ];
+        
+        let index = 0;
+        const statusElement = document.getElementById('analysisStatus');
+        
+        // Clear any existing interval
+        if (analysisInterval) {
+            clearInterval(analysisInterval);
         }
-    }, 600);
+        
+        analysisInterval = setInterval(() => {
+            if (index < steps.length && statusElement) {
+                statusElement.textContent = steps[index];
+                index++;
+            } else {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+                callback().finally(() => resolve());
+            }
+        }, 600);
+    });
 }
-
-// --- Export Functions ---
-// Export functionality moved to export.html page
 
 // --- Initialization ---
 function addEventListeners() {
@@ -167,40 +228,37 @@ function addEventListeners() {
     document.getElementById('nextStepBtn2')?.addEventListener('click', () => UI.nextStep(startAssessment));
     document.getElementById('prevStepBtn2')?.addEventListener('click', UI.prevStep);
     
-    // Results and Exports
+    // Results and Navigation
     document.getElementById('newAssessmentBtn')?.addEventListener('click', UI.startNewAssessment);
-    
-    // The dynamic save button and its handler are no longer needed
-    /*
-    document.querySelector('.form-content').addEventListener('click', (e) => {
-        if (e.target.matches('#saveToDbBtn') || e.target.closest('#saveToDbBtn')) {
-            handleSaveToDatabase();
-        }
-    });
-    */
-
-    // Export functionality moved to export.html page
-    // The export button now links directly to export.html
 }
 
 function initialize() {
-    // Event Listeners
-    UI.setupEventListeners({
-        onStartAssessment: startAssessment,
-        onStartNew: UI.startNewAssessment,
-        onLogin: Auth.showAuthModal,
-        signOut: Auth.signOut,
-        showAuthModal: Auth.showAuthModal,
-        closeAuthModal: Auth.closeAuthModal
-    });
+    try {
+        UI.setupEventListeners({
+            onStartAssessment: startAssessment,
+            onStartNew: UI.startNewAssessment,
+            onLogin: Auth.showAuthModal,
+            signOut: Auth.signOut,
+            showAuthModal: Auth.showAuthModal,
+            closeAuthModal: Auth.closeAuthModal
+        });
 
-    // Initialize Supabase and handle auth changes
-    Auth.initializeSupabase((user) => {
-        UI.updateUIForAuth(user);
-    });
+        Auth.initializeSupabase((user) => {
+            UI.updateUIForAuth(user);
+        });
 
-    UI.showStep(1);
-    addEventListeners();
+        UI.showStep(1);
+        addEventListeners();
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (analysisInterval) {
+        clearInterval(analysisInterval);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', initialize);

@@ -1,0 +1,47 @@
+/**
+ * single-layout.css
+ * 
+ * Single column layout for reports.
+ * This layout displays all sections in a single column.
+ */
+
+.report-layout--single {
+  /* Base layout properties */
+  --layout-columns: 1;
+  --layout-gap: var(--theme-spacing-lg);
+}
+
+.report-layout--single .report-main__content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-gap);
+}
+
+.report-layout--single .report-section {
+  background: var(--theme-section-background);
+  border-radius: var(--theme-border-radius-md);
+  box-shadow: var(--theme-shadow-sm);
+  padding: var(--theme-spacing-lg);
+  margin-bottom: var(--theme-spacing-lg);
+}
+
+.report-layout--single .report-section__title {
+  font-size: 1.5rem;
+  font-weight: var(--theme-font-weight-bold);
+  margin-bottom: var(--theme-spacing-md);
+  padding-bottom: var(--theme-spacing-sm);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+/* Ensure the summary section spans the full width */
+.report-layout--single .report-section__summary {
+  grid-column: 1 / -1;
+}
+
+/* Print styles */
+@media print {
+  .report-layout--single .report-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

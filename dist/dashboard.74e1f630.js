@@ -844,7 +844,156 @@ function getIsFree() {
     return userTier === 'free';
 }
 
-},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"9eYtm":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eoCsO":[function(require,module,exports,__globalThis) {
+// docs/js/supabase-client.js
+// Use the global Supabase object loaded from CDN in index.html
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+// Export the Supabase client
+parcelHelpers.export(exports, "supabase", ()=>supabase);
+const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+// Check if Supabase is available globally (from CDN)
+let supabase;
+// Initialize the global Supabase client if it doesn't exist
+if (typeof window !== 'undefined') {
+    if (window.supabase) {
+        // Use the global Supabase object if available
+        console.log('Using global Supabase client from CDN');
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else if (typeof window.supabaseClient !== 'undefined') {
+        // Use existing client if already initialized
+        console.log('Using existing Supabase client');
+        supabase = window.supabaseClient;
+    } else if (typeof window.createClient !== 'undefined') {
+        // Use the global createClient function if available
+        console.log('Creating Supabase client with global createClient');
+        supabase = window.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Store for reuse
+        window.supabaseClient = supabase;
+    } else {
+        // Fallback to mock implementation for pages that don't load the CDN
+        console.log('Using mock Supabase client');
+        supabase = createMockClient();
+        // Store for reuse
+        window.supabaseClient = supabase;
+    }
+} else {
+    // Fallback for non-browser environments
+    console.log('Using mock Supabase client (non-browser environment)');
+    supabase = createMockClient();
+}
+// Mock client implementation for pages that don't load the CDN
+function createMockClient() {
+    return {
+        auth: {
+            getSession: async ()=>{
+                return {
+                    data: {
+                        session: null
+                    },
+                    error: null
+                };
+            },
+            onAuthStateChange: (callback)=>{
+                console.log('Auth state change listener registered (mock)');
+                return ()=>{};
+            },
+            signInWithPassword: async ()=>{
+                console.log('Mock sign in');
+                return {
+                    error: new Error('Authentication not available in this view')
+                };
+            },
+            signUp: async ()=>{
+                console.log('Mock sign up');
+                return {
+                    error: new Error('Authentication not available in this view')
+                };
+            },
+            signOut: async ()=>{
+                console.log('Mock sign out');
+                return {
+                    error: null
+                };
+            }
+        },
+        from: (table)=>({
+                select: ()=>({
+                        execute: async ()=>({
+                                data: [],
+                                error: null
+                            }),
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: [],
+                                        error: null
+                                    }),
+                                single: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    }),
+                insert: ()=>({
+                        execute: async ()=>({
+                                data: {
+                                    id: 'mock-id'
+                                },
+                                error: null
+                            })
+                    }),
+                update: ()=>({
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    }),
+                delete: ()=>({
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    })
+            })
+    };
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"9eYtm":[function(require,module,exports,__globalThis) {
 // js/dashboard/assessments.js
 // Handles fetching, rendering, filtering, and managing assessments. 
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -950,20 +1099,22 @@ function renderRecentAssessments() {
         const riskColors = {
             low: 'bg-green-500',
             medium: 'bg-yellow-500',
-            high: 'bg-red-500',
-            critical: 'bg-purple-500'
+            high: 'bg-orange-500',
+            critical: 'bg-red-500' // Changed from purple to red
         };
         const riskColor = riskColors[assessment.risk_level?.toLowerCase()] || 'bg-gray-500';
-        const scoreColorClass = assessment.total_score >= 75 ? 'risk-critical' : assessment.total_score >= 50 ? 'risk-high' : assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
+        const scoreColorClass = assessment.total_score >= 80 ? 'risk-critical' : assessment.total_score >= 60 ? 'risk-high' : assessment.total_score >= 35 ? 'risk-medium' : 'risk-low'; // Aligned with AI_Risk_Framework.md Low (0-34)
+        const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+        const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
         return `
             <div class="dashboard-summary-assessments__item">
                 <div class="dashboard-summary-assessments__content">
                     <div class="dashboard-assessment-icon">
                         <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
-                        <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
+                        <div class="dashboard-assessment-risk-indicator ${assessment.risk_level?.toLowerCase()}"></div>
                     </div>
                     <div class="dashboard-summary-assessments__info">
-                        <div class="dashboard-summary-assessments__name">${assessment.name}</div>
+                        <div class="dashboard-summary-assessments__name">${fullToolName}</div>
                         <div class="dashboard-summary-assessments__meta">
                             <span>${date}</span>
                             <span class="dashboard-assessment-meta-divider">\u{2022}</span>
@@ -1019,6 +1170,8 @@ function renderAssessmentList() {
         const canDelete = (0, _authJs.getIsAdmin)() || user && assessment.user_id === user.id;
         const isExpanded = expandedAssessmentId === assessment.id;
         const formData = assessment.assessment_data?.formData || {};
+        const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+        const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
         return `
             <div class="assessments-page__list-item assessments-page__list-item--clickable" data-assessment-id="${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
@@ -1026,7 +1179,7 @@ function renderAssessmentList() {
                         <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
                     </button>
                     <div class="assessments-page__tool-info">
-                        <h4>${assessment.name}</h4>
+                        <h4>${fullToolName}</h4>
                         <p>${formData.toolCategory || assessment.category || 'General'}</p>
                     </div>
                 </div>
@@ -1156,43 +1309,74 @@ function renderAssessmentCompliance(assessment) {
         const formData = data.formData || {};
         const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
         // Access compliance data from multiple possible paths
-        const complianceData = assessment.compliance || data.compliance || {};
-        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
+        const complianceData = assessment.compliance || data.compliance || {}; // Keep for fallback/other uses if needed
+        const complianceCertificationsObject = assessment.compliance_certifications || data.compliance_certifications || {};
         console.log('Compliance Data:', {
             complianceData,
-            complianceCertifications,
+            complianceCertificationsObject,
             assessmentData: data
         });
-        // Defensive checks to prevent .join() errors
-        let complianceIcons = '';
-        // Handle compliance data as an object
-        if (complianceData && typeof complianceData === 'object') {
-            const complianceEntries = Object.entries(complianceData);
-            console.log('Compliance Entries:', complianceEntries);
-            if (complianceEntries.length > 0) complianceIcons = complianceEntries.map(([key, status])=>{
-                const icon = status === 'compliant' || status === true ? '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
-                return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
+        let certificationsHtml = '';
+        if (complianceCertificationsObject && typeof complianceCertificationsObject === 'object') {
+            const certEntries = Object.entries(complianceCertificationsObject);
+            if (certEntries.length > 0) certificationsHtml = certEntries.map(([certName, certDetails])=>{
+                const status = certDetails.status || 'N/A';
+                const details = certDetails.details || 'No details provided.';
+                const evidence = certDetails.evidence || 'No evidence provided.';
+                const limitations = certDetails.limitations || 'None';
+                const lastVerified = certDetails.last_verified || 'N/A';
+                let statusIcon = '';
+                let statusClass = '';
+                switch(status.toLowerCase()){
+                    case 'compliant':
+                    case 'type ii':
+                        statusIcon = '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>';
+                        statusClass = '--compliant';
+                        break;
+                    case 'conditionally compliant':
+                        statusIcon = '<i data-lucide="alert-triangle" class="assessments-page__compliance-icon assessments-page__compliance-icon--conditional"></i>';
+                        statusClass = '--conditional';
+                        break;
+                    case 'no':
+                        statusIcon = '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
+                        statusClass = '--noncompliant';
+                        break;
+                    case 'not applicable':
+                        statusIcon = '<i data-lucide="info" class="assessments-page__compliance-icon assessments-page__compliance-icon--na"></i>';
+                        statusClass = '--na';
+                        break;
+                    default:
+                        statusIcon = '<i data-lucide="help-circle" class="assessments-page__compliance-icon"></i>';
+                        break;
+                }
+                return `
+                        <div class="assessments-page__compliance-card">
+                            <div class="assessments-page__compliance-card-header">
+                                ${statusIcon}
+                                <h5 class="assessments-page__compliance-card-title">${certName.toUpperCase()}</h5>
+                                <span class="assessments-page__compliance-card-status assessments-page__compliance-card-status${statusClass}">${status}</span>
+                            </div>
+                            <div class="assessments-page__compliance-card-body">
+                                <p><strong>Details:</strong> ${details}</p>
+                                <p><strong>Evidence:</strong> ${evidence}</p>
+                                <p><strong>Limitations:</strong> ${limitations}</p>
+                                <p><strong>Last Verified:</strong> ${lastVerified}</p>
+                            </div>
+                        </div>
+                    `;
             }).join('');
         }
-        // Fallback to certifications if no compliance data
-        const safeComplianceCerts = Array.isArray(complianceCertifications) ? complianceCertifications : [];
-        if (!complianceIcons && safeComplianceCerts.length > 0) complianceIcons = safeComplianceCerts.map((cert)=>`<div class="assessments-page__compliance-item">
-                    <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
-                    <span>${String(cert).toUpperCase()}</span>
-                </div>`).join('');
-        // Final fallback
-        if (!complianceIcons) complianceIcons = '<p>No compliance data available</p>';
-        const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
-        // Defensive check for compliance certifications
-        const complianceCerts = Array.isArray(assessment.compliance_certifications) ? assessment.compliance_certifications.map((cert)=>String(cert)).join(', ') : Array.isArray(data.compliance_certifications) ? data.compliance_certifications.map((cert)=>String(cert)).join(', ') : 'No certifications specified';
+        // Fallback if no detailed certifications object
+        if (!certificationsHtml) certificationsHtml = '<p>No detailed compliance data available.</p>';
+        // Explicitly get compliance_summary from the correct nested path
+        const complianceSummary = assessment.assessment_data?.detailedAssessment?.compliance_summary || 'No compliance summary available';
         return `
             <div class="assessments-page__compliance-grid">
-                ${complianceIcons}
+                ${certificationsHtml}
             </div>
             <div class="assessments-page__compliance-summary">
-                <p><strong>Data Classification:</strong> ${formData.dataClassification || assessment.data_classification || 'Not specified'}</p>
+                <p><strong>Documentation Tier:</strong> ${assessment.documentation_tier || 'Not specified'}</p>
                 <p><strong>Use Case:</strong> ${formData.useCase || assessment.primary_use_case || 'Not specified'}</p>
-                <p><strong>Certifications:</strong> ${complianceCerts}</p>
                 <p><strong>Summary:</strong> ${complianceSummary}</p>
             </div>
         `;
@@ -1452,6 +1636,8 @@ const clearAllFilters = clearAllFiltersLegacy;
 function renderAssessmentItem(assessment) {
     const riskLevelClass = getRiskLevelClass(assessment.total_score);
     const riskLevelText = getRiskLevelText(assessment.total_score);
+    const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+    const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
     return `
         <div class="dashboard-summary-assessments__item">
             <div class="dashboard-summary-assessments__item-content">
@@ -1459,7 +1645,7 @@ function renderAssessmentItem(assessment) {
                     <i data-lucide="${getToolIcon(assessment.category)}" class="w-5 h-5"></i>
                 </div>
                 <div class="dashboard-summary-assessments__item-info">
-                    <h3 class="dashboard-summary-assessments__item-name">${assessment.name}</h3>
+                    <h3 class="dashboard-summary-assessments__item-name">${fullToolName}</h3>
                     <p class="dashboard-summary-assessments__item-category">${assessment.category || 'General'}</p>
                 </div>
             </div>
@@ -1528,6 +1714,8 @@ function renderFilteredAssessments(filteredData) {
             const canDelete = typeof (0, _authJs.getIsAdmin) === 'function' && (0, _authJs.getIsAdmin)() || user && assessment.user_id === user.id;
             const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
             const formData = assessment.assessment_data?.formData || {};
+            const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+            const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
             // Check if we're rendering for the new dashboard grid or old list
             if (container.classList.contains('assessment-grid')) // New dashboard grid format
             return `
@@ -1554,7 +1742,7 @@ function renderFilteredAssessments(filteredData) {
                     <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                         <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                             <div class="assessments-page__tool-info">
-                                <h4>${assessment.name}</h4>
+                                <h4>${fullToolName}</h4>
                                 <p>${formData.toolCategory || assessment.category || 'General'}</p>
                             </div>
                         </div>
@@ -2165,8 +2353,7 @@ function renderSummaryCards() {
     document.getElementById('compare-summary-high').innerHTML = `<div class="compare-tools__summary-label">High Risk</div><div class="compare-tools__summary-value">${high}</div>`;
     document.getElementById('compare-summary-medium').innerHTML = `<div class="compare-tools__summary-label">Medium Risk</div><div class="compare-tools__summary-value">${medium}</div>`;
     document.getElementById('compare-summary-low').innerHTML = `<div class="compare-tools__summary-label">Low Risk</div><div class="compare-tools__summary-value">${low}</div>`;
-// Optionally add critical if you want to display it
-// document.getElementById('compare-summary-critical').innerHTML = `<div class="compare-tools__summary-label">Critical Risk</div><div class="compare-tools__summary-value">${critical}</div>`;
+    document.getElementById('compare-summary-critical').innerHTML = `<div class="compare-tools__summary-label">Critical Risk</div><div class="compare-tools__summary-value">${critical}</div>`;
 }
 function renderSelectedTags() {
     const container = document.getElementById('compare-selected-tags');
@@ -2194,8 +2381,8 @@ function renderTable() {
         const detailedAssessment = ad.detailedAssessment || {};
         const recommendations = ad.recommendations || [];
         const isExpanded = expandedToolId === tool.id;
-        // Compliance info
-        const complianceCerts = (tool.compliance_certifications || []).join(', ') || '-';
+        // Compliance info (ensure they are strings)
+        const complianceCerts = Array.isArray(tool.compliance_certifications) ? tool.compliance_certifications.map(String).join(', ') : '-';
         const complianceSummary = ad.compliance_summary || detailedAssessment.compliance_summary || '-';
         // Recommendations
         const recs = recommendations.map((r)=>`
@@ -2208,15 +2395,15 @@ function renderTable() {
                 </div>
             </div>
         `).join('') || '<p>No recommendations available</p>';
-        // Detailed Breakdown
-        const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail])=>{
+        // Detailed Breakdown (ensure assessment_details is an object)
+        const detailsHTML = (typeof detailedAssessment.assessment_details === 'object' && detailedAssessment.assessment_details !== null ? Object.entries(detailedAssessment.assessment_details) : []).map(([key, detail])=>{
             const categoryScore = detail.category_score || 0;
             return `
                 <div class="compare-tools__detail-card">
                     <h5 class="compare-tools__detail-title">${key.replace(/_/g, ' ').replace(/\b\w/g, (char)=>char.toUpperCase())}</h5>
                     <div class="compare-tools__detail-score">Score: ${categoryScore}</div>
                     <div class="compare-tools__detail-content">
-                        ${Object.entries(detail.criteria || {}).map(([critKey, crit])=>`
+                        ${(typeof detail.criteria === 'object' && detail.criteria !== null ? Object.entries(detail.criteria) : []).map(([critKey, crit])=>`
                             <div class="compare-tools__detail-item">
                                 <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, (char)=>char.toUpperCase())}:</strong> ${crit.score} - ${crit.justification}
                             </div>
@@ -2226,17 +2413,16 @@ function renderTable() {
             `;
         }).join('') || '<p>No detailed assessment available</p>';
         // Compliance Icons (adapt from example)
-        const complianceIcons = Object.entries(tool.compliance || {}).map(([key, status])=>{
+        const complianceIcons = (typeof tool.compliance === 'object' && tool.compliance !== null ? Object.entries(tool.compliance) : []).map(([key, status])=>{
             const icon = status === 'compliant' ? '<i data-lucide="check-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--noncompliant"></i>';
             return `<div class="compare-tools__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
         }).join('') || '<p>No compliance data</p>';
-        // Score values
-        const dataStorage = scores.dataStorage ?? '-';
-        const trainingUsage = scores.trainingUsage ?? '-';
-        const accessControls = scores.accessControls ?? '-';
-        const complianceRisk = scores.complianceRisk ?? '-';
-        const vendorTransparency = scores.vendorTransparency ?? '-';
-        const compliance = tool.compliance ?? '-';
+        // Score values - Accessing from top-level `tool` object
+        const dataStorage = tool.data_storage_score ?? '-';
+        const trainingUsage = tool.training_usage_score ?? '-';
+        const accessControls = tool.access_controls_score ?? '-';
+        const complianceRisk = tool.compliance_score ?? '-';
+        const vendorTransparency = tool.vendor_transparency_score ?? '-';
         const totalScore = tool.total_score || ad.finalScore || 0;
         const risk = (0, _scoringJs.getRiskLevel)(totalScore);
         return `
@@ -2260,10 +2446,10 @@ function renderTable() {
             <td><span class="compare-tools__score">${accessControls}</span></td>
             <td><span class="compare-tools__score">${complianceRisk}</span></td>
             <td><span class="compare-tools__score">${vendorTransparency}</span></td>
-            <td><span class="compare-tools__score">${compliance}</span></td>
+            <!-- Removed Compliance Column -->
         </tr>
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
-            <td colspan="9">
+            <td colspan="8"> <!-- Changed colspan from 9 to 8 -->
                 <div class="compare-tools__details">
                     <div class="compare-tools__tabs">
                         <button class="compare-tools__tab compare-tools__tab--active" data-tab="details" data-tool-id="${tool.id}">
@@ -2297,8 +2483,11 @@ function renderTable() {
                             <div class="compare-tools__compliance-grid">
                                 ${complianceIcons}
                             </div>
+                            <!-- Display detailed compliance summary -->
                             <div class="compare-tools__compliance-summary">
-                                <p><strong>Certifications:</strong> ${complianceCerts}</p>
+                                <p><strong>Data Classification:</strong> ${tool.data_classification || 'Not specified'}</p>
+                                <p><strong>Use Case:</strong> ${tool.primary_use_case || 'Not specified'}</p>
+                                <p><strong>Documentation Tier:</strong> ${tool.documentation_tier || 'Not specified'}</p>
                                 <p><strong>Summary:</strong> ${complianceSummary}</p>
                             </div>
                         </div>
@@ -2711,14 +2900,110 @@ function applyClientSideMultipliers(dbData, formData) {
     baseScores.accessControls = Math.round(baseScores.accessControls * useCaseMultiplier);
     const totalScore = Object.values(baseScores).reduce((sum, score)=>sum + score, 0);
     // Return a structure that mimics the original toolData object for consistency
+    const updatedDetailedAssessment = {
+        ...dbData.detailed_assessment || {},
+        final_risk_score: totalScore,
+        final_risk_category: getRiskLevel(totalScore),
+        final_score_with_multiplier: totalScore,
+        assessment_details: {
+            ...dbData.detailed_assessment?.assessment_details || {},
+            data_storage_and_security: {
+                ...dbData.detailed_assessment?.assessment_details?.data_storage_and_security || {},
+                category_score: baseScores.dataStorage,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || 0;
+                    const newCategoryScore = baseScores.dataStorage;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            training_data_usage: {
+                ...dbData.detailed_assessment?.assessment_details?.training_data_usage || {},
+                category_score: baseScores.trainingUsage,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.training_data_usage?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.training_data_usage?.category_score || 0;
+                    const newCategoryScore = baseScores.trainingUsage;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            access_controls: {
+                ...dbData.detailed_assessment?.assessment_details?.access_controls || {},
+                category_score: baseScores.accessControls,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.access_controls?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.access_controls?.category_score || 0;
+                    const newCategoryScore = baseScores.accessControls;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            compliance_and_legal_risk: {
+                ...dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk || {},
+                category_score: baseScores.complianceRisk,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || 0;
+                    const newCategoryScore = baseScores.complianceRisk;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            vendor_transparency: {
+                ...dbData.detailed_assessment?.assessment_details?.vendor_transparency || {},
+                category_score: baseScores.vendorTransparency,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || 0;
+                    const newCategoryScore = baseScores.vendorTransparency;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            }
+        }
+    };
     return {
         ...dbData,
         total_score: totalScore,
+        risk_level: getRiskLevel(totalScore),
         compliance_certifications: dbData.compliance_certifications || [],
         breakdown: {
             ...dbData.breakdown,
             scores: baseScores
-        }
+        },
+        detailed_assessment: updatedDetailedAssessment
     };
 }
 function getRiskLevel(score) {

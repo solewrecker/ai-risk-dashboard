@@ -2,6 +2,10 @@
 
 import { supabase } from '../supabase-client.js';
 import { prepareReportData } from './export/report-generation.js';
+import { ScalableThemeSystem } from './export/themeSystem.js';
+import { themes } from './export/themes/themeConfig.js';
+import ThemeConnector from './export/themeConnector.js';
+import ThemeMarketplace from './export/themeMarketplace.js';
 
 // --- State ---
 let allAssessments = [];
@@ -89,9 +93,10 @@ async function init() {
         handleAuthError('No active user session. Please log in.');
     }
 
-    // Initialize tab navigation and theme gallery
+    // Initialize tab navigation and theme marketplace
     initializeTabNavigation();
-    initializeThemeGallery();
+    initializeThemeMarketplace();
+    setupThemeChangeListener();
     
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
@@ -153,154 +158,40 @@ function initializeTabNavigation() {
     });
 }
 
-// Initialize theme gallery
-function initializeThemeGallery() {
-    const themeCards = document.querySelectorAll('.theme-card');
-    const previewMock = document.getElementById('theme-preview-mock');
-    const currentThemeName = document.getElementById('current-theme-name');
-    const applyThemeBtn = document.getElementById('apply-theme-btn');
-    const previewWithThemeBtn = document.getElementById('preview-with-theme-btn');
-
-    // Theme configurations for preview updates
-    const themeConfigs = {
-        'theme-professional': {
-            name: 'Professional Theme',
-            headerColor: '#1e40af',
-            scoreColor: '#1e40af',
-            scoreBg: '#eff6ff'
-        },
-        'theme-executive': {
-            name: 'Executive Theme',
-            headerColor: '#1e3a8a',
-            scoreColor: '#1e3a8a',
-            scoreBg: '#eff6ff'
-        },
-        'theme-modern': {
-            name: 'Modern Theme',
-            headerColor: '#7c3aed',
-            scoreColor: '#7c3aed',
-            scoreBg: '#f3e8ff'
-        },
-        'theme-dark': {
-            name: 'Dark Theme',
-            headerColor: '#111827',
-            scoreColor: '#a855f7',
-            scoreBg: '#1f2937'
-        },
-        'theme-default': {
-            name: 'Default Theme',
-            headerColor: '#3b82f6',
-            scoreColor: '#3b82f6',
-            scoreBg: '#eff6ff'
-        }
-    };
-
-    // Handle theme card selection
-    themeCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const themeId = card.dataset.theme;
-            
-            // Update selected state
-            themeCards.forEach(c => c.classList.remove('theme-card--selected'));
-            card.classList.add('theme-card--selected');
-
-            // Update global selected theme
-            selectedTheme = themeId;
-
-            // Update live preview
-            updateThemePreview(themeId, themeConfigs[themeId]);
-        });
+// Theme change event listener
+function setupThemeChangeListener() {
+    // Update the selected theme variable when a theme is selected
+    window.addEventListener('themeChanged', (e) => {
+        console.log(`Switched to theme: ${e.detail.themeName}`);
+        selectedTheme = e.detail.themeName;
     });
-
-    // Apply theme button
-    if (applyThemeBtn) {
-        applyThemeBtn.addEventListener('click', () => {
-            // Switch to configure tab
-            const configureTab = document.getElementById('configure-tab');
-            if (configureTab) {
-                configureTab.click();
-            }
-            
-            // Show success message or update UI to indicate theme applied
-            showThemeAppliedMessage();
-        });
-    }
-
-    // Preview with theme button
-    if (previewWithThemeBtn) {
-        previewWithThemeBtn.addEventListener('click', () => {
-            // Generate preview with selected theme
-            generatePreview();
-        });
-    }
-
-    // Initialize with default theme
-    updateThemePreview('theme-professional', themeConfigs['theme-professional']);
 }
 
-// Update theme preview mock
-function updateThemePreview(themeId, config) {
-    const previewMock = document.getElementById('theme-preview-mock');
-    const currentThemeName = document.getElementById('current-theme-name');
-    const selectedThemeName = document.getElementById('selected-theme-name');
+// Initialize theme marketplace
+function initializeThemeMarketplace() {
+    // Create a new ThemeMarketplace instance
+    const themeMarketplace = new ThemeMarketplace();
     
-    if (!config) return;
-
-    // Update theme name in both locations
-    if (currentThemeName) {
-        currentThemeName.textContent = config.name;
-    }
-    if (selectedThemeName) {
-        selectedThemeName.textContent = config.name;
-    }
-
-    // Update preview mock colors
-    if (previewMock) {
-        const header = previewMock.querySelector('.theme-preview-mock__header');
-        const score = previewMock.querySelector('.theme-preview-mock__score');
-        
-        if (header) {
-            header.style.backgroundColor = config.headerColor;
-        }
-        
-        if (score) {
-            score.style.color = config.scoreColor;
-            score.style.backgroundColor = config.scoreBg;
+    // Store the ThemeMarketplace instance globally for access in other functions
+    window.themeMarketplace = themeMarketplace;
+    
+    // Enable the marketplace tab
+    const marketplaceTab = document.getElementById('marketplace-tab');
+    if (marketplaceTab) {
+        marketplaceTab.classList.remove('export-nav__tab--disabled');
+        const badge = marketplaceTab.querySelector('.export-nav__badge');
+        if (badge) {
+            badge.remove();
         }
     }
+    
+    // Add event listener to initialize marketplace when tab is clicked
+    marketplaceTab.addEventListener('click', () => {
+        themeMarketplace.initMarketplace();
+    });
 }
 
-// Show theme applied message
-function showThemeAppliedMessage() {
-    // Create a temporary notification
-    const notification = document.createElement('div');
-    notification.className = 'theme-applied-notification';
-    notification.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            font-weight: 500;
-        ">
-            ✓ Theme applied successfully!
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 3000);
-}
+// The updateThemePreview function is now handled by the ThemeConnector class
 
 function handleAuthError(message) {
     console.log('handleAuthError:', message);
@@ -431,7 +322,20 @@ function setupEventListeners() {
     });
 
     // Generate button
-    previewReportBtn.addEventListener('click', () => prepareReportData(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections, selectedTheme));
+    previewReportBtn.addEventListener('click', async () => {
+        if (selectedAssessmentIds.size === 0) {
+            alert('Please select at least one assessment to generate a report.');
+            return;
+        }
+
+        // For simplicity, we'll use the first selected assessment ID for the preview.
+        // In a real-world scenario, you might handle multiple selections differently.
+        const assessmentId = selectedAssessmentIds.values().next().value;
+
+        // Open the preview page with the assessment ID in the URL
+        // Use the correct path to report-preview.html (not in dist folder)
+        window.open(`dist/report-preview.html?assessmentId=${assessmentId}`, '_blank');
+    });
 
     // Mix-and-match sections selection
     mixMatchSelector.addEventListener('change', (e) => {

@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme Marketplace - AI Tool Risk Framework</title>
+  <link rel="stylesheet" href="./dist/export.ff053ac9.css">
+  <style>
+    :root {
+      --color-primary: #0066cc;
+      --color-primary-light: #e6f0fa;
+      --color-secondary: #ff6600;
+      --color-text: #333333;
+      --color-text-light: #666666;
+      --color-background: #ffffff;
+      --color-background-alt: #f5f5f5;
+      --color-border: #dddddd;
+      --color-border-light: #eeeeee;
+      --color-success: #00aa00;
+      --color-warning: #ffaa00;
+      --color-error: #cc0000;
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      --font-size-base: 16px;
+      --spacing-unit: 8px;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+      color: var(--color-text);
+      background-color: var(--color-background);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: calc(var(--spacing-unit) * 3);
+    }
+    
+    header {
+      background-color: var(--color-primary);
+      color: white;
+      padding: calc(var(--spacing-unit) * 4) 0;
+    }
+    
+    header .container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+    
+    header p {
+      margin: calc(var(--spacing-unit) * 2) 0 0;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    nav {
+      background-color: var(--color-background-alt);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      overflow-x: auto;
+    }
+    
+    nav li {
+      margin: 0;
+    }
+    
+    nav a {
+      display: block;
+      padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+      color: var(--color-text);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    nav a:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    nav a.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    
+    main {
+      padding: calc(var(--spacing-unit) * 4) 0;
+    }
+    
+    section {
+      margin-bottom: calc(var(--spacing-unit) * 6);
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      margin: 0 0 calc(var(--spacing-unit) * 3);
+      padding-bottom: calc(var(--spacing-unit) * 1);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    h3 {
+      font-size: 1.4rem;
+      margin: calc(var(--spacing-unit) * 4) 0 calc(var(--spacing-unit) * 2);
+    }
+    
+    h4 {
+      font-size: 1.2rem;
+      margin: calc(var(--spacing-unit) * 3) 0 calc(var(--spacing-unit) * 1);
+    }
+    
+    p {
+      margin: 0 0 calc(var(--spacing-unit) * 2);
+    }
+    
+    .search-bar {
+      display: flex;
+      margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+    
+    .search-bar input {
+      flex-grow: 1;
+      padding: calc(var(--spacing-unit) * 1.5);
+      border: 1px solid var(--color-border);
+      border-radius: 4px 0 0 4px;
+      font-size: 1rem;
+    }
+    
+    .search-bar button {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s ease;
+    }
+    
+    .search-bar button:hover {
+      background-color: #0055aa;
+    }
+    
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: calc(var(--spacing-unit) * 0.5);
+    }
+    
+    .filter-group select {
+      padding: calc(var(--spacing-unit) * 1);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      background-color: var(--color-background);
+      min-width: 150px;
+    }
+    
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-card {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      background-color: var(--color-background);
+    }
+    
+    .theme-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .theme-preview {
+      height: 200px;
+      background-color: var(--color-background-alt);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .theme-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .theme-card:hover .theme-preview img {
+      transform: scale(1.05);
+    }
+    
+    .theme-badge {
+      position: absolute;
+      top: calc(var(--spacing-unit) * 1);
+      right: calc(var(--spacing-unit) * 1);
+      background-color: var(--color-primary);
+      color: white;
+      padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .theme-badge.premium {
+      background-color: var(--color-secondary);
+    }
+    
+    .theme-info {
+      padding: calc(var(--spacing-unit) * 2);
+    }
+    
+    .theme-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-author {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+      margin: 0 0 calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-description {
+      margin: 0 0 calc(var(--spacing-unit) * 2);
+      font-size: 0.95rem;
+      color: var(--color-text);
+    }
+    
+    .theme-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: calc(var(--spacing-unit) * 2);
+      padding-top: calc(var(--spacing-unit) * 2);
+      border-top: 1px solid var(--color-border-light);
+    }
+    
+    .theme-rating {
+      display: flex;
+      align-items: center;
+    }
+    
+    .theme-rating-stars {
+      color: #ffaa00;
+      margin-right: calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-rating-count {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+    
+    .theme-price {
+      font-weight: 600;
+    }
+    
+    .theme-price.free {
+      color: var(--color-success);
+    }
+    
+    .theme-actions {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 1);
+      margin-top: calc(var(--spacing-unit) * 2);
+    }
+    
+    .theme-button {
+      flex: 1;
+      padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 2);
+      border-radius: 4px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    
+    .theme-button-primary {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+    }
+    
+    .theme-button-primary:hover {
+      background-color: #0055aa;
+    }
+    
+    .theme-button-secondary {
+      background-color: var(--color-background);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+    }
+    
+    .theme-button-secondary:hover {
+      background-color: var(--color-primary-light);
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: calc(var(--spacing-unit) * 6);
+    }
+    
+    .pagination-item {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      margin: 0 calc(var(--spacing-unit) * 0.5);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: var(--color-text);
+    }
+    
+    .pagination-item:hover {
+      background-color: var(--color-background-alt);
+    }
+    
+    .pagination-item.active {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    
+    .theme-detail-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .theme-detail-content {
+      background-color: var(--color-background);
+      margin: 50px auto;
+      max-width: 900px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .theme-detail-header {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    
+    .theme-detail-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .theme-detail-close {
+      position: absolute;
+      top: calc(var(--spacing-unit) * 2);
+      right: calc(var(--spacing-unit) * 2);
+      width: 40px;
+      height: 40px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .theme-detail-close:hover {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .theme-detail-body {
+      padding: calc(var(--spacing-unit) * 4);
+    }
+    
+    .theme-detail-title {
+      font-size: 2rem;
+      margin: 0 0 calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-detail-author {
+      color: var(--color-text-light);
+      margin: 0 0 calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-detail-meta {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 4);
+      margin-bottom: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-detail-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .theme-detail-meta-label {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      margin-bottom: calc(var(--spacing-unit) * 0.5);
+    }
+    
+    .theme-detail-meta-value {
+      font-weight: 600;
+    }
+    
+    .theme-detail-description {
+      margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+    
+    .theme-detail-tabs {
+      margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+    
+    .theme-detail-tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-detail-tab {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .theme-detail-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    
+    .theme-detail-tab-content {
+      display: none;
+    }
+    
+    .theme-detail-tab-content.active {
+      display: block;
+    }
+    
+    .theme-detail-actions {
+      display: flex;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-top: calc(var(--spacing-unit) * 4);
+    }
+    
+    .theme-detail-button {
+      padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+      border-radius: 4px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    
+    .theme-detail-button-primary {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      flex: 1;
+    }
+    
+    .theme-detail-button-primary:hover {
+      background-color: #0055aa;
+    }
+    
+    .theme-detail-button-secondary {
+      background-color: var(--color-background);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+    }
+    
+    .theme-detail-button-secondary:hover {
+      background-color: var(--color-primary-light);
+    }
+    
+    .theme-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: calc(var(--spacing-unit) * 3);
+      margin-bottom: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-preview-item {
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .theme-preview-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .theme-colors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--spacing-unit) * 2);
+      margin-bottom: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-color {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .theme-color-swatch {
+      width: 60px;
+      height: 60px;
+      border-radius: 4px;
+      margin-bottom: calc(var(--spacing-unit) * 1);
+      border: 1px solid var(--color-border-light);
+    }
+    
+    .theme-color-name {
+      font-size: 0.8rem;
+      color: var(--color-text-light);
+    }
+    
+    .theme-reviews {
+      margin-top: calc(var(--spacing-unit) * 3);
+    }
+    
+    .theme-review {
+      padding: calc(var(--spacing-unit) * 2) 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    
+    .theme-review:last-child {
+      border-bottom: none;
+    }
+    
+    .theme-review-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-review-author {
+      font-weight: 600;
+    }
+    
+    .theme-review-date {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+    
+    .theme-review-rating {
+      color: #ffaa00;
+      margin-bottom: calc(var(--spacing-unit) * 1);
+    }
+    
+    .theme-review-content {
+      color: var(--color-text);
+    }
+    
+    .theme-upload-cta {
+      background-color: var(--color-primary-light);
+      border-radius: 8px;
+      padding: calc(var(--spacing-unit) * 4);
+      text-align: center;
+      margin-top: calc(var(--spacing-unit) * 6);
+    }
+    
+    .theme-upload-cta h3 {
+      margin-top: 0;
+      margin-bottom: calc(var(--spacing-unit) * 2);
+    }
+    
+    .theme-upload-cta p {
+      margin-bottom: calc(var(--spacing-unit) * 3);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    footer {
+      background-color: var(--color-background-alt);
+      border-top: 1px solid var(--color-border);
+      padding: calc(var(--spacing-unit) * 4) 0;
+      color: var(--color-text-light);
+    }
+    
+    @media (max-width: 768px) {
+      .theme-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+      
+      .theme-preview-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .theme-detail-meta {
+        flex-direction: column;
+        gap: calc(var(--spacing-unit) * 2);
+      }
+      
+      .theme-detail-content {
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Theme Marketplace</h1>
+      <p>Discover and install custom themes for your AI Tool Risk Framework reports</p>
+    </div>
+  </header>
+  
+  <nav>
+    <div class="container">
+      <ul>
+        <li><a href="./dist/index.html">Dashboard</a></li>
+        <li><a href="./dist/export.html">Reports</a></li>
+        <li><a href="./theme-developer-guide.html">Developer Guide</a></li>
+        <li><a href="./theme-marketplace.html" class="active">Marketplace</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <main>
+    <div class="container">
+      <section>
+        <div class="search-bar">
+          <input type="text" placeholder="Search themes..." id="theme-search">
+          <button>Search</button>
+        </div>
+        
+        <div class="filters">
+          <div class="filter-group">
+            <label for="category-filter">Category</label>
+            <select id="category-filter">
+              <option value="all">All Categories</option>
+              <option value="corporate">Corporate</option>
+              <option value="modern">Modern</option>
+              <option value="minimal">Minimal</option>
+              <option value="data-focused">Data-Focused</option>
+              <option value="accessible">Accessible</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="price-filter">Price</label>
+            <select id="price-filter">
+              <option value="all">All Prices</option>
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="sort-filter">Sort By</label>
+            <select id="sort-filter">
+              <option value="popular">Most Popular</option>
+              <option value="newest">Newest</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="theme-grid" id="theme-grid">
+          <!-- Theme 1 -->
+          <div class="theme-card" data-theme-id="corporate-blue">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/e6f0fa/0066cc?text=Corporate+Blue" alt="Corporate Blue Theme Preview">
+              <div class="theme-badge">Featured</div>
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Corporate Blue</h3>
+              <p class="theme-author">by Risk Framework Team</p>
+              <p class="theme-description">A professional theme designed for corporate risk reports with a clean blue color scheme.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★★</div>
+                  <div class="theme-rating-count">(42)</div>
+                </div>
+                <div class="theme-price free">Free</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="corporate-blue">Install</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="corporate-blue">Preview</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme 2 -->
+          <div class="theme-card" data-theme-id="modern-dark">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/333333/ffffff?text=Modern+Dark" alt="Modern Dark Theme Preview">
+              <div class="theme-badge premium">Premium</div>
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Modern Dark</h3>
+              <p class="theme-author">by Design Solutions</p>
+              <p class="theme-description">A sleek dark theme with high contrast and modern design elements for impactful presentations.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★☆</div>
+                  <div class="theme-rating-count">(28)</div>
+                </div>
+                <div class="theme-price">$19.99</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="modern-dark">Purchase</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="modern-dark">Preview</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme 3 -->
+          <div class="theme-card" data-theme-id="minimal-light">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/ffffff/333333?text=Minimal+Light" alt="Minimal Light Theme Preview">
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Minimal Light</h3>
+              <p class="theme-author">by Minimalist Designs</p>
+              <p class="theme-description">A clean, minimalist theme that puts the focus on your data and analysis.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★★</div>
+                  <div class="theme-rating-count">(36)</div>
+                </div>
+                <div class="theme-price free">Free</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="minimal-light">Install</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="minimal-light">Preview</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme 4 -->
+          <div class="theme-card" data-theme-id="data-viz">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/f0f8ff/0077cc?text=Data+Visualization" alt="Data Visualization Theme Preview">
+              <div class="theme-badge premium">Premium</div>
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Data Visualization</h3>
+              <p class="theme-author">by Data Insights Co.</p>
+              <p class="theme-description">Optimized for data-heavy reports with enhanced chart styles and visualization components.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★☆</div>
+                  <div class="theme-rating-count">(19)</div>
+                </div>
+                <div class="theme-price">$24.99</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="data-viz">Purchase</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="data-viz">Preview</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme 5 -->
+          <div class="theme-card" data-theme-id="accessible-theme">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/f5f5f5/000066?text=Accessible+Theme" alt="Accessible Theme Preview">
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Accessible Theme</h3>
+              <p class="theme-author">by Inclusive Design</p>
+              <p class="theme-description">WCAG 2.1 AA compliant theme with high contrast options and screen reader optimizations.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★★</div>
+                  <div class="theme-rating-count">(24)</div>
+                </div>
+                <div class="theme-price free">Free</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="accessible-theme">Install</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="accessible-theme">Preview</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme 6 -->
+          <div class="theme-card" data-theme-id="executive-summary">
+            <div class="theme-preview">
+              <img src="https://via.placeholder.com/300x200/000033/ffffff?text=Executive+Summary" alt="Executive Summary Theme Preview">
+              <div class="theme-badge premium">Premium</div>
+            </div>
+            <div class="theme-info">
+              <h3 class="theme-name">Executive Summary</h3>
+              <p class="theme-author">by C-Suite Designs</p>
+              <p class="theme-description">Designed for executive presentations with emphasis on key metrics and insights.</p>
+              <div class="theme-meta">
+                <div class="theme-rating">
+                  <div class="theme-rating-stars">★★★★☆</div>
+                  <div class="theme-rating-count">(15)</div>
+                </div>
+                <div class="theme-price">$29.99</div>
+              </div>
+              <div class="theme-actions">
+                <button class="theme-button theme-button-primary theme-install-btn" data-theme-id="executive-summary">Purchase</button>
+                <button class="theme-button theme-button-secondary theme-preview-btn" data-theme-id="executive-summary">Preview</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pagination">
+          <a href="#" class="pagination-item active">1</a>
+          <a href="#" class="pagination-item">2</a>
+          <a href="#" class="pagination-item">3</a>
+          <a href="#" class="pagination-item">→</a>
+        </div>
+        
+        <div class="theme-upload-cta">
+          <h3>Create Your Own Theme</h3>
+          <p>Have a great design idea? Create and publish your own theme to the marketplace. Follow our developer guide to get started.</p>
+          <a href="./theme-developer-guide.html" class="theme-button theme-button-primary">Developer Guide</a>
+        </div>
+      </section>
+    </div>
+  </main>
+  
+  <!-- Theme Detail Modal -->
+  <div class="theme-detail-modal" id="theme-detail-modal">
+    <div class="theme-detail-content">
+      <div class="theme-detail-header">
+        <img src="https://via.placeholder.com/900x300/e6f0fa/0066cc?text=Corporate+Blue" alt="Theme Preview" id="modal-theme-image">
+        <div class="theme-detail-close" id="modal-close">×</div>
+      </div>
+      <div class="theme-detail-body">
+        <h2 class="theme-detail-title" id="modal-theme-title">Corporate Blue</h2>
+        <p class="theme-detail-author" id="modal-theme-author">by Risk Framework Team</p>
+        
+        <div class="theme-detail-meta">
+          <div class="theme-detail-meta-item">
+            <span class="theme-detail-meta-label">Version</span>
+            <span class="theme-detail-meta-value" id="modal-theme-version">1.2.0</span>
+          </div>
+          <div class="theme-detail-meta-item">
+            <span class="theme-detail-meta-label">Released</span>
+            <span class="theme-detail-meta-value" id="modal-theme-released">June 15, 2023</span>
+          </div>
+          <div class="theme-detail-meta-item">
+            <span class="theme-detail-meta-label">Downloads</span>
+            <span class="theme-detail-meta-value" id="modal-theme-downloads">1,245</span>
+          </div>
+          <div class="theme-detail-meta-item">
+            <span class="theme-detail-meta-label">Rating</span>
+            <span class="theme-detail-meta-value" id="modal-theme-rating">★★★★★ (42)</span>
+          </div>
+        </div>
+        
+        <div class="theme-detail-tabs">
+          <div class="theme-detail-tabs-nav">
+            <div class="theme-detail-tab active" data-tab="overview">Overview</div>
+            <div class="theme-detail-tab" data-tab="preview">Preview</div>
+            <div class="theme-detail-tab" data-tab="colors">Colors</div>
+            <div class="theme-detail-tab" data-tab="reviews">Reviews</div>
+          </div>
+          
+          <div class="theme-detail-tab-content active" id="overview">
+            <div class="theme-detail-description" id="modal-theme-description">
+              <p>A professional theme designed for corporate risk reports with a clean blue color scheme. This theme is perfect for organizations that need to present risk data in a clear, professional manner.</p>
+              <p>Features:</p>
+              <ul>
+                <li>Clean, professional design</li>
+                <li>Optimized for readability</li>
+                <li>Enhanced data visualization styles</li>
+                <li>Print-friendly layouts</li>
+                <li>Accessible color scheme</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="theme-detail-tab-content" id="preview">
+            <div class="theme-preview-grid">
+              <div class="theme-preview-item">
+                <img src="https://via.placeholder.com/600x400/e6f0fa/0066cc?text=Dashboard+Preview" alt="Dashboard Preview">
+              </div>
+              <div class="theme-preview-item">
+                <img src="https://via.placeholder.com/600x400/e6f0fa/0066cc?text=Report+Preview" alt="Report Preview">
+              </div>
+              <div class="theme-preview-item">
+                <img src="https://via.placeholder.com/600x400/e6f0fa/0066cc?text=Risk+Matrix+Preview" alt="Risk Matrix Preview">
+              </div>
+              <div class="theme-preview-item">
+                <img src="https://via.placeholder.com/600x400/e6f0fa/0066cc?text=Data+Tables+Preview" alt="Data Tables Preview">
+              </div>
+            </div>
+          </div>
+          
+          <div class="theme-detail-tab-content" id="colors">
+            <div class="theme-colors">
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #0066cc;"></div>
+                <div class="theme-color-name">Primary</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #e6f0fa;"></div>
+                <div class="theme-color-name">Primary Light</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #ff6600;"></div>
+                <div class="theme-color-name">Secondary</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #333333;"></div>
+                <div class="theme-color-name">Text</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #ffffff;"></div>
+                <div class="theme-color-name">Background</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #f5f5f5;"></div>
+                <div class="theme-color-name">Background Alt</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #dddddd;"></div>
+                <div class="theme-color-name">Border</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #00aa00;"></div>
+                <div class="theme-color-name">Success</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #ffaa00;"></div>
+                <div class="theme-color-name">Warning</div>
+              </div>
+              <div class="theme-color">
+                <div class="theme-color-swatch" style="background-color: #cc0000;"></div>
+                <div class="theme-color-name">Error</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="theme-detail-tab-content" id="reviews">
+            <div class="theme-reviews">
+              <div class="theme-review">
+                <div class="theme-review-header">
+                  <div class="theme-review-author">John Smith</div>
+                  <div class="theme-review-date">July 10, 2023</div>
+                </div>
+                <div class="theme-review-rating">★★★★★</div>
+                <div class="theme-review-content">
+                  <p>Excellent theme! Clean design and very professional looking. Our executive team loved the reports generated with this theme.</p>
+                </div>
+              </div>
+              
+              <div class="theme-review">
+                <div class="theme-review-header">
+                  <div class="theme-review-author">Sarah Johnson</div>
+                  <div class="theme-review-date">June 28, 2023</div>
+                </div>
+                <div class="theme-review-rating">★★★★☆</div>
+                <div class="theme-review-content">
+                  <p>Very good theme overall. The color scheme works well for our brand. Would like to see more chart customization options in future updates.</p>
+                </div>
+              </div>
+              
+              <div class="theme-review">
+                <div class="theme-review-header">
+                  <div class="theme-review-author">Michael Chen</div>
+                  <div class="theme-review-date">June 15, 2023</div>
+                </div>
+                <div class="theme-review-rating">★★★★★</div>
+                <div class="theme-review-content">
+                  <p>Perfect for our risk assessment reports. The data visualization styles are particularly well done. Highly recommended!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="theme-detail-actions">
+          <button class="theme-detail-button theme-detail-button-primary" id="modal-install-btn">Install Theme</button>
+          <button class="theme-detail-button theme-detail-button-secondary">View Documentation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <div class="container">
+      <p>AI Tool Risk Framework Report System - Theme Marketplace</p>
+      <p>&copy; 2023 AI Tool Risk Framework. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme Preview Buttons
+      const previewButtons = document.querySelectorAll('.theme-preview-btn');
+      const modal = document.getElementById('theme-detail-modal');
+      const modalClose = document.getElementById('modal-close');
+      const modalThemeTitle = document.getElementById('modal-theme-title');
+      const modalThemeAuthor = document.getElementById('modal-theme-author');
+      const modalThemeImage = document.getElementById('modal-theme-image');
+      
+      // Open modal when preview button is clicked
+      previewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const themeId = this.getAttribute('data-theme-id');
+          const themeCard = document.querySelector(`.theme-card[data-theme-id="${themeId}"]`);
+          const themeName = themeCard.querySelector('.theme-name').textContent;
+          const themeAuthor = themeCard.querySelector('.theme-author').textContent;
+          const themeImage = themeCard.querySelector('.theme-preview img').getAttribute('src');
+          
+          modalThemeTitle.textContent = themeName;
+          modalThemeAuthor.textContent = themeAuthor;
+          modalThemeImage.setAttribute('src', themeImage.replace('300x200', '900x300'));
+          
+          modal.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        });
+      });
+      
+      // Close modal
+      modalClose.addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      });
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      });
+      
+      // Tab functionality in modal
+      const tabs = document.querySelectorAll('.theme-detail-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and content
+          document.querySelectorAll('.theme-detail-tab').forEach(t => {
+            t.classList.remove('active');
+          });
+          document.querySelectorAll('.theme-detail-tab-content').forEach(c => {
+            c.classList.remove('active');
+          });
+          
+          // Add active class to current tab and content
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Theme installation functionality
+      const installButtons = document.querySelectorAll('.theme-install-btn');
+      installButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const themeId = this.getAttribute('data-theme-id');
+          const themeName = document.querySelector(`.theme-card[data-theme-id="${themeId}"] .theme-name`).textContent;
+          
+          // Check if it's a premium theme
+          const isPremium = document.querySelector(`.theme-card[data-theme-id="${themeId}"] .theme-badge.premium`);
+          
+          if (isPremium) {
+            alert(`Redirecting to purchase page for ${themeName}...`);
+          } else {
+            // Simulate installation
+            this.textContent = 'Installing...';
+            setTimeout(() => {
+              this.textContent = 'Installed';
+              this.disabled = true;
+              alert(`${themeName} has been installed successfully!`);
+            }, 1500);
+          }
+        });
+      });
+      
+      // Modal install button
+      const modalInstallBtn = document.getElementById('modal-install-btn');
+      modalInstallBtn.addEventListener('click', function() {
+        const themeName = modalThemeTitle.textContent;
+        
+        // Simulate installation
+        this.textContent = 'Installing...';
+        setTimeout(() => {
+          this.textContent = 'Installed';
+          this.disabled = true;
+          alert(`${themeName} has been installed successfully!`);
+        }, 1500);
+      });
+      
+      // Search functionality
+      const searchInput = document.getElementById('theme-search');
+      const themeGrid = document.getElementById('theme-grid');
+      const themeCards = document.querySelectorAll('.theme-card');
+      
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        themeCards.forEach(card => {
+          const themeName = card.querySelector('.theme-name').textContent.toLowerCase();
+          const themeDescription = card.querySelector('.theme-description').textContent.toLowerCase();
+          
+          if (themeName.includes(searchTerm) || themeDescription.includes(searchTerm)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+      
+      // Filter functionality
+      const categoryFilter = document.getElementById('category-filter');
+      const priceFilter = document.getElementById('price-filter');
+      
+      function applyFilters() {
+        const category = categoryFilter.value;
+        const price = priceFilter.value;
+        
+        themeCards.forEach(card => {
+          let showCard = true;
+          
+          // Category filter
+          if (category !== 'all') {
+            const themeId = card.getAttribute('data-theme-id');
+            if (!themeId.includes(category)) {
+              showCard = false;
+            }
+          }
+          
+          // Price filter
+          if (price !== 'all') {
+            const isPremium = card.querySelector('.theme-badge.premium');
+            if ((price === 'premium' && !isPremium) || (price === 'free' && isPremium)) {
+              showCard = false;
+            }
+          }
+          
+          card.style.display = showCard ? 'block' : 'none';
+        });
+      }
+      
+      categoryFilter.addEventListener('change', applyFilters);
+      priceFilter.addEventListener('change', applyFilters);
+    });
+  </script>
+</body>
+</html>

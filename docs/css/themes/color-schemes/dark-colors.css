@@ -1,0 +1,138 @@
+/**
+ * dark-colors.css
+ * 
+ * Dark color scheme for reports.
+ * Dark mode palette with high contrast elements.
+ */
+
+.theme-color--dark {
+  /* Primary colors */
+  --theme-background: #121212;
+  --theme-text-primary: #e0e0e0;
+  --theme-text-secondary: #a0a0a0;
+  --theme-accent: #bb86fc;
+  --theme-accent-secondary: #3700b3;
+  --theme-border: #333333;
+  --theme-section-background: #1e1e1e;
+  --theme-header-background: linear-gradient(135deg, #121212 0%, #000000 100%);
+  --theme-header-text: #ffffff;
+  
+  /* Risk colors */
+  --theme-risk-low: #4ade80;
+  --theme-risk-medium: #fbbf24;
+  --theme-risk-high: #f87171;
+  --theme-risk-critical: #ef4444;
+  
+  /* Component colors */
+  --theme-chart-primary: #bb86fc;
+  --theme-chart-secondary: #03dac6;
+  --theme-chart-tertiary: #cf6679;
+  --theme-chart-quaternary: #ffab40;
+  
+  /* Table colors */
+  --theme-table-header-bg: #2d2d2d;
+  --theme-table-header-text: #e0e0e0;
+  --theme-table-border: #333333;
+  --theme-table-row-alt: #252525;
+  
+  /* Button colors */
+  --theme-button-primary-bg: #bb86fc;
+  --theme-button-primary-text: #121212;
+  --theme-button-secondary-bg: #333333;
+  --theme-button-secondary-text: #e0e0e0;
+  
+  /* Card colors */
+  --theme-card-background: #1e1e1e;
+  --theme-card-border: #333333;
+  --theme-card-shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* Specific component styling for dark theme */
+.theme-color--dark .report-header {
+  background: var(--theme-header-background);
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.theme-color--dark .report-section__title {
+  color: var(--theme-accent);
+}
+
+.theme-color--dark .summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+  box-shadow: 0 4px 20px rgba(187, 134, 252, 0.3);
+}
+
+/* Risk level specific colors */
+.theme-color--dark .risk-level--low {
+  color: var(--theme-risk-low);
+}
+
+.theme-color--dark .risk-level--medium {
+  color: var(--theme-risk-medium);
+}
+
+.theme-color--dark .risk-level--high {
+  color: var(--theme-risk-high);
+}
+
+.theme-color--dark .risk-level--critical {
+  color: var(--theme-risk-critical);
+}
+
+/* Background variants */
+.theme-color--dark .bg-risk-level--low {
+  background-color: var(--theme-risk-low);
+  color: #121212;
+}
+
+.theme-color--dark .bg-risk-level--medium {
+  background-color: var(--theme-risk-medium);
+  color: #121212;
+}
+
+.theme-color--dark .bg-risk-level--high {
+  background-color: var(--theme-risk-high);
+  color: #121212;
+}
+
+.theme-color--dark .bg-risk-level--critical {
+  background-color: var(--theme-risk-critical);
+  color: #121212;
+}
+
+/* Additional dark-specific styles */
+.theme-color--dark .report-section {
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme-color--dark .report-header__meta {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-color--dark a {
+  color: var(--theme-accent);
+}
+
+.theme-color--dark .report-container {
+  background: var(--theme-background);
+}
+
+/* Scrollbar styling for dark theme */
+.theme-color--dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.theme-color--dark ::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.theme-color--dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+}
+
+.theme-color--dark ::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}

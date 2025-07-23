@@ -667,9 +667,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"27cw3":[function(require,module,exports,__globalThis) {
-// js/assessment/main.js
-// Main entry point for the assessment tool.
-// Orchestrates all modules and handles the main application state.
+// js/assessment/main.js - Fixed version
 var _authJs = require("./auth.js");
 var _uiJs = require("./ui.js");
 var _apiJs = require("./api.js");
@@ -677,152 +675,171 @@ var _scoringJs = require("./scoring.js");
 var _resultsJs = require("./results.js");
 // --- State ---
 let currentAssessment = {};
+let analysisInterval = null; // Track interval for cleanup
 // --- Core Functions ---
 async function startAssessment() {
-    _uiJs.showStep(3); // Show loading/analysis step
-    const formData = getFormData();
-    let toolData = await _apiJs.getToolFromDatabase(formData);
-    if (toolData) {
-        console.log('toolData from DB:', toolData); // Debug log
-        currentAssessment = {
-            formData: formData,
-            finalScore: toolData.total_score,
-            riskLevel: toolData.risk_level,
-            source: 'database',
-            breakdown: toolData.breakdown,
-            recommendations: toolData.recommendations,
-            detailedAssessment: toolData.detailed_assessment,
-            // Add new fields from ai_tools
-            vendor: toolData.vendor || null,
-            license_type: toolData.license_type || null,
-            primary_use_case: toolData.primary_use_case || null,
-            assessed_by: toolData.assessed_by || null,
-            confidence: toolData.confidence || null,
-            documentation_tier: toolData.documentation_tier || null,
-            assessment_notes: toolData.assessment_notes || null,
-            azure_permissions: toolData.azure_permissions || null,
-            sources: toolData.sources || null,
-            // Pass the raw compliance_certifications object; it will be handled by the API module
-            compliance_certifications: toolData.compliance_certifications
-        };
-    } else {
-        // Generate heuristic score
-        const baseScore = _scoringJs.generateHeuristicScore(formData);
-        const finalScore = _scoringJs.applyMultipliers(baseScore, formData);
-        currentAssessment = {
-            formData: formData,
-            finalScore: finalScore,
-            riskLevel: _scoringJs.getRiskLevel(finalScore),
-            source: 'heuristic',
-            breakdown: {
-                scores: {}
-            },
-            recommendations: _scoringJs.generateRecommendations(finalScore, formData),
-            // For heuristic, create a placeholder for detailedAssessment.compliance_certifications as an object
-            detailedAssessment: {
-                compliance_certifications: {
-                    "HIPAA": {
-                        "status": "Not Applicable"
-                    },
-                    "GDPR": {
-                        "status": "Not Applicable"
-                    },
-                    "SOC_2": {
-                        "status": "No"
-                    },
-                    "ISO_27001": {
-                        "status": "No"
-                    },
-                    "PCI_DSS": {
-                        "status": "Not Applicable"
-                    },
-                    "CCPA": {
-                        "status": "Not Applicable"
-                    },
-                    "FedRAMP": {
-                        "status": "Not Applicable"
-                    }
-                }
-            },
-            // Initialize other new fields for heuristic assessments
-            vendor: null,
-            license_type: null,
-            primary_use_case: null,
-            assessed_by: null,
-            confidence: null,
-            documentation_tier: null,
-            assessment_notes: null,
-            azure_permissions: null,
-            sources: null
-        };
-    }
-    simulateAnalysisSteps(async ()=>{
-        // --- Auto-save to database ---
-        console.log('Automatically saving assessment to database...');
-        const { data: savedData, error: saveError } = await _apiJs.saveToDatabase(currentAssessment);
-        if (saveError) {
-            console.error('Auto-save failed:', saveError);
-            _uiJs.showMessage(`Could not save assessment to your history: ${saveError.message}`, 'error');
-        } else console.log('Auto-save successful:', savedData);
-        // --- Show Results ---
-        _uiJs.showStep(4);
-        _resultsJs.displayResults(currentAssessment);
-    });
-}
-// This function is no longer needed with auto-saving
-/*
-async function handleSaveToDatabase() {
-    if (!Auth.getIsAdmin()) {
-        UI.showMessage('You must be an admin to save assessments.', 'error');
-        return;
-    }
-    if (!currentAssessment || !currentAssessment.results) {
-        UI.showMessage('No assessment results to save.', 'error');
-        return;
-    }
-    
-    UI.showMessage('Saving...', 'info');
-    const { data, error } = await API.saveToDatabase(currentAssessment);
-
-    if (error) {
-        UI.showMessage(`Error: ${error.message}`, 'error');
-    } else {
-        UI.showMessage('Assessment saved successfully!', 'success');
+    try {
+        _uiJs.showStep(3); // Show loading/analysis step
+        const formData = getFormData();
+        // Validate form data
+        if (!formData.toolName?.trim()) throw new Error('Tool name is required');
+        let toolData = await _apiJs.getToolFromDatabase(formData);
+        if (toolData) {
+            console.log('toolData from DB (after multipliers applied):', toolData);
+            currentAssessment = createDatabaseAssessment(toolData, formData);
+        } else currentAssessment = createHeuristicAssessment(formData);
+        await simulateAnalysisSteps(async ()=>{
+            try {
+                // Auto-save to database
+                console.log('Automatically saving assessment to database...');
+                console.log('Assessment data being saved:', currentAssessment);
+                const { data: savedData, error: saveError } = await _apiJs.saveToDatabase(currentAssessment);
+                if (saveError) {
+                    console.error('Auto-save failed:', saveError);
+                    if (saveError.code !== 'DUPLICATE_ENTRY') _uiJs.showMessage(`Could not save assessment: ${saveError.message}`, 'warning');
+                } else console.log('Auto-save successful:', savedData);
+                // Show Results regardless of save status
+                _uiJs.showStep(4);
+                _resultsJs.displayResults(currentAssessment);
+            } catch (error) {
+                console.error('Error in post-analysis phase:', error);
+                _uiJs.showMessage('Assessment completed but could not be saved', 'warning');
+                _uiJs.showStep(4);
+                _resultsJs.displayResults(currentAssessment);
+            }
+        });
+    } catch (error) {
+        console.error('Error starting assessment:', error);
+        _uiJs.showMessage(`Assessment failed: ${error.message}`, 'error');
+        _uiJs.showStep(2); // Go back to form
     }
 }
-*/ // --- Helper Functions ---
+function createDatabaseAssessment(toolData, formData) {
+    // toolData.total_score is already the recalculated score from applyClientSideMultipliers
+    // toolData.breakdown.scores contains the recalculated individual scores
+    return {
+        formData: formData,
+        finalScore: toolData.total_score,
+        riskLevel: _scoringJs.getRiskLevel(toolData.total_score),
+        source: 'database',
+        // Use the recalculated breakdown from applyClientSideMultipliers
+        breakdown: toolData.breakdown || {
+            scores: {
+                dataStorage: toolData.data_storage_score || 0,
+                trainingUsage: toolData.training_usage_score || 0,
+                accessControls: toolData.access_controls_score || 0,
+                complianceRisk: toolData.compliance_score || 0,
+                vendorTransparency: toolData.vendor_transparency_score || 0
+            }
+        },
+        recommendations: toolData.recommendations || [],
+        // Additional database fields
+        vendor: toolData.vendor || null,
+        license_type: toolData.license_type || null,
+        primary_use_case: toolData.primary_use_case || null,
+        assessed_by: toolData.assessed_by || null,
+        confidence: toolData.confidence || null,
+        documentation_tier: toolData.documentation_tier || null,
+        assessment_notes: toolData.assessment_notes || null,
+        azure_permissions: toolData.azure_permissions || null,
+        sources: toolData.sources || null,
+        summary_and_recommendation: toolData.summary_and_recommendation || null,
+        compliance_certifications: toolData.compliance_certifications || [],
+        // Standardize detailed assessment structure
+        detailedAssessment: normalizeDetailedAssessment(toolData.detailed_assessment)
+    };
+}
+function createHeuristicAssessment(formData) {
+    const baseScore = _scoringJs.generateHeuristicScore(formData);
+    const finalScore = _scoringJs.applyMultipliers(baseScore, formData);
+    const riskLevel = _scoringJs.getRiskLevel(finalScore);
+    return {
+        formData: formData,
+        finalScore: finalScore,
+        riskLevel: riskLevel,
+        source: 'heuristic',
+        breakdown: {
+            scores: {
+                dataStorage: Math.round(finalScore * 0.2),
+                trainingUsage: Math.round(finalScore * 0.25),
+                accessControls: Math.round(finalScore * 0.2),
+                complianceRisk: Math.round(finalScore * 0.2),
+                vendorTransparency: Math.round(finalScore * 0.15)
+            }
+        },
+        recommendations: _scoringJs.generateRecommendations(finalScore, formData),
+        // Initialize other fields for consistency
+        vendor: null,
+        license_type: license_type,
+        primary_use_case: null,
+        assessed_by: 'Heuristic Analysis',
+        confidence: 'Medium',
+        documentation_tier: 'Basic',
+        assessment_notes: 'Generated using heuristic analysis based on tool category and data classification.',
+        azure_permissions: null,
+        sources: null,
+        summary_and_recommendation: generateHeuristicSummary(riskLevel, formData.toolName),
+        compliance_certifications: [],
+        detailedAssessment: {
+            final_risk_score: finalScore,
+            final_risk_category: riskLevel,
+            assessment_details: {}
+        }
+    };
+}
+function normalizeDetailedAssessment(detailedAssessment) {
+    if (!detailedAssessment || typeof detailedAssessment !== 'object') return {
+        assessment_details: {}
+    };
+    // Ensure consistent structure
+    return {
+        ...detailedAssessment,
+        assessment_details: detailedAssessment.assessment_details || {}
+    };
+}
+function generateHeuristicSummary(riskLevel, toolName) {
+    const riskLower = riskLevel.toLowerCase();
+    if (riskLower === 'critical' || riskLower === 'high') return `High-risk assessment for ${toolName} based on heuristic analysis. Review required before deployment.`;
+    return `${toolName} assessment completed using heuristic analysis. Standard security practices recommended.`;
+}
+// --- Helper Functions ---
 function getFormData() {
     const form = document.getElementById('assessmentForm');
+    if (!form) throw new Error('Assessment form not found');
     const formData = new FormData(form);
     return {
-        toolName: formData.get('toolName'),
-        toolVersion: formData.get('toolVersion'),
-        toolCategory: formData.get('toolCategory'),
-        dataClassification: formData.get('dataClassification'),
-        useCase: formData.get('useCase')
+        toolName: formData.get('toolName')?.trim() || '',
+        toolVersion: formData.get('toolVersion')?.trim() || '',
+        toolCategory: formData.get('toolCategory') || '',
+        dataClassification: formData.get('dataClassification') || '',
+        useCase: formData.get('useCase') || 'general'
     };
 }
 function simulateAnalysisSteps(callback) {
-    const steps = [
-        "Analyzing tool policies...",
-        "Assessing data handling protocols...",
-        "Evaluating vendor reputation...",
-        "Cross-referencing compliance databases...",
-        "Finalizing risk score..."
-    ];
-    let index = 0;
-    const interval = setInterval(()=>{
-        if (index < steps.length) {
-            document.getElementById('analysisStatus').textContent = steps[index];
-            index++;
-        } else {
-            clearInterval(interval);
-            callback();
-        }
-    }, 600);
+    return new Promise((resolve)=>{
+        const steps = [
+            "Analyzing tool policies...",
+            "Assessing data handling protocols...",
+            "Evaluating vendor reputation...",
+            "Cross-referencing compliance databases...",
+            "Finalizing risk score..."
+        ];
+        let index = 0;
+        const statusElement = document.getElementById('analysisStatus');
+        // Clear any existing interval
+        if (analysisInterval) clearInterval(analysisInterval);
+        analysisInterval = setInterval(()=>{
+            if (index < steps.length && statusElement) {
+                statusElement.textContent = steps[index];
+                index++;
+            } else {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+                callback().finally(()=>resolve());
+            }
+        }, 600);
+    });
 }
-// --- Export Functions ---
-// Export functionality moved to export.html page
 // --- Initialization ---
 function addEventListeners() {
     // Auth
@@ -835,35 +852,32 @@ function addEventListeners() {
     document.getElementById('nextStepBtn1')?.addEventListener('click', ()=>_uiJs.nextStep(startAssessment));
     document.getElementById('nextStepBtn2')?.addEventListener('click', ()=>_uiJs.nextStep(startAssessment));
     document.getElementById('prevStepBtn2')?.addEventListener('click', _uiJs.prevStep);
-    // Results and Exports
+    // Results and Navigation
     document.getElementById('newAssessmentBtn')?.addEventListener('click', _uiJs.startNewAssessment);
-// The dynamic save button and its handler are no longer needed
-/*
-    document.querySelector('.form-content').addEventListener('click', (e) => {
-        if (e.target.matches('#saveToDbBtn') || e.target.closest('#saveToDbBtn')) {
-            handleSaveToDatabase();
-        }
-    });
-    */ // Export functionality moved to export.html page
-// The export button now links directly to export.html
 }
 function initialize() {
-    // Event Listeners
-    _uiJs.setupEventListeners({
-        onStartAssessment: startAssessment,
-        onStartNew: _uiJs.startNewAssessment,
-        onLogin: _authJs.showAuthModal,
-        signOut: _authJs.signOut,
-        showAuthModal: _authJs.showAuthModal,
-        closeAuthModal: _authJs.closeAuthModal
-    });
-    // Initialize Supabase and handle auth changes
-    _authJs.initializeSupabase((user)=>{
-        _uiJs.updateUIForAuth(user);
-    });
-    _uiJs.showStep(1);
-    addEventListeners();
+    try {
+        _uiJs.setupEventListeners({
+            onStartAssessment: startAssessment,
+            onStartNew: _uiJs.startNewAssessment,
+            onLogin: _authJs.showAuthModal,
+            signOut: _authJs.signOut,
+            showAuthModal: _authJs.showAuthModal,
+            closeAuthModal: _authJs.closeAuthModal
+        });
+        _authJs.initializeSupabase((user)=>{
+            _uiJs.updateUIForAuth(user);
+        });
+        _uiJs.showStep(1);
+        addEventListeners();
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
 }
+// Cleanup on page unload
+window.addEventListener('beforeunload', ()=>{
+    if (analysisInterval) clearInterval(analysisInterval);
+});
 document.addEventListener('DOMContentLoaded', initialize);
 
 },{"./auth.js":"lndTA","./ui.js":"aNoDE","./api.js":"3q7Ls","./scoring.js":"2mnUO","./results.js":"f0hqN"}],"lndTA":[function(require,module,exports,__globalThis) {
@@ -984,7 +998,156 @@ function switchAuthTab(tab) {
     document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
 }
 
-},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"aNoDE":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eoCsO":[function(require,module,exports,__globalThis) {
+// docs/js/supabase-client.js
+// Use the global Supabase object loaded from CDN in index.html
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+// Export the Supabase client
+parcelHelpers.export(exports, "supabase", ()=>supabase);
+const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+// Check if Supabase is available globally (from CDN)
+let supabase;
+// Initialize the global Supabase client if it doesn't exist
+if (typeof window !== 'undefined') {
+    if (window.supabase) {
+        // Use the global Supabase object if available
+        console.log('Using global Supabase client from CDN');
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else if (typeof window.supabaseClient !== 'undefined') {
+        // Use existing client if already initialized
+        console.log('Using existing Supabase client');
+        supabase = window.supabaseClient;
+    } else if (typeof window.createClient !== 'undefined') {
+        // Use the global createClient function if available
+        console.log('Creating Supabase client with global createClient');
+        supabase = window.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Store for reuse
+        window.supabaseClient = supabase;
+    } else {
+        // Fallback to mock implementation for pages that don't load the CDN
+        console.log('Using mock Supabase client');
+        supabase = createMockClient();
+        // Store for reuse
+        window.supabaseClient = supabase;
+    }
+} else {
+    // Fallback for non-browser environments
+    console.log('Using mock Supabase client (non-browser environment)');
+    supabase = createMockClient();
+}
+// Mock client implementation for pages that don't load the CDN
+function createMockClient() {
+    return {
+        auth: {
+            getSession: async ()=>{
+                return {
+                    data: {
+                        session: null
+                    },
+                    error: null
+                };
+            },
+            onAuthStateChange: (callback)=>{
+                console.log('Auth state change listener registered (mock)');
+                return ()=>{};
+            },
+            signInWithPassword: async ()=>{
+                console.log('Mock sign in');
+                return {
+                    error: new Error('Authentication not available in this view')
+                };
+            },
+            signUp: async ()=>{
+                console.log('Mock sign up');
+                return {
+                    error: new Error('Authentication not available in this view')
+                };
+            },
+            signOut: async ()=>{
+                console.log('Mock sign out');
+                return {
+                    error: null
+                };
+            }
+        },
+        from: (table)=>({
+                select: ()=>({
+                        execute: async ()=>({
+                                data: [],
+                                error: null
+                            }),
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: [],
+                                        error: null
+                                    }),
+                                single: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    }),
+                insert: ()=>({
+                        execute: async ()=>({
+                                data: {
+                                    id: 'mock-id'
+                                },
+                                error: null
+                            })
+                    }),
+                update: ()=>({
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    }),
+                delete: ()=>({
+                        eq: ()=>({
+                                execute: async ()=>({
+                                        data: null,
+                                        error: null
+                                    })
+                            })
+                    })
+            })
+    };
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"aNoDE":[function(require,module,exports,__globalThis) {
 // js/assessment/ui.js
 // Handles UI updates, step navigation, and general DOM manipulation.
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1141,8 +1304,7 @@ function setupEventListeners(callbacks) {
 }
 
 },{"./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"3q7Ls":[function(require,module,exports,__globalThis) {
-// js/assessment/api.js
-// Handles all API calls to the Supabase backend.
+// js/assessment/api.js - Updated with clean schema
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getToolFromDatabase", ()=>getToolFromDatabase);
@@ -1154,40 +1316,29 @@ async function getToolFromDatabase(formData) {
         console.warn('Supabase client not available for DB check.');
         return null;
     }
-    const toolName = formData.toolName.trim();
-    const toolVersion = formData.toolVersion.trim();
-    console.log(`Searching DB for: ${toolName} (Version: ${toolVersion})`);
+    const toolName = formData.toolName?.trim();
+    const licenseType = formData.toolVersion?.trim(); // This is actually license_type
+    if (!toolName) {
+        console.warn('No tool name provided for database search');
+        return null;
+    }
+    console.log(`Searching DB for: ${toolName} (License: ${licenseType || 'Any'})`);
     try {
-        // --- Attempt 1: Exact Phrase Match (e.g., "ChatGPT Free") ---
-        const exactPhrase = `${toolName} ${toolVersion}`;
-        console.log(`Attempt 1: Case-insensitive exact match for "${exactPhrase}"`);
-        let { data, error } = await (0, _authJs.supabase).from('ai_tools').select('*').ilike('name', exactPhrase).limit(1);
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 1): Found exact phrase match.', data[0]);
-            return (0, _scoringJs.applyClientSideMultipliers)(data[0], formData);
-        }
-        // --- Attempt 2: Keyword Match (name contains both toolName and toolVersion) ---
-        console.log(`Attempt 2: Keyword match for "${toolName}" and "${toolVersion}"`);
-        ({ data, error } = await (0, _authJs.supabase).from('ai_tools').select('*').ilike('name', `%${toolName}%`).ilike('name', `%${toolVersion}%`).limit(1));
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 2): Found keyword match.', data[0]);
-            return (0, _scoringJs.applyClientSideMultipliers)(data[0], formData);
-        }
-        // --- Attempt 3: Base Name Match (name contains only the toolName) ---
-        console.log(`Attempt 3: Base name match for "${toolName}"`);
-        ({ data, error } = await (0, _authJs.supabase).from('ai_tools').select('*').ilike('name', `%${toolName}%`)// Sort by creation date to get the most recent one if multiple exist
-        .order('created_at', {
+        let query = (0, _authJs.supabase).from('ai_tools').select('*').ilike('name', `%${toolName}%`);
+        // If license type is specified, filter by it
+        if (licenseType) query = query.ilike('license_type', licenseType);
+        const { data, error } = await query.order('created_at', {
             ascending: false
-        }).limit(1));
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 3): Found base name match.', data[0]);
-            return (0, _scoringJs.applyClientSideMultipliers)(data[0], formData);
-        }
+        }).limit(1);
         if (error) {
-            console.error('Database query failed after all attempts:', error);
+            console.error('Database query failed:', error);
             return null;
         }
-        console.log('No assessment found in database after all attempts.');
+        if (data && data.length > 0) {
+            console.log('Found tool in database:', data[0]);
+            return (0, _scoringJs.applyClientSideMultipliers)(data[0], formData);
+        }
+        console.log('No assessment found in database.');
         return null;
     } catch (err) {
         console.error('Critical error in getToolFromDatabase:', err);
@@ -1200,24 +1351,37 @@ async function saveToDatabase(assessment) {
             message: 'Not connected to database.'
         }
     };
-    const { formData, finalScore, breakdown, recommendations } = assessment;
     const user = (0, _authJs.getCurrentUser)();
     if (!user) return {
         error: {
             message: 'User must be logged in to save an assessment.'
         }
     };
-    // Defensively re-calculate risk level to ensure it's always valid for the DB.
+    if (!assessment?.formData?.toolName) return {
+        error: {
+            message: 'Invalid assessment data: missing tool name.'
+        }
+    };
+    const { formData, finalScore, breakdown, recommendations } = assessment;
     const validRiskLevel = (0, _scoringJs.getRiskLevel)(finalScore);
-    // Store all details in assessment_data
+    // Clean record with top-level fields and minimal JSONB
     const record = {
         user_id: user.id,
         name: formData.toolName,
         vendor: assessment.vendor || null,
-        license_type: assessment.license_type || null,
-        primary_use_case: assessment.primary_use_case || null,
         data_classification: formData.dataClassification,
+        sources: assessment.sources || null,
+        confidence: assessment.confidence || null,
+        assessment_notes: assessment.assessment_notes || null,
+        azure_permissions: assessment.azure_permissions || null,
         category: formData.toolCategory,
+        // Top-level metadata fields (no longer in JSONB)
+        license_type: assessment.license_type || formData.toolVersion || null,
+        primary_use_case: assessment.primary_use_case || formData.useCase || null,
+        assessed_by: assessment.assessed_by || 'User Assessment',
+        compliance_certifications: assessment.compliance_certifications || [],
+        documentation_tier: assessment.documentation_tier || 'Basic',
+        // Score fields
         total_score: finalScore,
         risk_level: validRiskLevel,
         data_storage_score: breakdown?.scores?.dataStorage ?? 0,
@@ -1225,36 +1389,32 @@ async function saveToDatabase(assessment) {
         access_controls_score: breakdown?.scores?.accessControls ?? 0,
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
-        // Add explicit mapping for the missing root-level fields
-        assessed_by: assessment.assessed_by || null,
-        confidence: assessment.confidence || null,
-        documentation_tier: assessment.documentation_tier || null,
-        assessment_notes: assessment.assessment_notes || null,
-        azure_permissions: assessment.azure_permissions || null,
-        sources: assessment.sources || null,
-        // Map compliance_certifications to an array of strings for the top-level column
-        compliance_certifications: assessment.compliance_certifications || null,
-        // Store the full, original assessment object in assessment_data without duplication
-        assessment_data: assessment
+        // Minimal JSONB with only non-redundant data
+        assessment_data: {
+            recommendations: recommendations,
+            detailedAssessment: assessment.detailedAssessment || null,
+            summary_and_recommendation: assessment.summary_and_recommendation || null
+        }
     };
     try {
         const { data, error } = await (0, _authJs.supabase).from('assessments').insert([
             record
         ]).select();
         if (error) {
-            // Check for unique constraint violation
             if (error.code === '23505') {
-                console.warn(`Tool "${record.name}" already exists. Consider an update?`);
+                console.warn(`Tool "${record.name}" already exists.`);
                 return {
                     error: {
-                        message: `An assessment for "${record.name}" already exists.`
+                        message: `An assessment for "${record.name}" already exists.`,
+                        code: 'DUPLICATE_ENTRY'
                     }
                 };
             }
             throw error;
         }
-        // Increment total assessments created counter
-        await incrementTotalAssessmentsCreated();
+        await incrementTotalAssessmentsCreated().catch((err)=>{
+            console.warn('Failed to update assessment counter:', err);
+        });
         console.log('Successfully saved to database:', data);
         return {
             data
@@ -1262,11 +1422,12 @@ async function saveToDatabase(assessment) {
     } catch (error) {
         console.error('Error saving to database:', error);
         return {
-            error
+            error: {
+                message: error.message || 'Unknown database error'
+            }
         };
     }
 }
-// New function to increment the total assessments created counter
 async function incrementTotalAssessmentsCreated() {
     const user = (0, _authJs.getCurrentUser)();
     if (!user) return;
@@ -1278,10 +1439,11 @@ async function incrementTotalAssessmentsCreated() {
                 total_assessments_created: newTotal
             }
         });
-        if (error) console.error('Failed to update total assessments created:', error);
-        else console.log(`Updated total assessments created: ${currentTotal} \u{2192} ${newTotal}`);
+        if (error) throw error;
+        console.log(`Updated total assessments created: ${currentTotal} \u{2192} ${newTotal}`);
     } catch (error) {
         console.error('Error incrementing total assessments created:', error);
+        throw error;
     }
 }
 
@@ -1347,14 +1509,110 @@ function applyClientSideMultipliers(dbData, formData) {
     baseScores.accessControls = Math.round(baseScores.accessControls * useCaseMultiplier);
     const totalScore = Object.values(baseScores).reduce((sum, score)=>sum + score, 0);
     // Return a structure that mimics the original toolData object for consistency
+    const updatedDetailedAssessment = {
+        ...dbData.detailed_assessment || {},
+        final_risk_score: totalScore,
+        final_risk_category: getRiskLevel(totalScore),
+        final_score_with_multiplier: totalScore,
+        assessment_details: {
+            ...dbData.detailed_assessment?.assessment_details || {},
+            data_storage_and_security: {
+                ...dbData.detailed_assessment?.assessment_details?.data_storage_and_security || {},
+                category_score: baseScores.dataStorage,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || 0;
+                    const newCategoryScore = baseScores.dataStorage;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            training_data_usage: {
+                ...dbData.detailed_assessment?.assessment_details?.training_data_usage || {},
+                category_score: baseScores.trainingUsage,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.training_data_usage?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.training_data_usage?.category_score || 0;
+                    const newCategoryScore = baseScores.trainingUsage;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            access_controls: {
+                ...dbData.detailed_assessment?.assessment_details?.access_controls || {},
+                category_score: baseScores.accessControls,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.access_controls?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.access_controls?.category_score || 0;
+                    const newCategoryScore = baseScores.accessControls;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            compliance_and_legal_risk: {
+                ...dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk || {},
+                category_score: baseScores.complianceRisk,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || 0;
+                    const newCategoryScore = baseScores.complianceRisk;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            },
+            vendor_transparency: {
+                ...dbData.detailed_assessment?.assessment_details?.vendor_transparency || {},
+                category_score: baseScores.vendorTransparency,
+                criteria: (()=>{
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || 0;
+                    const newCategoryScore = baseScores.vendorTransparency;
+                    const scalingFactor = oldCategoryScore !== 0 ? newCategoryScore / oldCategoryScore : newCategoryScore > 0 ? 1 : 0;
+                    const updatedCriteria = {};
+                    for(const key in oldCriteria)if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') updatedCriteria[key] = {
+                        ...oldCriteria[key],
+                        score: Math.round(oldCriteria[key].score * scalingFactor)
+                    };
+                    else updatedCriteria[key] = oldCriteria[key];
+                    return updatedCriteria;
+                })()
+            }
+        }
+    };
     return {
         ...dbData,
         total_score: totalScore,
+        risk_level: getRiskLevel(totalScore),
         compliance_certifications: dbData.compliance_certifications || [],
         breakdown: {
             ...dbData.breakdown,
             scores: baseScores
-        }
+        },
+        detailed_assessment: updatedDetailedAssessment
     };
 }
 function getRiskLevel(score) {
@@ -1386,6 +1644,10 @@ function generateRecommendations(score, formData) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "displayResults", ()=>displayResults);
+parcelHelpers.export(exports, "getScoreDescription", ()=>getScoreDescription) // --- Export Functions ---
+ // All old export functions will be removed from this file.
+ // New export functionality is handled by docs/js/dashboard/export.js
+;
 var _scoringJs = require("./scoring.js");
 var _authJs = require("./auth.js");
 let currentAssessment = null;
@@ -1400,8 +1662,8 @@ function displayResults(results) {
     resultsContainer.innerHTML = '';
     const { formData, finalScore, riskLevel, source, recommendations, breakdown, detailedAssessment } = results;
     const toolName = formData.toolName || 'Unknown Tool';
-    const toolVersion = formData.toolVersion || '';
-    const fullToolName = toolVersion ? `${toolName} (${toolVersion})` : toolName;
+    const toolVersion = formData.toolVersion ? formData.toolVersion.charAt(0).toUpperCase() + formData.toolVersion.slice(1) : '';
+    const fullToolName = toolVersion ? `${toolName} <span class="tool-title__license-type">${toolVersion}</span>` : toolName;
     // Build the results HTML
     const resultsHTML = `
         <div class="results-layout">
@@ -1463,7 +1725,7 @@ function renderInsights(breakdown) {
         {
             title: 'Training Data Usage',
             score: scores.trainingUsage,
-            icon: 'robot'
+            icon: 'cpu'
         },
         {
             title: 'Access Controls',
@@ -1567,16 +1829,18 @@ function formatItemName(item) {
     return item.replace(/_/g, ' ').replace(/\b\w/g, (char)=>char.toUpperCase()).trim();
 }
 function getScoreDescription(score, level, toolName) {
+    const risk = level;
     let description = '';
-    const risk = level.toLowerCase();
-    if (risk === 'critical') description = `<strong>Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a critical risk.`;
-    else if (risk === 'high') description = `<strong>Requires Review.</strong> With a score of ${score}, ${toolName} poses a high risk.`;
-    else if (risk === 'medium') description = `<strong>Use With Caution.</strong> With a score of ${score}, ${toolName} presents a medium risk.`;
-    else description = `<strong>Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered low risk.`;
+    // Capitalize the first letter of the risk level
+    const capitalizedRisk = risk.charAt(0).toUpperCase() + risk.slice(1);
+    // Apply specific styling based on risk level
+    const riskClass = `risk-level-display risk-level-display--${risk}`;
+    if (risk === 'critical') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Immediate Action Required.</strong> With a score of ${score}, ${toolName} poses a ${risk} risk.`;
+    else if (risk === 'high') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Requires Review.</strong> With a score of ${score}, ${toolName} poses a ${risk} risk.`;
+    else if (risk === 'medium') description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Use With Caution.</strong> With a score of ${score}, ${toolName} presents a ${risk} risk.`;
+    else description = `<strong><span class="${riskClass}">${capitalizedRisk} Risk.</span> Approved for General Use.</strong> With a score of ${score}, ${toolName} is considered ${risk} risk.`;
     return description;
-} // --- Export Functions ---
- // All old export functions will be removed from this file.
- // New export functionality is handled by docs/js/dashboard/export.js
+}
 
 },{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["6IEMQ","27cw3"], "27cw3", "parcelRequire4b35", {})
 

@@ -1,0 +1,41 @@
+/**
+ * theme-corporate.css
+ * 
+ * Corporate theme for reports.
+ * This file imports the necessary base, layout, and color scheme files.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* Import layout styles (default to two-column) */
+@import url('./layouts/two-col-layout.css');
+
+/* Import color scheme */
+@import url('./color-schemes/corporate-colors.css');
+
+/* Theme-specific overrides */
+.theme-corporate {
+  /* Apply both layout and color classes */
+  --theme-name: "Corporate";
+  --theme-description: "Professional blue-based theme suitable for business reports";
+}
+
+/* Additional theme-specific styles can be added here */
+.theme-corporate .report-header__title {
+  font-family: 'Arial', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.theme-corporate .report-section {
+  border-radius: var(--theme-border-radius-md);
+}
+
+/* Print-specific styles */
+@media print {
+  .theme-corporate {
+    /* Ensure proper printing of backgrounds */
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}

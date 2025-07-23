@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Comparison Tool</title>
+    <!-- Base Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/themes/theme-base.css">
+    
+    <!-- Theme Base (Always Loaded) -->
+    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --hover-color: #3a5ce5;
+            --border-color: #ddd;
+            --background-color: #f5f7fb;
+            --card-background: #fff;
+            --text-color: #333;
+            --text-secondary: #666;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .theme-selector select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+            min-width: 150px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .theme-preview {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--card-background);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .theme-preview-header {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .theme-preview-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .theme-preview-content {
+            height: 600px;
+            overflow: auto;
+        }
+        
+        .theme-preview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .diff-view {
+            margin-top: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--card-background);
+        }
+        
+        .diff-view-header {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .diff-view-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .diff-view-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .diff-item {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        
+        .diff-item-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .diff-item-content {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .diff-item-image {
+            flex: 1;
+            max-width: 48%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .diff-item-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .diff-item-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .screenshot-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .element-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .element-selector select {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Theme Comparison Tool</h1>
+            <div class="controls">
+                <div class="theme-selector">
+                    <label for="theme-a-select">Theme A:</label>
+                    <select id="theme-a-select">
+                        <option value="theme-corporate">Corporate</option>
+                        <option value="theme-minimal">Minimal</option>
+                        <option value="theme-dark">Dark</option>
+                        <option value="theme-vibrant">Vibrant</option>
+                    </select>
+                </div>
+                <div class="theme-selector">
+                    <label for="theme-b-select">Theme B:</label>
+                    <select id="theme-b-select">
+                        <option value="theme-minimal">Minimal</option>
+                        <option value="theme-corporate">Corporate</option>
+                        <option value="theme-dark">Dark</option>
+                        <option value="theme-vibrant">Vibrant</option>
+                    </select>
+                </div>
+                <button id="compare-themes">Compare Themes</button>
+                <button id="go-to-regression" class="secondary">Visual Regression Tests</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="side-by-side">Side-by-Side View</div>
+            <div class="tab" data-tab="visual-diff">Visual Diff</div>
+            <div class="tab" data-tab="element-compare">Element Comparison</div>
+        </div>
+        
+        <div id="side-by-side-tab" class="tab-content active">
+            <div class="comparison-container">
+                <div class="theme-preview" id="theme-a-preview">
+                    <div class="theme-preview-header">
+                        <h3 class="theme-preview-title">Theme A: <span id="theme-a-name">Corporate</span></h3>
+                        <button id="capture-a">Capture Screenshot</button>
+                    </div>
+                    <div class="theme-preview-content">
+                        <iframe id="theme-a-frame" src="about:blank"></iframe>
+                    </div>
+                </div>
+                
+                <div class="theme-preview" id="theme-b-preview">
+                    <div class="theme-preview-header">
+                        <h3 class="theme-preview-title">Theme B: <span id="theme-b-name">Minimal</span></h3>
+                        <button id="capture-b">Capture Screenshot</button>
+                    </div>
+                    <div class="theme-preview-content">
+                        <iframe id="theme-b-frame" src="about:blank"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="visual-diff-tab" class="tab-content">
+            <div class="screenshot-controls">
+                <button id="take-screenshots">Take Screenshots</button>
+                <button id="generate-diff">Generate Visual Diff</button>
+            </div>
+            
+            <div class="diff-view">
+                <div class="diff-view-header">
+                    <h3 class="diff-view-title">Visual Differences</h3>
+                </div>
+                <div class="diff-view-content" id="diff-results">
+                    <p>Click "Take Screenshots" and then "Generate Visual Diff" to see the differences between the two themes.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="element-compare-tab" class="tab-content">
+            <div class="element-selector">
+                <label for="element-select">Select Element:</label>
+                <select id="element-select">
+                    <option value="header">Header</option>
+                    <option value="risk-score">Risk Score</option>
+                    <option value="summary-section">Summary Section</option>
+                    <option value="recommendations">Recommendations</option>
+                    <option value="detailed-analysis">Detailed Analysis</option>
+                    <option value="footer">Footer</option>
+                </select>
+                <button id="compare-element">Compare Element</button>
+            </div>
+            
+            <div class="comparison-container" id="element-comparison">
+                <!-- Element comparison will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import ReportPreview from './js/report/ReportPreview.js';
+        import testReportData from './js/report/test-data.js';
+        import html2canvas from './js/lib/html2canvas.esm.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation button
+            document.getElementById('go-to-regression').addEventListener('click', () => {
+                window.location.href = 'theme-regression-test.html';
+            });
+            
+            // Initialize variables
+            const themeASelect = document.getElementById('theme-a-select');
+            const themeBSelect = document.getElementById('theme-b-select');
+            const compareButton = document.getElementById('compare-themes');
+            const themeAFrame = document.getElementById('theme-a-frame');
+            const themeBFrame = document.getElementById('theme-b-frame');
+            const themeAName = document.getElementById('theme-a-name');
+            const themeBName = document.getElementById('theme-b-name');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Set initial iframe sources
+            updateIframeSrc(themeAFrame, themeASelect.value);
+            updateIframeSrc(themeBFrame, themeBSelect.value);
+            
+            // Update theme names
+            themeAName.textContent = getThemeName(themeASelect.value);
+            themeBName.textContent = getThemeName(themeBSelect.value);
+            
+            // Compare button click handler
+            compareButton.addEventListener('click', () => {
+                updateIframeSrc(themeAFrame, themeASelect.value);
+                updateIframeSrc(themeBFrame, themeBSelect.value);
+                
+                themeAName.textContent = getThemeName(themeASelect.value);
+                themeBName.textContent = getThemeName(themeBSelect.value);
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Visual diff tab functionality
+            const takeScreenshotsBtn = document.getElementById('take-screenshots');
+            const generateDiffBtn = document.getElementById('generate-diff');
+            const diffResults = document.getElementById('diff-results');
+            
+            let screenshotA = null;
+            let screenshotB = null;
+            
+            takeScreenshotsBtn.addEventListener('click', async () => {
+                diffResults.innerHTML = '<p>Taking screenshots...</p>';
+                
+                try {
+                    // Wait for iframes to fully load
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Take screenshots of both iframes
+                    const frameADoc = themeAFrame.contentDocument || themeAFrame.contentWindow.document;
+                    const frameBDoc = themeBFrame.contentDocument || themeBFrame.contentWindow.document;
+                    
+                    screenshotA = await html2canvas(frameADoc.body);
+                    screenshotB = await html2canvas(frameBDoc.body);
+                    
+                    diffResults.innerHTML = '<p>Screenshots taken. Click "Generate Visual Diff" to compare.</p>';
+                } catch (error) {
+                    console.error('Error taking screenshots:', error);
+                    diffResults.innerHTML = `<p>Error taking screenshots: ${error.message}</p>`;
+                }
+            });
+            
+            generateDiffBtn.addEventListener('click', () => {
+                if (!screenshotA || !screenshotB) {
+                    diffResults.innerHTML = '<p>Please take screenshots first.</p>';
+                    return;
+                }
+                
+                diffResults.innerHTML = '';
+                
+                // Create diff item for full page comparison
+                const diffItem = document.createElement('div');
+                diffItem.className = 'diff-item';
+                diffItem.innerHTML = `
+                    <div class="diff-item-header">Full Page Comparison</div>
+                    <div class="diff-item-content">
+                        <div class="diff-item-image">
+                            <img src="${screenshotA.toDataURL()}" alt="Theme A Screenshot">
+                            <div class="diff-item-label">${getThemeName(themeASelect.value)}</div>
+                        </div>
+                        <div class="diff-item-image">
+                            <img src="${screenshotB.toDataURL()}" alt="Theme B Screenshot">
+                            <div class="diff-item-label">${getThemeName(themeBSelect.value)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                diffResults.appendChild(diffItem);
+                
+                // In a real implementation, you would add pixel-by-pixel comparison
+                // and highlight the differences between the two screenshots
+            });
+            
+            // Element comparison tab functionality
+            const elementSelect = document.getElementById('element-select');
+            const compareElementBtn = document.getElementById('compare-element');
+            const elementComparison = document.getElementById('element-comparison');
+            
+            compareElementBtn.addEventListener('click', async () => {
+                const selectedElement = elementSelect.value;
+                elementComparison.innerHTML = '<p>Comparing elements...</p>';
+                
+                try {
+                    // Wait for iframes to fully load
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Get the selected element from both iframes
+                    const frameADoc = themeAFrame.contentDocument || themeAFrame.contentWindow.document;
+                    const frameBDoc = themeBFrame.contentDocument || themeBFrame.contentWindow.document;
+                    
+                    const elementA = frameADoc.querySelector(`.${selectedElement}`) || 
+                                     frameADoc.getElementById(selectedElement);
+                    const elementB = frameBDoc.querySelector(`.${selectedElement}`) || 
+                                     frameBDoc.getElementById(selectedElement);
+                    
+                    if (!elementA || !elementB) {
+                        elementComparison.innerHTML = '<p>Element not found in one or both themes.</p>';
+                        return;
+                    }
+                    
+                    // Take screenshots of the elements
+                    const elementAScreenshot = await html2canvas(elementA);
+                    const elementBScreenshot = await html2canvas(elementB);
+                    
+                    // Create preview containers
+                    const elementAPreview = document.createElement('div');
+                    elementAPreview.className = 'theme-preview';
+                    elementAPreview.innerHTML = `
+                        <div class="theme-preview-header">
+                            <h3 class="theme-preview-title">${getThemeName(themeASelect.value)} - ${getElementName(selectedElement)}</h3>
+                        </div>
+                        <div class="theme-preview-content">
+                            <img src="${elementAScreenshot.toDataURL()}" alt="Element A Screenshot" style="width:100%">
+                        </div>
+                    `;
+                    
+                    const elementBPreview = document.createElement('div');
+                    elementBPreview.className = 'theme-preview';
+                    elementBPreview.innerHTML = `
+                        <div class="theme-preview-header">
+                            <h3 class="theme-preview-title">${getThemeName(themeBSelect.value)} - ${getElementName(selectedElement)}</h3>
+                        </div>
+                        <div class="theme-preview-content">
+                            <img src="${elementBScreenshot.toDataURL()}" alt="Element B Screenshot" style="width:100%">
+                        </div>
+                    `;
+                    
+                    elementComparison.innerHTML = '';
+                    elementComparison.appendChild(elementAPreview);
+                    elementComparison.appendChild(elementBPreview);
+                    
+                } catch (error) {
+                    console.error('Error comparing elements:', error);
+                    elementComparison.innerHTML = `<p>Error comparing elements: ${error.message}</p>`;
+                }
+            });
+            
+            // Helper functions
+            function updateIframeSrc(iframe, theme) {
+                // Clone the test data and update the theme
+                const reportData = JSON.parse(JSON.stringify(testReportData));
+                reportData.selectedTheme = theme;
+                
+                // Create a URL with the report data as a query parameter
+                const encodedData = encodeURIComponent(JSON.stringify(reportData));
+                const url = `report-test.html?data=${encodedData}`;
+                
+                // Also store in localStorage as a fallback
+                localStorage.setItem('reportData', JSON.stringify(reportData));
+                
+                // Set up the iframe load handler before changing the src
+                iframe.onload = function() {
+                    console.log('Iframe loaded:', iframe.id);
+                    
+                    try {
+                        // Try to access the iframe's window and pass the data directly
+                        const iframeWindow = iframe.contentWindow;
+                        if (iframeWindow) {
+                            // Wait a moment for the iframe content to be fully initialized
+                            setTimeout(() => {
+                                console.log('Sending postMessage to iframe:', iframe.id);
+                                iframeWindow.postMessage({
+                                    type: 'reportData',
+                                    data: reportData
+                                }, '*');
+                                
+                                // Try to directly access the iframe's document to ensure the container exists
+                                try {
+                                    const iframeDoc = iframe.contentDocument || iframeWindow.document;
+                                    const reportContainer = iframeDoc.getElementById('report-main');
+                                    console.log('Iframe report container found:', reportContainer);
+                                    
+                                    if (!reportContainer) {
+                                        console.error('Report container not found in iframe:', iframe.id);
+                                    }
+                                } catch (docError) {
+                                    console.error('Error accessing iframe document:', docError);
+                                }
+                            }, 500);
+                        }
+                    } catch (e) {
+                        console.error('Error passing data to iframe:', e);
+                    }
+                };
+                
+                // Set the iframe source to the report test page with data
+                console.log('Setting iframe src:', url);
+                iframe.src = url;
+            }
+            
+            function getThemeName(themeId) {
+                const themeMap = {
+                    'theme-corporate': 'Corporate',
+                    'theme-minimal': 'Minimal',
+                    'theme-dark': 'Dark',
+                    'theme-vibrant': 'Vibrant'
+                };
+                
+                return themeMap[themeId] || themeId;
+            }
+            
+            function getElementName(elementId) {
+                const elementMap = {
+                    'header': 'Header',
+                    'risk-score': 'Risk Score',
+                    'summary-section': 'Summary Section',
+                    'recommendations': 'Recommendations',
+                    'detailed-analysis': 'Detailed Analysis',
+                    'footer': 'Footer'
+                };
+                
+                return elementMap[elementId] || elementId;
+            }
+        });
+    </script>
+</body>
+</html>

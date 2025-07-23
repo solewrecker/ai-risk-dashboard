@@ -34,8 +34,7 @@ function renderSummaryCards() {
     document.getElementById('compare-summary-high').innerHTML = `<div class="compare-tools__summary-label">High Risk</div><div class="compare-tools__summary-value">${high}</div>`;
     document.getElementById('compare-summary-medium').innerHTML = `<div class="compare-tools__summary-label">Medium Risk</div><div class="compare-tools__summary-value">${medium}</div>`;
     document.getElementById('compare-summary-low').innerHTML = `<div class="compare-tools__summary-label">Low Risk</div><div class="compare-tools__summary-value">${low}</div>`;
-    // Optionally add critical if you want to display it
-    // document.getElementById('compare-summary-critical').innerHTML = `<div class="compare-tools__summary-label">Critical Risk</div><div class="compare-tools__summary-value">${critical}</div>`;
+    document.getElementById('compare-summary-critical').innerHTML = `<div class="compare-tools__summary-label">Critical Risk</div><div class="compare-tools__summary-value">${critical}</div>`;
 }
 
 function renderSelectedTags() {
@@ -68,9 +67,11 @@ function renderTable() {
         const detailedAssessment = ad.detailedAssessment || {};
         const recommendations = ad.recommendations || [];
         const isExpanded = expandedToolId === tool.id;
-        // Compliance info
-        const complianceCerts = (tool.compliance_certifications || []).join(', ') || '-';
+
+        // Compliance info (ensure they are strings)
+        const complianceCerts = Array.isArray(tool.compliance_certifications) ? tool.compliance_certifications.map(String).join(', ') : '-';
         const complianceSummary = ad.compliance_summary || (detailedAssessment.compliance_summary) || '-';
+        
         // Recommendations
         const recs = recommendations.map(r => `
             <div class="compare-tools__recommendation">
@@ -82,15 +83,20 @@ function renderTable() {
                 </div>
             </div>
         `).join('') || '<p>No recommendations available</p>';
-        // Detailed Breakdown
-        const detailsHTML = Object.entries(detailedAssessment.assessment_details || {}).map(([key, detail]) => {
+
+        // Detailed Breakdown (ensure assessment_details is an object)
+        const detailsHTML = (typeof detailedAssessment.assessment_details === 'object' && detailedAssessment.assessment_details !== null 
+            ? Object.entries(detailedAssessment.assessment_details) : []
+        ).map(([key, detail]) => {
             const categoryScore = detail.category_score || 0;
             return `
                 <div class="compare-tools__detail-card">
                     <h5 class="compare-tools__detail-title">${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</h5>
                     <div class="compare-tools__detail-score">Score: ${categoryScore}</div>
                     <div class="compare-tools__detail-content">
-                        ${Object.entries(detail.criteria || {}).map(([critKey, crit]) => `
+                        ${(typeof detail.criteria === 'object' && detail.criteria !== null 
+                            ? Object.entries(detail.criteria) : []
+                        ).map(([critKey, crit]) => `
                             <div class="compare-tools__detail-item">
                                 <strong>${critKey.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> ${crit.score} - ${crit.justification}
                             </div>
@@ -99,18 +105,20 @@ function renderTable() {
                 </div>
             `;
         }).join('') || '<p>No detailed assessment available</p>';
+
         // Compliance Icons (adapt from example)
-        const complianceIcons = Object.entries(tool.compliance || {}).map(([key, status]) => {
+        const complianceIcons = (typeof tool.compliance === 'object' && tool.compliance !== null ? Object.entries(tool.compliance) : []).map(([key, status]) => {
             const icon = status === 'compliant' ? '<i data-lucide="check-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--compliant"></i>' : '<i data-lucide="x-circle" class="compare-tools__compliance-icon compare-tools__compliance-icon--noncompliant"></i>';
             return `<div class="compare-tools__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
         }).join('') || '<p>No compliance data</p>';
-        // Score values
-        const dataStorage = scores.dataStorage ?? '-';
-        const trainingUsage = scores.trainingUsage ?? '-';
-        const accessControls = scores.accessControls ?? '-';
-        const complianceRisk = scores.complianceRisk ?? '-';
-        const vendorTransparency = scores.vendorTransparency ?? '-';
-        const compliance = tool.compliance ?? '-';
+
+        // Score values - Accessing from top-level `tool` object
+        const dataStorage = tool.data_storage_score ?? '-';
+        const trainingUsage = tool.training_usage_score ?? '-';
+        const accessControls = tool.access_controls_score ?? '-';
+        const complianceRisk = tool.compliance_score ?? '-';
+        const vendorTransparency = tool.vendor_transparency_score ?? '-';
+
         const totalScore = tool.total_score || ad.finalScore || 0;
         const risk = getRiskLevel(totalScore);
         return `
@@ -134,10 +142,10 @@ function renderTable() {
             <td><span class="compare-tools__score">${accessControls}</span></td>
             <td><span class="compare-tools__score">${complianceRisk}</span></td>
             <td><span class="compare-tools__score">${vendorTransparency}</span></td>
-            <td><span class="compare-tools__score">${compliance}</span></td>
+            <!-- Removed Compliance Column -->
         </tr>
         <tr class="compare-tools__details-row" style="display:${isExpanded ? 'table-row' : 'none'}">
-            <td colspan="9">
+            <td colspan="8"> <!-- Changed colspan from 9 to 8 -->
                 <div class="compare-tools__details">
                     <div class="compare-tools__tabs">
                         <button class="compare-tools__tab compare-tools__tab--active" data-tab="details" data-tool-id="${tool.id}">
@@ -171,8 +179,11 @@ function renderTable() {
                             <div class="compare-tools__compliance-grid">
                                 ${complianceIcons}
                             </div>
+                            <!-- Display detailed compliance summary -->
                             <div class="compare-tools__compliance-summary">
-                                <p><strong>Certifications:</strong> ${complianceCerts}</p>
+                                <p><strong>Data Classification:</strong> ${tool.data_classification || 'Not specified'}</p>
+                                <p><strong>Use Case:</strong> ${tool.primary_use_case || 'Not specified'}</p>
+                                <p><strong>Documentation Tier:</strong> ${tool.documentation_tier || 'Not specified'}</p>
                                 <p><strong>Summary:</strong> ${complianceSummary}</p>
                             </div>
                         </div>

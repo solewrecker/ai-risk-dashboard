@@ -120,22 +120,27 @@ function renderRecentAssessments() {
         const riskColors = {
             low: 'bg-green-500',
             medium: 'bg-yellow-500',
-            high: 'bg-red-500',
-            critical: 'bg-purple-500'
+            high: 'bg-orange-500', // Changed from red to orange
+            critical: 'bg-red-500' // Changed from purple to red
         };
         const riskColor = riskColors[assessment.risk_level?.toLowerCase()] || 'bg-gray-500';
-        const scoreColorClass = assessment.total_score >= 75 ? 'risk-critical' : 
-                              assessment.total_score >= 50 ? 'risk-high' : 
-                              assessment.total_score >= 25 ? 'risk-medium' : 'risk-low';
+        const scoreColorClass = assessment.total_score >= 80 ? 'risk-critical' : // Aligned with AI_Risk_Framework.md Critical (80-100)
+                              assessment.total_score >= 60 ? 'risk-high' :    // Aligned with AI_Risk_Framework.md High (60-79)
+                              assessment.total_score >= 35 ? 'risk-medium' : // Aligned with AI_Risk_Framework.md Medium (35-59)
+                              'risk-low';                                 // Aligned with AI_Risk_Framework.md Low (0-34)
+        
+        const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+        const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
+
         return `
             <div class="dashboard-summary-assessments__item">
                 <div class="dashboard-summary-assessments__content">
                     <div class="dashboard-assessment-icon">
                         <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
-                        <div class="dashboard-assessment-risk-indicator ${riskColor}"></div>
+                        <div class="dashboard-assessment-risk-indicator ${assessment.risk_level?.toLowerCase()}"></div>
                     </div>
                     <div class="dashboard-summary-assessments__info">
-                        <div class="dashboard-summary-assessments__name">${assessment.name}</div>
+                        <div class="dashboard-summary-assessments__name">${fullToolName}</div>
                         <div class="dashboard-summary-assessments__meta">
                             <span>${date}</span>
                             <span class="dashboard-assessment-meta-divider">•</span>
@@ -198,6 +203,8 @@ function renderAssessmentList() {
         const canDelete = getIsAdmin() || (user && assessment.user_id === user.id);
         const isExpanded = expandedAssessmentId === assessment.id;
         const formData = assessment.assessment_data?.formData || {};
+        const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+        const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
         return `
             <div class="assessments-page__list-item assessments-page__list-item--clickable" data-assessment-id="${assessment.id}" onclick="toggleAssessmentDetails('${assessment.id}')">
                 <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
@@ -205,7 +212,7 @@ function renderAssessmentList() {
                         <span class="chevron${isExpanded ? ' chevron--down' : ''}"></span>
                     </button>
                     <div class="assessments-page__tool-info">
-                        <h4>${assessment.name}</h4>
+                        <h4>${fullToolName}</h4>
                         <p>${formData.toolCategory || assessment.category || 'General'}</p>
                     </div>
                 </div>
@@ -355,66 +362,88 @@ function renderAssessmentCompliance(assessment) {
         const detailedAssessment = data.detailed_assessment || data.results?.detailed_assessment || {};
         
         // Access compliance data from multiple possible paths
-        const complianceData = assessment.compliance || data.compliance || {};
-        const complianceCertifications = assessment.compliance_certifications || data.compliance_certifications || [];
+        const complianceData = assessment.compliance || data.compliance || {}; // Keep for fallback/other uses if needed
+        const complianceCertificationsObject = assessment.compliance_certifications || data.compliance_certifications || {};
         
         console.log('Compliance Data:', {
             complianceData,
-            complianceCertifications,
+            complianceCertificationsObject,
             assessmentData: data
         });
 
-        // Defensive checks to prevent .join() errors
-        let complianceIcons = '';
-        
-        // Handle compliance data as an object
-        if (complianceData && typeof complianceData === 'object') {
-            const complianceEntries = Object.entries(complianceData);
-            console.log('Compliance Entries:', complianceEntries);
-            
-            if (complianceEntries.length > 0) {
-                complianceIcons = complianceEntries.map(([key, status]) => {
-                    const icon = status === 'compliant' || status === true ? 
-                        '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>' : 
-                        '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
-                    return `<div class="assessments-page__compliance-item">${icon} <span>${key.toUpperCase()}</span></div>`;
+        let certificationsHtml = '';
+
+        if (complianceCertificationsObject && typeof complianceCertificationsObject === 'object') {
+            const certEntries = Object.entries(complianceCertificationsObject);
+
+            if (certEntries.length > 0) {
+                certificationsHtml = certEntries.map(([certName, certDetails]) => {
+                    const status = certDetails.status || 'N/A';
+                    const details = certDetails.details || 'No details provided.';
+                    const evidence = certDetails.evidence || 'No evidence provided.';
+                    const limitations = certDetails.limitations || 'None';
+                    const lastVerified = certDetails.last_verified || 'N/A';
+
+                    let statusIcon = '';
+                    let statusClass = '';
+
+                    switch (status.toLowerCase()) {
+                        case 'compliant':
+                        case 'type ii': // Assuming Type II is a compliant status
+                            statusIcon = '<i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i>';
+                            statusClass = '--compliant';
+                            break;
+                        case 'conditionally compliant':
+                            statusIcon = '<i data-lucide="alert-triangle" class="assessments-page__compliance-icon assessments-page__compliance-icon--conditional"></i>';
+                            statusClass = '--conditional';
+                            break;
+                        case 'no':
+                            statusIcon = '<i data-lucide="x-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--noncompliant"></i>';
+                            statusClass = '--noncompliant';
+                            break;
+                        case 'not applicable':
+                            statusIcon = '<i data-lucide="info" class="assessments-page__compliance-icon assessments-page__compliance-icon--na"></i>';
+                            statusClass = '--na';
+                            break;
+                        default:
+                            statusIcon = '<i data-lucide="help-circle" class="assessments-page__compliance-icon"></i>';
+                            break;
+                    }
+
+                    return `
+                        <div class="assessments-page__compliance-card">
+                            <div class="assessments-page__compliance-card-header">
+                                ${statusIcon}
+                                <h5 class="assessments-page__compliance-card-title">${certName.toUpperCase()}</h5>
+                                <span class="assessments-page__compliance-card-status assessments-page__compliance-card-status${statusClass}">${status}</span>
+                            </div>
+                            <div class="assessments-page__compliance-card-body">
+                                <p><strong>Details:</strong> ${details}</p>
+                                <p><strong>Evidence:</strong> ${evidence}</p>
+                                <p><strong>Limitations:</strong> ${limitations}</p>
+                                <p><strong>Last Verified:</strong> ${lastVerified}</p>
+                            </div>
+                        </div>
+                    `;
                 }).join('');
             }
         }
-        
-        // Fallback to certifications if no compliance data
-        const safeComplianceCerts = Array.isArray(complianceCertifications) ? complianceCertifications : [];
-        if (!complianceIcons && safeComplianceCerts.length > 0) {
-            complianceIcons = safeComplianceCerts.map(cert => 
-                `<div class="assessments-page__compliance-item">
-                    <i data-lucide="check-circle" class="assessments-page__compliance-icon assessments-page__compliance-icon--compliant"></i> 
-                    <span>${String(cert).toUpperCase()}</span>
-                </div>`
-            ).join('');
+
+        // Fallback if no detailed certifications object
+        if (!certificationsHtml) {
+            certificationsHtml = '<p>No detailed compliance data available.</p>';
         }
-        
-        // Final fallback
-        if (!complianceIcons) {
-            complianceIcons = '<p>No compliance data available</p>';
-        }
-        
-        const complianceSummary = data.compliance_summary || detailedAssessment.compliance_summary || assessment.summary_and_recommendation || 'No compliance summary available';
-        
-        // Defensive check for compliance certifications
-        const complianceCerts = Array.isArray(assessment.compliance_certifications) 
-            ? assessment.compliance_certifications.map(cert => String(cert)).join(', ') 
-            : Array.isArray(data.compliance_certifications) 
-                ? data.compliance_certifications.map(cert => String(cert)).join(', ') 
-                : 'No certifications specified';
+
+        // Explicitly get compliance_summary from the correct nested path
+        const complianceSummary = assessment.assessment_data?.detailedAssessment?.compliance_summary || 'No compliance summary available';
         
         return `
             <div class="assessments-page__compliance-grid">
-                ${complianceIcons}
+                ${certificationsHtml}
             </div>
             <div class="assessments-page__compliance-summary">
-                <p><strong>Data Classification:</strong> ${formData.dataClassification || assessment.data_classification || 'Not specified'}</p>
+                <p><strong>Documentation Tier:</strong> ${assessment.documentation_tier || 'Not specified'}</p>
                 <p><strong>Use Case:</strong> ${formData.useCase || assessment.primary_use_case || 'Not specified'}</p>
-                <p><strong>Certifications:</strong> ${complianceCerts}</p>
                 <p><strong>Summary:</strong> ${complianceSummary}</p>
             </div>
         `;
@@ -718,6 +747,9 @@ export const clearAllFilters = clearAllFiltersLegacy;
 function renderAssessmentItem(assessment) {
     const riskLevelClass = getRiskLevelClass(assessment.total_score);
     const riskLevelText = getRiskLevelText(assessment.total_score);
+
+    const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+    const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
     
     return `
         <div class="dashboard-summary-assessments__item">
@@ -726,7 +758,7 @@ function renderAssessmentItem(assessment) {
                     <i data-lucide="${getToolIcon(assessment.category)}" class="w-5 h-5"></i>
                 </div>
                 <div class="dashboard-summary-assessments__item-info">
-                    <h3 class="dashboard-summary-assessments__item-name">${assessment.name}</h3>
+                    <h3 class="dashboard-summary-assessments__item-name">${fullToolName}</h3>
                     <p class="dashboard-summary-assessments__item-category">${assessment.category || 'General'}</p>
                 </div>
             </div>
@@ -811,6 +843,8 @@ function renderFilteredAssessments(filteredData) {
             const canDelete = (typeof getIsAdmin === 'function' && getIsAdmin()) || (user && assessment.user_id === user.id);
             const isExpanded = typeof expandedAssessmentId !== 'undefined' && expandedAssessmentId === assessment.id;
             const formData = assessment.assessment_data?.formData || {};
+            const toolVersion = assessment.license_type ? assessment.license_type.charAt(0).toUpperCase() + assessment.license_type.slice(1) : '';
+            const fullToolName = toolVersion ? `${assessment.name} <span class="tool-title__license-type">${toolVersion}</span>` : assessment.name;
             
             // Check if we're rendering for the new dashboard grid or old list
             if (container.classList.contains('assessment-grid')) {
@@ -840,7 +874,7 @@ function renderFilteredAssessments(filteredData) {
                     <div class="assessments-page__list-item" data-assessment-id="${assessment.id}">
                         <div class="assessments-page__col assessments-page__col--tool" data-label="Tool">
                             <div class="assessments-page__tool-info">
-                                <h4>${assessment.name}</h4>
+                                <h4>${fullToolName}</h4>
                                 <p>${formData.toolCategory || assessment.category || 'General'}</p>
                             </div>
                         </div>

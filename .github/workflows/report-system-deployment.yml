@@ -1,0 +1,163 @@
+name: Report System CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/js/dashboard/export/**'
+      - 'docs/css/themes/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/js/dashboard/export/**'
+      - 'docs/css/themes/**'
+
+jobs:
+  test:
+    name: Test Report System
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run unit tests
+      run: npm test -- --coverage
+    
+    - name: Run theme validation tests
+      run: node docs/js/dashboard/export/tests/validateThemes.js
+    
+    - name: Run visual regression tests
+      run: |
+        npm run test:visual
+        if [ -d "visual-regression-results" ]; then
+          echo "Visual regression test results available"
+          mkdir -p visual-artifacts
+          cp -r visual-regression-results visual-artifacts/
+        fi
+    
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          coverage/
+          visual-artifacts/
+        retention-days: 7
+  
+  build:
+    name: Build Report System
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build report system
+      run: npm run build:report-system
+    
+    - name: Optimize assets
+      run: |
+        npm run optimize-js
+        npm run optimize-css
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: report-system-build
+        path: dist/
+        retention-days: 7
+  
+  deploy:
+    name: Deploy Report System
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: report-system-build
+        path: dist
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Deploy to S3
+      run: |
+        aws s3 sync dist s3://${{ secrets.S3_BUCKET }}/report-system/ --delete
+    
+    - name: Invalidate CloudFront cache
+      run: |
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/report-system/*"
+    
+    - name: Create deployment record
+      run: |
+        echo "Report System deployed at $(date)" >> deployment-record.txt
+        echo "Commit: ${{ github.sha }}" >> deployment-record.txt
+        aws s3 cp deployment-record.txt s3://${{ secrets.S3_BUCKET }}/report-system/deployment-record.txt
+  
+  performance-test:
+    name: Performance Testing
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run performance tests
+      run: |
+        npm run test:performance
+        mkdir -p performance-results
+        cp performance-report.json performance-results/
+    
+    - name: Compare with baseline
+      run: node scripts/compare-performance.js
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: performance-results/
+        retention-days: 7
+    
+    - name: Send performance alert if needed
+      if: failure()
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{"text":"⚠️ Performance regression detected in Report System!"}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}

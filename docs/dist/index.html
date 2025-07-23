@@ -1,0 +1,310 @@
+<!DOCTYPE html><html lang="en"><head><script type="importmap">{"imports":{"@supabase/supabase-js":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"}}</script><link rel="stylesheet" href="./export.f2061d0f.css"><script type="module" src="./docs.47b24be7.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
+    <title>AI Tool Risk Assessment</title>
+    
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Initialize Supabase Client -->
+    <script>
+        // Initialize the global Supabase client
+        window.createClient = window.supabase?.createClient;
+    </script>
+    
+    <!-- Add Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    
+    <!-- Export functionality moved to export.html -->
+    
+    <link rel="stylesheet" href="./export.ff053ac9.css">
+</head>
+<body class="creator-page">
+    <div class="page-container">
+        <!-- Header -->
+        <div class="creator-header">
+            <h1>AI Tool Risk Assessment</h1>
+            <p>Enterprise-grade security analysis for AI tools and platforms</p>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection">
+            <!-- Login UI will be populated by JavaScript -->
+        </div>
+
+        <!-- Auth Modal -->
+        <div id="authModal" class="auth-modal-overlay">
+            <div class="auth-modal">
+                <div class="auth-modal-header">
+                    <h3><i data-lucide="lock" class="w-5 h-5"></i> Account Access</h3>
+                </div>
+                <div class="auth-modal-content">
+                    <div class="auth-tabs">
+                        <div id="signInTab" class="auth-tab active">Sign In</div>
+                        <div id="signUpTab" class="auth-tab">Create Account</div>
+                    </div>
+                    
+                    <div id="signInForm" class="auth-form active">
+                        <div class="auth-input-group">
+                            <label for="signInEmail">Email Address</label>
+                            <input type="email" id="signInEmail" class="auth-input" placeholder="Enter your email">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signInPassword">Password</label>
+                            <input type="password" id="signInPassword" class="auth-input" placeholder="Enter your password">
+                        </div>
+                        <button id="signInBtn" class="auth-button">
+                            <i data-lucide="log-in" class="w-4 h-4"></i> Sign In
+                        </button>
+                    </div>
+                    
+                    <div id="signUpForm" class="auth-form">
+                        <div class="auth-input-group">
+                            <label for="signUpEmail">Email Address</label>
+                            <input type="email" id="signUpEmail" class="auth-input" placeholder="Enter your email">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signUpPassword">Password</label>
+                            <input type="password" id="signUpPassword" class="auth-input" placeholder="Create a password">
+                        </div>
+                        <div class="auth-input-group">
+                            <label for="signUpTier">Account Type</label>
+                            <select id="signUpTier" class="auth-select">
+                                <option value="free">🆓 Free Tier - Basic exports</option>
+                                <option value="enterprise">⭐ Enterprise - $49/month</option>
+                            </select>
+                        </div>
+                        <button id="signUpBtn" class="auth-button">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i> Create Account
+                        </button>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <button id="closeAuthModalBtn" class="btn btn-secondary">
+                            Continue as Guest
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-step active" id="step1">
+                    <span class="step-number">1</span>
+                    <span>Tool Information</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="progress-step" id="step2">
+                    <span class="step-number">2</span>
+                    <span>Data Classification</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="progress-step" id="step3">
+                    <span class="step-number">3</span>
+                    <span>Analysis</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="progress-step" id="step4">
+                    <span class="step-number">4</span>
+                    <span>Results</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Security Risk Assessment</h2>
+                <p>Comprehensive analysis following enterprise security frameworks</p>
+            </div>
+            
+            <div class="form-content">
+                <form id="assessmentForm">
+                    <!-- Step 1: Tool Information -->
+                    <div class="step-section active" id="section1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="toolName">
+                                    Tool Name <span class="required">*</span>
+                                </label>
+                                <input type="text" id="toolName" name="toolName" class="form-input" placeholder="e.g., ChatGPT, Claude, Midjourney" required="">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="toolVersion">Tool Version</label>
+                                <select id="toolVersion" name="toolVersion" class="form-select">
+                                    <option value="free">Free/Personal Version</option>
+                                    <option value="pro">Pro Version</option>
+                                    <option value="enterprise">Enterprise Version</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="toolCategory">Category</label>
+                                <select id="toolCategory" name="toolCategory" class="form-select">
+                                    <option value="">Select category</option>
+                                    <option value="conversational-ai">Conversational AI</option>
+                                    <option value="code-assistant">Code Assistant</option>
+                                    <option value="content-generation">Content Generation</option>
+                                    <option value="data-analysis">Data Analysis</option>
+                                    <option value="productivity">Productivity Tool</option>
+                                    <option value="design-creative">Design &amp; Creative</option>
+                                    <option value="translation">Translation &amp; Language</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="useCase">Intended Use Case</label>
+                                <select id="useCase" name="useCase" class="form-select">
+                                    <option value="">Select primary use case</option>
+                                    <option value="legal-compliance">Legal/Compliance/Audit</option>
+                                    <option value="finance-accounting">Finance/Accounting</option>
+                                    <option value="hr-executive">HR/Executive Communications</option>
+                                    <option value="customer-support">Customer Data/Support</option>
+                                    <option value="development">Internal IT/Development</option>
+                                    <option value="marketing">Marketing/Public Content</option>
+                                    <option value="research">Research &amp; Analysis</option>
+                                    <option value="general">General Business Use</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="toolUrl">Tool Website/URL</label>
+                            <input type="url" id="toolUrl" name="toolUrl" class="form-input" placeholder="https://...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="additionalContext">Additional Context</label>
+                            <textarea id="additionalContext" name="additionalContext" class="form-textarea" placeholder="Provide any additional details about planned usage, specific features needed, or concerns..."></textarea>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" id="nextStepBtn1">
+                                Next: Data Classification →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Data Classification -->
+                    <div class="step-section" id="section2">
+                        <div class="data-classification">
+                            <div class="classification-title">
+                                <span class="classification-icon">🔒</span>
+                                Data Classification
+                            </div>
+                            <div class="classification-description">
+                                Select the type of data that will be processed by this AI tool. This helps us apply appropriate security standards.
+                            </div>
+                            
+                            <div class="classification-options">
+                                <label class="classification-option" for="phi">
+                                    <input type="radio" name="dataClassification" value="phi" id="phi" class="classification-radio">
+                                    <div class="classification-label">
+                                        <div class="classification-name">Protected Health Information (PHI)</div>
+                                        <div class="classification-example">Medical records, patient data, health information</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="classification-option" for="financial">
+                                    <input type="radio" name="dataClassification" value="financial" id="financial" class="classification-radio">
+                                    <div class="classification-label">
+                                        <div class="classification-name">Financial/Payment Data</div>
+                                        <div class="classification-example">Credit cards, banking info, SOX data, financial records</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="classification-option" for="trade-secrets">
+                                    <input type="radio" name="dataClassification" value="trade-secrets" id="trade-secrets" class="classification-radio">
+                                    <div class="classification-label">
+                                        <div class="classification-name">Trade Secrets/Intellectual Property</div>
+                                        <div class="classification-example">Product designs, algorithms, proprietary information</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="classification-option" for="pii">
+                                    <input type="radio" name="dataClassification" value="pii" id="pii" class="classification-radio">
+                                    <div class="classification-label">
+                                        <div class="classification-name">Personally Identifiable Information</div>
+                                        <div class="classification-example">SSN, addresses, employee data, personal information</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="classification-option" for="public">
+                                    <input type="radio" name="dataClassification" value="public" id="public" class="classification-radio">
+                                    <div class="classification-label">
+                                        <div class="classification-name">Public/Marketing Data</div>
+                                        <div class="classification-example">Published content, public information, marketing materials</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary" id="prevStepBtn2">
+                                ← Back
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextStepBtn2">
+                                Start Assessment →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Analysis (Loading) -->
+                    <div class="step-section" id="section3">
+                        <div class="loading active">
+                            <div class="spinner"></div>
+                            <h3>Analyzing Security Risk</h3>
+                            <p id="analysisStatus">Initializing assessment...</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Results -->
+                    <div class="step-section" id="section4">
+                        <div class="creator-results-container modern-results-container">
+                            <!-- This is where the results will be displayed -->
+                            <div class="creator-results-header">
+                                <h3 class="creator-results-title">Analysis Complete</h3>
+                                <p class="creator-results-subtitle">Risk Assessment Results</p>
+                            </div>
+                            <div id="resultsContent" class="p-6">
+                                <!-- Detailed results will be injected here by JavaScript -->
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Generating your detailed risk report...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group mt-6">
+                            <a href="./export.html" class="btn btn-secondary">
+                                <i data-lucide="download" class="w-4 h-4"></i> Export Report
+                            </a>
+                            <button type="button" class="btn btn-primary" id="newAssessmentBtn">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> New Assessment
+                            </button>
+                            <a href="./dashboard.html" class="btn btn-secondary">
+                                <i data-lucide="gauge" class="w-4 h-4"></i> Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load template binding before app.js -->
+    <script type="module" src="./docs.8d4a1220.js"></script>
+    
+    <!-- Initialize Lucide icons -->
+    <script>// Initialize Lucide icons after page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
+
+</script>
+
+</body></html>

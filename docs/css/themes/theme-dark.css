@@ -1,6 +1,18 @@
-/* Dark Theme - Sophisticated Dark Mode */
-/* Import base structure */
-@import url('./theme-base.css');
+/**
+ * theme-dark.css
+ * 
+ * Dark theme for reports.
+ * This file imports the necessary base, layout, and color scheme files.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* Import layout styles (default to two-column) */
+@import url('./layouts/two-col-layout.css');
+
+/* Import color scheme */
+@import url('./color-schemes/dark-colors.css');
 
 /* === DARK THEME VARIABLES === */
 :root {

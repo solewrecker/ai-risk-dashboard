@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme Preloader Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .theme-demo {
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #0066cc;
+      color: white;
+      font-weight: bold;
+    }
+    
+    button:hover {
+      background-color: #0055aa;
+    }
+    
+    .performance-metrics {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .log-container {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      margin-top: 20px;
+    }
+    
+    /* Theme-specific styles will be loaded dynamically */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Theme Preloader Demo</h1>
+    <p>This demo showcases the performance improvements from using the ThemePreloader class.</p>
+    
+    <div class="button-group">
+      <button id="load-default">Load Default Theme</button>
+      <button id="load-dark">Load Dark Theme</button>
+      <button id="load-print">Load Print Theme</button>
+      <button id="preload-themes">Preload All Themes</button>
+      <button id="clear-hints">Clear Resource Hints</button>
+    </div>
+    
+    <div class="theme-demo" id="theme-demo">
+      <h2>Theme Preview</h2>
+      <p>This section will update with the selected theme's styles.</p>
+      <ul>
+        <li>Faster initial page load with critical CSS preloading</li>
+        <li>Smoother theme switching with prefetching</li>
+        <li>Better performance through resource prioritization</li>
+      </ul>
+    </div>
+    
+    <div class="performance-metrics">
+      <h3>Performance Metrics</h3>
+      <div id="metrics">
+        <p>Click a theme button to see loading metrics</p>
+      </div>
+    </div>
+    
+    <div class="log-container" id="log">
+      <!-- Logs will appear here -->
+    </div>
+  </div>
+  
+  <script type="module">
+    import { ThemeRegistry } from './js/report/ThemeRegistry.js';
+    import { ThemeLoader } from './js/report/themeLoader.js';
+    import { ThemeSwitcher } from './js/report/themeSwitcher.js';
+    
+    // Custom logger that writes to the log container
+    const logger = {
+      log: function(message) {
+        const logContainer = document.getElementById('log');
+        const logEntry = document.createElement('div');
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+    };
+    
+    // Override console.log for this demo
+    const originalConsoleLog = console.log;
+    console.log = function(message) {
+      originalConsoleLog.apply(console, arguments);
+      if (typeof message === 'string') {
+        logger.log(message);
+      } else {
+        logger.log(JSON.stringify(message));
+      }
+    };
+    
+    // Initialize theme system
+    const themeRegistry = new ThemeRegistry();
+    const themeLoader = new ThemeLoader(themeRegistry, ['default', 'dark', 'print']);
+    const themeSwitcher = new ThemeSwitcher(themeLoader, themeRegistry);
+    
+    // Register demo themes
+    themeRegistry.registerTheme('default', {
+      name: 'Default',
+      displayName: 'Light Theme',
+      paths: {
+        variables: './css/themes/default/variables.css',
+        layout: './css/themes/default/layout.css',
+        typography: './css/themes/default/typography.css',
+        components: './css/themes/default/components.css'
+      }
+    });
+    
+    themeRegistry.registerTheme('dark', {
+      name: 'Dark',
+      displayName: 'Dark Theme',
+      paths: {
+        variables: './css/themes/dark/variables.css',
+        layout: './css/themes/dark/layout.css',
+        typography: './css/themes/dark/typography.css',
+        components: './css/themes/dark/components.css'
+      }
+    });
+    
+    themeRegistry.registerTheme('print', {
+      name: 'Print',
+      displayName: 'Print Theme',
+      paths: {
+        variables: './css/themes/print/variables.css',
+        layout: './css/themes/print/layout.css',
+        typography: './css/themes/print/typography.css',
+        components: './css/themes/print/components.css'
+      }
+    });
+    
+    // Set up event listeners
+    document.getElementById('load-default').addEventListener('click', async () => {
+      const startTime = performance.now();
+      await themeSwitcher.switchTheme('default');
+      const endTime = performance.now();
+      updateMetrics('default', endTime - startTime);
+    });
+    
+    document.getElementById('load-dark').addEventListener('click', async () => {
+      const startTime = performance.now();
+      await themeSwitcher.switchTheme('dark');
+      const endTime = performance.now();
+      updateMetrics('dark', endTime - startTime);
+    });
+    
+    document.getElementById('load-print').addEventListener('click', async () => {
+      const startTime = performance.now();
+      await themeSwitcher.switchTheme('print');
+      const endTime = performance.now();
+      updateMetrics('print', endTime - startTime);
+    });
+    
+    document.getElementById('preload-themes').addEventListener('click', () => {
+      themeLoader.prefetchCommonThemes();
+      logger.log('Prefetched common themes');
+    });
+    
+    document.getElementById('clear-hints').addEventListener('click', () => {
+      themeLoader.clearResourceHints();
+      logger.log('Cleared all resource hints');
+    });
+    
+    // Update metrics display
+    function updateMetrics(themeName, loadTime) {
+      const metricsContainer = document.getElementById('metrics');
+      metricsContainer.innerHTML = `
+        <p><strong>Theme:</strong> ${themeName}</p>
+        <p><strong>Load Time:</strong> ${loadTime.toFixed(2)}ms</p>
+        <p><strong>Resource Hints:</strong> ${document.querySelectorAll('link[data-theme-preloader="true"]').length}</p>
+      `;
+    }
+    
+    // Initial log
+    logger.log('Theme Preloader Demo initialized');
+    logger.log(`Default theme: ${themeRegistry.getDefaultTheme()?.name || 'None'}`); 
+  </script>
+</body>
+</html>

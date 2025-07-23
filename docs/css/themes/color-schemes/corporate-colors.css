@@ -1,0 +1,99 @@
+/**
+ * corporate-colors.css
+ * 
+ * Corporate color scheme for reports.
+ * Professional blue-based palette suitable for business reports.
+ */
+
+.theme-color--corporate {
+  /* Primary colors */
+  --theme-background: #ffffff;
+  --theme-text-primary: #2c3e50;
+  --theme-text-secondary: #546e7a;
+  --theme-accent: #3498db;
+  --theme-accent-secondary: #2980b9;
+  --theme-border: #e2e8f0;
+  --theme-section-background: #ffffff;
+  --theme-header-background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  --theme-header-text: #ffffff;
+  
+  /* Risk colors */
+  --theme-risk-low: #10b981;
+  --theme-risk-medium: #f59e0b;
+  --theme-risk-high: #ef4444;
+  --theme-risk-critical: #dc2626;
+  
+  /* Component colors */
+  --theme-chart-primary: #3498db;
+  --theme-chart-secondary: #2980b9;
+  --theme-chart-tertiary: #1abc9c;
+  --theme-chart-quaternary: #16a085;
+  
+  /* Table colors */
+  --theme-table-header-bg: #f8fafc;
+  --theme-table-header-text: #2c3e50;
+  --theme-table-border: #e2e8f0;
+  --theme-table-row-alt: #f8fafc;
+  
+  /* Button colors */
+  --theme-button-primary-bg: #3498db;
+  --theme-button-primary-text: #ffffff;
+  --theme-button-secondary-bg: #e2e8f0;
+  --theme-button-secondary-text: #2c3e50;
+  
+  /* Card colors */
+  --theme-card-background: #ffffff;
+  --theme-card-border: #e2e8f0;
+  --theme-card-shadow: rgba(0, 0, 0, 0.05);
+}
+
+/* Specific component styling for corporate theme */
+.theme-color--corporate .report-header {
+  background: var(--theme-header-background);
+}
+
+.theme-color--corporate .report-section__title {
+  color: var(--theme-accent);
+}
+
+.theme-color--corporate .summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+}
+
+/* Risk level specific colors */
+.theme-color--corporate .risk-level--low {
+  color: var(--theme-risk-low);
+}
+
+.theme-color--corporate .risk-level--medium {
+  color: var(--theme-risk-medium);
+}
+
+.theme-color--corporate .risk-level--high {
+  color: var(--theme-risk-high);
+}
+
+.theme-color--corporate .risk-level--critical {
+  color: var(--theme-risk-critical);
+}
+
+/* Background variants */
+.theme-color--corporate .bg-risk-level--low {
+  background-color: var(--theme-risk-low);
+  color: #ffffff;
+}
+
+.theme-color--corporate .bg-risk-level--medium {
+  background-color: var(--theme-risk-medium);
+  color: #ffffff;
+}
+
+.theme-color--corporate .bg-risk-level--high {
+  background-color: var(--theme-risk-high);
+  color: #ffffff;
+}
+
+.theme-color--corporate .bg-risk-level--critical {
+  background-color: var(--theme-risk-critical);
+  color: #ffffff;
+}

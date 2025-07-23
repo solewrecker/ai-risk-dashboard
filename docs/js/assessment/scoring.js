@@ -62,14 +62,141 @@ export function applyClientSideMultipliers(dbData, formData) {
     const totalScore = Object.values(baseScores).reduce((sum, score) => sum + score, 0);
 
     // Return a structure that mimics the original toolData object for consistency
+    const updatedDetailedAssessment = {
+        ...(dbData.detailed_assessment || {}),
+        final_risk_score: totalScore,
+        final_risk_category: getRiskLevel(totalScore),
+        final_score_with_multiplier: totalScore, // Add and update final_score_with_multiplier
+        assessment_details: { // Ensure assessment_details are updated
+            ...(dbData.detailed_assessment?.assessment_details || {}),
+            data_storage_and_security: {
+                ...(dbData.detailed_assessment?.assessment_details?.data_storage_and_security || {}),
+                category_score: baseScores.dataStorage,
+                criteria: (() => {
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.data_storage_and_security?.category_score || 0;
+                    const newCategoryScore = baseScores.dataStorage;
+                    const scalingFactor = (oldCategoryScore !== 0) ? (newCategoryScore / oldCategoryScore) : (newCategoryScore > 0 ? 1 : 0);
+
+                    const updatedCriteria = {};
+                    for (const key in oldCriteria) {
+                        if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') {
+                            updatedCriteria[key] = {
+                                ...oldCriteria[key],
+                                score: Math.round(oldCriteria[key].score * scalingFactor)
+                            };
+                        } else {
+                            updatedCriteria[key] = oldCriteria[key];
+                        }
+                    }
+                    return updatedCriteria;
+                })()
+            },
+            training_data_usage: {
+                ...(dbData.detailed_assessment?.assessment_details?.training_data_usage || {}),
+                category_score: baseScores.trainingUsage,
+                criteria: (() => {
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.training_data_usage?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.training_data_usage?.category_score || 0;
+                    const newCategoryScore = baseScores.trainingUsage;
+                    const scalingFactor = (oldCategoryScore !== 0) ? (newCategoryScore / oldCategoryScore) : (newCategoryScore > 0 ? 1 : 0);
+
+                    const updatedCriteria = {};
+                    for (const key in oldCriteria) {
+                        if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') {
+                            updatedCriteria[key] = {
+                                ...oldCriteria[key],
+                                score: Math.round(oldCriteria[key].score * scalingFactor)
+                            };
+                        } else {
+                            updatedCriteria[key] = oldCriteria[key];
+                        }
+                    }
+                    return updatedCriteria;
+                })()
+            },
+            access_controls: {
+                ...(dbData.detailed_assessment?.assessment_details?.access_controls || {}),
+                category_score: baseScores.accessControls,
+                criteria: (() => {
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.access_controls?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.access_controls?.category_score || 0;
+                    const newCategoryScore = baseScores.accessControls;
+                    const scalingFactor = (oldCategoryScore !== 0) ? (newCategoryScore / oldCategoryScore) : (newCategoryScore > 0 ? 1 : 0);
+
+                    const updatedCriteria = {};
+                    for (const key in oldCriteria) {
+                        if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') {
+                            updatedCriteria[key] = {
+                                ...oldCriteria[key],
+                                score: Math.round(oldCriteria[key].score * scalingFactor)
+                            };
+                        } else {
+                            updatedCriteria[key] = oldCriteria[key];
+                        }
+                    }
+                    return updatedCriteria;
+                })()
+            },
+            compliance_and_legal_risk: {
+                ...(dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk || {}),
+                category_score: baseScores.complianceRisk,
+                criteria: (() => {
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.compliance_and_legal_risk?.category_score || 0;
+                    const newCategoryScore = baseScores.complianceRisk;
+                    const scalingFactor = (oldCategoryScore !== 0) ? (newCategoryScore / oldCategoryScore) : (newCategoryScore > 0 ? 1 : 0);
+
+                    const updatedCriteria = {};
+                    for (const key in oldCriteria) {
+                        if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') {
+                            updatedCriteria[key] = {
+                                ...oldCriteria[key],
+                                score: Math.round(oldCriteria[key].score * scalingFactor)
+                            };
+                        } else {
+                            updatedCriteria[key] = oldCriteria[key];
+                        }
+                    }
+                    return updatedCriteria;
+                })()
+            },
+            vendor_transparency: {
+                ...(dbData.detailed_assessment?.assessment_details?.vendor_transparency || {}),
+                category_score: baseScores.vendorTransparency,
+                criteria: (() => {
+                    const oldCriteria = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.criteria || {};
+                    const oldCategoryScore = dbData.detailed_assessment?.assessment_details?.vendor_transparency?.category_score || 0;
+                    const newCategoryScore = baseScores.vendorTransparency;
+                    const scalingFactor = (oldCategoryScore !== 0) ? (newCategoryScore / oldCategoryScore) : (newCategoryScore > 0 ? 1 : 0);
+
+                    const updatedCriteria = {};
+                    for (const key in oldCriteria) {
+                        if (oldCriteria[key] && typeof oldCriteria[key].score === 'number') {
+                            updatedCriteria[key] = {
+                                ...oldCriteria[key],
+                                score: Math.round(oldCriteria[key].score * scalingFactor)
+                            };
+                        } else {
+                            updatedCriteria[key] = oldCriteria[key];
+                        }
+                    }
+                    return updatedCriteria;
+                })()
+            }
+        }
+    };
+
     return {
         ...dbData, // Pass through original data
         total_score: totalScore, // The new, client-adjusted total score
+        risk_level: getRiskLevel(totalScore), // Ensure top-level risk_level is also updated
         compliance_certifications: dbData.compliance_certifications || [], // Ensure compliance certifications are preserved
         breakdown: {
             ...dbData.breakdown,
             scores: baseScores
-        }
+        },
+        detailed_assessment: updatedDetailedAssessment, // Ensure the detailed_assessment is updated here
     };
 }
 

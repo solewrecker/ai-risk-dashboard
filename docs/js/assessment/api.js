@@ -1,5 +1,4 @@
-// js/assessment/api.js
-// Handles all API calls to the Supabase backend.
+// js/assessment/api.js - Updated with clean schema
 import { supabase, getCurrentUser } from './auth.js';
 import { applyClientSideMultipliers, getRiskLevel } from './scoring.js';
 
@@ -9,60 +8,42 @@ export async function getToolFromDatabase(formData) {
         return null;
     }
 
-    const toolName = formData.toolName.trim();
-    const toolVersion = formData.toolVersion.trim();
-    console.log(`Searching DB for: ${toolName} (Version: ${toolVersion})`);
+    const toolName = formData.toolName?.trim();
+    const licenseType = formData.toolVersion?.trim(); // This is actually license_type
+    
+    if (!toolName) {
+        console.warn('No tool name provided for database search');
+        return null;
+    }
+
+    console.log(`Searching DB for: ${toolName} (License: ${licenseType || 'Any'})`);
 
     try {
-        // --- Attempt 1: Exact Phrase Match (e.g., "ChatGPT Free") ---
-        const exactPhrase = `${toolName} ${toolVersion}`;
-        console.log(`Attempt 1: Case-insensitive exact match for "${exactPhrase}"`);
-        let { data, error } = await supabase
+        let query = supabase
             .from('ai_tools')
             .select('*')
-            .ilike('name', exactPhrase)
-            .limit(1);
-
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 1): Found exact phrase match.', data[0]);
-            return applyClientSideMultipliers(data[0], formData);
-        }
-
-        // --- Attempt 2: Keyword Match (name contains both toolName and toolVersion) ---
-        console.log(`Attempt 2: Keyword match for "${toolName}" and "${toolVersion}"`);
-        ({ data, error } = await supabase
-            .from('ai_tools')
-            .select('*')
-            .ilike('name', `%${toolName}%`)
-            .ilike('name', `%${toolVersion}%`)
-            .limit(1));
-
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 2): Found keyword match.', data[0]);
-            return applyClientSideMultipliers(data[0], formData);
-        }
-
-        // --- Attempt 3: Base Name Match (name contains only the toolName) ---
-        console.log(`Attempt 3: Base name match for "${toolName}"`);
-        ({ data, error } = await supabase
-            .from('ai_tools')
-            .select('*')
-            .ilike('name', `%${toolName}%`)
-            // Sort by creation date to get the most recent one if multiple exist
-            .order('created_at', { ascending: false }) 
-            .limit(1));
+            .ilike('name', `%${toolName}%`);
             
-        if (data && data.length > 0) {
-            console.log('Success (Attempt 3): Found base name match.', data[0]);
-            return applyClientSideMultipliers(data[0], formData);
+        // If license type is specified, filter by it
+        if (licenseType) {
+            query = query.ilike('license_type', licenseType);
         }
         
+        const { data, error } = await query
+            .order('created_at', { ascending: false })
+            .limit(1);
+
         if (error) {
-            console.error('Database query failed after all attempts:', error);
+            console.error('Database query failed:', error);
             return null;
         }
 
-        console.log('No assessment found in database after all attempts.');
+        if (data && data.length > 0) {
+            console.log('Found tool in database:', data[0]);
+            return applyClientSideMultipliers(data[0], formData);
+        }
+
+        console.log('No assessment found in database.');
         return null;
 
     } catch (err) {
@@ -72,27 +53,42 @@ export async function getToolFromDatabase(formData) {
 }
 
 export async function saveToDatabase(assessment) {
-    if (!supabase) return { error: { message: 'Not connected to database.' } };
+    if (!supabase) {
+        return { error: { message: 'Not connected to database.' } };
+    }
     
-    const { formData, finalScore, breakdown, recommendations } = assessment;
     const user = getCurrentUser();
-
     if (!user) {
         return { error: { message: 'User must be logged in to save an assessment.' } };
     }
 
-    // Defensively re-calculate risk level to ensure it's always valid for the DB.
+    if (!assessment?.formData?.toolName) {
+        return { error: { message: 'Invalid assessment data: missing tool name.' } };
+    }
+
+    const { formData, finalScore, breakdown, recommendations } = assessment;
     const validRiskLevel = getRiskLevel(finalScore);
 
-    // Store all details in assessment_data
+    // Clean record with top-level fields and minimal JSONB
     const record = {
         user_id: user.id,
         name: formData.toolName,
-        vendor: assessment.vendor || null, // Add vendor
-        license_type: assessment.license_type || null, // Add license_type
-        primary_use_case: assessment.primary_use_case || null, // Add primary_use_case
+        vendor: assessment.vendor || null,
         data_classification: formData.dataClassification,
+        sources: assessment.sources || null,
+        confidence: assessment.confidence || null,
+        assessment_notes: assessment.assessment_notes || null,
+        azure_permissions: assessment.azure_permissions || null,
         category: formData.toolCategory,
+        
+        // Top-level metadata fields (no longer in JSONB)
+        license_type: assessment.license_type || formData.toolVersion || null,
+        primary_use_case: assessment.primary_use_case || formData.useCase || null,
+        assessed_by: assessment.assessed_by || 'User Assessment',
+        compliance_certifications: assessment.compliance_certifications || [],
+        documentation_tier: assessment.documentation_tier || 'Basic',
+        
+        // Score fields
         total_score: finalScore,
         risk_level: validRiskLevel,
         data_storage_score: breakdown?.scores?.dataStorage ?? 0,
@@ -101,19 +97,12 @@ export async function saveToDatabase(assessment) {
         compliance_score: breakdown?.scores?.complianceRisk ?? 0,
         vendor_transparency_score: breakdown?.scores?.vendorTransparency ?? 0,
         
-        // Add explicit mapping for the missing root-level fields
-        assessed_by: assessment.assessed_by || null,
-        confidence: assessment.confidence || null,
-        documentation_tier: assessment.documentation_tier || null,
-        assessment_notes: assessment.assessment_notes || null,
-        azure_permissions: assessment.azure_permissions || null,
-        sources: assessment.sources || null,
-
-        // Map compliance_certifications to an array of strings for the top-level column
-        compliance_certifications: assessment.compliance_certifications || null,
-        
-        // Store the full, original assessment object in assessment_data without duplication
-        assessment_data: assessment
+        // Minimal JSONB with only non-redundant data
+        assessment_data: {
+            recommendations: recommendations,
+            detailedAssessment: assessment.detailedAssessment || null,
+            summary_and_recommendation: assessment.summary_and_recommendation || null
+        }
     };
     
     try {
@@ -123,26 +112,30 @@ export async function saveToDatabase(assessment) {
             .select();
             
         if (error) {
-            // Check for unique constraint violation
             if (error.code === '23505') { 
-                console.warn(`Tool "${record.name}" already exists. Consider an update?`);
-                return { error: { message: `An assessment for "${record.name}" already exists.`} };
+                console.warn(`Tool "${record.name}" already exists.`);
+                return { 
+                    error: { 
+                        message: `An assessment for "${record.name}" already exists.`,
+                        code: 'DUPLICATE_ENTRY'
+                    } 
+                };
             }
             throw error;
         }
         
-        // Increment total assessments created counter
-        await incrementTotalAssessmentsCreated();
+        await incrementTotalAssessmentsCreated().catch(err => {
+            console.warn('Failed to update assessment counter:', err);
+        });
         
         console.log('Successfully saved to database:', data);
         return { data };
     } catch (error) {
         console.error('Error saving to database:', error);
-        return { error };
+        return { error: { message: error.message || 'Unknown database error' } };
     }
 }
 
-// New function to increment the total assessments created counter
 async function incrementTotalAssessmentsCreated() {
     const user = getCurrentUser();
     if (!user) return;
@@ -155,12 +148,10 @@ async function incrementTotalAssessmentsCreated() {
             data: { total_assessments_created: newTotal }
         });
         
-        if (error) {
-            console.error('Failed to update total assessments created:', error);
-        } else {
-            console.log(`Updated total assessments created: ${currentTotal} → ${newTotal}`);
-        }
+        if (error) throw error;
+        console.log(`Updated total assessments created: ${currentTotal} → ${newTotal}`);
     } catch (error) {
         console.error('Error incrementing total assessments created:', error);
+        throw error;
     }
 }

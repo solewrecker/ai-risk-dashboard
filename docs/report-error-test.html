@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Error Boundary Test</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    <link rel="stylesheet" href="./css/themes/theme-base.css">
+    <link rel="stylesheet" href="./css/report-error-boundaries.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .test-section__title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .test-section__description {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .test-button {
+            padding: 8px 16px;
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .test-button:hover {
+            background-color: #3a5ce5;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Report Error Boundary Test</h1>
+            <p>This page demonstrates the error boundary system for report templates</p>
+        </div>
+    </header>
+    
+    <main class="test-container">
+        <div class="test-section">
+            <h2 class="test-section__title">Template Not Found Error</h2>
+            <p class="test-section__description">Tests the error boundary when a template is not found in the registry.</p>
+            <button class="test-button" id="test-template-not-found">Test Template Not Found</button>
+            <div class="test-result" id="result-template-not-found"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-section__title">Section Render Error</h2>
+            <p class="test-section__description">Tests the error boundary when a specific section fails to render.</p>
+            <button class="test-button" id="test-section-error">Test Section Error</button>
+            <div class="test-result" id="result-section-error"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-section__title">Data Validation Error</h2>
+            <p class="test-section__description">Tests the error boundary when data validation fails.</p>
+            <button class="test-button" id="test-data-validation">Test Data Validation</button>
+            <div class="test-result" id="result-data-validation"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-section__title">Critical Render Error</h2>
+            <p class="test-section__description">Tests the error boundary when a critical rendering error occurs.</p>
+            <button class="test-button" id="test-critical-error">Test Critical Error</button>
+            <div class="test-result" id="result-critical-error"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-section__title">Fallback Content</h2>
+            <p class="test-section__description">Tests the error boundary with fallback content.</p>
+            <button class="test-button" id="test-fallback-content">Test Fallback Content</button>
+            <div class="test-result" id="result-fallback-content"></div>
+        </div>
+    </main>
+    
+    <script type="module">
+        import ErrorBoundaryTemplates from './js/report/ErrorBoundaryTemplates.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Template Not Found Test
+            document.getElementById('test-template-not-found').addEventListener('click', () => {
+                const result = ErrorBoundaryTemplates.templateNotFound(
+                    'Template "premium-report" not found',
+                    'Please check if the template is registered correctly'
+                );
+                document.getElementById('result-template-not-found').innerHTML = result;
+            });
+            
+            // Section Error Test
+            document.getElementById('test-section-error').addEventListener('click', () => {
+                const result = ErrorBoundaryTemplates.sectionRenderError(
+                    'Executive Summary',
+                    'Failed to render section due to missing data'
+                );
+                document.getElementById('result-section-error').innerHTML = result;
+            });
+            
+            // Data Validation Test
+            document.getElementById('test-data-validation').addEventListener('click', () => {
+                const result = ErrorBoundaryTemplates.dataValidationError(
+                    'Risk Level',
+                    'Required field "risk_level" is missing or invalid'
+                );
+                document.getElementById('result-data-validation').innerHTML = result;
+            });
+            
+            // Critical Error Test
+            document.getElementById('test-critical-error').addEventListener('click', () => {
+                const result = ErrorBoundaryTemplates.criticalRenderError(
+                    'Critical error rendering template: Cannot read property "name" of undefined'
+                );
+                document.getElementById('result-critical-error').innerHTML = result;
+            });
+            
+            // Fallback Content Test
+            document.getElementById('test-fallback-content').addEventListener('click', () => {
+                const fallbackContent = '<div style="padding: 10px; background-color: #f8f9fa;">Fallback vendor name: ACME Corporation</div>';
+                const result = ErrorBoundaryTemplates.fallbackContent(
+                    'Using fallback content for vendor information',
+                    fallbackContent
+                );
+                document.getElementById('result-fallback-content').innerHTML = result;
+            });
+        });
+    </script>
+</body>
+</html>

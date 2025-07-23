@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report System Integration Test</title>
+  <link rel="stylesheet" href="css/integration/report-system-integration.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    
+    .card {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+    
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .control-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    select, button {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+    
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    .report-preview {
+      min-height: 300px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom-color: #3498db;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Report System Integration Test</h1>
+      <p>This page demonstrates the integration between legacy and new report systems.</p>
+    </header>
+    
+    <div class="card">
+      <h2>Report Generation</h2>
+      
+      <div class="controls">
+        <div class="control-group">
+          <label for="report-type">Report Type:</label>
+          <select id="report-type">
+            <option value="executive">Executive Summary</option>
+            <option value="technical">Technical Report</option>
+            <option value="comparison">Comparison Report</option>
+            <option value="custom">Custom Report</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select">
+            <option value="default">Default</option>
+            <option value="dark">Dark</option>
+            <option value="modern">Modern</option>
+            <option value="classic">Classic</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label for="force-system">Force System:</label>
+          <select id="force-system">
+            <option value="auto">Auto (Use Integration Logic)</option>
+            <option value="new">New System</option>
+            <option value="legacy">Legacy System</option>
+          </select>
+        </div>
+      </div>
+      
+      <button id="generate-report">Generate Report</button>
+    </div>
+    
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" data-tab="preview">Report Preview</div>
+        <div class="tab" data-tab="performance">Performance Metrics</div>
+        <div class="tab" data-tab="settings">Integration Settings</div>
+      </div>
+      
+      <div class="tab-content active" id="preview-tab">
+        <div class="report-preview" id="report-container">
+          <p>Report preview will appear here...</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="performance-tab">
+        <div class="performance-monitor-panel">
+          <h3>Performance Metrics</h3>
+          <div id="performance-metrics">
+            <p>Generate a report to see performance metrics...</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="settings-tab">
+        <h3>Feature Flags</h3>
+        
+        <div class="feature-flag-toggle">
+          <label for="new-system-toggle">Use New Report System:</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="new-system-toggle" checked>
+            <span class="toggle-slider"></span>
+          </div>
+        </div>
+        
+        <div class="feature-flag-toggle">
+          <label for="marketplace-toggle">Enable Theme Marketplace:</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="marketplace-toggle" checked>
+            <span class="toggle-slider"></span>
+          </div>
+        </div>
+        
+        <div class="feature-flag-toggle">
+          <label for="customization-toggle">Enable Advanced Customization:</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="customization-toggle">
+            <span class="toggle-slider"></span>
+          </div>
+        </div>
+        
+        <button id="save-settings" style="margin-top: 20px;">Save Settings</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>System Status</h2>
+      <div id="system-status">
+        <p>Current System: <span class="system-status-indicator new">New System</span></p>
+        <p>Migration Status:</p>
+        <ul>
+          <li>Executive Summary: <span class="system-status-indicator new">Migrated</span></li>
+          <li>Technical Report: <span class="system-status-indicator new">Migrated</span></li>
+          <li>Comparison Report: <span class="system-status-indicator legacy">Legacy</span></li>
+          <li>Custom Report: <span class="system-status-indicator legacy">Legacy</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mock Legacy System (for testing) -->
+  <script>
+    // Mock legacy report system
+    class LegacyReportSystem {
+      constructor() {
+        this.supportsThemes = true;
+        this.currentTheme = 'default';
+      }
+      
+      getAvailableReportTypes() {
+        return [
+          { id: 'executive', name: 'Executive Summary', config: {} },
+          { id: 'technical', name: 'Technical Report', config: {} },
+          { id: 'comparison', name: 'Comparison Report', config: {} },
+          { id: 'custom', name: 'Custom Report', config: {} }
+        ];
+      }
+      
+      setTheme(themeId) {
+        this.currentTheme = themeId;
+        console.log(`Legacy system theme set to: ${themeId}`);
+      }
+      
+      async generateReport(reportType, data, options) {
+        console.log(`Legacy system generating ${reportType} report`);
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        return {
+          title: `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report (Legacy)`,
+          content: `This is a mock ${reportType} report generated by the legacy system.`,
+          theme: this.currentTheme,
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+  </script>
+  
+  <!-- Integration Script -->
+  <script type="module">
+    import { ReportSystemIntegration } from './js/dashboard/export/integration/ReportSystemIntegration.js';
+      import { PerformanceMonitor } from './js/dashboard/export/integration/PerformanceMonitor.js';
+      import { ReportSystem } from './js/dashboard/export/mock-report-system.js';
+    
+    // Initialize the integration
+    const legacySystem = new LegacyReportSystem();
+    const integration = new ReportSystemIntegration(legacySystem);
+    const performanceMonitor = new PerformanceMonitor();
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize the integration
+      await integration.initialize();
+      
+      // Set up tab switching
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and contents
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          const tabId = `${tab.dataset.tab}-tab`;
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Set up report generation
+      const generateButton = document.getElementById('generate-report');
+      generateButton.addEventListener('click', async () => {
+        const reportType = document.getElementById('report-type').value;
+        const theme = document.getElementById('theme-select').value;
+        const forceSystem = document.getElementById('force-system').value;
+        
+        // Show loading state
+        const reportContainer = document.getElementById('report-container');
+        reportContainer.innerHTML = '<p>Generating report...</p>';
+        
+        try {
+          // Override system selection if needed
+          if (forceSystem !== 'auto') {
+            sessionStorage.setItem('use_legacy_report_system', forceSystem === 'legacy' ? 'true' : 'false');
+          } else {
+            sessionStorage.removeItem('use_legacy_report_system');
+          }
+          
+          // Start performance monitoring
+          performanceMonitor.startMeasurement('ui_generate_report');
+          
+          // Generate the report
+          const report = await integration.generateReport(reportType, {
+            title: `Sample ${reportType} Report`,
+            data: { timestamp: new Date().toISOString() }
+          }, { theme });
+          
+          // End performance monitoring
+          performanceMonitor.endMeasurement('ui_generate_report');
+          
+          // Display the report
+          reportContainer.innerHTML = `
+            <h2>${report.title}</h2>
+            <p>${report.content}</p>
+            <p><strong>Theme:</strong> ${report.theme}</p>
+            <p><strong>Generated:</strong> ${new Date(report.timestamp).toLocaleString()}</p>
+          `;
+          
+          // Update performance metrics
+          updatePerformanceMetrics();
+        } catch (error) {
+          reportContainer.innerHTML = `<p>Error generating report: ${error.message}</p>`;
+          console.error('Report generation error:', error);
+        }
+      });
+      
+      // Set up settings saving
+      const saveSettingsButton = document.getElementById('save-settings');
+      saveSettingsButton.addEventListener('click', () => {
+        const useNewSystem = document.getElementById('new-system-toggle').checked;
+        const enableMarketplace = document.getElementById('marketplace-toggle').checked;
+        const enableCustomization = document.getElementById('customization-toggle').checked;
+        
+        // Save feature flags
+        const featureFlags = {
+          useNewReportSystem: useNewSystem,
+          enableThemeMarketplace: enableMarketplace,
+          enableAdvancedCustomization: enableCustomization
+        };
+        
+        localStorage.setItem('report_feature_flags', JSON.stringify(featureFlags));
+        
+        // Show confirmation
+        alert('Settings saved successfully!');
+        
+        // Reload the page to apply settings
+        window.location.reload();
+      });
+      
+      // Load initial settings
+      loadSettings();
+    });
+    
+    // Function to update performance metrics display
+    function updatePerformanceMetrics() {
+      const metricsContainer = document.getElementById('performance-metrics');
+      const lastMeasurement = performanceMonitor.getLastMeasurement('ui_generate_report');
+      
+      if (!lastMeasurement) {
+        metricsContainer.innerHTML = '<p>No performance data available</p>';
+        return;
+      }
+      
+      let statusClass = '';
+      if (lastMeasurement.comparison) {
+        statusClass = lastMeasurement.comparison.status;
+      }
+      
+      metricsContainer.innerHTML = `
+        <div class="performance-metric">
+          <span class="metric-name">Total Duration:</span>
+          <span class="metric-value ${statusClass}">${lastMeasurement.duration.toFixed(2)} ms</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-name">Memory Usage:</span>
+          <span class="metric-value">${lastMeasurement.memoryDelta ? lastMeasurement.memoryDelta.toFixed(2) + ' MB' : 'N/A'}</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-name">System Used:</span>
+          <span class="metric-value">${sessionStorage.getItem('use_legacy_report_system') === 'true' ? 'Legacy System' : 'New System'}</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-name">Timestamp:</span>
+          <span class="metric-value">${new Date(lastMeasurement.timestamp).toLocaleString()}</span>
+        </div>
+      `;
+    }
+    
+    // Function to load settings from localStorage
+    function loadSettings() {
+      try {
+        const storedFlags = localStorage.getItem('report_feature_flags');
+        if (storedFlags) {
+          const flags = JSON.parse(storedFlags);
+          
+          document.getElementById('new-system-toggle').checked = flags.useNewReportSystem;
+          document.getElementById('marketplace-toggle').checked = flags.enableThemeMarketplace;
+          document.getElementById('customization-toggle').checked = flags.enableAdvancedCustomization;
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      }
+    }
+  </script>
+</body>
+</html>

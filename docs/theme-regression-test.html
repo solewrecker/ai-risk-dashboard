@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Visual Regression Testing</title>
+    <!-- Base Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/themes/theme-base.css">
+    
+    <!-- Theme Base (Always Loaded) -->
+    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --hover-color: #3a5ce5;
+            --border-color: #ddd;
+            --background-color: #f5f7fb;
+            --card-background: #fff;
+            --text-color: #333;
+            --text-secondary: #666;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .theme-selector select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+            min-width: 150px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: var(--hover-color);
+        }
+        
+        button.secondary {
+            background-color: #6c757d;
+        }
+        
+        button.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        button.success {
+            background-color: var(--success-color);
+        }
+        
+        button.success:hover {
+            background-color: #218838;
+        }
+        
+        button.warning {
+            background-color: var(--warning-color);
+            color: #212529;
+        }
+        
+        button.warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .test-container {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--card-background);
+        }
+        
+        .test-header {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .test-content {
+            padding: 20px;
+        }
+        
+        .test-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .option-group label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .test-iframe-container {
+            height: 400px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .test-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .test-results {
+            margin-top: 30px;
+        }
+        
+        .regression-test-report {
+            margin-top: 20px;
+        }
+        
+        .regression-test-summary {
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .stat {
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            font-weight: 500;
+        }
+        
+        .stat.passed {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #155724;
+        }
+        
+        .stat.failed {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #721c24;
+        }
+        
+        .stat.error {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: #383d41;
+        }
+        
+        .stat.warning {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #856404;
+        }
+        
+        .stat.info {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: #0c5460;
+        }
+        
+        .regression-test-details {
+            margin-top: 20px;
+        }
+        
+        .test-result {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .test-result.passed {
+            border-color: rgba(40, 167, 69, 0.5);
+        }
+        
+        .test-result.failed {
+            border-color: rgba(220, 53, 69, 0.5);
+        }
+        
+        .test-result.error {
+            border-color: rgba(108, 117, 125, 0.5);
+        }
+        
+        .test-result.no_baseline {
+            border-color: rgba(255, 193, 7, 0.5);
+        }
+        
+        .test-result.baseline_created {
+            border-color: rgba(23, 162, 184, 0.5);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-header h4 {
+            margin: 0;
+            font-size: 15px;
+        }
+        
+        .result-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .result-status.passed {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #155724;
+        }
+        
+        .result-status.failed {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #721c24;
+        }
+        
+        .result-status.error {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: #383d41;
+        }
+        
+        .result-status.no_baseline {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #856404;
+        }
+        
+        .result-status.baseline_created {
+            background-color: rgba(23, 162, 184, 0.2);
+            color: #0c5460;
+        }
+        
+        .result-message {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .image-container {
+            flex: 1;
+            min-width: 200px;
+            max-width: 100%;
+        }
+        
+        .image-container h5 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .result-images {
+                flex-direction: column;
+            }
+            
+            .image-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Theme Visual Regression Testing</h1>
+            <div class="controls">
+                <button id="back-to-comparison" class="secondary">Back to Theme Comparison</button>
+            </div>
+        </div>
+        
+        <div class="test-container">
+            <div class="test-header">
+                <h3 class="test-title">Regression Test Configuration</h3>
+            </div>
+            <div class="test-content">
+                <div class="test-options">
+                    <div class="option-group">
+                        <label for="test-theme-select">Theme to Test:</label>
+                        <select id="test-theme-select">
+                            <option value="theme-corporate">Corporate</option>
+                            <option value="theme-minimal">Minimal</option>
+                            <option value="theme-dark">Dark</option>
+                            <option value="theme-vibrant">Vibrant</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="test-mode-select">Test Mode:</label>
+                        <select id="test-mode-select">
+                            <option value="run">Run Tests</option>
+                            <option value="create">Create Baselines</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="threshold-input">Difference Threshold (%):</label>
+                        <input type="number" id="threshold-input" min="0" max="100" value="10" step="1">
+                    </div>
+                    
+                    <button id="run-tests" class="success">Run Tests</button>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="test-full-page" checked>
+                        Full Page
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-header" checked>
+                        Header
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-risk-score" checked>
+                        Risk Score
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-summary" checked>
+                        Summary
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-recommendations" checked>
+                        Recommendations
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-detailed-analysis" checked>
+                        Detailed Analysis
+                    </label>
+                    <label>
+                        <input type="checkbox" id="test-footer" checked>
+                        Footer
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-iframe-container">
+            <iframe id="test-iframe" class="test-iframe" src="about:blank"></iframe>
+        </div>
+        
+        <div id="test-results" class="test-results">
+            <!-- Test results will be inserted here -->
+        </div>
+    </div>
+    
+    <script type="module">
+        import ThemeRegressionTest from './js/report/theme-regression-test.js';
+        import testReportData from './js/report/test-data.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize variables
+            const themeSelect = document.getElementById('test-theme-select');
+            const modeSelect = document.getElementById('test-mode-select');
+            const thresholdInput = document.getElementById('threshold-input');
+            const runTestsButton = document.getElementById('run-tests');
+            const testIframe = document.getElementById('test-iframe');
+            const testResults = document.getElementById('test-results');
+            const backButton = document.getElementById('back-to-comparison');
+            
+            // Checkbox elements
+            const fullPageCheckbox = document.getElementById('test-full-page');
+            const headerCheckbox = document.getElementById('test-header');
+            const riskScoreCheckbox = document.getElementById('test-risk-score');
+            const summaryCheckbox = document.getElementById('test-summary');
+            const recommendationsCheckbox = document.getElementById('test-recommendations');
+            const detailedAnalysisCheckbox = document.getElementById('test-detailed-analysis');
+            const footerCheckbox = document.getElementById('test-footer');
+            
+            // Set initial iframe source
+            updateIframeSrc(testIframe, themeSelect.value);
+            
+            // Run tests button click handler
+            runTestsButton.addEventListener('click', async () => {
+                const selectedTheme = themeSelect.value;
+                const testMode = modeSelect.value;
+                const threshold = parseInt(thresholdInput.value) / 100; // Convert to 0-1 range
+                
+                // Get selected test elements
+                const testElements = [];
+                
+                if (headerCheckbox.checked) {
+                    testElements.push({ name: 'header', selector: '.report-header' });
+                }
+                
+                if (riskScoreCheckbox.checked) {
+                    testElements.push({ name: 'risk-score', selector: '.risk-score-section' });
+                }
+                
+                if (summaryCheckbox.checked) {
+                    testElements.push({ name: 'summary', selector: '.summary-section' });
+                }
+                
+                if (recommendationsCheckbox.checked) {
+                    testElements.push({ name: 'recommendations', selector: '.recommendations-section' });
+                }
+                
+                if (detailedAnalysisCheckbox.checked) {
+                    testElements.push({ name: 'detailed-analysis', selector: '.detailed-analysis-section' });
+                }
+                
+                if (footerCheckbox.checked) {
+                    testElements.push({ name: 'footer', selector: '.report-footer' });
+                }
+                
+                // Initialize regression test
+                const regressionTest = new ThemeRegressionTest({
+                    threshold,
+                    testElements
+                });
+                
+                // Set mode
+                regressionTest.setBaselineCreationMode(testMode === 'create');
+                
+                // Show loading message
+                testResults.innerHTML = '<p>Running tests, please wait...</p>';
+                
+                try {
+                    // Wait for iframe to fully load
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Get iframe document
+                    const iframeDoc = testIframe.contentDocument || testIframe.contentWindow.document;
+                    
+                    // Run tests
+                    await regressionTest.runTests(selectedTheme, iframeDoc);
+                    
+                    // Generate and display report
+                    const reportElement = regressionTest.generateReport();
+                    testResults.innerHTML = '';
+                    testResults.appendChild(reportElement);
+                } catch (error) {
+                    console.error('Error running tests:', error);
+                    testResults.innerHTML = `<p>Error running tests: ${error.message}</p>`;
+                }
+            });
+            
+            // Theme select change handler
+            themeSelect.addEventListener('change', () => {
+                updateIframeSrc(testIframe, themeSelect.value);
+            });
+            
+            // Back button click handler
+            backButton.addEventListener('click', () => {
+                window.location.href = 'theme-comparison.html';
+            });
+            
+            // Helper function to update iframe source
+            function updateIframeSrc(iframe, theme) {
+                // Clone the test data and update the theme
+                const reportData = JSON.parse(JSON.stringify(testReportData));
+                reportData.selectedTheme = theme;
+                
+                // Store the data in localStorage for the iframe to use
+                localStorage.setItem('reportData', JSON.stringify(reportData));
+                
+                // Set the iframe source to the report test page
+                iframe.src = 'report-test.html';
+            }
+        });
+    </script>
+</body>
+</html>

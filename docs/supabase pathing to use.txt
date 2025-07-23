@@ -1,0 +1,45 @@
+# Supabase Data Pathing for Report Generation
+
+This document outlines the preferred data mapping from the Supabase 'assessments' table to the report generation templates.
+
+## General Principle:
+- Prioritize top-level properties for general information.
+- Use the `assessment_data` JSONB field for detailed, nested information like scores, justifications, and recommendations.
+
+## Field Mapping:
+
+### Top-Level Properties to Use:
+- `name`: The name of the AI tool (e.g., "ChatGPT").
+- `vendor`: The vendor of the tool (e.g., "OpenAI").
+- `risk_level`: The overall risk level (e.g., "high").
+- `total_score`: The final calculated score.
+- `data_storage_score`: The score for data storage.
+- `training_usage_score`: The score for training usage.
+- `access_controls_score`: The score for access controls.
+- `compliance_score`: The score for compliance.
+- `vendor_transparency_score`: The score for vendor transparency.
+- `category`: The category of the tool.
+- `data_classification`: The data classification.
+- `is_public`: Indicates if the assessment is public.
+- `primary_use_case`: The primary use case of the tool.
+- `assessed_by`: The entity that performed the assessment.
+- `documentation_tier`: The documentation tier of the assessment.
+- `assessment_notes`: Any additional notes for the assessment.
+
+### Properties to use from `assessment_data`:
+- `license_type`: The license type (e.g., "Free").
+- `summary_and_recommendation`: The overall summary and recommendation text.
+- `compliance_summary`: The summary text for compliance.
+- `final_risk_category`: The final risk category.
+- `final_score_with_multiplier`: The final score with multiplier.
+- `use_case_multiplier_applied`: The use case multiplier applied.
+- `confidence`: The confidence score.
+- `recommendations`: The list of recommendations.
+- `compliance_certifications`: The structured compliance data.
+- `sources`: List of sources used for the assessment.
+- `azure_permissions`: The azure permissions.
+- `detailed_assessment`: Contains the breakdown of scores by category.
+
+## Implementation in `report-preview.js`:
+
+The `prepareTemplateData` function should be updated to reflect this mapping. Instead of relying almost entirely on `primaryAssessment.assessment_data`, it should be structured to pull from both the top-level `primaryAssessment` object and the nested `assessment_data` where appropriate.

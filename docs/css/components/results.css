@@ -155,6 +155,38 @@
     justify-content: center;
 }
 
+.tool-title__license-type {
+    font-weight: 700; /* Bolder */
+    margin-left: 0.25rem; /* Small space between tool name and license type */
+}
+
+/* Styling for Risk Level in Description */
+.risk-level-display {
+    font-weight: 700;
+    margin-right: 0.25rem;
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    color: white;
+}
+
+.risk-level-display--critical {
+    background-color: #dc2626; /* Red */
+}
+
+.risk-level-display--high {
+    background-color: #ea580c; /* Orange */
+}
+
+.risk-level-display--medium {
+    background-color: #f59e0b; /* Amber */
+    color: #333; /* Darker text for contrast on yellow */
+}
+
+.risk-level-display--low {
+    background-color: #22c55e; /* Green */
+}
+
 /* Results Layout Container */
 .results-layout {
     display: flex;

@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report System Monitoring Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #004080;
+      --accent-color: #ff6600;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --info-color: #17a2b8;
+      --light-bg: #f8f9fa;
+      --dark-bg: #343a40;
+      --text-color: #333;
+      --text-light: #f8f9fa;
+      --border-color: #dee2e6;
+      --chart-color-1: #4e73df;
+      --chart-color-2: #1cc88a;
+      --chart-color-3: #36b9cc;
+      --chart-color-4: #f6c23e;
+      --chart-color-5: #e74a3b;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+    
+    nav ul li {
+      margin-left: 1.5rem;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    nav a:hover {
+      opacity: 0.8;
+    }
+    
+    .dashboard {
+      padding: 2rem 0;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-title {
+      font-size: 1.8rem;
+      color: var(--secondary-color);
+    }
+    
+    .dashboard-controls {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .time-range-selector {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.5rem;
+    }
+    
+    .time-range-selector select {
+      border: none;
+      background: transparent;
+      padding: 0.25rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    
+    .refresh-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .refresh-button:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .stat-card-title {
+      font-size: 0.9rem;
+      color: #6c757d;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .stat-card-icon {
+      font-size: 1.5rem;
+      opacity: 0.8;
+    }
+    
+    .stat-card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-card-trend {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    
+    .trend-up {
+      color: var(--success-color);
+    }
+    
+    .trend-down {
+      color: var(--danger-color);
+    }
+    
+    .trend-neutral {
+      color: var(--info-color);
+    }
+    
+    .trend-icon {
+      margin-right: 0.25rem;
+    }
+    
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .chart-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .chart-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .chart-action-button {
+      background-color: transparent;
+      border: none;
+      color: #6c757d;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.25rem;
+      transition: color 0.2s;
+    }
+    
+    .chart-action-button:hover {
+      color: var(--primary-color);
+    }
+    
+    .chart {
+      height: 300px;
+      width: 100%;
+    }
+    
+    .tables-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .table-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .table-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table th {
+      background-color: var(--light-bg);
+      font-weight: 600;
+      color: #495057;
+    }
+    
+    .data-table tbody tr:hover {
+      background-color: rgba(0,0,0,0.02);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-success {
+      background-color: rgba(40, 167, 69, 0.1);
+      color: var(--success-color);
+    }
+    
+    .status-warning {
+      background-color: rgba(255, 193, 7, 0.1);
+      color: var(--warning-color);
+    }
+    
+    .status-danger {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: var(--danger-color);
+    }
+    
+    .status-info {
+      background-color: rgba(23, 162, 184, 0.1);
+      color: var(--info-color);
+    }
+    
+    .system-health {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .health-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+    }
+    
+    .health-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .health-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .health-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .health-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .health-good {
+      background-color: var(--success-color);
+    }
+    
+    .health-warning {
+      background-color: var(--warning-color);
+    }
+    
+    .health-critical {
+      background-color: var(--danger-color);
+    }
+    
+    .health-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .health-metric {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .health-metric-name {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+    
+    .health-metric-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .progress-container {
+      margin-top: 1rem;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+      font-size: 0.85rem;
+    }
+    
+    .progress-bar-container {
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      border-radius: 4px;
+    }
+    
+    .progress-good {
+      background-color: var(--success-color);
+    }
+    
+    .progress-warning {
+      background-color: var(--warning-color);
+    }
+    
+    .progress-danger {
+      background-color: var(--danger-color);
+    }
+    
+    .alerts-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .alerts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .alerts-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .alerts-list {
+      list-style: none;
+    }
+    
+    .alert-item {
+      padding: 1rem;
+      border-left: 4px solid;
+      background-color: rgba(0,0,0,0.02);
+      margin-bottom: 0.5rem;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .alert-critical {
+      border-left-color: var(--danger-color);
+    }
+    
+    .alert-warning {
+      border-left-color: var(--warning-color);
+    }
+    
+    .alert-info {
+      border-left-color: var(--info-color);
+    }
+    
+    .alert-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    .alert-title {
+      font-weight: 600;
+    }
+    
+    .alert-timestamp {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .alert-message {
+      margin-bottom: 0.5rem;
+    }
+    
+    .alert-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .alert-action-button {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .alert-action-button:hover {
+      background-color: var(--light-bg);
+    }
+    
+    footer {
+      background-color: var(--light-bg);
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--border-color);
+      margin-top: 2rem;
+    }
+    
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: #6c757d;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary-color);
+    }
+    
+    .copyright {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 992px) {
+      .charts-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .tables-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      header .container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      nav ul {
+        margin-top: 1rem;
+      }
+      
+      nav ul li:first-child {
+        margin-left: 0;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .health-metrics {
+        grid-template-columns: 1fr;
+      }
+      
+      footer .container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+    
+    /* Canvas styling for charts */
+    canvas {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>AI Tool Risk Framework - Report System</h1>
+      <nav>
+        <ul>
+          <li><a href="dist/index.html">Dashboard</a></li>
+          <li><a href="dist/export.html">Reports</a></li>
+          <li><a href="theme-marketplace.html">Themes</a></li>
+          <li><a href="theme-developer-guide.html">Developer Guide</a></li>
+          <li><a href="user-guide.html">User Guide</a></li>
+          <li><a href="monitoring-dashboard.html">Monitoring</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <div class="container">
+      <div class="dashboard-header">
+        <h2 class="dashboard-title">Report System Monitoring Dashboard</h2>
+        <div class="dashboard-controls">
+          <div class="time-range-selector">
+            <span>Time Range:</span>
+            <select id="timeRange">
+              <option value="1h">Last Hour</option>
+              <option value="6h">Last 6 Hours</option>
+              <option value="24h" selected>Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+            </select>
+          </div>
+          <button class="refresh-button" id="refreshButton">
+            <i class="fas fa-sync-alt"></i> Refresh Data
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Reports Generated</div>
+            <div class="stat-card-icon">
+              <i class="fas fa-file-alt" style="color: var(--primary-color);"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">1,248</div>
+          <div class="stat-card-trend trend-up">
+            <i class="fas fa-arrow-up trend-icon"></i> 12.3% from last period
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Theme Installations</div>
+            <div class="stat-card-icon">
+              <i class="fas fa-palette" style="color: var(--accent-color);"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">347</div>
+          <div class="stat-card-trend trend-up">
+            <i class="fas fa-arrow-up trend-icon"></i> 8.7% from last period
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Avg. Load Time</div>
+            <div class="stat-card-icon">
+              <i class="fas fa-tachometer-alt" style="color: var(--info-color);"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">0.82s</div>
+          <div class="stat-card-trend trend-down">
+            <i class="fas fa-arrow-down trend-icon"></i> 5.2% from last period
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Error Rate</div>
+            <div class="stat-card-icon">
+              <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">0.05%</div>
+          <div class="stat-card-trend trend-neutral">
+            <i class="fas fa-equals trend-icon"></i> No change from last period
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">Performance Metrics Over Time</div>
+            <div class="chart-actions">
+              <button class="chart-action-button" title="Download CSV">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="chart-action-button" title="View Full Screen">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart" id="performanceChart">
+            <canvas id="performanceChartCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">Theme Usage Distribution</div>
+            <div class="chart-actions">
+              <button class="chart-action-button" title="Download CSV">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="chart-action-button" title="View Full Screen">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart" id="themeUsageChart">
+            <canvas id="themeUsageChartCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="system-health">
+        <div class="health-card">
+          <div class="health-card-header">
+            <div class="health-card-title">Theme System Health</div>
+            <div class="health-status">
+              <div class="health-indicator health-good"></div>
+              Good
+            </div>
+          </div>
+          <div class="health-metrics">
+            <div class="health-metric">
+              <div class="health-metric-name">Load Time</div>
+              <div class="health-metric-value">0.24s</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Cache Hit Rate</div>
+              <div class="health-metric-value">98.2%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Error Rate</div>
+              <div class="health-metric-value">0.01%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Availability</div>
+              <div class="health-metric-value">99.99%</div>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Resource Usage</span>
+              <span>42%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar progress-good" style="width: 42%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="health-card">
+          <div class="health-card-header">
+            <div class="health-card-title">Template System Health</div>
+            <div class="health-status">
+              <div class="health-indicator health-good"></div>
+              Good
+            </div>
+          </div>
+          <div class="health-metrics">
+            <div class="health-metric">
+              <div class="health-metric-name">Load Time</div>
+              <div class="health-metric-value">0.31s</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Cache Hit Rate</div>
+              <div class="health-metric-value">97.5%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Error Rate</div>
+              <div class="health-metric-value">0.02%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Availability</div>
+              <div class="health-metric-value">99.98%</div>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Resource Usage</span>
+              <span>38%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar progress-good" style="width: 38%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="health-card">
+          <div class="health-card-header">
+            <div class="health-card-title">Data Adapter Health</div>
+            <div class="health-status">
+              <div class="health-indicator health-warning"></div>
+              Warning
+            </div>
+          </div>
+          <div class="health-metrics">
+            <div class="health-metric">
+              <div class="health-metric-name">Response Time</div>
+              <div class="health-metric-value">0.87s</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Cache Hit Rate</div>
+              <div class="health-metric-value">82.3%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Error Rate</div>
+              <div class="health-metric-value">0.12%</div>
+            </div>
+            <div class="health-metric">
+              <div class="health-metric-name">Availability</div>
+              <div class="health-metric-value">99.87%</div>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Resource Usage</span>
+              <span>76%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar progress-warning" style="width: 76%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerts-container">
+        <div class="alerts-header">
+          <div class="alerts-title">Recent Alerts</div>
+          <button class="chart-action-button" title="View All Alerts">
+            <i class="fas fa-external-link-alt"></i> View All
+          </button>
+        </div>
+        <ul class="alerts-list">
+          <li class="alert-item alert-warning">
+            <div class="alert-header">
+              <div class="alert-title">High Memory Usage in Data Adapter</div>
+              <div class="alert-timestamp">Today, 10:23 AM</div>
+            </div>
+            <div class="alert-message">
+              Memory usage for the Data Adapter component has exceeded 75% for more than 15 minutes.
+            </div>
+            <div class="alert-actions">
+              <button class="alert-action-button">Acknowledge</button>
+              <button class="alert-action-button">Investigate</button>
+            </div>
+          </li>
+          <li class="alert-item alert-info">
+            <div class="alert-header">
+              <div class="alert-title">Theme Cache Cleared</div>
+              <div class="alert-timestamp">Today, 08:17 AM</div>
+            </div>
+            <div class="alert-message">
+              Theme cache was automatically cleared due to scheduled maintenance.
+            </div>
+            <div class="alert-actions">
+              <button class="alert-action-button">Acknowledge</button>
+            </div>
+          </li>
+          <li class="alert-item alert-critical">
+            <div class="alert-header">
+              <div class="alert-title">API Rate Limit Exceeded</div>
+              <div class="alert-timestamp">Yesterday, 11:42 PM</div>
+            </div>
+            <div class="alert-message">
+              External API rate limit was exceeded, causing temporary slowdowns in report generation.
+            </div>
+            <div class="alert-actions">
+              <button class="alert-action-button">Acknowledged</button>
+              <button class="alert-action-button">View Details</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="tables-row">
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title">Recent Report Generation Activity</div>
+            <button class="chart-action-button" title="Export Data">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Report ID</th>
+                <th>Template</th>
+                <th>Theme</th>
+                <th>Generation Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>RPT-2023-10-15-001</td>
+                <td>Executive Summary</td>
+                <td>Corporate Blue</td>
+                <td>0.74s</td>
+                <td><span class="status-badge status-success">Success</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-15-002</td>
+                <td>Detailed Assessment</td>
+                <td>Modern Dark</td>
+                <td>1.21s</td>
+                <td><span class="status-badge status-success">Success</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-15-003</td>
+                <td>Technical Report</td>
+                <td>Minimalist</td>
+                <td>0.68s</td>
+                <td><span class="status-badge status-success">Success</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-14-098</td>
+                <td>Compliance Report</td>
+                <td>Corporate Blue</td>
+                <td>1.45s</td>
+                <td><span class="status-badge status-warning">Slow</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-14-097</td>
+                <td>Executive Summary</td>
+                <td>Light Mode</td>
+                <td>0.82s</td>
+                <td><span class="status-badge status-success">Success</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-14-096</td>
+                <td>Detailed Assessment</td>
+                <td>Modern Dark</td>
+                <td>0.91s</td>
+                <td><span class="status-badge status-success">Success</span></td>
+              </tr>
+              <tr>
+                <td>RPT-2023-10-14-095</td>
+                <td>Technical Report</td>
+                <td>Corporate Blue</td>
+                <td>0.00s</td>
+                <td><span class="status-badge status-danger">Failed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title">Theme Performance Metrics</div>
+            <button class="chart-action-button" title="Export Data">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Theme</th>
+                <th>Avg. Load Time</th>
+                <th>Size</th>
+                <th>Usage</th>
+                <th>Performance Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Corporate Blue</td>
+                <td>0.21s</td>
+                <td>42KB</td>
+                <td>38%</td>
+                <td>98/100</td>
+              </tr>
+              <tr>
+                <td>Modern Dark</td>
+                <td>0.24s</td>
+                <td>56KB</td>
+                <td>27%</td>
+                <td>95/100</td>
+              </tr>
+              <tr>
+                <td>Light Mode</td>
+                <td>0.18s</td>
+                <td>38KB</td>
+                <td>15%</td>
+                <td>99/100</td>
+              </tr>
+              <tr>
+                <td>Minimalist</td>
+                <td>0.15s</td>
+                <td>32KB</td>
+                <td>12%</td>
+                <td>100/100</td>
+              </tr>
+              <tr>
+                <td>Technical</td>
+                <td>0.28s</td>
+                <td>64KB</td>
+                <td>8%</td>
+                <td>92/100</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Contact Support</a></li>
+        <li><a href="#">Documentation</a></li>
+      </ul>
+      <div class="copyright">&copy; 2023 AI Tool Risk Framework. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Initialize charts when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Performance Chart
+      const performanceCtx = document.getElementById('performanceChartCanvas').getContext('2d');
+      const performanceChart = new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+          labels: generateTimeLabels(24),
+          datasets: [
+            {
+              label: 'Page Load Time (s)',
+              data: generateRandomData(24, 0.5, 1.2),
+              borderColor: 'rgba(78, 115, 223, 1)',
+              backgroundColor: 'rgba(78, 115, 223, 0.1)',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+              pointBorderColor: '#fff',
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+              pointHoverBorderColor: '#fff',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'API Response Time (s)',
+              data: generateRandomData(24, 0.2, 0.8),
+              borderColor: 'rgba(28, 200, 138, 1)',
+              backgroundColor: 'rgba(28, 200, 138, 0.1)',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(28, 200, 138, 1)',
+              pointBorderColor: '#fff',
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: 'rgba(28, 200, 138, 1)',
+              pointHoverBorderColor: '#fff',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Theme Load Time (s)',
+              data: generateRandomData(24, 0.1, 0.5),
+              borderColor: 'rgba(54, 185, 204, 1)',
+              backgroundColor: 'rgba(54, 185, 204, 0.1)',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(54, 185, 204, 1)',
+              pointBorderColor: '#fff',
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: 'rgba(54, 185, 204, 1)',
+              pointHoverBorderColor: '#fff',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.parsed.y.toFixed(2) + 's';
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toFixed(1) + 's';
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Theme Usage Chart
+      const themeUsageCtx = document.getElementById('themeUsageChartCanvas').getContext('2d');
+      const themeUsageChart = new Chart(themeUsageCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Corporate Blue', 'Modern Dark', 'Light Mode', 'Minimalist', 'Technical'],
+          datasets: [{
+            data: [38, 27, 15, 12, 8],
+            backgroundColor: [
+              'rgba(78, 115, 223, 0.8)',
+              'rgba(28, 200, 138, 0.8)',
+              'rgba(54, 185, 204, 0.8)',
+              'rgba(246, 194, 62, 0.8)',
+              'rgba(231, 74, 59, 0.8)'
+            ],
+            borderColor: [
+              'rgba(78, 115, 223, 1)',
+              'rgba(28, 200, 138, 1)',
+              'rgba(54, 185, 204, 1)',
+              'rgba(246, 194, 62, 1)',
+              'rgba(231, 74, 59, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                padding: 20
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  return `${label}: ${value}%`;
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+
+      // Refresh button functionality
+      document.getElementById('refreshButton').addEventListener('click', function() {
+        // Simulate data refresh
+        performanceChart.data.datasets[0].data = generateRandomData(24, 0.5, 1.2);
+        performanceChart.data.datasets[1].data = generateRandomData(24, 0.2, 0.8);
+        performanceChart.data.datasets[2].data = generateRandomData(24, 0.1, 0.5);
+        performanceChart.update();
+        
+        // Update timestamp
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        this.innerHTML = `<i class="fas fa-sync-alt"></i> Last updated: ${timeString}`;
+        
+        // Show notification
+        showNotification('Dashboard data refreshed successfully');
+      });
+
+      // Time range selector functionality
+      document.getElementById('timeRange').addEventListener('change', function() {
+        const value = this.value;
+        let points;
+        
+        switch(value) {
+          case '1h':
+            points = 60;
+            break;
+          case '6h':
+            points = 72;
+            break;
+          case '24h':
+            points = 24;
+            break;
+          case '7d':
+            points = 28;
+            break;
+          case '30d':
+            points = 30;
+            break;
+          default:
+            points = 24;
+        }
+        
+        performanceChart.data.labels = generateTimeLabels(points, value);
+        performanceChart.data.datasets[0].data = generateRandomData(points, 0.5, 1.2);
+        performanceChart.data.datasets[1].data = generateRandomData(points, 0.2, 0.8);
+        performanceChart.data.datasets[2].data = generateRandomData(points, 0.1, 0.5);
+        performanceChart.update();
+        
+        showNotification(`Time range changed to ${this.options[this.selectedIndex].text}`);
+      });
+
+      // Alert action buttons
+      document.querySelectorAll('.alert-action-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const alertItem = this.closest('.alert-item');
+          const action = this.textContent.trim();
+          const alertTitle = alertItem.querySelector('.alert-title').textContent;
+          
+          if (action === 'Acknowledge' || action === 'Acknowledged') {
+            alertItem.style.opacity = '0.6';
+            this.textContent = 'Acknowledged';
+            this.disabled = true;
+            showNotification(`Alert "${alertTitle}" acknowledged`);
+          } else if (action === 'Investigate' || action === 'View Details') {
+            showNotification(`Opening details for alert "${alertTitle}"`);
+          }
+        });
+      });
+
+      // Add interactivity to health cards
+      document.querySelectorAll('.health-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const title = this.querySelector('.health-card-title').textContent;
+          showNotification(`Viewing detailed metrics for ${title}`);
+        });
+      });
+    });
+
+    // Helper function to generate random data points
+    function generateRandomData(count, min, max) {
+      const data = [];
+      for (let i = 0; i < count; i++) {
+        data.push((Math.random() * (max - min) + min).toFixed(2));
+      }
+      return data;
+    }
+
+    // Helper function to generate time labels
+    function generateTimeLabels(count, range = '24h') {
+      const labels = [];
+      const now = new Date();
+      
+      let format;
+      let step;
+      
+      switch(range) {
+        case '1h':
+          format = 'HH:MM';
+          step = 1; // 1 minute
+          break;
+        case '6h':
+          format = 'HH:MM';
+          step = 5; // 5 minutes
+          break;
+        case '24h':
+          format = 'HH:MM';
+          step = 60; // 1 hour
+          break;
+        case '7d':
+          format = 'MM/DD';
+          step = 6 * 60; // 6 hours
+          break;
+        case '30d':
+          format = 'MM/DD';
+          step = 24 * 60; // 1 day
+          break;
+        default:
+          format = 'HH:MM';
+          step = 60; // 1 hour
+      }
+      
+      for (let i = count - 1; i >= 0; i--) {
+        const time = new Date(now.getTime() - (i * step * 60000));
+        if (format === 'HH:MM') {
+          labels.push(time.getHours().toString().padStart(2, '0') + ':' + 
+                     time.getMinutes().toString().padStart(2, '0'));
+        } else {
+          labels.push((time.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                     time.getDate().toString().padStart(2, '0'));
+        }
+      }
+      
+      return labels;
+    }
+
+    // Function to show a notification
+    function showNotification(message) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.right = '20px';
+      notification.style.backgroundColor = 'rgba(0, 102, 204, 0.9)';
+      notification.style.color = 'white';
+      notification.style.padding = '12px 20px';
+      notification.style.borderRadius = '4px';
+      notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+      notification.style.zIndex = '1000';
+      notification.style.transition = 'opacity 0.3s, transform 0.3s';
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(20px)';
+      
+      // Add to DOM
+      document.body.appendChild(notification);
+      
+      // Trigger animation
+      setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateY(0)';
+      }, 10);
+      
+      // Remove after delay
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

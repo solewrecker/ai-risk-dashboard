@@ -1,0 +1,58 @@
+/**
+ * Dark theme variables
+ */
+:root {
+  --color-primary: #4dabf7;
+  --color-primary-hover: #339af0;
+  --color-secondary: #adb5bd;
+  --color-success: #40c057;
+  --color-info: #22b8cf;
+  --color-warning: #fab005;
+  --color-danger: #fa5252;
+  --color-light: #f8f9fa;
+  --color-dark: #212529;
+  
+  --color-background: #121212;
+  --color-background-alt: #1e1e1e;
+  --color-background-hover: #2c2c2c;
+  
+  --color-text: #e9ecef;
+  --color-text-light: #adb5bd;
+  --color-text-inverse: #212529;
+  
+  --color-border: #343a40;
+  --color-border-light: #495057;
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  
+  --font-family-base: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading: var(--font-family-base);
+  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  
+  --line-height-base: 1.5;
+  --line-height-sm: 1.25;
+  --line-height-lg: 1.8;
+  
+  --spacing-base: 1rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-pill: 50rem;
+  
+  --transition-base: all 0.2s ease-in-out;
+  --transition-slow: all 0.3s ease-in-out;
+  --transition-fast: all 0.1s ease-in-out;
+}

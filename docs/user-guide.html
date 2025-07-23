@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tool Risk Framework - Report System User Guide</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #004080;
+      --accent-color: #ff6600;
+      --text-color: #333333;
+      --light-bg: #f5f5f5;
+      --border-color: #dddddd;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --code-bg: #f8f9fa;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+    }
+    
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    
+    nav ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+    
+    nav li {
+      margin-left: 20px;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    nav a:hover {
+      opacity: 0.8;
+    }
+    
+    .page-title {
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: var(--secondary-color);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    
+    .toc {
+      background-color: var(--light-bg);
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 30px;
+    }
+    
+    .toc h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: var(--secondary-color);
+    }
+    
+    .toc ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .toc li {
+      margin-bottom: 8px;
+    }
+    
+    .toc a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .toc a:hover {
+      text-decoration: underline;
+    }
+    
+    section {
+      margin-bottom: 40px;
+    }
+    
+    h2 {
+      color: var(--secondary-color);
+      font-size: 24px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    
+    h3 {
+      color: var(--secondary-color);
+      font-size: 20px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    
+    h4 {
+      color: var(--text-color);
+      font-size: 18px;
+      margin-top: 25px;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      margin-bottom: 15px;
+    }
+    
+    ul, ol {
+      margin-bottom: 20px;
+      padding-left: 25px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+    }
+    
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: var(--code-bg);
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    
+    pre {
+      background-color: var(--code-bg);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+    }
+    
+    pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    
+    .note {
+      background-color: #e8f4fd;
+      border-left: 4px solid var(--primary-color);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 5px 5px 0;
+    }
+    
+    .warning {
+      background-color: #fff8e1;
+      border-left: 4px solid var(--warning-color);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 5px 5px 0;
+    }
+    
+    .tip {
+      background-color: #e8f5e9;
+      border-left: 4px solid var(--success-color);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 5px 5px 0;
+    }
+    
+    .image-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .image-container img {
+      max-width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+    }
+    
+    .caption {
+      font-style: italic;
+      color: #666;
+      margin-top: 8px;
+      font-size: 0.9em;
+      text-align: center;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    th {
+      background-color: var(--light-bg);
+      font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .btn:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    footer {
+      background-color: var(--light-bg);
+      padding: 30px 0;
+      margin-top: 50px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .footer-links li {
+      margin-right: 20px;
+    }
+    
+    .footer-links a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary-color);
+    }
+    
+    .copyright {
+      color: #666;
+      font-size: 0.9em;
+    }
+    
+    @media (max-width: 768px) {
+      header .container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      nav ul {
+        margin-top: 15px;
+      }
+      
+      nav li {
+        margin-left: 0;
+        margin-right: 15px;
+      }
+      
+      footer .container {
+        flex-direction: column;
+      }
+      
+      .footer-links {
+        margin-bottom: 15px;
+      }
+    }
+    
+    /* Specific styles for the user guide */
+    .keyboard-shortcut {
+      display: inline-block;
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .feature-card {
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .feature-card h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+    
+    .feature-card p {
+      margin-bottom: 0;
+    }
+    
+    .steps-list {
+      counter-reset: step-counter;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    
+    .steps-list li {
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 20px;
+    }
+    
+    .steps-list li::before {
+      content: counter(step-counter);
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    
+    .theme-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .theme-card {
+      width: calc(33.333% - 20px);
+      min-width: 250px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .theme-card-image {
+      height: 150px;
+      background-color: #eee;
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .theme-card-content {
+      padding: 15px;
+    }
+    
+    .theme-card h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    .theme-card p {
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+    
+    .theme-card .btn {
+      font-size: 0.9em;
+      padding: 5px 10px;
+    }
+    
+    @media (max-width: 768px) {
+      .theme-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>AI Tool Risk Framework</h1>
+      <nav>
+        <ul>
+          <li><a href="dist/index.html">Dashboard</a></li>
+          <li><a href="dist/export.html">Reports</a></li>
+          <li><a href="theme-marketplace.html">Themes</a></li>
+          <li><a href="theme-developer-guide.html">Developer Guide</a></li>
+          <li><a href="user-guide.html">User Guide</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">Report System User Guide</h1>
+    
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#creating-reports">Creating Reports</a></li>
+        <li><a href="#customizing-reports">Customizing Reports</a>
+          <ul>
+            <li><a href="#applying-themes">Applying Themes</a></li>
+            <li><a href="#customizing-templates">Customizing Templates</a></li>
+          </ul>
+        </li>
+        <li><a href="#exporting-reports">Exporting Reports</a></li>
+        <li><a href="#managing-themes">Managing Themes</a>
+          <ul>
+            <li><a href="#installing-themes">Installing Themes</a></li>
+            <li><a href="#creating-custom-themes">Creating Custom Themes</a></li>
+          </ul>
+        </li>
+        <li><a href="#advanced-features">Advanced Features</a>
+          <ul>
+            <li><a href="#data-integration">Data Integration</a></li>
+            <li><a href="#automation">Automation</a></li>
+            <li><a href="#performance-optimization">Performance Optimization</a></li>
+          </ul>
+        </li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#faq">Frequently Asked Questions</a></li>
+      </ul>
+    </div>
+    
+    <section id="introduction">
+      <h2>Introduction</h2>
+      <p>Welcome to the AI Tool Risk Framework Report System! This comprehensive guide will help you understand how to use our advanced reporting system to create beautiful, customizable reports for your AI risk assessments.</p>
+      
+      <p>The Report System is designed to help you:</p>
+      <ul>
+        <li>Create professional-looking reports with minimal effort</li>
+        <li>Customize the appearance of your reports with themes</li>
+        <li>Export reports in various formats (PDF, HTML, etc.)</li>
+        <li>Share reports with stakeholders</li>
+        <li>Maintain consistent branding across all your reports</li>
+      </ul>
+      
+      <div class="note">
+        <strong>Note:</strong> This guide assumes you have already installed and set up the AI Tool Risk Framework. If you haven't done so yet, please refer to the <a href="#">Installation Guide</a> first.
+      </div>
+    </section>
+    
+    <section id="getting-started">
+      <h2>Getting Started</h2>
+      
+      <h3>System Requirements</h3>
+      <p>The Report System works best with the following:</p>
+      <ul>
+        <li>Modern web browser (Chrome, Firefox, Safari, Edge)</li>
+        <li>JavaScript enabled</li>
+        <li>Minimum screen resolution of 1280x720</li>
+      </ul>
+      
+      <h3>Accessing the Report System</h3>
+      <p>To access the Report System, navigate to the Reports section in the main dashboard or click on the "Reports" tab in the navigation menu.</p>
+      
+      <div class="image-container">
+        <img src="https://via.placeholder.com/800x400" alt="Report System Dashboard">
+        <p class="caption">Figure 1: The Report System Dashboard</p>
+      </div>
+      
+      <h3>Understanding the Interface</h3>
+      <p>The Report System interface consists of several key areas:</p>
+      
+      <ol>
+        <li><strong>Report List</strong> - Shows all your saved reports</li>
+        <li><strong>Preview Panel</strong> - Displays a preview of the selected report</li>
+        <li><strong>Toolbar</strong> - Contains actions like Create, Edit, Export, and Share</li>
+        <li><strong>Theme Selector</strong> - Allows you to change the visual theme of your report</li>
+        <li><strong>Template Selector</strong> - Lets you choose different report layouts</li>
+      </ol>
+      
+      <div class="tip">
+        <strong>Tip:</strong> Hover over any button or control in the interface to see a tooltip explaining its function.
+      </div>
+    </section>
+    
+    <section id="creating-reports">
+      <h2>Creating Reports</h2>
+      
+      <h3>Starting a New Report</h3>
+      <p>To create a new report:</p>
+      
+      <ol class="steps-list">
+        <li>Click the <strong>"New Report"</strong> button in the toolbar</li>
+        <li>Select a report template from the available options</li>
+        <li>Give your report a title and optional description</li>
+        <li>Click <strong>"Create"</strong> to generate your new report</li>
+      </ol>
+      
+      <h3>Using Templates</h3>
+      <p>Templates provide pre-designed layouts for different types of reports. The system includes several built-in templates:</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Executive Summary</h3>
+          <p>A concise overview of key findings and recommendations, ideal for senior management.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Detailed Assessment</h3>
+          <p>A comprehensive report with in-depth analysis of all risk factors and mitigation strategies.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Technical Report</h3>
+          <p>Focused on technical details and specifications, suitable for technical teams.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Compliance Report</h3>
+          <p>Structured to address specific regulatory or compliance requirements.</p>
+        </div>
+      </div>
+      
+      <h3>Adding Content</h3>
+      <p>After creating a report, you can add and edit content:</p>
+      
+      <ol>
+        <li>Click on any section to edit its content</li>
+        <li>Use the formatting toolbar to style your text</li>
+        <li>Add images, charts, and tables using the insert menu</li>
+        <li>Drag and drop sections to reorder them</li>
+      </ol>
+      
+      <div class="warning">
+        <strong>Important:</strong> Always save your work regularly by clicking the <strong>"Save"</strong> button in the toolbar. Unsaved changes may be lost if you navigate away from the page.
+      </div>
+    </section>
+    
+    <section id="customizing-reports">
+      <h2>Customizing Reports</h2>
+      
+      <section id="applying-themes">
+        <h3>Applying Themes</h3>
+        <p>Themes control the visual appearance of your reports, including colors, fonts, and styling. To apply a theme:</p>
+        
+        <ol>
+          <li>Open your report in the editor</li>
+          <li>Click the <strong>"Themes"</strong> button in the toolbar</li>
+          <li>Browse the available themes in the theme gallery</li>
+          <li>Click on a theme to preview it</li>
+          <li>Click <strong>"Apply Theme"</strong> to apply it to your report</li>
+        </ol>
+        
+        <div class="theme-preview">
+          <div class="theme-card">
+            <div class="theme-card-image" style="background-image: url('https://via.placeholder.com/300x150/0066cc/ffffff?text=Modern+Blue')"></div>
+            <div class="theme-card-content">
+              <h4>Modern Blue</h4>
+              <p>A clean, professional theme with a blue color scheme.</p>
+              <a href="#" class="btn">Apply</a>
+            </div>
+          </div>
+          <div class="theme-card">
+            <div class="theme-card-image" style="background-image: url('https://via.placeholder.com/300x150/222222/ffffff?text=Dark+Mode')"></div>
+            <div class="theme-card-content">
+              <h4>Dark Mode</h4>
+              <p>A sleek dark theme that reduces eye strain.</p>
+              <a href="#" class="btn">Apply</a>
+            </div>
+          </div>
+          <div class="theme-card">
+            <div class="theme-card-image" style="background-image: url('https://via.placeholder.com/300x150/f5f5f5/333333?text=Minimalist')"></div>
+            <div class="theme-card-content">
+              <h4>Minimalist</h4>
+              <p>Clean, simple design with minimal distractions.</p>
+              <a href="#" class="btn">Apply</a>
+            </div>
+          </div>
+        </div>
+        
+        <p>For more themes, visit the <a href="theme-marketplace.html">Theme Marketplace</a>.</p>
+      </section>
+      
+      <section id="customizing-templates">
+        <h3>Customizing Templates</h3>
+        <p>You can customize the structure and layout of your reports by modifying templates:</p>
+        
+        <h4>Basic Customization</h4>
+        <ol>
+          <li>Open your report in the editor</li>
+          <li>Click the <strong>"Template"</strong> button in the toolbar</li>
+          <li>Select <strong>"Customize Current Template"</strong></li>
+          <li>Use the template editor to add, remove, or rearrange sections</li>
+          <li>Click <strong>"Save Template"</strong> when finished</li>
+        </ol>
+        
+        <h4>Advanced Customization</h4>
+        <p>For more advanced customization, you can create your own templates:</p>
+        <ol>
+          <li>Click the <strong>"Template"</strong> button in the toolbar</li>
+          <li>Select <strong>"Create New Template"</strong></li>
+          <li>Start from scratch or use an existing template as a base</li>
+          <li>Define sections, layouts, and content placeholders</li>
+          <li>Save your template with a unique name</li>
+        </ol>
+        
+        <div class="note">
+          <strong>Note:</strong> Custom templates are saved to your account and can be used for future reports.
+        </div>
+      </section>
+    </section>
+    
+    <section id="exporting-reports">
+      <h2>Exporting Reports</h2>
+      
+      <p>The Report System allows you to export your reports in various formats:</p>
+      
+      <h3>Export Formats</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Format</th>
+            <th>Description</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PDF</td>
+            <td>Portable Document Format</td>
+            <td>Sharing with stakeholders, printing, archiving</td>
+          </tr>
+          <tr>
+            <td>HTML</td>
+            <td>Web page format</td>
+            <td>Online viewing, embedding in websites</td>
+          </tr>
+          <tr>
+            <td>DOCX</td>
+            <td>Microsoft Word document</td>
+            <td>Further editing in Word, compatibility with Office</td>
+          </tr>
+          <tr>
+            <td>PNG</td>
+            <td>Image format</td>
+            <td>Including in presentations, social media sharing</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h3>Export Process</h3>
+      <p>To export your report:</p>
+      
+      <ol class="steps-list">
+        <li>Open the report you want to export</li>
+        <li>Click the <strong>"Export"</strong> button in the toolbar</li>
+        <li>Select the desired export format</li>
+        <li>Configure any format-specific options (e.g., page size for PDF)</li>
+        <li>Click <strong>"Export"</strong> to generate and download the file</li>
+      </ol>
+      
+      <h3>Sharing Reports</h3>
+      <p>In addition to exporting, you can share reports directly:</p>
+      
+      <ol>
+        <li>Click the <strong>"Share"</strong> button in the toolbar</li>
+        <li>Choose a sharing method:
+          <ul>
+            <li><strong>Link</strong> - Generate a shareable link</li>
+            <li><strong>Email</strong> - Send the report via email</li>
+            <li><strong>Embed</strong> - Get HTML code to embed the report in a website</li>
+          </ul>
+        </li>
+        <li>Set permissions (view only, comment, edit)</li>
+        <li>Click <strong>"Share"</strong> to complete the process</li>
+      </ol>
+      
+      <div class="tip">
+        <strong>Tip:</strong> When sharing sensitive reports, consider setting an expiration date for the shared link or restricting access to specific email domains.
+      </div>
+    </section>
+    
+    <section id="managing-themes">
+      <h2>Managing Themes</h2>
+      
+      <section id="installing-themes">
+        <h3>Installing Themes</h3>
+        <p>You can install additional themes from the Theme Marketplace:</p>
+        
+        <ol class="steps-list">
+          <li>Navigate to the <a href="theme-marketplace.html">Theme Marketplace</a></li>
+          <li>Browse or search for themes</li>
+          <li>Click on a theme to view details</li>
+          <li>Click the <strong>"Install"</strong> button (for free themes) or <strong>"Purchase"</strong> (for premium themes)</li>
+          <li>Follow the installation prompts</li>
+        </ol>
+        
+        <p>Once installed, the theme will be available in your theme selector when creating or editing reports.</p>
+        
+        <h4>Managing Installed Themes</h4>
+        <p>To manage your installed themes:</p>
+        
+        <ol>
+          <li>Go to <strong>"Settings"</strong> > <strong>"Themes"</strong></li>
+          <li>View all your installed themes</li>
+          <li>Use the options to:
+            <ul>
+              <li>Set a default theme</li>
+              <li>Update themes</li>
+              <li>Uninstall themes</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+      
+      <section id="creating-custom-themes">
+        <h3>Creating Custom Themes</h3>
+        <p>Advanced users can create their own custom themes:</p>
+        
+        <ol>
+          <li>Go to <strong>"Settings"</strong> > <strong>"Themes"</strong> > <strong>"Create Theme"</strong></li>
+          <li>Choose to start from scratch or use an existing theme as a base</li>
+          <li>Use the theme editor to customize:
+            <ul>
+              <li>Colors and color schemes</li>
+              <li>Typography (fonts, sizes, weights)</li>
+              <li>Spacing and layout</li>
+              <li>Component styles</li>
+            </ul>
+          </li>
+          <li>Preview your theme in real-time</li>
+          <li>Save your theme with a unique name</li>
+        </ol>
+        
+        <p>For detailed instructions on creating custom themes, refer to the <a href="theme-developer-guide.html">Theme Developer Guide</a>.</p>
+        
+        <div class="warning">
+          <strong>Note:</strong> Creating custom themes requires knowledge of CSS and design principles. If you're not familiar with these concepts, we recommend starting with a pre-made theme and making small adjustments.
+        </div>
+      </section>
+    </section>
+    
+    <section id="advanced-features">
+      <h2>Advanced Features</h2>
+      
+      <section id="data-integration">
+        <h3>Data Integration</h3>
+        <p>The Report System can integrate with various data sources to automatically populate your reports:</p>
+        
+        <h4>Supported Data Sources</h4>
+        <ul>
+          <li>AI Tool Risk Framework database</li>
+          <li>CSV and Excel files</li>
+          <li>JSON and XML data</li>
+          <li>REST APIs</li>
+          <li>SQL databases (with appropriate connectors)</li>
+        </ul>
+        
+        <h4>Setting Up Data Integration</h4>
+        <ol>
+          <li>Open your report in the editor</li>
+          <li>Click the <strong>"Data"</strong> button in the toolbar</li>
+          <li>Select <strong>"Connect Data Source"</strong></li>
+          <li>Choose your data source type</li>
+          <li>Configure the connection settings</li>
+          <li>Map data fields to report elements</li>
+          <li>Click <strong>"Save"</strong> to establish the connection</li>
+        </ol>
+        
+        <p>Once connected, your report will automatically update when the data source changes.</p>
+      </section>
+      
+      <section id="automation">
+        <h3>Automation</h3>
+        <p>You can automate report generation and distribution:</p>
+        
+        <h4>Scheduled Reports</h4>
+        <ol>
+          <li>Go to <strong>"Settings"</strong> > <strong>"Automation"</strong> > <strong>"Scheduled Reports"</strong></li>
+          <li>Click <strong>"Create Schedule"</strong></li>
+          <li>Select a report template</li>
+          <li>Configure the schedule (daily, weekly, monthly)</li>
+          <li>Set up data source refreshing</li>
+          <li>Configure distribution options (email, save to folder, etc.)</li>
+          <li>Click <strong>"Save Schedule"</strong></li>
+        </ol>
+        
+        <h4>Event-Triggered Reports</h4>
+        <p>Reports can also be generated automatically when certain events occur:</p>
+        <ol>
+          <li>Go to <strong>"Settings"</strong> > <strong>"Automation"</strong> > <strong>"Event Triggers"</strong></li>
+          <li>Click <strong>"Create Trigger"</strong></li>
+          <li>Select the triggering event (e.g., risk assessment completion)</li>
+          <li>Choose a report template</li>
+          <li>Configure distribution options</li>
+          <li>Click <strong>"Save Trigger"</strong></li>
+        </ol>
+      </section>
+      
+      <section id="performance-optimization">
+        <h3>Performance Optimization</h3>
+        <p>For large or complex reports, consider these performance optimization techniques:</p>
+        
+        <h4>Report Optimization</h4>
+        <ul>
+          <li><strong>Limit large images</strong> - Resize and compress images before adding them to reports</li>
+          <li><strong>Paginate large reports</strong> - Break very long reports into multiple pages</li>
+          <li><strong>Use data summaries</strong> - For large datasets, use summaries instead of raw data</li>
+          <li><strong>Optimize charts</strong> - Use appropriate chart types and limit the number of data points</li>
+        </ul>
+        
+        <h4>Theme Optimization</h4>
+        <ul>
+          <li><strong>Use lightweight themes</strong> - Some themes are more performance-optimized than others</li>
+          <li><strong>Preload themes</strong> - Preload frequently used themes for faster switching</li>
+          <li><strong>Limit custom fonts</strong> - Each custom font adds loading time</li>
+        </ul>
+        
+        <div class="tip">
+          <strong>Tip:</strong> You can use the built-in Performance Monitor to identify performance bottlenecks in your reports. Access it via <strong>"Tools"</strong> > <strong>"Performance Monitor"</strong>.
+        </div>
+      </section>
+    </section>
+    
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      
+      <h3>Common Issues and Solutions</h3>
+      
+      <h4>Report Not Loading</h4>
+      <ul>
+        <li><strong>Issue:</strong> Report fails to load or displays a blank screen</li>
+        <li><strong>Solutions:</strong>
+          <ul>
+            <li>Clear your browser cache and reload the page</li>
+            <li>Check your internet connection</li>
+            <li>Try a different browser</li>
+            <li>Ensure JavaScript is enabled</li>
+            <li>Check if the report contains corrupted elements</li>
+          </ul>
+        </li>
+      </ul>
+      
+      <h4>Export Failures</h4>
+      <ul>
+        <li><strong>Issue:</strong> Unable to export reports</li>
+        <li><strong>Solutions:</strong>
+          <ul>
+            <li>Check if the report contains unsupported elements for the chosen format</li>
+            <li>Try exporting to a different format</li>
+            <li>Reduce the report size or complexity</li>
+            <li>Ensure you have sufficient permissions</li>
+            <li>Check your browser's download settings</li>
+          </ul>
+        </li>
+      </ul>
+      
+      <h4>Theme Issues</h4>
+      <ul>
+        <li><strong>Issue:</strong> Themes not applying correctly or causing display problems</li>
+        <li><strong>Solutions:</strong>
+          <ul>
+            <li>Try a different theme to isolate the issue</li>
+            <li>Update the problematic theme if an update is available</li>
+            <li>Reinstall the theme</li>
+            <li>Check for browser compatibility issues</li>
+            <li>Clear browser cache and reload</li>
+          </ul>
+        </li>
+      </ul>
+      
+      <h3>Getting Support</h3>
+      <p>If you continue to experience issues, you can get support through the following channels:</p>
+      
+      <ul>
+        <li><strong>In-app Help</strong> - Click the <strong>"Help"</strong> button in the top-right corner</li>
+        <li><strong>Documentation</strong> - Visit our <a href="#">online documentation</a></li>
+        <li><strong>Support Ticket</strong> - Submit a ticket through the <a href="#">support portal</a></li>
+        <li><strong>Community Forum</strong> - Ask questions in our <a href="#">user community</a></li>
+      </ul>
+      
+      <div class="tip">
+        <strong>Tip:</strong> When seeking support, include as much detail as possible about the issue, including screenshots, error messages, and steps to reproduce the problem.
+      </div>
+    </section>
+    
+    <section id="faq">
+      <h2>Frequently Asked Questions</h2>
+      
+      <h3>General Questions</h3>
+      
+      <h4>Q: Can I use the Report System offline?</h4>
+      <p>A: The Report System requires an internet connection for most features. However, you can export reports and view them offline.</p>
+      
+      <h4>Q: Is there a limit to how many reports I can create?</h4>
+      <p>A: The number of reports you can create depends on your subscription plan. Free accounts have a limit of 5 reports, while premium accounts have higher or unlimited quotas.</p>
+      
+      <h4>Q: Can I collaborate with others on reports?</h4>
+      <p>A: Yes, you can invite collaborators to view or edit your reports. Go to the "Share" menu and add collaborators by email address.</p>
+      
+      <h3>Theme Questions</h3>
+      
+      <h4>Q: Can I modify a theme without creating a new one?</h4>
+      <p>A: Yes, you can make temporary modifications to a theme when applying it to a report. These changes will only affect the current report and won't alter the original theme.</p>
+      
+      <h4>Q: Are premium themes worth the cost?</h4>
+      <p>A: Premium themes often include advanced features, better performance optimization, and professional designs. Whether they're worth the cost depends on your specific needs and how important visual presentation is for your reports.</p>
+      
+      <h4>Q: Can I use my organization's branding in reports?</h4>
+      <p>A: Yes, you can create a custom theme that incorporates your organization's colors, logos, and fonts. See the <a href="#creating-custom-themes">Creating Custom Themes</a> section for details.</p>
+      
+      <h3>Technical Questions</h3>
+      
+      <h4>Q: What file size limits apply to reports?</h4>
+      <p>A: Individual reports have a 50MB size limit, which includes all embedded images and attachments. For larger reports, consider breaking them into multiple smaller reports or using external references.</p>
+      
+      <h4>Q: Can I embed interactive elements in my reports?</h4>
+      <p>A: Yes, you can embed interactive elements like charts, maps, and data visualizations. These will remain interactive in HTML exports but will be rendered as static images in PDF and other formats.</p>
+      
+      <h4>Q: Is my report data secure?</h4>
+      <p>A: Yes, all report data is encrypted both in transit and at rest. Access controls ensure that only authorized users can view or edit your reports. For more details, see our <a href="#">Security Documentation</a>.</p>
+    </section>
+  </div>
+
+  <footer>
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+      <div class="copyright">&copy; 2023 AI Tool Risk Framework. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple script to handle smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80, // Offset for header
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // Theme preview buttons (demo functionality)
+    document.querySelectorAll('.theme-card .btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const themeName = this.closest('.theme-card').querySelector('h4').textContent;
+        alert(`Theme "${themeName}" would be applied in a real implementation.`);
+      });
+    });
+  </script>
+</body>
+</html>

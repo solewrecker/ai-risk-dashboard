@@ -1,12 +1,9 @@
 /* === EXPORT PAGE STYLES === */
 /* Main export page with component imports */
 
-/* Import base components */
-@import '../components/report-base.css';
-@import '../components/report-header.css';
-@import '../components/report-cards.css';
-@import '../components/report-sections.css';
-@import '../components/report-footer.css';
+/* Import theme system components */
+@import '../themes/theme-base.css';
+/* Theme-specific styles will be loaded dynamically */
 
 /* === EXPORT-SPECIFIC STYLES === */
 /* === EXPORT PAGE IMPORTS === */
@@ -524,6 +521,27 @@
   color: #9ca3af;
   font-size: 0.75rem;
   margin-top: 0.75rem;
+}
+
+/* Governor Theme Preview */
+.theme-card__preview--governor {
+    background-color: #1e3a8a; /* Dark Blue 900 */
+}
+
+.theme-card__preview--governor .theme-card__preview-header {
+    background-color: #1d4ed8; /* Dark Blue 800 */
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--primary {
+    background-color: #d4af37; /* Gold */
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--secondary {
+    background-color: #f0e68c; /* Khaki */
+}
+
+.theme-card__preview--governor .theme-card__preview-bar--tertiary {
+    background-color: #ffffff; /* White */
 }
 
 @media print {
