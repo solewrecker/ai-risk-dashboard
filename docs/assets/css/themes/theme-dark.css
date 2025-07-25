@@ -1,0 +1,482 @@
+/**
+ * theme-dark.css
+ * 
+ * Dark theme for reports.
+ * This file imports the necessary base, layout, and color scheme files.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* Import layout styles (default to two-column) */
+@import url('./layouts/two-col-layout.css');
+
+/* Import color scheme */
+@import url('./color-schemes/dark-colors.css');
+
+/* === DARK THEME VARIABLES === */
+:root {
+    /* Primary Colors - Dark with Purple Accents */
+    --theme-primary-start: #1f2937;
+    --theme-primary-end: #374151;
+    --theme-accent: #8b5cf6;
+    --theme-accent-light: #3730a3;
+    
+    /* Background Colors */
+    --theme-background: #111827;
+    --theme-section-background: #1f2937;
+    --theme-card-background: #374151;
+    --theme-card-header: #4b5563;
+    --theme-premium-background: #1e1b4b;
+    
+    /* Text Colors */
+    --theme-text-primary: #f9fafb;
+    --theme-text-secondary: #d1d5db;
+    --theme-header-text: #ffffff;
+    
+    /* Border Colors */
+    --theme-border: #4b5563;
+    --theme-border-light: #374151;
+    
+    /* Score Colors */
+    --theme-score-background: #4b5563;
+    --theme-score-text: #f9fafb;
+    
+    /* Priority Colors */
+    --theme-priority-background: #4b5563;
+    --theme-priority-text: #f9fafb;
+    
+    /* Table Colors */
+    --theme-table-header: #374151;
+    --theme-table-stripe: #1f2937;
+    
+    /* Typography */
+    --theme-font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* === DARK THEME CUSTOMIZATIONS === */
+
+/* Dark gradient header with subtle animations */
+.report-header {
+    background: linear-gradient(135deg, #111827 0%, #1f2937 25%, #374151 50%, #4b5563 100%);
+    position: relative;
+    border-bottom: 2px solid #8b5cf6;
+}
+
+.report-header::before {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+    width: 500px;
+    height: 500px;
+    animation: darkFloat 8s ease-in-out infinite;
+}
+
+.report-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+@keyframes darkFloat {
+    0%, 100% { transform: translate(50px, -50px) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50px, -100px) scale(1.1); opacity: 0.5; }
+}
+
+/* Dark card styling with glowing effects */
+.detailed-breakdown-card,
+.recommendations-item,
+.premium-feature,
+.compliance-item {
+    background: var(--theme-card-background);
+    border: 1px solid #4b5563;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.detailed-breakdown-card:hover,
+.recommendations-item:hover,
+.premium-feature:hover,
+.compliance-item:hover {
+    border-color: #8b5cf6;
+    box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
+}
+
+.detailed-breakdown-card:hover::before,
+.recommendations-item:hover::before,
+.premium-feature:hover::before,
+.compliance-item:hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* Dark score display with neon effects */
+.summary-section__score-display {
+    background: linear-gradient(135deg, var(--theme-risk-color) 0%, var(--theme-risk-color-light) 100%);
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(139, 92, 246, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-section__score-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: darkShimmer 4s infinite;
+}
+
+@keyframes darkShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Dark insight styling with glowing borders */
+.summary-section__insight-item {
+    background: var(--theme-card-background);
+    border: 1px solid #4b5563;
+    border-left: 4px solid #8b5cf6;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.summary-section__insight-item:hover {
+    border-left-color: #a855f7;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        -4px 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Dark table styling */
+.comparison-table {
+    background: var(--theme-card-background);
+    border: 1px solid #4b5563;
+}
+
+.comparison-table__header {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: #f9fafb;
+    border-bottom: 2px solid #8b5cf6;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    position: relative;
+}
+
+.comparison-table__header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.comparison-table__row:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.comparison-table__cell {
+    border-bottom: 1px solid #374151;
+    color: var(--theme-text-secondary);
+}
+
+.comparison-table__cell--name {
+    color: var(--theme-text-primary);
+}
+
+/* Dark section titles with glowing underlines */
+.summary-section__insight-title,
+.detailed-breakdown-section__title,
+.recommendations-section__title,
+.premium-features-section__title,
+.compliance-section__title,
+.comparison-section__title {
+    color: var(--theme-text-primary);
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.summary-section__insight-title::after,
+.detailed-breakdown-section__title::after,
+.recommendations-section__title::after,
+.premium-features-section__title::after,
+.compliance-section__title::after,
+.comparison-section__title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* Dark icons with glowing effects */
+.summary-section__insight-title::before {
+    content: '📊';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.detailed-breakdown-section__title::before {
+    content: '🔍';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.recommendations-section__title::before {
+    content: '💡';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.premium-features-section__title::before {
+    content: '⭐';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.compliance-section__title::before {
+    content: '✅';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.comparison-section__title::before {
+    content: '📈';
+    margin-right: 0.75rem;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+/* Dark compliance styling with neon effects */
+.compliance-item--compliant .compliance-item__icon::before {
+    content: '✅';
+    color: #10b981;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+
+.compliance-item--partial .compliance-item__icon::before {
+    content: '⚠️';
+    color: #f59e0b;
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+}
+
+.compliance-item--non-compliant .compliance-item__icon::before {
+    content: '❌';
+    color: #ef4444;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+}
+
+/* Dark premium features with special effects */
+.premium-feature {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    border: 1px solid #4c1d95;
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.premium-feature:hover::before {
+    opacity: 1;
+}
+
+.premium-feature:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+.premium-feature:nth-child(1) .premium-feature__icon::before {
+    content: '📊';
+    color: #8b5cf6;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.6));
+}
+
+.premium-feature:nth-child(2) .premium-feature__icon::before {
+    content: '🔒';
+    color: #6366f1;
+    filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.6));
+}
+
+.premium-feature:nth-child(3) .premium-feature__icon::before {
+    content: '📈';
+    color: #8b5cf6;
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.6));
+}
+
+.premium-feature:nth-child(4) .premium-feature__icon::before {
+    content: '🎯';
+    color: #6366f1;
+    filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.6));
+}
+
+/* Dark priority badges with glowing effects */
+.recommendations-item--high .recommendations-item__priority {
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+    color: #fecaca;
+    border: 1px solid #dc2626;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.recommendations-item--medium .recommendations-item__priority {
+    background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+    color: #fde68a;
+    border: 1px solid #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+
+.recommendations-item--low .recommendations-item__priority {
+    background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+    color: #bbf7d0;
+    border: 1px solid #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+/* Dark card headers */
+.detailed-breakdown-card__header {
+    background: var(--theme-card-header);
+    border-bottom: 1px solid #6b7280;
+}
+
+.detailed-breakdown-card__title {
+    color: var(--theme-text-primary);
+}
+
+.detailed-breakdown-card__content {
+    background: var(--theme-card-background);
+}
+
+.detailed-breakdown-card__description {
+    color: var(--theme-text-secondary);
+}
+
+.detailed-breakdown-card__criterion-title {
+    color: var(--theme-text-primary);
+}
+
+.detailed-breakdown-card__criterion-text {
+    color: var(--theme-text-secondary);
+}
+
+/* Dark recommendations content */
+.recommendations-item__title {
+    color: var(--theme-text-primary);
+}
+
+.recommendations-item__description {
+    color: var(--theme-text-secondary);
+}
+
+/* Dark premium content */
+.premium-feature__title {
+    color: var(--theme-text-primary);
+}
+
+.premium-feature__description {
+    color: var(--theme-text-secondary);
+}
+
+/* Dark compliance content */
+.compliance-item__title {
+    color: var(--theme-text-primary);
+}
+
+.compliance-item__description {
+    color: var(--theme-text-secondary);
+}
+
+/* Dark scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Dark responsive adjustments */
+@media (max-width: 768px) {
+    .report-header::before {
+        width: 300px;
+        height: 300px;
+    }
+}
+
+/* Dark print styles */
+@media print {
+    :root {
+        --theme-background: #ffffff;
+        --theme-section-background: #ffffff;
+        --theme-card-background: #ffffff;
+        --theme-text-primary: #1e293b;
+        --theme-text-secondary: #475569;
+        --theme-border: #e2e8f0;
+    }
+    
+    .report-header {
+        background: #1f2937 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .detailed-breakdown-card,
+    .recommendations-item,
+    .premium-feature,
+    .compliance-item {
+        background: #ffffff !important;
+        color: #1e293b !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+}

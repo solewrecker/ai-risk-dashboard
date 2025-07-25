@@ -1,0 +1,109 @@
+/* Default Theme - Classic Blue & Gray Design */
+/* Note: This theme is available in the Theme Gallery as 'Default'. */
+/* Import base structure */
+@import url('./theme-base.css');
+
+/* === DEFAULT THEME VARIABLES === */
+:root {
+    /* Primary Colors */
+    --theme-primary-start: #667eea;
+    --theme-primary-end: #764ba2;
+    --theme-accent: #3498db;
+    --theme-accent-light: #e3f2fd;
+    
+    /* Background Colors */
+    --theme-background: #f8f9fa;
+    --theme-section-background: #ffffff;
+    --theme-card-background: #ffffff;
+    --theme-card-header: #f8fafc;
+    --theme-premium-background: #f8fafc;
+    
+    /* Text Colors */
+    --theme-text-primary: #2c3e50;
+    --theme-text-secondary: #555555;
+    --theme-header-text: #ffffff;
+    
+    /* Border Colors */
+    --theme-border: #e9ecef;
+    --theme-border-light: #f1f5f9;
+    
+    /* Score Colors */
+    --theme-score-background: #e9ecef;
+    --theme-score-text: #555555;
+    
+    /* Priority Colors */
+    --theme-priority-background: #e9ecef;
+    --theme-priority-text: #555555;
+    
+    /* Table Colors */
+    --theme-table-header: #f8fafc;
+    --theme-table-stripe: #f8fafc;
+    
+    /* Typography */
+    --theme-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* === DEFAULT THEME CUSTOMIZATIONS === */
+
+/* Classic gradient header */
+.report-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    position: relative;
+}
+
+.report-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3498db 0%, #667eea 100%);
+}
+
+/* Enhanced card styling for default theme */
+.detailed-breakdown-card {
+    border-left: 4px solid var(--theme-accent, #3498db);
+    transition: all 0.3s ease;
+}
+
+.detailed-breakdown-card:hover {
+    border-left-color: #667eea;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+/* Classic button styling */
+.recommendations-item__priority {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Subtle section dividers */
+.summary-section,
+.detailed-breakdown-section,
+.recommendations-section,
+.compliance-section,
+.premium-features-section {
+    border-bottom: 2px solid #e3f2fd;
+}
+
+/* Classic table styling */
+.comparison-table__header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%);
+    color: var(--theme-text-primary, #2c3e50);
+}
+
+/* Print optimizations */
+@media print {
+    .report-header {
+        background: #667eea !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}

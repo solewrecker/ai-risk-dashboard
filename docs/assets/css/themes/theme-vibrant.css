@@ -1,0 +1,110 @@
+/**
+ * theme-vibrant.css
+ * 
+ * Vibrant theme for reports.
+ * This file imports the necessary base, layout, and color scheme files.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* Import layout styles (default to three-column) */
+@import url('./layouts/three-col-layout.css');
+
+/* Import color scheme */
+@import url('./color-schemes/vibrant-colors.css');
+
+/* Theme-specific overrides */
+.theme-vibrant {
+  /* Apply both layout and color classes */
+  --theme-name: "Vibrant";
+  --theme-description: "Bold, colorful theme with high contrast elements";
+  
+  /* Typography overrides */
+  --theme-font-family: 'Poppins', 'Segoe UI', Roboto, sans-serif;
+  --theme-font-size-base: 16px;
+  --theme-line-height: 1.6;
+  
+  /* Shadow overrides for more dramatic effects */
+  --theme-shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --theme-shadow-md: 0 8px 15px rgba(0, 0, 0, 0.1);
+  --theme-shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Additional theme-specific styles */
+.theme-vibrant .report-header {
+  background: var(--theme-header-background);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-vibrant .report-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.3), transparent 70%);
+  pointer-events: none;
+}
+
+.theme-vibrant .report-header__title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-vibrant .report-section {
+  border-radius: var(--theme-border-radius-lg);
+  box-shadow: var(--theme-shadow-md);
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-vibrant .report-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-secondary));
+}
+
+.theme-vibrant .report-section__title {
+  color: var(--theme-accent);
+  font-weight: 700;
+  letter-spacing: -0.25px;
+}
+
+.theme-vibrant .summary-section__score-display {
+  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-secondary) 100%);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-vibrant .summary-section__score-display::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+/* Print-specific styles */
+@media print {
+  .theme-vibrant {
+    /* Ensure proper printing of backgrounds */
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  .theme-vibrant .report-section::before {
+    display: none !important;
+  }
+}

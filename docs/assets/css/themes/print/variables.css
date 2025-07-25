@@ -1,0 +1,58 @@
+/**
+ * Print theme variables
+ */
+:root {
+  --color-primary: #000000;
+  --color-primary-hover: #333333;
+  --color-secondary: #666666;
+  --color-success: #006600;
+  --color-info: #006699;
+  --color-warning: #996600;
+  --color-danger: #990000;
+  --color-light: #f8f9fa;
+  --color-dark: #212529;
+  
+  --color-background: #ffffff;
+  --color-background-alt: #f5f5f5;
+  --color-background-hover: #eeeeee;
+  
+  --color-text: #000000;
+  --color-text-light: #666666;
+  --color-text-inverse: #ffffff;
+  
+  --color-border: #cccccc;
+  --color-border-light: #eeeeee;
+  
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  
+  --font-family-base: 'Times New Roman', Times, serif;
+  --font-family-heading: 'Times New Roman', Times, serif;
+  --font-family-monospace: 'Courier New', Courier, monospace;
+  
+  --font-size-base: 12pt;
+  --font-size-sm: 10pt;
+  --font-size-lg: 14pt;
+  --font-size-xl: 16pt;
+  --font-size-xxl: 18pt;
+  
+  --line-height-base: 1.5;
+  --line-height-sm: 1.25;
+  --line-height-lg: 1.8;
+  
+  --spacing-base: 1rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  --border-radius-sm: 0;
+  --border-radius-md: 0;
+  --border-radius-lg: 0;
+  --border-radius-pill: 0;
+  
+  --transition-base: none;
+  --transition-slow: none;
+  --transition-fast: none;
+}

@@ -1,0 +1,131 @@
+/* Professional Theme Components */
+
+/* Professional insight styling */
+.summary-section__insight-item {
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border-radius: 0.375rem;
+}
+
+/* Professional icon styling */
+.summary-section__insight-title::before {
+    content: '📊';
+    margin-right: 0.5rem;
+}
+
+.detailed-breakdown-section__title::before {
+    content: '🔍';
+    margin-right: 0.5rem;
+}
+
+.recommendations-section__title::before {
+    content: '💡';
+    margin-right: 0.5rem;
+}
+
+.premium-features-section__title::before {
+    content: '⭐';
+    margin-right: 0.5rem;
+}
+
+.compliance-section__title::before {
+    content: '✅';
+    margin-right: 0.5rem;
+}
+
+.comparison-section__title::before {
+    content: '📈';
+    margin-right: 0.5rem;
+}
+
+/* Professional compliance icons */
+.compliance-item--compliant .compliance-item__icon::before {
+    content: '✅';
+    color: #10b981;
+}
+
+.compliance-item--partial .compliance-item__icon::before {
+    content: '⚠️';
+    color: #f59e0b;
+}
+
+.compliance-item--non-compliant .compliance-item__icon::before {
+    content: '❌';
+    color: #ef4444;
+}
+
+/* Professional premium feature icons */
+.premium-feature:nth-child(1) .premium-feature__icon::before {
+    content: '📊';
+    color: #3b82f6;
+}
+
+.premium-feature:nth-child(2) .premium-feature__icon::before {
+    content: '🔒';
+    color: #3b82f6;
+}
+
+.premium-feature:nth-child(3) .premium-feature__icon::before {
+    content: '📈';
+    color: #3b82f6;
+}
+
+.premium-feature:nth-child(4) .premium-feature__icon::before {
+    content: '🎯';
+    color: #3b82f6;
+}
+
+/* Buttons */
+.button {
+    background-color: var(--theme-accent);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.button:hover {
+    background-color: var(--theme-primary-start);
+}
+
+/* Cards */
+.card {
+    background-color: var(--theme-card-background);
+    border: 1px solid var(--theme-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: var(--theme-card-header);
+    padding: 1rem;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-primary {
+    background-color: var(--theme-accent-light);
+    color: var(--theme-primary-start);
+}

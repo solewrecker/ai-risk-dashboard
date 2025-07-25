@@ -1,0 +1,175 @@
+/**
+ * theme-colorful.css
+ * 
+ * Colorful theme for reports with vibrant accents.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* === COLORFUL THEME VARIABLES === */
+:root {
+    /* Primary Colors - Vibrant Palette */
+    --theme-primary-start: #6366f1;
+    --theme-primary-end: #8b5cf6;
+    --theme-accent: #ec4899;
+    --theme-accent-light: #fbcfe8;
+    
+    /* Background Colors */
+    --theme-background: #ffffff;
+    --theme-section-background: #f9fafb;
+    --theme-card-background: #ffffff;
+    --theme-card-header: #f3f4f6;
+    --theme-premium-background: #f0fdf4;
+    
+    /* Text Colors */
+    --theme-text-primary: #111827;
+    --theme-text-secondary: #4b5563;
+    --theme-header-text: #ffffff;
+    
+    /* Border Colors */
+    --theme-border: #e5e7eb;
+    --theme-border-light: #f3f4f6;
+    
+    /* Score Colors */
+    --theme-score-background: #ddd6fe;
+    --theme-score-text: #5b21b6;
+    
+    /* Priority Colors */
+    --theme-priority-background: #fce7f3;
+    --theme-priority-text: #be185d;
+    
+    /* Table Colors */
+    --theme-table-header: #f3f4f6;
+    --theme-table-stripe: #f9fafb;
+    
+    /* Typography */
+    --theme-font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* === COLORFUL THEME CUSTOMIZATIONS === */
+
+/* Vibrant header styling */
+.report-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    position: relative;
+}
+
+.report-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+}
+
+/* Colorful card styling */
+.detailed-breakdown-card,
+.recommendations-item,
+.premium-feature,
+.compliance-item {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.detailed-breakdown-card:hover,
+.recommendations-item:hover,
+.premium-feature:hover,
+.compliance-item:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Colorful section titles */
+.section-title {
+    color: #6366f1;
+    font-weight: 700;
+}
+
+/* Colorful icons */
+.summary-section__insight-title::before {
+    content: '🌈';
+    margin-right: 0.5rem;
+}
+
+.detailed-breakdown-section__title::before {
+    content: '🔍';
+    margin-right: 0.5rem;
+    color: #8b5cf6;
+}
+
+.recommendations-section__title::before {
+    content: '💡';
+    margin-right: 0.5rem;
+    color: #ec4899;
+}
+
+.premium-features-section__title::before {
+    content: '✨';
+    margin-right: 0.5rem;
+    color: #f59e0b;
+}
+
+/* Colorful compliance icons */
+.compliance-item--compliant .compliance-item__icon::before {
+    content: '✅';
+    color: #10b981;
+}
+
+.compliance-item--partial .compliance-item__icon::before {
+    content: '⚠️';
+    color: #f59e0b;
+}
+
+.compliance-item--non-compliant .compliance-item__icon::before {
+    content: '❌';
+    color: #ef4444;
+}
+
+/* Colorful premium feature icons */
+.premium-feature:nth-child(1) .premium-feature__icon::before {
+    content: '🎨';
+    color: #6366f1;
+}
+
+.premium-feature:nth-child(2) .premium-feature__icon::before {
+    content: '🔒';
+    color: #8b5cf6;
+}
+
+.premium-feature:nth-child(3) .premium-feature__icon::before {
+    content: '📊';
+    color: #ec4899;
+}
+
+.premium-feature:nth-child(4) .premium-feature__icon::before {
+    content: '🚀';
+    color: #f59e0b;
+}
+
+/* Colorful responsive adjustments */
+@media (max-width: 768px) {
+    .report-header {
+        background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+    }
+}
+
+/* Colorful print styles */
+@media print {
+    :root {
+        --theme-primary-start: #6366f1;
+        --theme-primary-end: #8b5cf6;
+        --theme-accent: #ec4899;
+    }
+    
+    .report-header {
+        background: #6366f1 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}

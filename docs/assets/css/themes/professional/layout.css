@@ -1,0 +1,72 @@
+/* Professional Theme Layout */
+
+/* Enhanced header styling for professional look */
+.report-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+    position: relative;
+}
+
+.report-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+}
+
+/* Professional card styling */
+.detailed-breakdown-card,
+.recommendations-item,
+.premium-feature,
+.compliance-item {
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.detailed-breakdown-card:hover,
+.recommendations-item:hover,
+.premium-feature:hover,
+.compliance-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+/* Professional button styling for interactive elements */
+.summary-section__risk-badge {
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Professional table styling */
+.comparison-table__header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+}
+
+/* Professional score display enhancements */
+.summary-section__score-display {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+}
+
+/* Professional responsive adjustments */
+@media (max-width: 768px) {
+    .report-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    }
+}
+
+/* Professional print styles */
+@media print {
+    .report-header {
+        background: #1e40af !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}

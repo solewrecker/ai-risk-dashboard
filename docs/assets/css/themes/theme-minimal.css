@@ -1,0 +1,82 @@
+/**
+ * theme-minimal.css
+ * 
+ * Minimal theme for reports.
+ * This file imports the necessary base, layout, and color scheme files.
+ */
+
+/* Import base theme styles */
+@import url('./base/theme-base.css');
+
+/* Import layout styles (default to single-column) */
+@import url('./layouts/single-layout.css');
+
+/* Import color scheme */
+@import url('./color-schemes/minimal-colors.css');
+
+/* Theme-specific overrides */
+.theme-minimal {
+  /* Apply both layout and color classes */
+  --theme-name: "Minimal";
+  --theme-description: "Clean, monochromatic theme with subtle accents";
+  
+  /* Typography overrides */
+  --theme-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --theme-font-size-base: 14px;
+  --theme-line-height: 1.6;
+  
+  /* Spacing overrides */
+  --theme-spacing-md: 0.75rem;
+  --theme-spacing-lg: 1.5rem;
+  
+  /* Border radius overrides */
+  --theme-border-radius-md: 0.25rem;
+  --theme-border-radius-lg: 0.5rem;
+}
+
+/* Additional theme-specific styles */
+.theme-minimal .report-header {
+  padding: var(--theme-spacing-lg);
+  background: var(--theme-header-background);
+}
+
+.theme-minimal .report-header__title {
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+
+.theme-minimal .report-section {
+  border: 1px solid var(--theme-border);
+  box-shadow: none;
+  margin-bottom: var(--theme-spacing-md);
+}
+
+.theme-minimal .report-section__title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.25px;
+  border-bottom: 1px solid var(--theme-border);
+  padding-bottom: var(--theme-spacing-sm);
+  margin-bottom: var(--theme-spacing-md);
+}
+
+.theme-minimal .summary-section__score-display {
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+}
+
+/* Print-specific styles */
+@media print {
+  .theme-minimal {
+    /* Ensure proper printing of backgrounds */
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  .theme-minimal .report-section {
+    border: 1px solid var(--theme-border) !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

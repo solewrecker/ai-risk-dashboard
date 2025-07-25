@@ -1,0 +1,40 @@
+/* Professional Theme Variables */
+
+:root {
+    /* Primary Colors */
+    --theme-primary-start: #1e40af;
+    --theme-primary-end: #3b82f6;
+    --theme-accent: #3b82f6;
+    --theme-accent-light: #dbeafe;
+    
+    /* Background Colors */
+    --theme-background: #ffffff;
+    --theme-section-background: #ffffff;
+    --theme-card-background: #ffffff;
+    --theme-card-header: #f8fafc;
+    --theme-premium-background: #f8fafc;
+    
+    /* Text Colors */
+    --theme-text-primary: #1e293b;
+    --theme-text-secondary: #475569;
+    --theme-header-text: #ffffff;
+    
+    /* Border Colors */
+    --theme-border: #e2e8f0;
+    --theme-border-light: #f1f5f9;
+    
+    /* Score Colors */
+    --theme-score-background: #e2e8f0;
+    --theme-score-text: #475569;
+    
+    /* Priority Colors */
+    --theme-priority-background: #e2e8f0;
+    --theme-priority-text: #475569;
+    
+    /* Table Colors */
+    --theme-table-header: #f8fafc;
+    --theme-table-stripe: #f8fafc;
+    
+    /* Typography */
+    --theme-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
