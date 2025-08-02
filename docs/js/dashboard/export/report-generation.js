@@ -13,22 +13,26 @@ const supabase = window.supabaseClient;
 // Templates are now defined in templates.js as window properties
 const baseTemplate = window.baseTemplate;
 
+// Import ReportDataAdapter for proper data transformation
+import ReportDataAdapter from '../../report/data/ReportDataAdapter.js';
+
 
 // Data preparation for Handlebars templates
 function prepareTemplateData(primaryAssessment, selectedData, sectionsToGenerate) {
-    // Flatten the data structure for the template by merging the nested assessment_data
-    // object with the top-level assessment object. This provides a clean, flat data structure
-    // for the Handlebars template, making it easier and less error-prone.
+    // Use ReportDataAdapter to properly transform and enhance the data
+    const adapter = new ReportDataAdapter();
+    const transformedData = adapter.transformData(primaryAssessment);
+    
+    // Add additional template-specific data
     const templateData = {
-        ...(primaryAssessment.assessment_data || {}), // Spread nested data first
-        ...primaryAssessment, // Then spread root, overwriting any duplicates (like 'name')
+        ...transformedData,
         currentYear: new Date().getFullYear(),
         sectionsHtml: '<!-- Sections would be rendered here if configured -->',
+        selectedData: selectedData, // Include all selected assessments for comparison
+        sectionsToGenerate: sectionsToGenerate // Include sections configuration
     };
 
-    // Delete the nested object to avoid confusion in the template
-    delete templateData.assessment_data;
-
+    console.log('Template data prepared by ReportDataAdapter:', templateData);
     return templateData;
 }
 
