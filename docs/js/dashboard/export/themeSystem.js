@@ -3,7 +3,7 @@ import { designTokens } from './config/designTokens.js';
 import { themes } from './themes/themeConfig.js';
 
 // Scalable Theme System for 50+ Themes
-class ScalableThemeSystem {
+export class ScalableThemeSystem {
   constructor() {
     this.designTokens = designTokens;
 
@@ -136,4 +136,4 @@ class ScalableThemeSystem {
   }
 }
 
-export { ScalableThemeSystem };
+// ScalableThemeSystem is already exported with the class declaration

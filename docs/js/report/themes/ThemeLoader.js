@@ -9,7 +9,7 @@ class ThemeLoader {
   constructor() {
     this.loadedThemes = new Set();
     this.loadingPromises = new Map();
-    this.baseUrl = './css/themes/';
+    this.baseUrl = '/css/themes/';
   }
 
   /**
@@ -26,7 +26,7 @@ class ThemeLoader {
    * @param {Array} components - Optional array of theme components to load
    * @returns {Promise<boolean>} Promise resolving to success status
    */
-  async loadTheme(themeName, components = ['base', 'layout', 'colors']) {
+  async loadTheme(themeName, components = []) {
     // If already loading this theme, return the existing promise
     if (this.loadingPromises.has(themeName)) {
       return this.loadingPromises.get(themeName);
@@ -89,25 +89,43 @@ class ThemeLoader {
   _getThemeFiles(themeName, components) {
     const files = [];
     
-    // Always include the base theme file if it exists
-    if (components.includes('base')) {
-      files.push(`${this.baseUrl}base/theme-base.css`);
+    // For most themes, just load the main theme file
+    // Only load component files if they actually exist for component-based themes
+    const hasComponentStructure = this._checkComponentStructure(themeName);
+    
+    if (hasComponentStructure) {
+      // Always include the base theme file if it exists
+      if (components.includes('base')) {
+        files.push(`${this.baseUrl}base/theme-base.css`);
+      }
+      
+      // Add layout file if requested
+      if (components.includes('layout')) {
+        files.push(`${this.baseUrl}layouts/${themeName}-layout.css`);
+      }
+      
+      // Add color scheme file if requested
+      if (components.includes('colors')) {
+        files.push(`${this.baseUrl}color-schemes/${themeName}-colors.css`);
+      }
     }
     
-    // Add layout file if requested
-    if (components.includes('layout')) {
-      files.push(`${this.baseUrl}layouts/${themeName}-layout.css`);
-    }
-    
-    // Add color scheme file if requested
-    if (components.includes('colors')) {
-      files.push(`${this.baseUrl}color-schemes/${themeName}-colors.css`);
-    }
-    
-    // Add the main theme file
+    // Always add the main theme file
     files.push(`${this.baseUrl}${themeName}.css`);
     
     return files;
+  }
+
+  /**
+   * Checks if a theme has component-based structure
+   * @param {string} themeName - The name of the theme
+   * @returns {boolean} Whether the theme has component structure
+   * @private
+   */
+  _checkComponentStructure(themeName) {
+    // List of themes that have component-based structure
+    const componentBasedThemes = ['default', 'dark', 'print'];
+    return componentBasedThemes.includes(themeName);
   }
 
   /**

@@ -106,6 +106,7 @@
     import { ThemeRegistry } from './js/report/ThemeRegistry.js';
     import { ThemeLoader } from './js/report/themeLoader.js';
     import { ThemeSwitcher } from './js/report/themeSwitcher.js';
+    import { ScalableThemeSystem } from './js/dashboard/export/themeSystem.js';
     
     // Custom logger that writes to the log container
     const logger = {
@@ -129,43 +130,51 @@
       }
     };
     
-    // Initialize theme system
-    const themeRegistry = new ThemeRegistry();
+    // Initialize theme registry
+    const themeRegistry = new ScalableThemeSystem();
     const themeLoader = new ThemeLoader(themeRegistry, ['default', 'dark', 'print']);
     const themeSwitcher = new ThemeSwitcher(themeLoader, themeRegistry);
     
     // Register demo themes
-    themeRegistry.registerTheme('default', {
-      name: 'Default',
-      displayName: 'Light Theme',
-      paths: {
-        variables: './css/themes/default/variables.css',
-        layout: './css/themes/default/layout.css',
-        typography: './css/themes/default/typography.css',
-        components: './css/themes/default/components.css'
+    const themeConfigs = [
+      {
+        id: 'default',
+        name: 'Default',
+        displayName: 'Light Theme',
+        paths: {
+          variables: './css/themes/default/variables.css',
+          layout: './css/themes/default/layout.css',
+          typography: './css/themes/default/typography.css',
+          components: './css/themes/default/components.css'
+        }
+      },
+      {
+        id: 'dark',
+        name: 'Dark',
+        displayName: 'Dark Theme',
+        paths: {
+          variables: './css/themes/dark/variables.css',
+          layout: './css/themes/dark/layout.css',
+          typography: './css/themes/dark/typography.css',
+          components: './css/themes/dark/components.css'
+        }
+      },
+      {
+        id: 'print',
+        name: 'Print',
+        displayName: 'Print Theme',
+        paths: {
+          variables: './css/themes/print/variables.css',
+          layout: './css/themes/print/layout.css',
+          typography: './css/themes/print/typography.css',
+          components: './css/themes/print/components.css'
+        }
       }
-    });
-    
-    themeRegistry.registerTheme('dark', {
-      name: 'Dark',
-      displayName: 'Dark Theme',
-      paths: {
-        variables: './css/themes/dark/variables.css',
-        layout: './css/themes/dark/layout.css',
-        typography: './css/themes/dark/typography.css',
-        components: './css/themes/dark/components.css'
-      }
-    });
-    
-    themeRegistry.registerTheme('print', {
-      name: 'Print',
-      displayName: 'Print Theme',
-      paths: {
-        variables: './css/themes/print/variables.css',
-        layout: './css/themes/print/layout.css',
-        typography: './css/themes/print/typography.css',
-        components: './css/themes/print/components.css'
-      }
+    ];
+
+    themeConfigs.forEach(config => {
+      console.log(`Registering ${config.id} theme`);
+      themeRegistry.registerTheme(config.id, config);
     });
     
     // Set up event listeners

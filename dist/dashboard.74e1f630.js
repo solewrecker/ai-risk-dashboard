@@ -160,11 +160,11 @@
       });
     }
   }
-})({"4YepI":[function(require,module,exports,__globalThis) {
+})({"kirti":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
-var HMR_SERVER_PORT = 1234;
+var HMR_SERVER_PORT = 8080;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "439701173a9199ea";
 var HMR_USE_SSE = false;
@@ -697,8 +697,13 @@ window.handleFileSelect = (0, _importJs.handleFileSelect);
 window.processImport = (0, _importJs.processImport);
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
-    console.log('Supabase client initialized');
-    (0, _importJs.initImport)((0, _supabaseClientJs.supabase));
+    // Check if Supabase client is available
+    if (!window.supabaseClient) {
+        console.error('Supabase client is not initialized. Please check your configuration.');
+        return;
+    }
+    console.log('Supabase client is ready, proceeding with dashboard initialization.');
+    (0, _importJs.initImport)(window.supabaseClient);
     const isAuthenticated = await (0, _authJs.checkAuth)();
     if (isAuthenticated) await initializeDashboard();
     else {
@@ -778,6 +783,7 @@ async function initializeDashboard() {
 },{"./auth.js":"2bucD","./assessments.js":"9eYtm","./import.js":"8JRbO","./gamification.js":"lUSAA","./achievements.js":"fPGsB","./ui.js":"lhVUw","./admin-ui.js":"llSGL","./compare.js":"7DPt1","../supabase-client.js":"eoCsO"}],"2bucD":[function(require,module,exports,__globalThis) {
 // js/dashboard/auth.js
 // Handles user authentication, session management, and login UI. 
+// Use the globally initialized Supabase client
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "checkAuth", ()=>checkAuth);
@@ -787,14 +793,14 @@ parcelHelpers.export(exports, "getIsAdmin", ()=>getIsAdmin);
 parcelHelpers.export(exports, "getUserTier", ()=>getUserTier);
 parcelHelpers.export(exports, "getIsEnterprise", ()=>getIsEnterprise);
 parcelHelpers.export(exports, "getIsFree", ()=>getIsFree);
-var _supabaseClientJs = require("../supabase-client.js");
+const supabase = window.supabaseClient;
 // State variables
 let currentUser = null;
 let isAdmin = false;
 let userTier = 'free';
 async function checkAuth() {
     try {
-        const { data: { session } } = await (0, _supabaseClientJs.supabase).auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             currentUser = session.user;
             // Determine user tier
@@ -842,125 +848,6 @@ function getIsEnterprise() {
 }
 function getIsFree() {
     return userTier === 'free';
-}
-
-},{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eoCsO":[function(require,module,exports,__globalThis) {
-// docs/js/supabase-client.js
-// Use the global Supabase object loaded from CDN in index.html
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-// Export the Supabase client
-parcelHelpers.export(exports, "supabase", ()=>supabase);
-const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-// Check if Supabase is available globally (from CDN)
-let supabase;
-// Initialize the global Supabase client if it doesn't exist
-if (typeof window !== 'undefined') {
-    if (window.supabase) {
-        // Use the global Supabase object if available
-        console.log('Using global Supabase client from CDN');
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else if (typeof window.supabaseClient !== 'undefined') {
-        // Use existing client if already initialized
-        console.log('Using existing Supabase client');
-        supabase = window.supabaseClient;
-    } else if (typeof window.createClient !== 'undefined') {
-        // Use the global createClient function if available
-        console.log('Creating Supabase client with global createClient');
-        supabase = window.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        // Store for reuse
-        window.supabaseClient = supabase;
-    } else {
-        // Fallback to mock implementation for pages that don't load the CDN
-        console.log('Using mock Supabase client');
-        supabase = createMockClient();
-        // Store for reuse
-        window.supabaseClient = supabase;
-    }
-} else {
-    // Fallback for non-browser environments
-    console.log('Using mock Supabase client (non-browser environment)');
-    supabase = createMockClient();
-}
-// Mock client implementation for pages that don't load the CDN
-function createMockClient() {
-    return {
-        auth: {
-            getSession: async ()=>{
-                return {
-                    data: {
-                        session: null
-                    },
-                    error: null
-                };
-            },
-            onAuthStateChange: (callback)=>{
-                console.log('Auth state change listener registered (mock)');
-                return ()=>{};
-            },
-            signInWithPassword: async ()=>{
-                console.log('Mock sign in');
-                return {
-                    error: new Error('Authentication not available in this view')
-                };
-            },
-            signUp: async ()=>{
-                console.log('Mock sign up');
-                return {
-                    error: new Error('Authentication not available in this view')
-                };
-            },
-            signOut: async ()=>{
-                console.log('Mock sign out');
-                return {
-                    error: null
-                };
-            }
-        },
-        from: (table)=>({
-                select: ()=>({
-                        execute: async ()=>({
-                                data: [],
-                                error: null
-                            }),
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: [],
-                                        error: null
-                                    }),
-                                single: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    }),
-                insert: ()=>({
-                        execute: async ()=>({
-                                data: {
-                                    id: 'mock-id'
-                                },
-                                error: null
-                            })
-                    }),
-                update: ()=>({
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    }),
-                delete: ()=>({
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    })
-            })
-    };
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
@@ -1791,7 +1678,55 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
 });
 
-},{"../supabase-client.js":"eoCsO","./auth.js":"2bucD","./gamification.js":"lUSAA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"lUSAA":[function(require,module,exports,__globalThis) {
+},{"../supabase-client.js":"eoCsO","./auth.js":"2bucD","./gamification.js":"lUSAA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eoCsO":[function(require,module,exports,__globalThis) {
+// docs/js/supabase-client.js
+// This file provides a consistent way to access the Supabase client across the application
+// Constants for Supabase connection
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "supabase", ()=>supabase);
+const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+// Initialize Supabase client
+let supabaseClient;
+// Try to use the global client if available
+if (typeof window !== 'undefined' && window.supabaseClient) {
+    supabaseClient = window.supabaseClient;
+    console.log('Using globally initialized Supabase client');
+} else if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Created new Supabase client');
+    // Make it globally available
+    window.supabaseClient = supabaseClient;
+} else if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Created new Supabase client in module context');
+} else {
+    console.error('Supabase client could not be initialized. Make sure the Supabase library is loaded.');
+    // Create a dummy client to prevent errors
+    supabaseClient = {
+        auth: {
+            onAuthStateChange: ()=>{},
+            getSession: async ()=>({
+                    data: {
+                        session: null
+                    }
+                }),
+            signInWithPassword: async ()=>({
+                    error: new Error('Supabase not initialized')
+                }),
+            signUp: async ()=>({
+                    error: new Error('Supabase not initialized')
+                }),
+            signOut: async ()=>({
+                    error: new Error('Supabase not initialized')
+                })
+        }
+    };
+}
+const supabase = supabaseClient;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"lUSAA":[function(require,module,exports,__globalThis) {
 // js/dashboard/gamification.js
 // Handles all gamification features, such as achievements,
 // progress tracking, and rewards. 
@@ -3029,6 +2964,6 @@ function generateRecommendations(score, formData) {
     return recommendations;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["4YepI","80B5u"], "80B5u", "parcelRequire4b35", {})
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["kirti","80B5u"], "80B5u", "parcelRequire4b35", {})
 
 //# sourceMappingURL=dashboard.74e1f630.js.map

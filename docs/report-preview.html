@@ -4,52 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:;">
-    <title>Report Preview</title>
+    <title>Report Preview - Premium Template</title>
     
-    <!-- Add Supabase Client Library -->
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Initialize Supabase Client -->
-    <script>
-        // Initialize the global Supabase client
-        window.createClient = window.supabase?.createClient;
-    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Add Lucide Icons -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Handlebars -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    
+    <!-- jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Base Styles -->
     <link rel="stylesheet" href="./css/style.css">
+    
+    <!-- Theme Base -->
     <link rel="stylesheet" href="./css/themes/theme-base.css">
     
-    <!-- Theme Base (Always Loaded) -->
-    <link rel="stylesheet" href="./css/themes/base/theme-base.css">
+    <!-- Professional Theme Styles -->
+    <link rel="stylesheet" href="./css/themes/theme-professional.css">
     
-    <!-- Theme Layouts -->
-    <link rel="stylesheet" href="./css/themes/layouts/single-layout.css" disabled>
-    <link rel="stylesheet" href="./css/themes/layouts/two-col-layout.css" disabled>
-    <link rel="stylesheet" href="./css/themes/layouts/three-col-layout.css" disabled>
+    <!-- Report Error Boundaries -->
+    <link rel="stylesheet" href="./css/report-error-boundaries.css">
     
-    <!-- Theme Color Schemes -->
-    <link rel="stylesheet" href="./css/themes/color-schemes/corporate-colors.css" disabled>
-    <link rel="stylesheet" href="./css/themes/color-schemes/minimal-colors.css" disabled>
-    <link rel="stylesheet" href="./css/themes/color-schemes/dark-colors.css" disabled>
-    <link rel="stylesheet" href="./css/themes/color-schemes/vibrant-colors.css" disabled>
-    
-    <!-- Main Theme Files -->
-    <link rel="stylesheet" href="./css/themes/theme-corporate.css" data-theme="theme-corporate" disabled>
-    <link rel="stylesheet" href="./css/themes/theme-minimal.css" data-theme="theme-minimal" disabled>
-    <link rel="stylesheet" href="./css/themes/theme-dark.css" data-theme="theme-dark" disabled>
-    <link rel="stylesheet" href="./css/themes/theme-vibrant.css" data-theme="theme-vibrant" disabled>
+    <style>
+        /* Additional professional theme styling */
+        body {
+            font-family: var(--theme-font-family, 'Inter', sans-serif);
+            background-color: var(--theme-background, #ffffff);
+            color: var(--theme-text-primary, #1e293b);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        #report-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--theme-card-background, #ffffff);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .report-actions {
+            max-width: 1200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        
+        .report-actions button {
+            background: var(--theme-accent, #3b82f6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .report-actions button:hover {
+            background: var(--theme-primary-start, #1e40af);
+        }
+        
+        .loader {
+            border: 4px solid var(--theme-border, #e2e8f0);
+            border-top: 4px solid var(--theme-accent, #3b82f6);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div id="report-main"></div>
+    <div id="report-main">
+        <div class="loader"></div>
+        <p style="text-align: center; margin-top: 20px;">Loading premium report preview...</p>
+    </div>
     <div class="report-actions">
         <button id="download-pdf">Download as PDF</button>
         <button id="download-html">Download as HTML</button>
     </div>
-    <!-- Include the ThemeConnector for compatibility with the dashboard theme system -->
-    <script type="module" src="./js/dashboard/export/themeConnector.js"></script>
-    <script type="module" src="./js/report/ReportPreview.js"></script>
+    
+    <!-- Supabase Configuration -->
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        window.supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+    
+    <!-- Main Script -->
+    <script type="module">
+        // Import and initialize the full report preview system
+        import('./js/report/ReportPreview.js')
+            .then(module => {
+                const reportPreview = new module.default({
+                    containerSelector: '#report-main'
+                });
+                reportPreview.init();
+            })
+            .catch(error => {
+                console.error('Error loading ReportPreview:', error);
+                document.getElementById('report-main').innerHTML = 
+                    '<div style="padding: 40px; text-align: center;"><h2>Error Loading Report System</h2><p>' + error.message + '</p></div>';
+            });
+    </script>
 </body>
 </html>

@@ -1,16 +1,21 @@
 // docs/js/dashboard/export/report-generation.js
 
-import { supabase } from '../../supabase-client.js';
-import Handlebars from 'handlebars';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import QRCode from 'qrcode'; // Using the 'qrcode' package
-import { createIcons, icons } from 'lucide';
-import { baseTemplate } from './templates.js';
+// Import libraries from CDN (already loaded in HTML)
+const Handlebars = window.Handlebars;
+const jsPDF = window.jspdf.jsPDF;
+const html2canvas = window.html2canvas;
+const QRCode = window.QRCode;
+const { createIcons, icons } = window.lucide;
+
+// Use the global Supabase client initialized in export.html
+const supabase = window.supabaseClient;
+// Access templates from global window object
+// Templates are now defined in templates.js as window properties
+const baseTemplate = window.baseTemplate;
 
 
 // Data preparation for Handlebars templates
-export function prepareTemplateData(primaryAssessment, selectedData, sectionsToGenerate) {
+function prepareTemplateData(primaryAssessment, selectedData, sectionsToGenerate) {
     // Flatten the data structure for the template by merging the nested assessment_data
     // object with the top-level assessment object. This provides a clean, flat data structure
     // for the Handlebars template, making it easier and less error-prone.
@@ -28,7 +33,7 @@ export function prepareTemplateData(primaryAssessment, selectedData, sectionsToG
 }
 
 
-export async function prepareReportData(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections, selectedTheme) {
+async function prepareReportData(selectedAssessmentIds, allAssessments, quickTemplates, selectedTemplate, currentMode, customSelectedSections, selectedTheme) {
     if (selectedAssessmentIds.size === 0 || (currentMode === 'template' && !selectedTemplate) || (currentMode === 'custom' && customSelectedSections.size === 0)) {
         alert('Please select at least one assessment and either a quick template or custom sections.');
         return;
@@ -80,3 +85,6 @@ export async function prepareReportData(selectedAssessmentIds, allAssessments, q
         createIcons({ icons: icons });
     }
 }
+
+// Export functions for use in other modules
+export { prepareTemplateData, prepareReportData };

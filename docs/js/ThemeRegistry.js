@@ -5,7 +5,7 @@
  * It supports theme inheritance, lazy loading, and validation.
  */
 
-class ThemeRegistry {
+export default class ThemeRegistry {
   constructor() {
     this.themes = new Map();
     this.baseTheme = null;
@@ -38,7 +38,7 @@ class ThemeRegistry {
     // Register single-file themes
     this.registerTheme('theme-colorful', {
       name: 'theme-colorful',
-      cssFiles: ['/css/themes/theme-colorful.css'],
+      cssFiles: ['./css/themes/theme-colorful.css'],
       colors: {
         primary: '#e74c3c',
         secondary: '#f39c12',
@@ -51,7 +51,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-corporate', {
       name: 'theme-corporate',
-      cssFiles: ['/css/themes/theme-corporate.css'],
+      cssFiles: ['./css/themes/theme-corporate.css'],
       colors: {
         primary: '#34495e',
         secondary: '#95a5a6',
@@ -64,7 +64,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-executive', {
       name: 'theme-executive',
-      cssFiles: ['/css/themes/theme-executive.css'],
+      cssFiles: ['./css/themes/theme-executive.css'],
       colors: {
         primary: '#2c3e50',
         secondary: '#34495e',
@@ -77,7 +77,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-minimal', {
       name: 'theme-minimal',
-      cssFiles: ['/css/themes/theme-minimal.css'],
+      cssFiles: ['./css/themes/theme-minimal.css'],
       colors: {
         primary: '#7f8c8d',
         secondary: '#95a5a6',
@@ -90,7 +90,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-modern', {
       name: 'theme-modern',
-      cssFiles: ['/css/themes/theme-modern.css'],
+      cssFiles: ['./css/themes/theme-modern.css'],
       colors: {
         primary: '#3498db',
         secondary: '#9b59b6',
@@ -103,7 +103,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-vibrant', {
       name: 'theme-vibrant',
-      cssFiles: ['/css/themes/theme-vibrant.css'],
+      cssFiles: ['./css/themes/theme-vibrant.css'],
       colors: {
         primary: '#e74c3c',
         secondary: '#f39c12',
@@ -116,7 +116,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-system', {
       name: 'theme-system',
-      cssFiles: ['/css/themes/theme-system.css'],
+      cssFiles: ['./css/themes/theme-system.css'],
       colors: {
         primary: '#007acc',
         secondary: '#0099cc',
@@ -129,7 +129,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-dark', {
       name: 'theme-dark',
-      cssFiles: ['/css/themes/theme-dark.css'],
+      cssFiles: ['./css/themes/theme-dark.css'],
       colors: {
         primary: '#3498db',
         secondary: '#2ecc71',
@@ -142,7 +142,7 @@ class ThemeRegistry {
 
     this.registerTheme('theme-professional', {
       name: 'theme-professional',
-      cssFiles: ['/css/themes/theme-professional.css'],
+      cssFiles: ['./css/themes/theme-professional.css'],
       colors: {
         primary: '#2c3e50',
         secondary: '#34495e',

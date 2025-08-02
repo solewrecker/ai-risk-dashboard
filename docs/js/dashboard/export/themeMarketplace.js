@@ -6,14 +6,43 @@
  */
 
 import ThemeValidator from './themeValidationSchema.js';
-import ThemeRegistry from '../../report/themes/ThemeRegistry.js';
-import ThemeLoader from '../../report/themes/ThemeLoader.js';
+import { ScalableThemeSystem } from './themeSystem.js';
+// Use global ThemeRegistry and ThemeLoader objects instead of importing them directly
+// This helps avoid module resolution issues
 
 class ThemeMarketplace {
   constructor() {
     this.validator = new ThemeValidator();
-    this.themeRegistry = new ThemeRegistry();
-    this.themeLoader = new ThemeLoader();
+    
+    // Initialize theme registry - check for different possible theme systems
+    if (window.themeSystem instanceof ScalableThemeSystem) {
+      // Use existing ScalableThemeSystem instance if available
+      console.log('Using existing ScalableThemeSystem instance');
+      this.themeRegistry = window.themeSystem;
+    } else if (ScalableThemeSystem) {
+      // Create new ScalableThemeSystem if class is available
+      console.log('Creating new ScalableThemeSystem instance');
+      window.themeSystem = new ScalableThemeSystem();
+      this.themeRegistry = window.themeSystem;
+    } else if (window.ThemeRegistry) {
+      // Fall back to legacy ThemeRegistry
+      console.log('Using legacy ThemeRegistry');
+      this.themeRegistry = new window.ThemeRegistry();
+    } else {
+      // Create a minimal mock object as last resort
+      console.warn('No theme system found, using mock object');
+      this.themeRegistry = { 
+        themes: new Map(),
+        registerTheme: (id, config) => console.log(`Mock registered theme: ${id}`),
+        switchTheme: (id) => console.log(`Mock switched to theme: ${id}`)
+      };
+    }
+    
+    // Initialize theme loader
+    this.themeLoader = window.ThemeLoader ? new window.ThemeLoader() : {
+      loadTheme: (id, cssFiles) => Promise.resolve(console.log(`Mock loaded theme: ${id}`))
+    };
+    
     this.installedThemes = new Map(); // Map of installed themes (id -> theme config)
     this.marketplaceThemes = new Map(); // Map of available marketplace themes (id -> theme metadata)
     this.apiEndpoint = 'https://api.example.com/themes'; // Replace with actual API endpoint
@@ -248,13 +277,55 @@ class ThemeMarketplace {
       }
     ];
     
-    // Mark themes as installed if they are already installed
+    // Process each mock theme
     mockThemes.forEach(theme => {
+      // Check if theme is already installed via localStorage
       if (!theme.installed) {
         theme.installed = this.isThemeInstalled(theme.id);
       }
+      
+      // If theme is marked as installed, make sure it's properly registered
+      if (theme.installed) {
+        // Create theme configuration for installation if not already in installedThemes
+        if (!this.installedThemes.has(theme.id)) {
+          const themeConfig = {
+            id: theme.id,
+            name: theme.name,
+            description: theme.description,
+            version: theme.version,
+            author: theme.author,
+            cssFiles: [
+              `themes/${theme.id}/base.css`,
+              `themes/${theme.id}/layout.css`,
+              `themes/${theme.id}/colors.css`,
+              `themes/${theme.id}/main.css`
+            ]
+          };
+          
+          // Add to installed themes map
+          this.installedThemes.set(theme.id, themeConfig);
+          
+          // Register with ThemeRegistry or ScalableThemeSystem if it exists
+          if (this.themeRegistry) {
+            if (typeof this.themeRegistry.registerTheme === 'function') {
+              // For both ThemeRegistry and ScalableThemeSystem
+              console.log(`Registering theme ${themeConfig.id} with theme system`);
+              this.themeRegistry.registerTheme(themeConfig.id, themeConfig);
+            } else if (typeof this.themeRegistry.themes !== 'undefined' && typeof this.themeRegistry.themes.set === 'function') {
+              // Fallback for mock registry
+              console.log(`Adding theme ${themeConfig.id} to mock registry`);
+              this.themeRegistry.themes.set(themeConfig.id, themeConfig);
+            }
+          }
+        }
+      }
+      
+      // Add to marketplace themes map
       this.marketplaceThemes.set(theme.id, theme);
     });
+    
+    // Save installed themes to localStorage
+    this._saveInstalledThemes();
   }
 
   /**
@@ -537,8 +608,18 @@ class ThemeMarketplace {
       // Save to local storage
       this._saveInstalledThemes();
       
-      // Register theme with ThemeRegistry
-      this.themeRegistry.registerTheme(themeConfig);
+      // Register theme with ThemeRegistry or ScalableThemeSystem
+      if (this.themeRegistry) {
+        if (typeof this.themeRegistry.registerTheme === 'function') {
+          // For both ThemeRegistry and ScalableThemeSystem
+          console.log(`Registering theme ${themeConfig.id} with theme system`);
+          this.themeRegistry.registerTheme(themeConfig.id, themeConfig);
+        } else if (typeof this.themeRegistry.themes !== 'undefined' && typeof this.themeRegistry.themes.set === 'function') {
+          // Fallback for mock registry
+          console.log(`Adding theme ${themeConfig.id} to mock registry`);
+          this.themeRegistry.themes.set(themeConfig.id, themeConfig);
+        }
+      }
       
       // Update UI to show theme as installed
       this._updateThemeCardStatus(themeId, true);
@@ -592,13 +673,24 @@ class ThemeMarketplace {
       await this.themeLoader.loadTheme(themeConfig.id, themeConfig.cssFiles);
       
       // Activate theme in ThemeRegistry
-      this.themeRegistry.activateTheme(themeId);
+      // Check if we have a ScalableThemeSystem instance or the old ThemeRegistry
+      if (this.themeRegistry.switchTheme && typeof this.themeRegistry.switchTheme === 'function') {
+        // Use switchTheme for ScalableThemeSystem
+        await this.themeRegistry.switchTheme(themeId);
+      } else if (this.themeRegistry.activateTheme && typeof this.themeRegistry.activateTheme === 'function') {
+        // Use activateTheme for old ThemeRegistry
+        this.themeRegistry.activateTheme(themeId);
+      } else {
+        // Fallback to direct event dispatch if no activation method is available
+        console.warn(`No theme activation method found for ${themeId}, dispatching event only`);
+      }
       
       // Dispatch theme changed event
       const event = new CustomEvent('themeChanged', {
-        detail: { themeId: themeId }
+        detail: { themeName: themeId, themeId: themeId }
       });
       document.dispatchEvent(event);
+      window.dispatchEvent(event); // Dispatch to window as well for broader compatibility
       
       // Show success message
       this._showInstallProgress(themeId, 'Theme activated successfully!', 'success');

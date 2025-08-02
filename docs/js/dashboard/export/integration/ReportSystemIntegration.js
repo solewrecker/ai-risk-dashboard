@@ -38,6 +38,7 @@ export class ReportSystemIntegration {
     this.initializeErrorTracking();
     
     console.log('Report system integration initialized');
+    return Promise.resolve();
   }
   
   /**

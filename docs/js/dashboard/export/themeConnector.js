@@ -6,19 +6,114 @@
  * It connects the theme selection in the marketplace to the theme loading in the report preview.
  */
 
-import ThemeRegistry from '../../report/themes/ThemeRegistry.js';
-import ThemeLoader from '../../report/themes/ThemeLoader.js';
+// Use dynamic imports or global window objects to avoid module resolution issues
+let ThemeRegistry, ThemeLoader;
+
+// Function to initialize the module dependencies
+async function initDependencies() {
+  // Try to load from window globals first
+  if (window.ThemeRegistry && window.ThemeLoader) {
+    ThemeRegistry = window.ThemeRegistry;
+    ThemeLoader = window.ThemeLoader;
+    return true;
+  } else {
+    // Fallback to dynamic imports
+    try {
+      const ThemeRegistryModule = await import('../../../js/ThemeRegistry.js');
+      const ThemeLoaderModule = await import('../../../js/ThemeLoader.js');
+      ThemeRegistry = ThemeRegistryModule.default;
+      ThemeLoader = ThemeLoaderModule.default;
+      return true;
+    } catch (error) {
+      console.error('Error loading theme modules:', error);
+      // Create dummy classes as fallback
+      ThemeRegistry = class ThemeRegistry { 
+        getAvailableThemes() { return []; }
+      };
+      ThemeLoader = class ThemeLoader {};
+      return false;
+    }
+  }
+}
+
+// Initialize dependencies
+(async function() {
+  try {
+    await initDependencies();
+  } catch (err) {
+    console.error('Failed to initialize ThemeConnector dependencies:', err);
+  }
+})();
 
 class ThemeConnector {
   constructor() {
-    this.themeRegistry = new ThemeRegistry();
-    this.themeLoader = new ThemeLoader();
     this.selectedTheme = 'theme-professional'; // Default theme
+    this.initialized = false;
     
     // Load the selected theme from localStorage if available
     const storedTheme = localStorage.getItem('selectedTheme');
     if (storedTheme) {
       this.selectedTheme = storedTheme;
+    }
+    
+    // Initialize registry and loader if they're available synchronously
+    if (typeof ThemeRegistry === 'function' && typeof ThemeLoader === 'function') {
+      this.themeRegistry = new ThemeRegistry();
+      this.themeLoader = new ThemeLoader();
+      this.initialized = true;
+    } else {
+      // Create dummy objects as placeholders
+      this.themeRegistry = { getAvailableThemes: () => [] };
+      this.themeLoader = {};
+      console.warn('Theme modules not fully loaded in constructor');
+      
+      // Try to initialize asynchronously
+      this.init();
+    }
+  }
+  
+  async init() {
+    try {
+      // Wait for dependencies to be initialized
+      await initDependencies();
+      
+      // Create instances if ThemeRegistry and ThemeLoader are available
+      if (typeof ThemeRegistry === 'function' && typeof ThemeLoader === 'function') {
+        this.themeRegistry = new ThemeRegistry();
+        this.themeLoader = new ThemeLoader();
+        this.initialized = true;
+        console.log('ThemeConnector initialized successfully');
+      } else {
+        console.error('ThemeConnector initialization failed: dependencies not available');
+      }
+    } catch (error) {
+      console.error('Error initializing ThemeConnector:', error);
+    }
+  }
+  
+  /**
+   * Initialize the ThemeConnector asynchronously
+   * This should be called after instantiation if the constructor couldn't fully initialize
+   */
+  async initialize() {
+    // If we already have proper instances, no need to initialize again
+    if (this.themeRegistry instanceof ThemeRegistry && this.themeLoader instanceof ThemeLoader) {
+      return;
+    }
+    
+    try {
+      // Try to load modules dynamically if they weren't available in constructor
+      if (typeof ThemeRegistry !== 'function' || typeof ThemeLoader !== 'function') {
+        const ThemeRegistryModule = await import('../../../js/ThemeRegistry.js');
+        const ThemeLoaderModule = await import('../../../js/ThemeLoader.js');
+        ThemeRegistry = ThemeRegistryModule.default;
+        ThemeLoader = ThemeLoaderModule.default;
+      }
+      
+      this.themeRegistry = new ThemeRegistry();
+      this.themeLoader = new ThemeLoader();
+    } catch (error) {
+      console.error('Error initializing ThemeConnector:', error);
     }
   }
   
@@ -103,10 +198,37 @@ class ThemeConnector {
   }
   
   /**
+   * Set the current theme and save to localStorage
+   * @param {string} themeName - The theme ID to set
+   * @returns {string} The set theme ID
+   */
+  setTheme(themeName) {
+    if (!this.initialized) {
+      console.warn('ThemeConnector not fully initialized, theme change may not take effect');
+    }
+    
+    this.selectedTheme = themeName;
+    localStorage.setItem('selectedTheme', themeName);
+    
+    // Dispatch a theme changed event
+    const event = new CustomEvent('themeChanged', {
+      detail: { themeName }
+    });
+    document.dispatchEvent(event);
+    
+    return themeName;
+  }
+  
+  /**
    * Get the theme data for the report generation system
    * @returns {Object} The theme data in the format expected by the new theme system
    */
   getThemeDataForReport() {
+    if (!this.initialized) {
+      console.warn('ThemeConnector not fully initialized, returning basic theme data');
+      return { themeId: this.selectedTheme };
+    }
+    
     const themeId = this.selectedTheme;
     
     // Get theme data from marketplace if available
@@ -132,26 +254,48 @@ class ThemeConnector {
    * @returns {string} The selected theme ID
    */
   bridgeToThemeSystem() {
-    const themeId = this.selectedTheme;
-    
-    // If the theme is in the marketplace, use its data to register with the ThemeRegistry
-    if (window.themeMarketplace && window.themeMarketplace.marketplaceThemes.has(themeId)) {
-      const theme = window.themeMarketplace.marketplaceThemes.get(themeId);
-      
-      // Check if the theme is already registered
-      if (!this.themeRegistry.hasTheme(themeId)) {
-        // Register the theme with the ThemeRegistry
-        this.themeRegistry.registerTheme(themeId, {
-          name: theme.name,
-          author: theme.author?.name || 'Unknown',
-          version: theme.version || '1.0.0',
-          cssFiles: theme.cssFiles || [],
-          dependencies: theme.dependencies || []
-        });
-      }
+    if (!this.initialized) {
+      console.warn('ThemeConnector not fully initialized, cannot bridge to theme system');
+      return this.selectedTheme;
     }
     
-    return themeId;
+    try {
+      const themeId = this.selectedTheme;
+      
+      // If the theme is in the marketplace, use its data to register with the ThemeRegistry
+      if (window.themeMarketplace && window.themeMarketplace.marketplaceThemes.has(themeId)) {
+        const theme = window.themeMarketplace.marketplaceThemes.get(themeId);
+        
+        // Check if the theme is already registered and themeRegistry has the hasTheme method
+        if (typeof this.themeRegistry.hasTheme === 'function' && !this.themeRegistry.hasTheme(themeId)) {
+          // Register the theme with the ThemeRegistry or ScalableThemeSystem
+          if (typeof this.themeRegistry.registerTheme === 'function') {
+            console.log(`ThemeConnector: Registering theme ${themeId} with theme system`);
+            const themeConfig = {
+              id: themeId,
+              name: theme.name,
+              author: theme.author?.name || 'Unknown',
+              version: theme.version || '1.0.0',
+              cssFiles: theme.cssFiles || [],
+              dependencies: theme.dependencies || []
+            };
+            
+            // Handle different parameter orders between systems
+            if (this.themeRegistry instanceof window.ScalableThemeSystem) {
+              this.themeRegistry.registerTheme(themeId, themeConfig);
+            } else {
+              // Legacy ThemeRegistry expects (name, config) format
+              this.themeRegistry.registerTheme(themeId, themeConfig);
+            }
+          }
+        }
+      }
+      
+      return themeId;
+    } catch (error) {
+      console.error('Error bridging to theme system:', error);
+      return this.selectedTheme;
+    }
   }
 }
 

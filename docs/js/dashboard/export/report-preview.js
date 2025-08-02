@@ -1,9 +1,12 @@
-import { supabase } from '../../supabase-client.js';
-import Handlebars from 'handlebars';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import QRCode from 'qrcode';
-import { createIcons, icons } from 'lucide';
+// Import libraries from CDN (already loaded in HTML)
+const Handlebars = window.Handlebars;
+const jsPDF = window.jspdf.jsPDF;
+const html2canvas = window.html2canvas;
+const QRCode = window.QRCode;
+const { createIcons, icons } = window.lucide;
+
+// Use the global Supabase client initialized in export.html
+const supabase = window.supabaseClient;
 import { baseTemplate } from './templates.js';
 import { prepareTemplateData } from './report-generation.js';
 import { ScalableThemeSystem } from './themeSystem.js';

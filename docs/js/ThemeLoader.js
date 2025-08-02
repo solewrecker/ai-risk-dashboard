@@ -5,11 +5,11 @@
  * It supports lazy loading of CSS files and handles loading errors.
  */
 
-class ThemeLoader {
+export default class ThemeLoader {
   constructor() {
     this.loadedThemes = new Set();
     this.loadingPromises = new Map();
-    this.baseUrl = '/css/themes/';
+    this.baseUrl = './css/themes/';
   }
 
   /**
@@ -26,7 +26,7 @@ class ThemeLoader {
    * @param {Array} components - Optional array of theme components to load
    * @returns {Promise<boolean>} Promise resolving to success status
    */
-  async loadTheme(themeName, components = ['base', 'layout', 'colors']) {
+  async loadTheme(themeName, components = []) {
     // If already loading this theme, return the existing promise
     if (this.loadingPromises.has(themeName)) {
       return this.loadingPromises.get(themeName);
@@ -95,19 +95,12 @@ class ThemeLoader {
     console.log(`Theme name without prefix: ${themeNameWithoutPrefix}`);
     console.log(`Theme name with prefix: ${themeNameWithPrefix}`);
     
-    // Always include the base theme file if it exists
-    if (components.includes('base')) {
-      const baseFile = `${this.baseUrl}base/theme-base.css`;
-      console.log(`Adding base theme file: ${baseFile}`);
-      files.push(baseFile);
-    }
-    
     // Check if theme has a component-based structure
     const hasComponentStructure = this._checkComponentStructure(themeName);
     console.log(`Theme ${themeName} has component structure: ${hasComponentStructure}`);
     
     if (hasComponentStructure) {
-      // Add component files
+      // Add component files for themes with component structure
       const variablesFile = `${this.baseUrl}${themeNameWithoutPrefix}/variables.css`;
       const layoutFile = `${this.baseUrl}${themeNameWithoutPrefix}/layout.css`;
       const typographyFile = `${this.baseUrl}${themeNameWithoutPrefix}/typography.css`;
@@ -124,10 +117,17 @@ class ThemeLoader {
       files.push(typographyFile);
       files.push(componentsFile);
     } else {
-      // Add the main theme file
+      // For single-file themes, only load the main theme file
       const mainFile = `${this.baseUrl}${themeNameWithPrefix}.css`;
       console.log(`Adding main theme file: ${mainFile}`);
       files.push(mainFile);
+    }
+    
+    // Only include base theme file if it exists and is requested for component-based themes
+    if (hasComponentStructure && components.includes('base')) {
+      const baseFile = `${this.baseUrl}base/theme-base.css`;
+      console.log(`Adding base theme file: ${baseFile}`);
+      files.unshift(baseFile); // Add at beginning for proper cascade
     }
     
     console.log(`Final theme files for ${themeName}:`, files);

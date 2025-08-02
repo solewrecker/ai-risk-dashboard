@@ -9,7 +9,13 @@
     
     <!-- Initialize Supabase Client -->
     <script>// Initialize the global Supabase client
-window.createClient = window.supabase?.createClient;
+const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+// Create the Supabase client and make it globally available
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase client initialized globally');
+} else console.warn('Supabase CDN not loaded properly');
 
 </script>
     

@@ -59,7 +59,8 @@ class ReportPreviewBridge {
     // Check if the theme is already registered
     if (!this.themeRegistry.hasTheme(themeId)) {
       // Register the theme with basic configuration
-      this.themeRegistry.registerTheme(themeId, {
+      const themeConfig = {
+        id: themeId,
         name: themeData.name || themeId,
         components: {
           base: `${themeId}-base`,
@@ -68,7 +69,17 @@ class ReportPreviewBridge {
         },
         // Add any additional configuration from themeData
         ...(themeData.config || {})
-      });
+      };
+      
+      // Handle different parameter orders between systems
+      if (this.themeRegistry && typeof this.themeRegistry.registerTheme === 'function') {
+        console.log(`ReportPreviewBridge: Registering theme ${themeId} with ThemeRegistry`);
+        this.themeRegistry.registerTheme(themeId, themeConfig);
+      } else {
+        console.log(`ReportPreviewBridge: No valid theme registry found for ${themeId}`);
+        // Fallback - just log the theme config
+        console.log('Theme config:', themeConfig);
+      }
     }
     
     return themeId;

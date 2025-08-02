@@ -86,7 +86,8 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-.template-card.selected {
+.template-card.selected,
+.template-card--selected {
     border-color: var(--color-blue-400);
     background: var(--color-blue-900-transparent);
     box-shadow: 0 0 0 3px var(--color-blue-500-transparent);
@@ -434,17 +435,17 @@
   align-items: flex-start;
 }
 
-.export-choice-section {
+.export-choice__section {
   flex: 1;
 }
 
-.export-choice-title {
+.export-choice__title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
-.export-choice-subtitle {
+.export-choice__subtitle {
   color: #9ca3af;
   font-size: 0.9rem;
   margin-bottom: 1.25rem;
@@ -470,7 +471,7 @@
   padding: 1rem;
 }
 
-.custom-notice {
+.custom-sections__notice {
   background: #1f2937;
   border: 1px solid #374151;
   border-radius: 6px;
@@ -480,18 +481,41 @@
   font-size: 0.8rem;
 }
 
-.mix-match-selector {
+.custom-sections__notice.active {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+  color: #e2e8f0;
+}
+
+.custom-sections__selector {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.mix-match-selector__section-toggle {
+.custom-sections__toggle {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 0;
   border-bottom: 1px solid #374151;
+  transition: color 0.2s ease;
+}
+
+.custom-sections__toggle.active {
+  color: #3b82f6;
+}
+
+.custom-sections__toggle input[type="checkbox"] {
+  accent-color: #3b82f6;
+}
+
+.custom-sections__toggle.active {
+  color: #3b82f6;
+}
+
+.custom-sections__toggle input[type="checkbox"] {
+  accent-color: #3b82f6;
 }
 
 .export-mode-indicator {
@@ -503,7 +527,7 @@
   color: #10b981;
 }
 
-.export-preview-panel {
+.export-preview {
   background: #1a1f2e;
   border: 1px solid #2d3748;
   border-radius: 8px;
@@ -511,13 +535,23 @@
   margin-top: 1.5rem;
 }
 
-.export-preview-title {
+.export-preview__title {
   font-weight: 600;
   margin-bottom: 0.75rem;
   color: #3b82f6;
 }
 
-.export-preview-status {
+.export-preview__sections {
+  margin-bottom: 1rem;
+}
+
+.export-preview__item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #2d3748;
+  color: #d1d5db;
+}
+
+.export-preview__status {
   color: #9ca3af;
   font-size: 0.75rem;
   margin-top: 0.75rem;

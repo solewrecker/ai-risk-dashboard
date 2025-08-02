@@ -422,7 +422,14 @@ export class DeploymentPipeline {
     // If theme registry is available, actually register the theme
     if (this.themeRegistry && data.themeData) {
       try {
-        this.themeRegistry.registerTheme(data.themeData);
+        // Handle different theme registration methods between systems
+        if (this.themeRegistry instanceof window.ScalableThemeSystem) {
+          console.log(`DeploymentPipeline: Registering theme with ScalableThemeSystem`);
+          this.themeRegistry.registerTheme(data.themeData.id || data.themeId, data.themeData);
+        } else {
+          console.log(`DeploymentPipeline: Registering theme with ThemeRegistry`);
+          this.themeRegistry.registerTheme(data.themeData);
+        }
         this.logDeployment(deployment.id, 'info', `Theme ${data.themeId} registered successfully`);
       } catch (error) {
         this.logDeployment(deployment.id, 'warning', `Theme registration warning: ${error.message}`);

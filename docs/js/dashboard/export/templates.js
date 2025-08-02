@@ -1,4 +1,6 @@
-export const baseTemplate = `
+// Define the base template for reports
+// Define templates as global window properties to avoid module resolution issues
+window.baseTemplate = `
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -201,7 +203,7 @@ export const footerTemplate = `<footer class="report-footer">
 </footer>`;
 
 // Report type configurations
-export const reportConfigs = {
+window.reportConfigs = {
     'executive': {
         title: 'Executive Summary Report',
         sections: ['summary-section'],
@@ -224,8 +226,10 @@ export const reportConfigs = {
     }
 };
 
+// No need to export baseTemplate as it's now a global window property
+
 // Available themes configuration
-export const themeConfigs = {
+window.themeConfigs = {
     'theme-professional': {
         name: 'Professional',
         description: 'Clean corporate design with blue accents',

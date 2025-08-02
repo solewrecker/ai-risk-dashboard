@@ -80,11 +80,15 @@ class ReportDataAdapter {
       }
 
       // Check allowed values if specified
-      if (rules.allowedValues && data[field] !== undefined && 
-          !rules.allowedValues.includes(data[field])) {
-        console.warn(`Field '${field}' has invalid value. Using fallback value.`);
-        validatedData[field] = rules.fallback;
-        return;
+      if (rules.allowedValues && data[field] !== undefined) {
+        const value = typeof data[field] === 'string' ? data[field].toUpperCase() : data[field];
+        if (!rules.allowedValues.includes(value)) {
+          console.warn(`Field '${field}' has invalid value. Using fallback value.`);
+          validatedData[field] = rules.fallback;
+          return;
+        } else {
+          validatedData[field] = value;
+        }
       }
 
       // Check min/max for numbers
@@ -138,6 +142,52 @@ class ReportDataAdapter {
 
     // Add risk color based on risk level
     enhancedData.riskColor = this.getRiskColor(enhancedData.risk_level);
+    
+    // Transform categories data for premium template
+    if (data.categories && Array.isArray(data.categories)) {
+      enhancedData.categories = data.categories.map(category => ({
+        ...category,
+        riskColor: this.getRiskColor(category.risk_level),
+        criteria: category.criteria ? category.criteria.map(criteria => ({
+          ...criteria,
+          riskColor: this.getRiskColor(criteria.risk_level)
+        })) : []
+      }));
+    }
+    
+    // Ensure key findings is an array
+    if (data.key_findings && !Array.isArray(data.key_findings)) {
+      enhancedData.key_findings = [data.key_findings];
+    }
+    
+    // Transform detailed analysis data
+    if (data.detailed_analysis && Array.isArray(data.detailed_analysis)) {
+      enhancedData.detailed_analysis = data.detailed_analysis.map(analysis => {
+        const transformedAnalysis = { ...analysis };
+        
+        // Handle table data
+        if (analysis.data && analysis.data.type === 'table') {
+          transformedAnalysis.isTable = true;
+          transformedAnalysis.tableHeaders = analysis.data.headers || [];
+          transformedAnalysis.tableRows = analysis.data.rows || [];
+        }
+        
+        // Handle list data
+        if (analysis.data && analysis.data.type === 'list') {
+          transformedAnalysis.isList = true;
+          transformedAnalysis.listItems = analysis.data.items || [];
+        }
+        
+        return transformedAnalysis;
+      });
+    }
+    
+    // Add derived fields for template convenience
+    enhancedData.risk_level_lowercase = enhancedData.risk_level ? enhancedData.risk_level.toLowerCase() : 'medium';
+    enhancedData.hasCategories = enhancedData.categories && enhancedData.categories.length > 0;
+    enhancedData.hasKeyFindings = enhancedData.key_findings && enhancedData.key_findings.length > 0;
+    enhancedData.hasDetailedAnalysis = enhancedData.detailed_analysis && enhancedData.detailed_analysis.length > 0;
+    enhancedData.hasRecommendations = enhancedData.recommendations && enhancedData.recommendations.length > 0;
     
     return enhancedData;
   }

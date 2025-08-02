@@ -12,15 +12,42 @@
     <!-- Initialize Supabase Client -->
     <script>
         // Initialize the global Supabase client
-        window.createClient = window.supabase?.createClient;
+        const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
+        
+        // Create the Supabase client and make it globally available
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase client initialized globally');
+        } else {
+            console.warn('Supabase CDN not loaded properly');
+        }
     </script>
     
     <!-- Add Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
     
+    <!-- Add Handlebars for templating -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    
+    <!-- Add jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Add QRCode library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    
+    <!-- Add Lucide icons library -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    
+    <!-- Add Export Module -->
+    <script type="module" src="./js/dashboard/export-main.js"></script>
+    
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="css/pages/export-page.css">
     <link rel="stylesheet" href="css/pages/marketplace.css">
+    
+    <!-- Load our JavaScript modules -->
 </head>
 <body class="dashboard-page bg-gray-900 text-white min-h-screen">
     <div class="flex">
@@ -100,12 +127,12 @@
                             </div>
                             <div class="export-step__content">
                                 <div class="export-choice-container">
-                                    <div class="export-choice-section">
-                                        <h4 class="export-choice-title">📋 Quick Select Template</h4>
-                                        <p class="export-choice-subtitle">Choose a pre-built template for a standard report.</p>
+                                    <div class="export-choice__section">
+                                        <h4 class="export-choice__title">📋 Quick Select Template</h4>
+                                        <p class="export-choice__subtitle">Choose a pre-built template for a standard report.</p>
                                         
                                         <div class="template-selector template-selector--quick-select">
-                                            <div class="template-card" data-template="summary">
+                                            <div class="template-card" data-template="executive">
                                                 <i data-lucide="file-text" class="template-card__icon"></i>
                                                 <h4 class="template-card__title">Executive Summary</h4>
                                                 <p class="template-card__description">High-level overview with scores and risks. Ideal for management.</p>
@@ -134,20 +161,20 @@
                                     
                                     <div class="export-divider"></div>
                                     
-                                    <div class="export-choice-section">
-                                        <h4 class="export-choice-title">⚙️ Customize Sections</h4>
-                                        <p class="export-choice-subtitle">Hand-pick specific sections to build a custom report.</p>
+                                    <div class="export-choice__section">
+                                        <h4 class="export-choice__title">⚙️ Customize Sections</h4>
+                                        <p class="export-choice__subtitle">Hand-pick specific sections to build a custom report.</p>
                                         
                                         <div class="custom-sections">
-                                            <div class="custom-notice" id="custom-notice">
+                                            <div class="custom-sections__notice" id="custom-notice">
                                                 Select sections below to create a custom report
                                             </div>
                                             
-                                            <div class="mix-match-selector">
-                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="summary"> Executive Summary</label>
-                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
-                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="recommendations"> Recommendations</label>
-                                                <label class="mix-match-selector__section-toggle"><input type="checkbox" data-section="comparison"> Comparison Table</label>
+                                            <div class="custom-sections__selector">
+                                                <label class="custom-sections__toggle"><input type="checkbox" data-section="summary"> Executive Summary</label>
+                                                <label class="custom-sections__toggle"><input type="checkbox" data-section="detailed"> Detailed Breakdown</label>
+                                                <label class="custom-sections__toggle"><input type="checkbox" data-section="recommendations"> Recommendations</label>
+                                                <label class="custom-sections__toggle"><input type="checkbox" data-section="comparison"> Comparison Table</label>
                                             </div>
                                         </div>
                                     </div>
@@ -169,13 +196,13 @@
                                     📋 Using Executive Summary Template
                                 </div>
                                 
-                                <div class="export-preview-panel">
-                                    <div class="export-preview-title">Your Report Will Include</div>
-                                    <div id="preview-sections">
+                                <div class="export-preview">
+                                    <div class="export-preview__title">Your Report Will Include</div>
+                                    <div id="preview-sections" class="export-preview__sections">
                                         <!-- Dynamic sections will be inserted here -->
-                                        <div class="preview-item">✓ Executive Summary</div>
+                                        <div class="export-preview__item">✓ Executive Summary</div>
                                     </div>
-                                    <div class="export-preview-status">
+                                    <div class="export-preview__status">
                                         <strong>Executive Summary Template</strong> • Estimated length: 3-4 pages
                                     </div>
                                 </div>
@@ -244,8 +271,145 @@
         </div>
     </div>
 
-    <!-- Parcel will bundle and inject all necessary scripts here -->
-    <!-- Using marketplace-specific script that doesn't require authentication -->
-    <script type="module" src="js/dashboard/export-marketplace.js"></script>
+    <!-- Load all necessary scripts as inline scripts to avoid module resolution issues -->
+    <script>
+        // Simple mock implementation of ThemeRegistry
+        window.ThemeRegistry = class ThemeRegistry {
+            constructor() {
+                this.themes = new Map();
+                console.log('Mock ThemeRegistry initialized');
+            }
+            
+            getAvailableThemes() {
+                return [
+                    { id: 'theme-professional', name: 'Professional', description: 'Clean corporate design' },
+                    { id: 'theme-executive', name: 'Executive', description: 'Sophisticated dark blue and gold' },
+                    { id: 'theme-modern', name: 'Modern', description: 'Vibrant purple and teal' }
+                ];
+            }
+        };
+        
+        // Simple mock implementation of ThemeLoader
+        window.ThemeLoader = class ThemeLoader {
+            constructor() {
+                console.log('Mock ThemeLoader initialized');
+            }
+            
+            loadTheme(themeId) {
+                console.log('Loading theme:', themeId);
+                return Promise.resolve({ id: themeId });
+            }
+        };
+        
+        // Define templates as global window properties
+        window.baseTemplate = `<div class="container"><!-- Template content --></div>`;
+        
+        // Report type configurations
+        window.reportConfigs = {
+            'executive': {
+                title: 'Executive Summary Report',
+                sections: ['summary-section'],
+                description: 'High-level overview for executives and decision makers'
+            },
+            'detailed': {
+                title: 'Detailed Technical Report', 
+                sections: ['summary-section', 'detailed-breakdown-section', 'recommendations-section'],
+                description: 'Comprehensive technical analysis with detailed recommendations'
+            },
+            'premium': {
+                title: 'Premium Security Assessment',
+                sections: ['summary-section', 'premium-features-section', 'detailed-breakdown-section', 'recommendations-section', 'compliance-section'],
+                description: 'Complete assessment with premium features and compliance analysis'
+            },
+            'comparison': {
+                title: 'Comparison Analysis Report',
+                sections: ['summary-section', 'comparison-table-section'],
+                description: 'Side-by-side comparison of multiple assessments'
+            }
+        };
+        
+        // Available themes configuration
+        window.themeConfigs = {
+            'theme-professional': {
+                name: 'Professional',
+                description: 'Clean corporate design with blue accents',
+                primaryColor: '#3b82f6',
+                category: 'business'
+            },
+            'theme-executive': {
+                name: 'Executive',
+                description: 'Sophisticated dark blue and gold for high-level presentations',
+                primaryColor: '#1e3a8a',
+                category: 'premium'
+            },
+            'theme-modern': {
+                name: 'Modern',
+                description: 'Vibrant purple and teal with contemporary styling',
+                primaryColor: '#8b5cf6',
+                category: 'creative'
+            },
+            'theme-dark': {
+                name: 'Dark',
+                description: 'Sophisticated dark mode with purple accents',
+                primaryColor: '#374151',
+                category: 'modern'
+            }
+        };
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Set up tab navigation
+            const tabs = document.querySelectorAll('.export-nav__tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Skip if tab is disabled
+                    if (tab.classList.contains('export-nav__tab--disabled')) {
+                        return;
+                    }
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('export-nav__tab--active'));
+                    tab.classList.add('export-nav__tab--active');
+                    
+                    // Show active content
+                    tabContents.forEach(content => {
+                        if (content.getAttribute('data-tab') === tabId) {
+                            content.classList.add('tab-content--active');
+                        } else {
+                            content.classList.remove('tab-content--active');
+                        }
+                    });
+                });
+            });
+            
+            // Load assessments if user is logged in
+            if (window.supabaseClient) {
+                window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                    if (session) {
+                        console.log('User is logged in, loading assessments...');
+                        // The export-main.js module is loaded via script tag
+                        // Wait for it to be fully loaded
+                        setTimeout(() => {
+                            if (typeof window.loadAssessments === 'function') {
+                                window.loadAssessments();
+                            } else {
+                                console.error('loadAssessments function not found in global scope');
+                            }
+                        }, 500); // Give a small delay to ensure the module is loaded
+                    } else {
+                        console.log('User is not logged in');
+                        // Redirect to login page or show login prompt
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

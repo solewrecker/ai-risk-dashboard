@@ -1,7 +1,8 @@
 // js/dashboard/auth.js
 // Handles user authentication, session management, and login UI. 
 
-import { supabase } from '../supabase-client.js';
+// Use the globally initialized Supabase client
+const supabase = window.supabaseClient;
 
 // State variables
 let currentUser = null;

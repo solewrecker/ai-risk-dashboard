@@ -1,13 +1,14 @@
-// js/assessment/auth.js
+// js/auth.js
 // Handles user authentication, session management, and Supabase client initialization.
 
 // --- Configuration ---
-import { supabase } from '../supabase-client.js';
+import { supabase } from './supabase-client.js';
 export { supabase };
 
 // --- State ---
 let currentUser = null;
 let isAdmin = false;
+let userTier = 'free';
 
 // --- Public Functions ---
 export function initializeSupabase(onAuthStateChange) {
@@ -21,10 +22,41 @@ export function initializeSupabase(onAuthStateChange) {
     supabase.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         isAdmin = session?.user?.user_metadata?.role === 'admin';
+        userTier = currentUser?.user_metadata?.tier || 'free';
         if (onAuthStateChange) {
-            onAuthStateChange(); // Callback to update UI
+            onAuthStateChange(currentUser); // Callback to update UI
         }
     });
+}
+
+export async function checkAuth() {
+    try {
+        if (!supabase || !supabase.auth) {
+            console.error('Supabase client or auth is not available. Make sure the client is properly initialized.');
+            return false;
+        }
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+            currentUser = session.user;
+            // Determine user tier
+            userTier = currentUser.user_metadata?.tier || 'free';
+            // Only treat explicit admin role as admin
+            isAdmin = currentUser.user_metadata?.role === 'admin';
+            
+            console.log('User authenticated:', currentUser.email);
+            console.log('User metadata:', currentUser.user_metadata);
+            console.log('Tier:', userTier, 'Admin:', isAdmin);
+            return true;
+        } else {
+            console.log('No active session');
+            return false;
+        }
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+    }
 }
 
 export async function signInUser() {
@@ -83,6 +115,20 @@ export async function signOut() {
     }
 }
 
+export function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+export function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
 export function getCurrentUser() {
     return currentUser;
 }
@@ -91,33 +137,14 @@ export function getIsAdmin() {
     return isAdmin;
 }
 
+export function getUserTier() {
+    return userTier;
+}
+
 export function getIsEnterprise() {
-    return currentUser?.user_metadata?.tier === 'enterprise';
+    return userTier === 'enterprise';
 }
 
 export function getIsFree() {
-    return !currentUser?.user_metadata?.tier || currentUser.user_metadata.tier === 'free';
-}
-
-// --- Auth Modal Logic ---
-export function showAuthModal(tab = 'signin') {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        switchAuthTab(tab);
-    }
-}
-
-export function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-export function switchAuthTab(tab) {
-    document.getElementById('signInTab').classList.toggle('active', tab === 'signin');
-    document.getElementById('signUpTab').classList.toggle('active', tab === 'signup');
-    document.getElementById('signInForm').classList.toggle('active', tab === 'signin');
-    document.getElementById('signUpForm').classList.toggle('active', tab === 'signup');
+    return userTier === 'free';
 }

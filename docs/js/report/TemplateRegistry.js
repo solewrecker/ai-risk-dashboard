@@ -6,9 +6,9 @@
  */
 
 
-import standardTemplate from './standard-template.js';
+import standardTemplate from './templates/standard-template.js';
 import premiumTemplate from './premium-template.js';
-import ErrorBoundaryTemplates from '../ErrorBoundaryTemplates.js';
+import ErrorBoundaryTemplates from './ErrorBoundaryTemplates.js';
 
 class TemplateRegistry {
   constructor() {

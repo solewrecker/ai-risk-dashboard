@@ -68,7 +68,7 @@
   box-shadow: 0 8px 20px #0003;
 }
 
-.template-card.selected {
+.template-card.selected, .template-card--selected {
   border-color: var(--color-blue-400);
   background: var(--color-blue-900-transparent);
   box-shadow: 0 0 0 3px var(--color-blue-500-transparent);
@@ -417,17 +417,17 @@
   display: flex;
 }
 
-.export-choice-section {
+.export-choice__section {
   flex: 1;
 }
 
-.export-choice-title {
+.export-choice__title {
   margin-bottom: .5rem;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
-.export-choice-subtitle {
+.export-choice__subtitle {
   color: #9ca3af;
   margin-bottom: 1.25rem;
   font-size: .9rem;
@@ -453,7 +453,7 @@
   padding: 1rem;
 }
 
-.custom-notice {
+.custom-sections__notice {
   color: #9ca3af;
   background: #1f2937;
   border: 1px solid #374151;
@@ -463,18 +463,33 @@
   font-size: .8rem;
 }
 
-.mix-match-selector {
+.custom-sections__notice.active {
+  color: #e2e8f0;
+  background: #1e3a8a;
+  border-color: #3b82f6;
+}
+
+.custom-sections__selector {
   flex-direction: column;
   gap: .75rem;
   display: flex;
 }
 
-.mix-match-selector__section-toggle {
+.custom-sections__toggle {
   border-bottom: 1px solid #374151;
   align-items: center;
   gap: .75rem;
   padding: .625rem 0;
+  transition: color .2s;
   display: flex;
+}
+
+.custom-sections__toggle.active {
+  color: #3b82f6;
+}
+
+.custom-sections__toggle input[type="checkbox"] {
+  accent-color: #3b82f6;
 }
 
 .export-mode-indicator {
@@ -486,7 +501,7 @@
   font-size: .75rem;
 }
 
-.export-preview-panel {
+.export-preview {
   background: #1a1f2e;
   border: 1px solid #2d3748;
   border-radius: 8px;
@@ -494,13 +509,23 @@
   padding: 1.25rem;
 }
 
-.export-preview-title {
+.export-preview__title {
   color: #3b82f6;
   margin-bottom: .75rem;
   font-weight: 600;
 }
 
-.export-preview-status {
+.export-preview__sections {
+  margin-bottom: 1rem;
+}
+
+.export-preview__item {
+  color: #d1d5db;
+  border-bottom: 1px solid #2d3748;
+  padding: .5rem 0;
+}
+
+.export-preview__status {
   color: #9ca3af;
   margin-top: .75rem;
   font-size: .75rem;

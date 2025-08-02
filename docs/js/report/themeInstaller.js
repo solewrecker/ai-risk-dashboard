@@ -199,12 +199,22 @@ export class ThemeInstaller {
     });
     
     // Register with theme registry
-    this.themeRegistry.registerTheme(name, {
+    const themeConfig = {
+      id: name,
       name,
       displayName: displayName || name,
       description: description || '',
       paths: themePaths
-    });
+    };
+    
+    // Handle different parameter orders between systems
+    if (this.themeRegistry instanceof window.ScalableThemeSystem) {
+      console.log(`ThemeInstaller: Registering theme ${name} with ScalableThemeSystem`);
+      this.themeRegistry.registerTheme(name, themeConfig);
+    } else {
+      console.log(`ThemeInstaller: Registering theme ${name} with ThemeRegistry`);
+      this.themeRegistry.registerTheme(name, themeConfig);
+    }
   }
   
   /**

@@ -160,11 +160,11 @@
       });
     }
   }
-})({"6IEMQ":[function(require,module,exports,__globalThis) {
+})({"jGZs3":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
-var HMR_SERVER_PORT = 1234;
+var HMR_SERVER_PORT = 8080;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "439701173a9199ea";
 var HMR_USE_SSE = false;
@@ -906,10 +906,14 @@ let currentUser = null;
 let isAdmin = false;
 function initializeSupabase(onAuthStateChange) {
     console.log('Supabase client initialized.');
+    if (!(0, _supabaseClientJs.supabase) || !(0, _supabaseClientJs.supabase).auth) {
+        console.error('Supabase client or auth is not available. Make sure the client is properly initialized.');
+        return;
+    }
     (0, _supabaseClientJs.supabase).auth.onAuthStateChange((event, session)=>{
         currentUser = session?.user || null;
         isAdmin = session?.user?.user_metadata?.role === 'admin';
-        onAuthStateChange(); // Callback to update UI
+        if (onAuthStateChange) onAuthStateChange(); // Callback to update UI
     });
 }
 async function signInUser() {
@@ -1000,122 +1004,51 @@ function switchAuthTab(tab) {
 
 },{"../supabase-client.js":"eoCsO","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eoCsO":[function(require,module,exports,__globalThis) {
 // docs/js/supabase-client.js
-// Use the global Supabase object loaded from CDN in index.html
+// This file provides a consistent way to access the Supabase client across the application
+// Constants for Supabase connection
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-// Export the Supabase client
 parcelHelpers.export(exports, "supabase", ()=>supabase);
 const SUPABASE_URL = 'https://lgybmsziqjdmmxdiyils.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWJtc3ppcWpkbW14ZGl5aWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MTAzOTcsImV4cCI6MjA2NjI4NjM5N30.GFqiwK2qi3TnlUDCmdFZpG69pqdPP-jpbxdUGX6VlSg';
-// Check if Supabase is available globally (from CDN)
-let supabase;
-// Initialize the global Supabase client if it doesn't exist
-if (typeof window !== 'undefined') {
-    if (window.supabase) {
-        // Use the global Supabase object if available
-        console.log('Using global Supabase client from CDN');
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else if (typeof window.supabaseClient !== 'undefined') {
-        // Use existing client if already initialized
-        console.log('Using existing Supabase client');
-        supabase = window.supabaseClient;
-    } else if (typeof window.createClient !== 'undefined') {
-        // Use the global createClient function if available
-        console.log('Creating Supabase client with global createClient');
-        supabase = window.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        // Store for reuse
-        window.supabaseClient = supabase;
-    } else {
-        // Fallback to mock implementation for pages that don't load the CDN
-        console.log('Using mock Supabase client');
-        supabase = createMockClient();
-        // Store for reuse
-        window.supabaseClient = supabase;
-    }
+// Initialize Supabase client
+let supabaseClient;
+// Try to use the global client if available
+if (typeof window !== 'undefined' && window.supabaseClient) {
+    supabaseClient = window.supabaseClient;
+    console.log('Using globally initialized Supabase client');
+} else if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Created new Supabase client');
+    // Make it globally available
+    window.supabaseClient = supabaseClient;
+} else if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Created new Supabase client in module context');
 } else {
-    // Fallback for non-browser environments
-    console.log('Using mock Supabase client (non-browser environment)');
-    supabase = createMockClient();
-}
-// Mock client implementation for pages that don't load the CDN
-function createMockClient() {
-    return {
+    console.error('Supabase client could not be initialized. Make sure the Supabase library is loaded.');
+    // Create a dummy client to prevent errors
+    supabaseClient = {
         auth: {
-            getSession: async ()=>{
-                return {
+            onAuthStateChange: ()=>{},
+            getSession: async ()=>({
                     data: {
                         session: null
-                    },
-                    error: null
-                };
-            },
-            onAuthStateChange: (callback)=>{
-                console.log('Auth state change listener registered (mock)');
-                return ()=>{};
-            },
-            signInWithPassword: async ()=>{
-                console.log('Mock sign in');
-                return {
-                    error: new Error('Authentication not available in this view')
-                };
-            },
-            signUp: async ()=>{
-                console.log('Mock sign up');
-                return {
-                    error: new Error('Authentication not available in this view')
-                };
-            },
-            signOut: async ()=>{
-                console.log('Mock sign out');
-                return {
-                    error: null
-                };
-            }
-        },
-        from: (table)=>({
-                select: ()=>({
-                        execute: async ()=>({
-                                data: [],
-                                error: null
-                            }),
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: [],
-                                        error: null
-                                    }),
-                                single: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    }),
-                insert: ()=>({
-                        execute: async ()=>({
-                                data: {
-                                    id: 'mock-id'
-                                },
-                                error: null
-                            })
-                    }),
-                update: ()=>({
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    }),
-                delete: ()=>({
-                        eq: ()=>({
-                                execute: async ()=>({
-                                        data: null,
-                                        error: null
-                                    })
-                            })
-                    })
-            })
+                    }
+                }),
+            signInWithPassword: async ()=>({
+                    error: new Error('Supabase not initialized')
+                }),
+            signUp: async ()=>({
+                    error: new Error('Supabase not initialized')
+                }),
+            signOut: async ()=>({
+                    error: new Error('Supabase not initialized')
+                })
+        }
     };
 }
+const supabase = supabaseClient;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
@@ -1842,6 +1775,6 @@ function getScoreDescription(score, level, toolName) {
     return description;
 }
 
-},{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["6IEMQ","27cw3"], "27cw3", "parcelRequire4b35", {})
+},{"./scoring.js":"2mnUO","./auth.js":"lndTA","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["jGZs3","27cw3"], "27cw3", "parcelRequire4b35", {})
 
 //# sourceMappingURL=docs.9a1acb47.js.map

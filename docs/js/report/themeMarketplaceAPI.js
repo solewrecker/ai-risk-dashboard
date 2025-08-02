@@ -365,7 +365,14 @@ export class ThemeMarketplaceAPI {
       } else {
         // Fallback: Register theme with registry
         if (this.themeRegistry) {
-          this.themeRegistry.registerTheme(themeDetails);
+          // Handle different theme registration methods between systems
+          if (this.themeRegistry instanceof window.ScalableThemeSystem) {
+            console.log(`ThemeMarketplaceAPI: Registering theme with ScalableThemeSystem`);
+            this.themeRegistry.registerTheme(themeDetails.id, themeDetails);
+          } else {
+            console.log(`ThemeMarketplaceAPI: Registering theme with ThemeRegistry`);
+            this.themeRegistry.registerTheme(themeDetails);
+          }
         } else {
           throw new Error('No theme installer or registry available');
         }

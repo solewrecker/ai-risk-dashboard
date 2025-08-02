@@ -6,7 +6,8 @@
  * and renders the report using the template registry.
  */
 
-import { supabase } from '../supabase-client.js';
+// Use the global Supabase client initialized in export.html
+const supabase = window.supabaseClient;
 import Handlebars from 'handlebars';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -14,8 +15,8 @@ import { createIcons, icons } from 'lucide';
 
 // Import our new modules
 import ReportDataAdapter from './data/ReportDataAdapter.js';
-import TemplateRegistry from './templates/TemplateRegistry.js';
-import ThemeRegistry from './themes/ThemeRegistry.js';
+import TemplateRegistry from './TemplateRegistry.js';
+import ThemeRegistry from '../ThemeRegistry.js';
 import ThemeLoader from './themes/ThemeLoader.js';
 import ReportPreviewBridge from './report-preview-bridge.js';
 
@@ -65,10 +66,15 @@ class ReportPreview {
     });
 
     Handlebars.registerHelper('eq', function(a, b, options) {
-      if (a === b) {
-        return options.fn(this);
+      if (options && options.fn) {
+        // Block usage
+        if (a === b) {
+          return options.fn(this);
+        }
+        return options.inverse(this);
       }
-      return options.inverse(this);
+      // Inline usage
+      return a === b;
     });
 
     Handlebars.registerHelper('gt', function(a, b, options) {
@@ -80,6 +86,22 @@ class ReportPreview {
 
     Handlebars.registerHelper('JSONstringify', function(data) {
       return JSON.stringify(data, null, 2);
+    });
+
+    // Typeof helper
+    Handlebars.registerHelper('typeof', function(value) {
+      return typeof value;
+    });
+
+    // Format date helper
+    Handlebars.registerHelper('formatDate', function(date) {
+      if (!date) return '';
+      try {
+        const dateObj = new Date(date);
+        return dateObj.toLocaleDateString();
+      } catch (e) {
+        return date;
+      }
     });
   }
   
@@ -203,7 +225,17 @@ class ReportPreview {
       const themeName = selectedTheme || 'theme-corporate';
       const registeredTheme = this.previewBridge.registerThemeIfNeeded(themeName, themeData);
       await this.previewBridge.loadTheme(registeredTheme);
-      this.themeRegistry.activateTheme(registeredTheme, transformedData);
+      
+      // Handle different theme activation methods between systems
+      // Theme CSS is now loaded statically in HTML head to avoid MIME type issues
+      // if (this.themeRegistry && typeof this.themeRegistry.switchTheme === 'function') {
+      //   console.log(`ReportPreview: Switching to theme ${registeredTheme} with theme system`);
+      //   this.themeRegistry.switchTheme(registeredTheme, transformedData);
+      // } else {
+      //   console.log(`ReportPreview: Activating theme ${registeredTheme} with ThemeRegistry`);
+      //   this.themeRegistry.activateTheme(registeredTheme, transformedData);
+      // }
+      console.log(`ReportPreview: Using static theme ${registeredTheme} loaded in HTML head`);
       
       // 3. Register and render the template
       const template = this.templateRegistry.getTemplate(selectedTemplate || 'standard');

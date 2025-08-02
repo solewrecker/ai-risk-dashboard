@@ -35,14 +35,19 @@ window.processImport = processImport;
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Modern Dashboard initializing...');
-    
-        console.log('Supabase client initialized');
-    
 
-    initImport(supabase);
+    // Check if Supabase client is available
+    if (!window.supabaseClient) {
+        console.error('Supabase client is not initialized. Please check your configuration.');
+        return;
+    }
+    
+    console.log('Supabase client is ready, proceeding with dashboard initialization.');
+
+    initImport(window.supabaseClient);
 
     const isAuthenticated = await checkAuth();
-    
+
     if (isAuthenticated) {
         await initializeDashboard();
     } else {
