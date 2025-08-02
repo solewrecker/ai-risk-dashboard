@@ -7,11 +7,13 @@
  */
 
 // Use the global Supabase client initialized in export.html
-const supabase = window.supabaseClient;
-import Handlebars from 'handlebars';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import { createIcons, icons } from 'lucide';
+const supabase = window.supabaseClient || null;
+
+// Use global variables loaded from CDN instead of imports
+const Handlebars = window.Handlebars;
+const { jsPDF } = window.jspdf;
+const html2canvas = window.html2canvas;
+const { createIcons } = window.lucide;
 
 // Import our new modules
 import ReportDataAdapter from './data/ReportDataAdapter.js';
@@ -22,6 +24,20 @@ import ReportPreviewBridge from './report-preview-bridge.js';
 
 class ReportPreview {
   constructor(options = {}) {
+    // Check for required global dependencies
+    if (!window.Handlebars) {
+      throw new Error('Handlebars is not loaded. Please ensure the CDN script is included.');
+    }
+    if (!window.jspdf) {
+      throw new Error('jsPDF is not loaded. Please ensure the CDN script is included.');
+    }
+    if (!window.html2canvas) {
+      throw new Error('html2canvas is not loaded. Please ensure the CDN script is included.');
+    }
+    if (!window.lucide) {
+      throw new Error('Lucide is not loaded. Please ensure the CDN script is included.');
+    }
+    
     this.dataAdapter = new ReportDataAdapter();
     this.templateRegistry = new ReportTemplateRegistry();
     this.themeRegistry = new MainThemeRegistry();
@@ -168,6 +184,10 @@ class ReportPreview {
     }
 
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+      
       console.log(`Fetching report data from Supabase for assessment ID: ${assessmentId}`);
       const { data, error } = await supabase
         .from('assessments')
@@ -249,7 +269,9 @@ class ReportPreview {
       this.reportContentEl.innerHTML = fullReportHtml;
       
       // 5. Initialize icons and event listeners
-      createIcons({ icons });
+      if (window.lucide && window.lucide.createIcons) {
+        window.lucide.createIcons();
+      }
       
       // Add event listeners for download buttons
       const downloadPdfBtn = document.getElementById('download-pdf');
@@ -363,10 +385,7 @@ class ReportPreview {
   }
 }
 
-// Initialize the report preview when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  const reportPreview = new ReportPreview();
-  reportPreview.init();
-});
+// REMOVED: The DOMContentLoaded event listener that was causing double initialization
+// The class is now only initialized from the HTML file's module import
 
 export default ReportPreview;
