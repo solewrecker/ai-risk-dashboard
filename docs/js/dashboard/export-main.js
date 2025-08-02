@@ -637,10 +637,12 @@ function updatePreviewSection() {
 
 // Export functions for use in other modules
 export {
+    init,
     loadAssessments,
     renderAssessmentSelector,
     updateUI
 };
 
-// Also expose loadAssessments to the global scope for direct access
+// Also expose functions to the global scope for direct access
+window.init = init;
 window.loadAssessments = loadAssessments;

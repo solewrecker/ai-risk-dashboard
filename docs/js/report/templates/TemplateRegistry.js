@@ -124,9 +124,7 @@ registerTemplate(name, templateString, components = [], options = {}) {
     try {
       // Validate data against expected schema
       if (!this.validateDataForTemplate(templateName, data)) {
-        console.warn(`Data validation failed for template '${templateName}'. Using fallback data.`);
-        // Continue with rendering but use fallback data where needed
-        data = this.applyFallbackData(templateName, data);
+        throw new Error(`Data validation failed for template '${templateName}'. No fallback data is allowed.`);
       }
       
       // Register partial for each component used in this template
@@ -443,67 +441,7 @@ registerTemplate(name, templateString, components = [], options = {}) {
     return true;
   }
   
-  /**
-   * Applies fallback data for missing or invalid fields
-   * @param {string} templateName - The name of the template
-   * @param {Object} data - The original data
-   * @returns {Object} The data with fallbacks applied
-   */
-  applyFallbackData(templateName, data) {
-    // Create a copy of the data to avoid modifying the original
-    const fallbackData = { ...data };
-    
-    // Define fallback values for each template
-    const fallbacks = {
-      'standard': {
-        name: 'Unnamed Tool',
-        vendor: 'Unknown Vendor',
-        risk_level: 'MEDIUM',
-        total_score: 50,
-        assessment_date: new Date().toISOString().split('T')[0],
-        currentDate: new Date().toLocaleDateString(),
-        currentYear: new Date().getFullYear(),
-        assessor_name: 'System',
-        executive_summary: 'No summary available.',
-        key_findings: ['No findings available.'],
-        risk_categories: [],
-        recommendations: [],
-        include_detailed_analysis: false
-      }
-      // Add more templates as needed
-    };
-    
-    // Get fallbacks for this template
-    const templateFallbacks = fallbacks[templateName];
-    if (!templateFallbacks) {
-      // No fallbacks defined for this template
-      return fallbackData;
-    }
-    
-    // Apply fallbacks for missing fields
-    Object.entries(templateFallbacks).forEach(([field, value]) => {
-      if (fallbackData[field] === undefined || fallbackData[field] === null) {
-        fallbackData[field] = value;
-      }
-    });
-    
-    // Special handling for nested data
-    if (templateName === 'standard') {
-      // Ensure risk_level_lowercase is set
-      if (fallbackData.risk_level) {
-        fallbackData.risk_level_lowercase = fallbackData.risk_level.toLowerCase();
-      }
-      
-      // Ensure empty arrays for collections
-      ['risk_categories', 'recommendations', 'key_findings'].forEach(field => {
-        if (!Array.isArray(fallbackData[field])) {
-          fallbackData[field] = [];
-        }
-      });
-    }
-    
-    return fallbackData;
-  }
+
 
   /**
    * Registers common Handlebars helpers

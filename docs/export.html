@@ -395,12 +395,12 @@
                     if (session) {
                         console.log('User is logged in, loading assessments...');
                         // The export-main.js module is loaded via script tag
-                        // Wait for it to be fully loaded
+                        // Wait for it to be fully loaded and call init function
                         setTimeout(() => {
-                            if (typeof window.loadAssessments === 'function') {
-                                window.loadAssessments();
+                            if (typeof window.init === 'function') {
+                                window.init();
                             } else {
-                                console.error('loadAssessments function not found in global scope');
+                                console.error('init function not found in global scope');
                             }
                         }, 500); // Give a small delay to ensure the module is loaded
                     } else {
