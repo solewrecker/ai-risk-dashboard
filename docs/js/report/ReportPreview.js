@@ -15,17 +15,17 @@ import { createIcons, icons } from 'lucide';
 
 // Import our new modules
 import ReportDataAdapter from './data/ReportDataAdapter.js';
-import TemplateRegistry from './TemplateRegistry.js';
-import ThemeRegistry from '../ThemeRegistry.js';
-import ThemeLoader from './themes/ThemeLoader.js';
+import ReportTemplateRegistry from './TemplateRegistry.js';
+import MainThemeRegistry from '../ThemeRegistry.js';
+import MainThemeLoader from '../ThemeLoader.js';
 import ReportPreviewBridge from './report-preview-bridge.js';
 
 class ReportPreview {
   constructor(options = {}) {
     this.dataAdapter = new ReportDataAdapter();
-    this.templateRegistry = new TemplateRegistry();
-    this.themeRegistry = new ThemeRegistry();
-    this.themeLoader = new ThemeLoader();
+    this.templateRegistry = new ReportTemplateRegistry();
+    this.themeRegistry = new MainThemeRegistry();
+    this.themeLoader = new MainThemeLoader();
     this.previewBridge = new ReportPreviewBridge();
     
     // Set the base URL for theme files
