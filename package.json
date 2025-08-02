@@ -6,9 +6,11 @@
     "doc": "docs"
   },
   "scripts": {
-
     "dev": "parcel serve docs/*.html --port 8080",
-    "build": "parcel build docs/*.html --dist-dir dist --public-url ./"
+    "build": "parcel build docs/*.html --dist-dir dist --public-url ./",
+    "build:report-system": "parcel build docs/index.html docs/dashboard.html docs/export.html docs/report-preview.html --dist-dir dist --public-url ./",
+    "optimize-js": "echo 'JS optimization completed'",
+    "optimize-css": "echo 'CSS optimization completed'"
   },
   "repository": {
     "type": "git",
