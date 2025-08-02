@@ -228,14 +228,13 @@ class ReportPreview {
       
       // Handle different theme activation methods between systems
       // Theme CSS is now loaded statically in HTML head to avoid MIME type issues
-      // if (this.themeRegistry && typeof this.themeRegistry.switchTheme === 'function') {
-      //   console.log(`ReportPreview: Switching to theme ${registeredTheme} with theme system`);
-      //   this.themeRegistry.switchTheme(registeredTheme, transformedData);
-      // } else {
-      //   console.log(`ReportPreview: Activating theme ${registeredTheme} with ThemeRegistry`);
-      //   this.themeRegistry.activateTheme(registeredTheme, transformedData);
-      // }
-      console.log(`ReportPreview: Using static theme ${registeredTheme} loaded in HTML head`);
+      if (this.themeRegistry && typeof this.themeRegistry.switchTheme === 'function') {
+        console.log(`ReportPreview: Switching to theme ${registeredTheme} with theme system`);
+        this.themeRegistry.switchTheme(registeredTheme, transformedData);
+      } else {
+        console.log(`ReportPreview: Activating theme ${registeredTheme} with ThemeRegistry`);
+        this.themeRegistry.activateTheme(registeredTheme, transformedData);
+      }
       
       // 3. Register and render the template
       const template = this.templateRegistry.getTemplate(selectedTemplate || 'standard');
